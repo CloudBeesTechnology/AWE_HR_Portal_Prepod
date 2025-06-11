@@ -30,6 +30,8 @@ import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { TimeSheetSpinner } from "./customTimeSheet/TimeSheetSpinner";
 import { UnlockVerifiedCellVS } from "./customTimeSheet/UnlockVerifiedCellVS";
 import PopupForDuplicateFileAlert from "./ModelForSuccessMess/PopupForDuplicateFileAlert";
+import { useTableMergedData } from "./customTimeSheet/useTableMergedData";
+import PopupForCheckBadgeNo from "./ModelForSuccessMess/PopupForCheckBadgeNo";
 
 const client = generateClient();
 export const ViewORMCsheet = ({
@@ -76,6 +78,9 @@ export const ViewORMCsheet = ({
   const [changePopupMessage, setChangePopupMessage] = useState(null);
   const [popupMess, setPopupMess] = useState({});
 
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
   const [toggleForRemark, setToggleForRemark] = useState(null);
   const [allApprovedData, setAllApprovedData] = useState([]);
   const [allRejectedData, setAllRejectedData] = useState([]);
@@ -84,10 +89,10 @@ export const ViewORMCsheet = ({
   const [currentPage, setCurrentPage] = useState(1);
 
   let visibleData;
-
+  const [finalData, setFinalData] = useState([]);
   const [storingMess, setStoringMess] = useState(null);
-  const processedData = useTableMerged(excelData);
-
+  const { data: processedData } = useTableMerged(excelData);
+  const { empAndWorkInfo } = useTableMergedData();
   const mergedData = AutoFetchForAssignManager();
   const { startDate, endDate, searchQuery, setSearchQuery } = useTempID();
 
@@ -705,7 +710,53 @@ export const ViewORMCsheet = ({
     }
   }, [changePopupMessage]);
 
-  const storeInitialData = async () => {
+  const checkBadgeNoOrNWHPD = async (data, decision) => {
+    if (decision === "Allowed") return false;
+    let hasMissingField = false;
+    let message = "";
+
+    for (let emp of data) {
+      const badge = emp.empBadgeNo?.toString()?.trim();
+      const workHrs = emp.normalWorkHrs?.toString()?.trim();
+
+      if (!badge || badge === "N/A" || badge === "0") {
+        hasMissingField = true;
+        message =
+          "Some records are missing the Badge Number. Please update the Excel sheet accordingly.";
+        // return true;
+        break;
+      }
+
+      if (!workHrs || workHrs === "0" || workHrs === "N/A") {
+        hasMissingField = true;
+        message =
+          "One or more records have missing 'Normal Working Hours Per Day'.";
+        // return true;
+        break;
+      }
+    }
+
+    if (hasMissingField) {
+      setAlertMessage(message);
+      setShowConfirm(true);
+      return true;
+    } else {
+      console.log("All required fields are filled. Proceeding...");
+      // storeInitialData();
+      return false;
+      // Proceed with your action here
+    }
+  };
+
+  const handleDecision = (decision) => {
+    setShowConfirm(false);
+    // if (decision === "Allowed") {
+    storeInitialData(decision);
+    // }
+  };
+
+  const storeInitialData = async (decision) => {
+    if (decision === "Denied") return;
     const result =
       data &&
       data.length > 0 &&
@@ -714,7 +765,7 @@ export const ViewORMCsheet = ({
           fileName: fileName,
           empName: val.NAME || "",
           empDept: val.DEPTDIV || "",
-          empBadgeNo: val.BADGE || "",
+          empBadgeNo: val.BADGE || "N/A",
           date: val.DATE || "",
           inTime: val.IN || "",
           outTime: val.OUT || "",
@@ -722,7 +773,7 @@ export const ViewORMCsheet = ({
           allDayHrs: val.ALLDAYMINHRS || "",
           netMins: val.NETMINUTES || "",
           totalHrs: val.TOTALHOURS || "",
-          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || "0",
           actualWorkHrs: val.WORKINGHOURS || "",
           otTime: val.OT || "",
           remarks: val.REMARKS || "",
@@ -736,6 +787,10 @@ export const ViewORMCsheet = ({
 
     let identifier = "create";
     let finalResult = result;
+    let resultOfBadgeNo = await checkBadgeNoOrNWHPD(finalResult, decision);
+
+    if (resultOfBadgeNo) return;
+
     const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
       {
         finalResult,
@@ -786,8 +841,6 @@ export const ViewORMCsheet = ({
     } = storePreSubmitData;
 
     if (Array.isArray(finalResult) && finalResult.length === 0) return;
-
-    
 
     await TimeSheetsCRUDoperations({
       finalResult,
@@ -906,8 +959,37 @@ export const ViewORMCsheet = ({
     }
   }, [startDate, endDate, secondaryData, searchQuery]);
 
+  useEffect(() => {
+    if (!Array.isArray(empAndWorkInfo) || !Array.isArray(data)) return;
+    // Create a map for quick lookup
+    const empInfoMap = new Map();
+
+    if (Array.isArray(empAndWorkInfo)) {
+      empAndWorkInfo.forEach((item) => {
+        empInfoMap.set(String(item.empBadgeNo).toUpperCase(), item);
+      });
+    }
+
+    // Process visibleData
+    const addedNWHPD =
+      Array.isArray(data) &&
+      data.map((val) => {
+        const badgeKey = String(val.BADGE).toUpperCase();
+        const workInfoItem = empInfoMap.get(badgeKey);
+
+        return {
+          ...val,
+          NORMALWORKINGHRSPERDAY: workInfoItem
+            ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
+            : "0",
+        };
+      });
+
+    setFinalData(addedNWHPD);
+  }, [empAndWorkInfo, data]);
+
   const itemsPerPage = 25;
-  const safeData = data || [];
+  const safeData = finalData || [];
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -918,6 +1000,7 @@ export const ViewORMCsheet = ({
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   // currentData.sort((a, b) => a.NAME.localeCompare(b.NAME));
   visibleData = currentData;
+
   return (
     <div>
       <div>
@@ -1326,6 +1409,7 @@ export const ViewORMCsheet = ({
           Position={Position}
           handleSubmit={handleSubmit}
           editFormTitle={editFormTitle}
+          empAndWorkInfo={empAndWorkInfo}
         />
       )}
       {storingMess === true ? (
@@ -1405,6 +1489,13 @@ export const ViewORMCsheet = ({
         />
       ) : (
         ""
+      )}
+
+      {showConfirm && (
+        <PopupForCheckBadgeNo
+          handleDecision={handleDecision}
+          alertMessage={alertMessage}
+        />
       )}
     </div>
   );

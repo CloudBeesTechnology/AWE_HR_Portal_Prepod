@@ -17,11 +17,13 @@ export const EditTimeSheet = ({
   Position,
   handleSubmit,
   editFormTitle,
+  empAndWorkInfo,
 }) => {
   const [jobCode, setJobCode] = useState(null);
   const [allLocation, setAllLocation] = useState(null);
 
   const [warningMess, setWarningMess] = useState(null);
+  const [warningStaffLevelEmp, setWarningStaffLevelEmp] = useState(false);
   const [warningMessForAdinin, setWarningMessForAdinin] = useState(null);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [errors, setErrors] = useState({});
@@ -265,199 +267,150 @@ export const EditTimeSheet = ({
   }, []);
 
   useEffect(() => {
-    const formatTime = (decimalHours) => {
-      const hours = Math.floor(decimalHours);
-      const minutes = Math.round((decimalHours - hours) * 60);
-      return `${hours}:${minutes.toString().padStart(2, "0")}`;
-    };
-
-    // From
-    const updateFormData = (workingHoursKey, actualHoursKey) => {
-      // };
-      try {
-        const ConvertHours = (sections) => {
-          let totalMinutes = 0;
-
-          if (sections) {
-            let time = sections?.includes(".")
-              ? sections?.replace(".", ":")
-              : sections;
-
-            if (!time.includes(":")) {
-              time = `${time}:00`;
-            }
-
-            const [hours, minutes] = time?.split(":").map(Number);
-
-            if (isNaN(hours) || isNaN(minutes)) {
-              throw new Error("Invalid time format");
-            }
-
-            totalMinutes = hours * 60 + minutes;
+    try {
+      function addHoursMinutesFormat(input) {
+        try {
+          // If input contains colon (e.g., "8:30")
+          if (input?.includes(":")) {
+            const [hours, minutes] = input?.split(":")?.map(Number);
+            return `${hours}:${minutes?.toString()?.padStart(2, "0")}`;
           }
 
-          const outputHours = Math.floor(totalMinutes / 60);
-          const outputMinutes = totalMinutes % 60;
-          return `${outputHours}:${outputMinutes.toString().padStart(2, "0")}`;
-        };
+          // If input contains decimal (e.g., "7.30")
+          if (input?.includes(".")) {
+            const [hours, decimal] = input?.split(".")?.map(Number);
 
-        const sumHoursAndMinutes = (sections, key) => {
-          let totalMinutes = sections?.reduce((total, sec) => {
-            if (sec[key]) {
-              let time = sec[key]?.includes(".")
-                ? sec[key]?.replace(".", ":")
-                : sec[key];
-
-              if (!time?.includes(":")) {
-                time = `${time}:00`;
-              }
-
-              const [hours, minutes] = time?.split(":")?.map(Number);
-              total += hours * 60 + (minutes || 0);
-            }
-            return total;
-          }, 0);
-
-          const hours = Math.floor(totalMinutes / 60);
-          const minutes = totalMinutes % 60;
-          return `${hours}:${minutes.toString().padStart(2, "0")}`;
-        };
-
-        let totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
-        let totalOvertimeHrs = sumHoursAndMinutes(sections, "OVERTIMEHRS");
-
-        setFormData((prevFormData) => {
-          const updatedWorkingHours =
-            parseFloat(totalWorkingHrs?.split(":")[0]) +
-            parseFloat(totalWorkingHrs?.split(":")[1]) / 60;
-          const normalWH = ConvertHours(prevFormData?.NORMALWORKINGHRSPERDAY);
-          const convertNWPD =
-            parseFloat(normalWH?.split(":")[0]) +
-            parseFloat(normalWH?.split(":")[1]) / 60;
-
-          const calculatedOT =
-            updatedWorkingHours - convertNWPD <= 0
-              ? 0
-              : updatedWorkingHours - convertNWPD;
-
-          setWarningMess(updatedWorkingHours > convertNWPD);
-          try {
-            if (
-              typeof parseFloat(prevFormData?.ADININWORKSENGINEERINGSDNBHD) ===
-                "number" &&
-              prevFormData?.ADININWORKSENGINEERINGSDNBHD?.includes(":")
-            ) {
-              const adininWorks = ConvertHours(
-                prevFormData?.ADININWORKSENGINEERINGSDNBHD
-              );
-              const adinin =
-                parseFloat(adininWorks?.split(":")[0]) +
-                parseFloat(adininWorks?.split(":")[1]) / 60;
-
-              const updatedTotalOvertimeHrs =
-                parseFloat(totalOvertimeHrs?.split(":")[0]) +
-                parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
-
-              if (updatedWorkingHours + updatedTotalOvertimeHrs > adinin) {
-                setWarningMessForAdinin(
-                  updatedWorkingHours + updatedTotalOvertimeHrs > adinin
-                );
-              } else {
-                setWarningMessForAdinin(false);
-              }
-            } else if (
-              prevFormData?.ADININWORKSENGINEERINGSDNBHD?.includes("h")
-            ) {
-              try {
-                function convertToTimeFormat(timeStr) {
-                  return timeStr.replace(/(\d+)h\s*(\d+)m/, "$1:$2");
-                }
-
-                // Example usage
-                const input = prevFormData?.ADININWORKSENGINEERINGSDNBHD;
-                const adininworksEngineering = convertToTimeFormat(input);
-
-                const adininWorks = ConvertHours(adininworksEngineering);
-                const adinin =
-                  parseFloat(adininWorks?.split(":")[0]) +
-                  parseFloat(adininWorks?.split(":")[1]) / 60;
-
-                const updatedTotalOvertimeHrs =
-                  parseFloat(totalOvertimeHrs?.split(":")[0]) +
-                  parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
-
-                if (updatedWorkingHours + updatedTotalOvertimeHrs > adinin) {
-                  setWarningMessForAdinin(
-                    updatedWorkingHours + updatedTotalOvertimeHrs > adinin
-                  );
-                } else {
-                  setWarningMessForAdinin(false);
-                }
-              } catch (err) {}
-            } else {
-              if (updatedWorkingHours > convertNWPD) {
-                setWarningMess(updatedWorkingHours > convertNWPD);
-              } else {
-                setWarningMessForAdinin(false);
-              }
-            }
-          } catch (err) {
-            console.log(err);
+            return `${hours}:${decimal?.toString()?.padStart(2, "0")}`;
           }
-          return {
-            ...prevFormData,
-            [actualHoursKey]:
-              totalWorkingHrs?.includes("NaN") || !totalWorkingHrs
-                ? "0:00"
-                : totalWorkingHrs,
-            OT: formatTime(calculatedOT)?.includes("NaN")
-              ? "0:00"
-              : formatTime(calculatedOT),
-          };
-        });
-      } catch (err) {
-        console.log("Error : ", err);
+
+          // Default case: whole number string (e.g., "8")
+          const hours = parseInt(input, 10);
+          return `${hours}:00`;
+        } catch (err) {
+          console.log("Error : ", err);
+        }
       }
-    };
-    // End
+      // From
+      const updateFormData = (workingHoursKey, actualHoursKey) => {
+        // };
+        try {
+          const sumHoursAndMinutes = (sections, key) => {
+            let totalDecimalHours = sections?.reduce((total, sec) => {
+              if (sec[key]) {
+                const decimal = parseFloat(sec[key]);
+                total += decimal;
+              }
+              return total;
+            }, 0);
 
-    if (titleName === "HO") {
-      updateFormData("TOTALACTUALHOURS", "TOTALACTUALHOURS");
-    } else if (titleName === "BLNG") {
-      updateFormData("WORKINGHOURS", "WORKINGHOURS");
-    } else {
-      updateFormData("WORKINGHOURS", "WORKINGHOURS");
+            // Round to two decimals and convert back to HH:100 format
+            const hours = Math.floor(totalDecimalHours);
+            const hundredMinutes = Math.round(
+              (totalDecimalHours - hours) * 100
+            );
+
+            // Correct if minutes reach 100
+            const adjustedHours = hours + Math.floor(hundredMinutes / 100);
+            const adjustedMinutes = hundredMinutes % 100;
+
+            return `${adjustedHours}:${adjustedMinutes
+              .toString()
+              .padStart(2, "0")}`;
+          };
+
+          console.log("sections : ", sections);
+          let totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
+
+          setFormData((prevFormData) => {
+            const [workingHoursPart, workingMinutesPart] = totalWorkingHrs
+              ?.split(":")
+              .map(Number);
+            const updatedWorkingHours =
+              workingHoursPart + workingMinutesPart / 100; // HH:100 basis
+
+            const [normalHoursPart, normalMinutesPart] = addHoursMinutesFormat(
+              prevFormData?.NORMALWORKINGHRSPERDAY
+            )
+              ?.split(":")
+              .map(Number);
+            const convertNWPD = normalHoursPart + normalMinutesPart / 100; // HH:100 basis
+
+            const isOvertime = updatedWorkingHours > convertNWPD;
+            setWarningMess(isOvertime);
+
+            try {
+              if (isOvertime) {
+                setWarningMess(true);
+              } else {
+                setWarningMessForAdinin(false);
+                setWarningStaffLevelEmp(false);
+              }
+            } catch (err) {
+              console.log(err);
+            }
+
+            return {
+              ...prevFormData,
+              [actualHoursKey]:
+                totalWorkingHrs?.includes("NaN") || !totalWorkingHrs
+                  ? "0:00"
+                  : totalWorkingHrs,
+            };
+          });
+        } catch (err) {
+          console.log("Error : ", err);
+        }
+      };
+      // End
+
+      console.log("sections : ", sections);
+      if (titleName === "HO") {
+        updateFormData("TOTALACTUALHOURS", "TOTALACTUALHOURS");
+      } else if (titleName === "BLNG") {
+        updateFormData("WORKINGHOURS", "WORKINGHOURS");
+      } else {
+        updateFormData("WORKINGHOURS", "WORKINGHOURS");
+      }
+    } catch (err) {
+      console.log("Error : ", err);
     }
   }, [sections]);
 
   useEffect(() => {
-    const totalOvertimeHrs = sections?.reduce((total, sec) => {
+    const totalDecimalOvertime = sections?.reduce((total, sec) => {
       try {
         let overtime = sec.OVERTIMEHRS || "0:00";
 
-        if (overtime?.includes(".")) {
-          overtime = overtime?.replace(".", ":");
-        } else if (!overtime.includes(":")) {
-          overtime = `${overtime}:00`;
+        // Convert overtime string to decimal value
+        if (overtime?.includes(":")) {
+          const [hrs, mins] = overtime?.split(":")?.map(Number);
+          overtime = hrs + mins / 100; // Convert HH:MM to HH.XX (100-base)
+        } else {
+          overtime = parseFloat(overtime); // Already in decimal format
         }
 
-        const [hrs, mins] = overtime?.split(":").map(Number);
-        return total + hrs * 60 + mins;
+        return total + (isNaN(overtime) ? 0 : overtime);
       } catch (err) {
-        return "0:00";
+        return total;
       }
     }, 0);
 
-    const hours = Math.floor(totalOvertimeHrs / 60);
-    const minutes = totalOvertimeHrs % 60;
-    const formattedTime = `${hours}:${minutes.toString().padStart(2, "0")}`;
+    // Convert totalDecimalOvertime to HH:100 format
+    const hours = Math.floor(totalDecimalOvertime);
+    const hundredMinutes = Math.round((totalDecimalOvertime - hours) * 100);
 
-    if (totalOvertimeHrs > 0) {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        OT: formattedTime,
-      }));
-    }
+    // Adjust if minutes >= 100
+    const adjustedHours = hours + Math.floor(hundredMinutes / 100);
+    const adjustedMinutes = hundredMinutes % 100;
+
+    const formattedTime = `${adjustedHours}:${adjustedMinutes
+      .toString()
+      .padStart(2, "0")}`;
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      OT: totalDecimalOvertime > 0 ? formattedTime : "0:00",
+    }));
   }, [sections]);
 
   const addJCandLocaWhrs = useCallback(() => {
@@ -503,18 +456,229 @@ export const EditTimeSheet = ({
     });
     setSections(result);
   };
+
   const handleValidation = () => {
     const newErrors = {};
     sections?.forEach((section, index) => {
       if (!section.LOCATION) {
         newErrors[`LOCATION-${index}`] = "Location is required.";
       }
+      // Switch-case style logic using Object.keys
+      if (editObject && typeof editObject === "object") {
+        Object.keys(editObject).forEach((key) => {
+          const value = editObject[key]?.toString().trim();
+
+          switch (key) {
+            case "BADGE":
+              if (!value || value === "N/A" || value === "0") {
+                newErrors["badgeNo"] = "Badge Number is required.";
+              }
+              break;
+
+            case "FID":
+              if (!value || value === "N/A" || value === "0") {
+                newErrors["fid"] = "FID or SAP Number is required.";
+              }
+              break;
+
+            case "NO":
+              if (!value || value === "N/A" || value === "0") {
+                newErrors["no"] = "FID or SAP Number is required.";
+              }
+              break;
+
+            case "NORMALWORKINGHRSPERDAY":
+              if (!value || value === "N/A" || value === "0") {
+                newErrors["NWHPD"] = "Working hours per day is required.";
+              }
+              break;
+
+            // Add other validations here if needed
+            default:
+              break;
+          }
+        });
+      }
     });
+    console.log("newErrors : ", newErrors);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const getEmpAndWorkInfo = (empAndWorkInfo, fileType) => {
+    const firstExcelTypes = ["Offshore", "Offshore's ORMC"];
+    const secondExcelTypes = ["HO", "SBW", "ORMC"];
+    return empAndWorkInfo?.filter((fi) => {
+      if (
+        editObject?.BADGE &&
+        fi?.empBadgeNo &&
+        editObject?.BADGE === fi?.empBadgeNo &&
+        secondExcelTypes.includes(fileType)
+      ) {
+        return fi;
+      }
+      if (
+        editObject?.NO &&
+        fi?.sapNo &&
+        editObject?.NO === fi?.sapNo &&
+        firstExcelTypes.includes(fileType)
+      ) {
+        return fi;
+      }
+
+      if (
+        editObject?.FID &&
+        fi?.sapNo &&
+        editObject?.FID === fi?.sapNo &&
+        fileType === "BLNG"
+      ) {
+        return fi;
+      }
+    })[0];
+  };
+
+  //   const getEmpAndWorkInfo = (empAndWorkInfo) => {
+  //   return empAndWorkInfo?.find((fi) => {
+  //     return (
+  //       (editObject.empBadgeNo && fi.empBadgeNo && editObject.empBadgeNo === fi.empBadgeNo) ||
+  //       (editObject.fidNo && fi.sapNo && editObject.fidNo === fi.sapNo)
+  //     );
+  //   });
+  // };
+
+  function formatToHHColonMM(input) {
+    const str = input?.toString();
+
+    // Case 1: "4" → "4:00"
+    if (/^\d+$/.test(str)) {
+      return `${str}:00`;
+    }
+
+    // Case 2: "5.3" or "5.30" → "5:30" or "5:03" logic based on minute length
+    if (/^\d+\.\d+$/.test(str)) {
+      const [hours, minutes] = str.split(".");
+      const min = minutes.length === 1 ? `${minutes}0` : minutes;
+      return `${parseInt(hours)}:${min}`;
+    }
+
+    // Case 3: "3:2" or "6:40"
+    if (/^\d{1,2}:\d{1,2}$/.test(str)) {
+      const [hours, minutes] = str.split(":");
+      const min = minutes.length === 1 ? `${minutes}0` : minutes;
+      return `${parseInt(hours)}:${min}`;
+    }
+
+    // Invalid format
+    return null;
+  }
+  function convertHHMMtoHH100(hhmmStr) {
+    const [hoursStr, minutesStr] = hhmmStr?.split(":");
+    const hours = parseInt(hoursStr);
+    const minutes = parseInt(minutesStr);
+
+    const hh100 = parseFloat(`${hours}.${minutes.toString().padStart(2, "0")}`);
+    return normalizeHH100(hh100);
+  }
+
+  function normalizeHH100(value) {
+    let hours = Math.floor(value);
+    let hundredMinutes = Math.round((value - hours) * 100);
+
+    if (hundredMinutes >= 100) {
+      hours += Math.floor(hundredMinutes / 100);
+      hundredMinutes = hundredMinutes % 100;
+    }
+
+    return parseFloat(`${hours}.${hundredMinutes.toString().padStart(2, "0")}`);
+  }
+  function convertToYYYYMMDD(dateStr, fileType) {
+    const [day, month, year] = dateStr.split(/[-\/]/);
+
+    // Pad day and month to 2 digits if needed
+    const paddedDay = day.padStart(2, "0");
+    const paddedMonth = month.padStart(2, "0");
+
+    // if (
+    //   fileType === "HO" ||
+    //   fileType === "SBW" ||
+    //   fileType === "ORMC" ||
+    //   fileType === "Offshore" ||
+    //   fileType === "Offshore's ORMC" ||
+    //   fileType === "BLNG"
+    // )
+    return `${year}-${paddedDay}-${paddedMonth}`;
+  }
   const handleSave = () => {
     if (handleValidation()) {
+      if (warningMess) {
+        alert(
+          `Working hours cannot be greater than 'Normal Daily Hours' (${editObject?.NORMALWORKINGHRSPERDAY})`
+        );
+        return;
+      }
+
+      let AllowToExecute = true;
+      let alertShown = true;
+      try {
+        const getMatchedData = getEmpAndWorkInfo(
+          empAndWorkInfo,
+          editObject?.fileType
+        );
+        console.log("getMatchedData : ", getMatchedData);
+        console.log("editObject : ", editObject);
+        console.log("empAndWorkInfo : ", empAndWorkInfo);
+        let rawDate =
+          editObject?.DATE?.trim() || editObject?.ENTRANCEDATEUSED?.trim();
+        let formattedDate = convertToYYYYMMDD(rawDate, editObject.fileType);
+        console.log("formattedDate : ", formattedDate);
+        const currentDay = new Date(formattedDate);
+        const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
+          weekday: "long",
+        }).format(currentDay);
+
+        let NWHPD =
+          getMatchedData?.workHrs[getMatchedData?.workHrs.length - 1] || 0;
+        let NWHPM =
+          getMatchedData?.workMonth[getMatchedData?.workMonth.length - 1] || 0;
+        let formattedNWHPD = parseFloat(NWHPD);
+        if (
+          String(NWHPD) === "8" &&
+          String(NWHPM) === "24" &&
+          dayOfWeek === "Saturday"
+        ) {
+          formattedNWHPD = parseFloat(NWHPD) / 2;
+        }
+
+        sections.map((val) => {
+          // if(val.WORKINGHRS)
+          if (!alertShown) return;
+          if (!val.WORKINGHRS) return;
+          const formattedWorkHrs = formatToHHColonMM(val.WORKINGHRS);
+          const normalizedWorkHrs = convertHHMMtoHH100(formattedWorkHrs);
+          const normalizedNormalHrs = normalizeHH100(formattedNWHPD);
+
+          console.log("normalizedWorkHrs : ", normalizedWorkHrs);
+          console.log("normalizedNormalHrs : ", normalizedNormalHrs);
+          if (normalizedWorkHrs > normalizedNormalHrs) {
+            alertShown = false;
+            if (dayOfWeek === "Saturday" && NWHPD == 8 && NWHPM == 24) {
+              setWarningStaffLevelEmp(true);
+              alert(
+                `On Saturdays, working hours cannot exceed the normal daily limit (${formattedNWHPD} hours) for staff-level employees.`
+              );
+              // return false;
+              AllowToExecute = false;
+              return;
+            }
+          }
+        });
+      } catch (err) {
+        AllowToExecute = true;
+        console.log("ERROR : ", err);
+      }
+
+      if (!AllowToExecute) return;
+
       const isDateField = formData.DATE !== undefined;
       const fieldToSave = isDateField ? "DATE" : "ENTRANCEDATEUSED";
       const entranceDateTime = "ENTRANCEDATETIME";
@@ -583,14 +747,51 @@ export const EditTimeSheet = ({
                       ? "formatted_EXITDATETIME"
                       : field
                   }
-                  className="border border-slate_grey bg-[#f1f5f9] rounded text-dark_grey text-[16px] text_size_5 outline-none w-full py-[7px] px-3 cursor-auto "
+                  className="border border-slate_grey bg-[#f1f5f9] rounded text-dark_grey text-[16px] text_size_5 outline-none w-full py-[7px] px-3 cursor-auto"
                   value={
                     formData[`formatted_${field}`] || formData[field] || ""
                   }
                   onChange={handleChange}
-                  readOnly={Position !== "Manager" ? index < 8 : true}
+                  // readOnly={Position !== "Manager" ? index < 0 : true}
+                  // readOnly={field === "NORMALWORKINGHRSPERDAY" || Position !== "Manager" ? index < 5 : true}
+                  readOnly={
+                    field === "NORMALWORKINGHRSPERDAY"
+                      ? true
+                      : field === "BADGE" || field === "FID" || field === "NO"
+                      ? false
+                      : Position !== "Manager"
+                      ? index < 6
+                      : false
+                  }
                 />
+                {/* {field === "BADGE" ? ( */}
+                {field === "BADGE" && errors[`badgeNo`] ? (
+                  <span className="text-red text_size_9">
+                    {errors[`badgeNo`]}
+                  </span>
+                ) : field === "FID" && errors[`fid`] ? (
+                  <span className="text-red text_size_9">{errors[`fid`]}</span>
+                ) : field === "NO" && errors[`no`] ? (
+                  <span className="text-red text_size_9">{errors[`no`]}</span>
+                ) : field === "NORMALWORKINGHRSPERDAY" && errors[`NWHPD`] ? (
+                  <span className="text-red text_size_9">
+                    {errors[`NWHPD`]}
+                  </span>
+                ) : (
+                  ""
+                )}
+                {/* ):("")} */}
 
+                {warningStaffLevelEmp === true && warningMess === false
+                  ? (field === "WORKINGHOURS" ||
+                      field === "TOTALACTUALHOURS") && (
+                      <span className="text_size_9 mt-2 text-red">
+                        {`Staff can't exceed ${
+                          parseFloat(editObject?.NORMALWORKINGHRSPERDAY) / 2
+                        } hrs on Saturdays.`}
+                      </span>
+                    )
+                  : null}
                 {warningMess === true &&
                 warningMessForAdinin === false &&
                 titleName === "BLNG"
@@ -689,7 +890,7 @@ export const EditTimeSheet = ({
                       />
 
                       {errors[`LOCATION-${index}`] && (
-                        <span className="text-red text_size_8">
+                        <span className="text-red text_size_9">
                           {errors[`LOCATION-${index}`]}
                         </span>
                       )}
@@ -706,7 +907,7 @@ export const EditTimeSheet = ({
                             "WorkingHrs"
                           );
                         }}
-                        placeholder="Enter Hours"
+                        placeholder="H.100 or x(H.100)H.100"
                         className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto bg-white"
                         readOnly={!section.LOCATION}
                       />
@@ -723,7 +924,7 @@ export const EditTimeSheet = ({
                             "OvertimeHrs"
                           );
                         }}
-                        placeholder="Enter Overtime "
+                        placeholder="H.100"
                         className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto bg-white"
                         readOnly={!section.LOCATION}
                       />

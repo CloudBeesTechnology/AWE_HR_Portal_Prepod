@@ -42,6 +42,9 @@ import { TimeSheetSpinner } from "./customTimeSheet/TimeSheetSpinner";
 import { UnlockVerifiedCellVS } from "./customTimeSheet/UnlockVerifiedCellVS";
 import PopupForDuplicateFileAlert from "./ModelForSuccessMess/PopupForDuplicateFileAlert";
 
+import { useTableMergedData } from "./customTimeSheet/useTableMergedData";
+import PopupForCheckBadgeNo from "./ModelForSuccessMess/PopupForCheckBadgeNo";
+
 const client = generateClient();
 
 export const ViewTSTBeforeSave = ({
@@ -81,6 +84,9 @@ export const ViewTSTBeforeSave = ({
   const [changePopupMessage, setChangePopupMessage] = useState(null);
   const [popupMess, setPopupMess] = useState({});
 
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
@@ -94,7 +100,7 @@ export const ViewTSTBeforeSave = ({
   const [passSelectedData, setPassSelectedData] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [finalData, setFinalData] = useState([]);
   let visibleData;
 
   const mergedData = AutoFetchForAssignManager();
@@ -102,11 +108,12 @@ export const ViewTSTBeforeSave = ({
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
   const [editFormTitle, setEditFormTitle] = useState("");
-
+  // const [empAndWorkInfo, setEmpAndWorkInfo] = useState([]);
   const { startDate, endDate, searchQuery, setSearchQuery } = useTempID();
   const { selectedRows, setSelectedRows, handleCheckboxChange, handleSubmit } =
     useRowSelection();
   const { createNotification } = useCreateNotification();
+  const { empAndWorkInfo } = useTableMergedData();
   useEffect(() => {
     try {
       const fetchData = async () => {
@@ -775,7 +782,53 @@ export const ViewTSTBeforeSave = ({
     }
   }, [changePopupMessage]);
 
-  const storeInitialData = async () => {
+  const checkBadgeNoOrNWHPD = async (data, decision) => {
+    if (decision === "Allowed") return false;
+    let hasMissingField = false;
+    let message = "";
+
+    for (let emp of data) {
+      const fid = emp.fidNo?.toString()?.trim();
+      const workHrs = emp.normalWorkHrs?.toString()?.trim();
+
+      if (!fid || fid === "N/A" || fid === "0") {
+        hasMissingField = true;
+        message =
+          "Some records are missing the FID or SAP NO. Please update the Excel sheet accordingly.";
+        // return true;
+        break;
+      }
+
+      if (!workHrs || workHrs === "0" || workHrs === "N/A") {
+        hasMissingField = true;
+        message =
+          "One or more records have missing 'Normal Working Hours Per Day'.";
+        // return true;
+        break;
+      }
+    }
+
+    if (hasMissingField) {
+      setAlertMessage(message);
+      setShowConfirm(true);
+      return true;
+    } else {
+      console.log("All required fields are filled. Proceeding...");
+      // storeInitialData();
+      return false;
+      // Proceed with your action here
+    }
+  };
+
+  const handleDecision = (decision) => {
+    setShowConfirm(false);
+    // if (decision === "Allowed") {
+    storeInitialData(decision);
+    // }
+  };
+
+  const storeInitialData = async (decision) => {
+    if (decision === "Denied") return;
     const result =
       data &&
       data.length > 0 &&
@@ -783,7 +836,7 @@ export const ViewTSTBeforeSave = ({
         return {
           fileName: fileName,
           empName: val.NAME || "",
-          fidNo: val.NO || "",
+          fidNo: val.NO || "N/A",
           companyName: val.LOCATIONATTOP || "",
           location: val.LOCATION || "",
           trade: val.TRADE || "",
@@ -791,7 +844,7 @@ export const ViewTSTBeforeSave = ({
           totalNT: val.TOTALHOURS || "",
           totalOT: val.TOTALHOURS2 || "",
           totalNTOT: val.TOTALHOURS3 || "",
-          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || "0",
           actualWorkHrs: val.WORKINGHOURS || "",
           otTime: val.OT || "",
           remarks: val.REMARKS || "",
@@ -804,6 +857,9 @@ export const ViewTSTBeforeSave = ({
 
     let identifier = "create";
     let finalResult = result;
+    let resultOfBadgeNo = await checkBadgeNoOrNWHPD(finalResult, decision);
+
+    if (resultOfBadgeNo) return;
     const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
       {
         finalResult,
@@ -856,8 +912,6 @@ export const ViewTSTBeforeSave = ({
 
     if (Array.isArray(finalResult) && finalResult.length === 0) return;
 
- 
-
     await TimeSheetsCRUDoperations({
       finalResult,
       toggleSFAMessage,
@@ -876,7 +930,6 @@ export const ViewTSTBeforeSave = ({
 
   useEffect(() => {
     if (showDuplicateAlert || cancelAction) return;
-    console.log("storePreSubmitData : ", storePreSubmitData);
 
     if (
       Array.isArray(storePreSubmitData?.finalResult) &&
@@ -976,7 +1029,36 @@ export const ViewTSTBeforeSave = ({
     }
   }, [startDate, endDate, secondaryData, searchQuery]);
 
-  const safeData = data || [];
+  useEffect(() => {
+    if (!Array.isArray(empAndWorkInfo) || !Array.isArray(data)) return;
+    // Create a map for quick lookup
+    const empInfoMap = new Map();
+
+    if (Array.isArray(empAndWorkInfo)) {
+      empAndWorkInfo.forEach((item) => {
+        empInfoMap.set(String(item.sapNo).toUpperCase(), item);
+      });
+    }
+
+    // Process visibleData
+    const addedNWHPD =
+      Array.isArray(data) &&
+      data.map((val) => {
+        const badgeKey = String(val?.NO).toUpperCase();
+        const workInfoItem = empInfoMap.get(badgeKey);
+
+        return {
+          ...val,
+          NORMALWORKINGHRSPERDAY: workInfoItem
+            ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
+            : "0",
+        };
+      });
+
+    setFinalData(addedNWHPD);
+  }, [empAndWorkInfo, data]);
+
+  const safeData = finalData || [];
   const itemsPerPage = 25;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -1382,6 +1464,7 @@ export const ViewTSTBeforeSave = ({
           Position={Position}
           handleSubmit={handleSubmit}
           editFormTitle={editFormTitle}
+          empAndWorkInfo={empAndWorkInfo}
         />
       )}
       {storingMess === true ? (
@@ -1463,6 +1546,13 @@ export const ViewTSTBeforeSave = ({
         />
       ) : (
         ""
+      )}
+
+      {showConfirm && (
+        <PopupForCheckBadgeNo
+          handleDecision={handleDecision}
+          alertMessage={alertMessage}
+        />
       )}
     </div>
   );

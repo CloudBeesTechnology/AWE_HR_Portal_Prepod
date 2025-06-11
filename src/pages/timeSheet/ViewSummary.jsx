@@ -12,8 +12,9 @@ import { EditViewSummary } from "./viewSummarySheets/EditViewSummary";
 import { ViewSummaryTable } from "./viewSummarySheets/ViewSummaryTable";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GetHolidayList } from "./customTimeSheet/GetHolidayList";
+import { HoursMinuAbsentCal } from "./customTimeSheet/HoursMinuAbsentCal";
 
 export const ViewSummary = () => {
   const [data, setData] = useState(null);
@@ -21,6 +22,7 @@ export const ViewSummary = () => {
   const [toggleForEVSummary, setToggleForEVSummary] = useState(null);
   const [loadingMess, setLoadingMess] = useState(true);
   const [summaryObject, setSummaryObject] = useState(null);
+  // const [resultOfWHrsAbsCal, setResultOfWHrsAbsCal] = useState("");
 
   const {
     startDate,
@@ -33,6 +35,8 @@ export const ViewSummary = () => {
     offshoreType,
   } = useTempID();
 
+  const { workHrsAbsentCal } = HoursMinuAbsentCal();
+
   const publicHoliday = GetHolidayList();
 
   const ProcessedDataFunc = async (data) => {
@@ -41,6 +45,13 @@ export const ViewSummary = () => {
   };
 
   const updateGroupedData = async (updatedData, object) => {
+    const getFormatedWorkHrs = await workHrsAbsentCal({
+      NWHPD: object?.NWHPD,
+      NWHPM: object?.NWHPM,
+      workingHrsKey: object?.workingHrsKey,
+      workingHrs: object?.workingHrs,
+    });
+
     let ExcelfileType = ["BLNG", "Offshore", "Offshore's ORMC"];
 
     const updatedGrouped = data?.map((val) => {
@@ -120,9 +131,11 @@ export const ViewSummary = () => {
             ...val.assignUpdaterDateTime,
             [object.workingHrsKey]: today,
           },
+
           workingHrs: {
             ...val.workingHrs,
-            [object.workingHrsKey]: object.workingHrs,
+            // [object.workingHrsKey]: object.workingHrs,
+            [object.workingHrsKey]: getFormatedWorkHrs,
           },
           OVERTIMEHRS: {
             ...val.OVERTIMEHRS,
@@ -181,6 +194,11 @@ export const ViewSummary = () => {
   }, []);
 
   const toggleEditViewSummaryFunc = () => {
+    // console.log("value : ", value);
+    // if (value === "0.00") {
+    //   setResultOfWHrsAbsCal("");
+    //   return;
+    // }
     setToggleForEVSummary(!toggleForEVSummary);
   };
 
@@ -258,21 +276,34 @@ export const ViewSummary = () => {
   };
 
   const FinalEditedData = async (getObject) => {
-    setLoadingMess(false);
-
-    const { resData, object, newresData, resDataForJobcode } =
-      await UpdateViewSummary(getObject, updateGroupedData);
-
     const {
       badgeNo,
       data: objectData,
       sapNo,
       jobcode,
       location,
+      NWHPD,
+      NWHPM,
       workingHrsKey,
       workingHrs,
       overtimeHrs,
     } = getObject;
+
+    const getFormatedWorkHrs = await workHrsAbsentCal({
+      NWHPD: NWHPD,
+      NWHPM: NWHPM,
+      workingHrsKey: workingHrsKey,
+      workingHrs: workingHrs,
+    });
+
+    // setResultOfWHrsAbsCal(getFormatedWorkHrs);
+
+    if (getFormatedWorkHrs === "0.00") return;
+
+    setLoadingMess(false);
+
+    const { resData, object, newresData, resDataForJobcode } =
+      await UpdateViewSummary(getObject, updateGroupedData);
 
     if (resData && resData.length > 0) {
       try {
@@ -323,7 +354,7 @@ export const ViewSummary = () => {
                 ...obj,
                 workingHrs: {
                   ...obj.workingHrs,
-                  [workingHrsKey]: workingHrs,
+                  [workingHrsKey]: getFormatedWorkHrs,
                 },
                 OVERTIMEHRS: {
                   ...obj.OVERTIMEHRS,
@@ -342,6 +373,7 @@ export const ViewSummary = () => {
         setData(result);
         setSecondaryData(result);
       } catch (err) {
+        console.log("Error : ", err);
       } finally {
         setLoadingMess(true);
       }
@@ -397,7 +429,7 @@ export const ViewSummary = () => {
               ...obj,
               workingHrs: {
                 ...obj.workingHrs,
-                [workingHrsKey]: workingHrs,
+                [workingHrsKey]: getFormatedWorkHrs,
               },
               OVERTIMEHRS: {
                 ...obj.OVERTIMEHRS,
@@ -411,6 +443,7 @@ export const ViewSummary = () => {
         setData(result);
         setSecondaryData(result);
       } catch (err) {
+        console.log("ERROR : ", err);
       } finally {
         setLoadingMess(true);
       }
@@ -419,6 +452,7 @@ export const ViewSummary = () => {
 
   const dayCounts =
     Math.ceil((getEndDate - getStartDate) / (1000 * 60 * 60 * 24)) + 1;
+
   return (
     <div>
       <ApplyVSFunction
@@ -441,6 +475,7 @@ export const ViewSummary = () => {
         resetTableFunc={resetTableFunc}
         toggleEditViewSummaryFunc={toggleEditViewSummaryFunc}
         editViewSummaryObject={editViewSummaryObject}
+        // resultOfWHrsAbsCal={resultOfWHrsAbsCal}
 
         // updatedResData={updatedResData}
       />
@@ -449,6 +484,7 @@ export const ViewSummary = () => {
           toggleEditViewSummaryFunc={toggleEditViewSummaryFunc}
           summaryObject={summaryObject}
           FinalEditedData={FinalEditedData}
+          // resultOfWHrsAbsCal={resultOfWHrsAbsCal}
         />
       )}
 

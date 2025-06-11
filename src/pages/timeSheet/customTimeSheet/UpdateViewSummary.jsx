@@ -234,9 +234,11 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
           variables: { input: item },
         });
         const Responses = response?.data?.createTimeSheet;
-
+        console.log("Responses : ", Responses);
         newresData = [Responses];
-      } catch (err) {}
+      } catch (err) {
+        console.log("Error : ", err);
+      }
     };
 
     const UpdateMethod = async (finalData) => {
@@ -250,7 +252,7 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
             variables: { input: validTimeSheet },
           });
           const Responses = response?.data?.updateTimeSheet;
-
+          console.log("Responses : ", Responses);
           resData = [Responses];
           if (Responses) {
             return true;
@@ -299,23 +301,19 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
           const parsedEmpWorkInfo = updatedObject.empWorkInfo.map((info) =>
             typeof info === "string" ? JSON.parse(info) : info
           );
-        
+
           const seperatedDataEmpWorkInfo = seperatedData.empWorkInfo.map(
             (info) => (typeof info === "string" ? JSON.parse(info) : info)
           );
 
-          
-
           const processedWorkInfo = parsedEmpWorkInfo.flat();
 
           const updatedWorkInfo = seperatedDataEmpWorkInfo.map((info) => {
-            
             const matchingInfo = processedWorkInfo.find(
               (seperatedInfo) => info.id === seperatedInfo.id
             );
-           
+
             if (matchingInfo) {
-             
               return {
                 ...info,
                 JOBCODE: obj.jobcode || "",
@@ -340,20 +338,22 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
       const updatedObject = await assignUpdatedWorkHrs(val);
 
       const seperatedData = await MatchingObject(object, updatedObject);
-   
+
       var finalData = await insertUpdatedObject(updatedObject, seperatedData);
 
       await UpdateMethod(finalData);
     }
 
     const empDetails = await findMatchingObject(object);
- 
+
     if (empDetails && empDetails !== true) {
       await fetchEmployeeData(empDetails);
     } else if (empDetails === false) {
       await summaryCreateMethod();
     }
-  
+
     return { resData, object, newresData, resDataForJobcode };
-  } catch (err) {}
+  } catch (err) {
+    console.log("Error : ", err);
+  }
 };
