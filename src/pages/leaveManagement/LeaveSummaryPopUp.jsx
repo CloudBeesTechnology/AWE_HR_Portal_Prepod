@@ -144,8 +144,8 @@ export const LeaveSummaryPopUp = ({
           "Unpaid Authorize - Sick": "unPaidAuthorizeSick",
           "Unpaid Authorize - Annual": "unPaidAuthorizeAnnual",
         };
-     
-          const trimmedLeaveType = val.empLeaveType?.trim();
+
+        const trimmedLeaveType = val.empLeaveType?.trim();
         const leaveKey = leaveTypeKeyMap[trimmedLeaveType];
         const applicationStartDate = val.empLeaveSelectedFrom
           ? new Date(dateNewFormate(val.empLeaveSelectedFrom))
@@ -199,89 +199,103 @@ export const LeaveSummaryPopUp = ({
         let shouldProcessLeave = false;
 
         if (leaveKey === "sickLeave") {
-          let currentDate = new Date();
-          let startEffectiveDate = new Date(
-            dateNewFormate(val.empSickLeaveDate)
+          const sickStart = new Date(dateNewFormate(val.empSickLeaveDate));
+          const sickEnd = new Date(sickStart);
+          sickEnd.setFullYear(sickEnd.getFullYear() + 1);
+          sickEnd.setDate(sickEnd.getDate() - 1);
+
+          const leaveStart = new Date(
+            dateNewFormate(val.empLeaveSelectedFrom || val.empLeaveStartDate)
           );
-          let endEffectiveDate = new Date(startEffectiveDate);
-          endEffectiveDate.setFullYear(endEffectiveDate.getFullYear() + 1);
-          endEffectiveDate.setDate(endEffectiveDate.getDate() - 1);
+          const leaveEnd = new Date(
+            dateNewFormate(val.empLeaveSelectedTo || val.empLeaveEndDate)
+          );
 
-          const leaveStartDate = val.empLeaveSelectedFrom
-            ? new Date(dateNewFormate(val.empLeaveSelectedFrom))
-            : new Date(dateNewFormate(val.empLeaveStartDate));
-
-          const leaveEndDate = val.empLeaveSelectedTo
-            ? new Date(dateNewFormate(val.empLeaveSelectedTo))
-            : new Date(dateNewFormate(val.empLeaveEndDate));
-
-          // Initialize sick leave record if not exists
+          // Initialize sick leave data
           if (!acc[val.empID][leaveKey]) {
+            const total = Number(val.sickLeave) || 0;
             acc[val.empID][leaveKey] = {
-              total: Number(val.sickLeave) || 0,
+              total,
               taken: 0,
               waitingLeave: 0,
-              remaining: Number(val.sickLeave) || 0,
+              remaining: total,
             };
           }
 
           if (startDate && endDate) {
-            const filterStartDate = new Date(startDate);
-            const filterEndDate = new Date(endDate);
+            const filterStart = new Date(startDate);
+            const filterEnd = new Date(endDate);
 
-            // Find the relevant period based on filter dates
-            let relevantStartDate = new Date(startEffectiveDate);
-            let relevantEndDate = new Date(endEffectiveDate);
+            let relevantStart = new Date(sickStart);
+            let relevantEnd = new Date(sickEnd);
 
-            if (filterStartDate < startEffectiveDate) {
-              relevantStartDate.setFullYear(
-                relevantStartDate.getFullYear() - 1
-              );
-              relevantEndDate.setFullYear(relevantEndDate.getFullYear() - 1);
+            while (filterStart > relevantEnd) {
+              relevantStart.setFullYear(relevantStart.getFullYear() + 1);
+              relevantEnd.setFullYear(relevantEnd.getFullYear() + 1);
             }
-            if (filterStartDate > endEffectiveDate) {
-              relevantStartDate.setFullYear(
-                relevantStartDate.getFullYear() + 1
-              );
-              relevantEndDate.setFullYear(relevantEndDate.getFullYear() + 1);
+            while (filterStart < relevantStart) {
+              relevantStart.setFullYear(relevantStart.getFullYear() - 1);
+              relevantEnd.setFullYear(relevantEnd.getFullYear() - 1);
             }
 
-            if (
-              ((leaveStartDate >= filterStartDate &&
-                leaveStartDate <= filterEndDate) ||
-                (leaveEndDate >= filterStartDate &&
-                  leaveEndDate <= filterEndDate) ||
-                (leaveStartDate <= filterStartDate &&
-                  leaveEndDate >= filterEndDate)) &&
-              ((leaveStartDate >= relevantStartDate &&
-                leaveStartDate <= relevantEndDate) ||
-                (leaveEndDate >= relevantStartDate &&
-                  leaveEndDate <= relevantEndDate))
-            ) {
+            const isOverlap = (aStart, aEnd, bStart, bEnd) =>
+              aStart <= bEnd && bStart <= aEnd;
+
+            const overlapsFilter = isOverlap(
+              leaveStart,
+              leaveEnd,
+              filterStart,
+              filterEnd
+            );
+            const overlapsRelevant = isOverlap(
+              leaveStart,
+              leaveEnd,
+              relevantStart,
+              relevantEnd
+            );
+
+            // if (val.empID === "6056") {
+            //   console.log({
+            //     leaveStart,
+            //     leaveEnd,
+            //     filterStart,
+            //     filterEnd,
+            //     relevantStart,
+            //     relevantEnd,
+            //     overlapsFilter,
+            //     overlapsRelevant,
+            //   });
+            // }
+            if (overlapsFilter && overlapsRelevant) {
+              // if (val.empID === "6056") {
+              //   console.log(val.empSickLeaveDate, "empSickLeave");
+              //   console.log(val.leaveDays, "leaveDate");
+              // }
+              const leaveDays = Number(val.leaveDays) || 0;
               if (
                 val.managerStatus === "Approved" &&
                 val.empStatus !== "Cancelled"
               ) {
-                acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
+                acc[val.empID][leaveKey].taken += leaveDays;
               } else if (
                 val.managerStatus === "Pending" &&
                 val.supervisorStatus !== "Rejected" &&
                 val.empStatus !== "Cancelled"
               ) {
-                acc[val.empID][leaveKey].waitingLeave +=
-                  Number(val.leaveDays) || 0;
+                acc[val.empID][leaveKey].waitingLeave += leaveDays;
+             
               }
-
-              // Calculate remaining leave
-              const total = acc[val.empID][leaveKey].total || 0;
-              const taken = acc[val.empID][leaveKey].taken || 0;
-              const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
-              const remaining = formatToTwoDecimals(total - (taken + waiting));
+              const { total, taken, waitingLeave } = acc[val.empID][leaveKey];
+              const remaining = formatToTwoDecimals(
+                total - (taken + waitingLeave)
+              );
               acc[val.empID][leaveKey].remaining =
                 remaining < 5 ? remaining : remaining;
             }
           } else {
             // Default behavior: show current effective period data
+            let currentDate = new Date();
+
             let startED = new Date(dateNewFormate(val.empSickLeaveDate));
             let endED = new Date(startED);
             endED.setFullYear(endED.getFullYear() + 1);
@@ -293,8 +307,8 @@ export const LeaveSummaryPopUp = ({
 
             if (
               currentDate >= startED &&
-              leaveStartDate >= startED &&
-              leaveEndDate <= endED &&
+              leaveStart >= startED &&
+              leaveEnd <= endED &&
               currentDate <= endED
             ) {
               if (
@@ -325,7 +339,6 @@ export const LeaveSummaryPopUp = ({
           shouldProcessLeave = shouldProcessOtherLeave;
         }
 
-
         if (leaveKey && shouldProcessLeave) {
           if (!acc[val.empID][leaveKey]) {
             acc[val.empID][leaveKey] = {
@@ -343,14 +356,12 @@ export const LeaveSummaryPopUp = ({
             val.empStatus !== "Cancelled"
           ) {
             acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
-        
           } else if (
             val.managerStatus === "Pending" &&
             val.supervisorStatus !== "Rejected" &&
             val.empStatus !== "Cancelled"
           ) {
             acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
-             
           }
 
           if (
