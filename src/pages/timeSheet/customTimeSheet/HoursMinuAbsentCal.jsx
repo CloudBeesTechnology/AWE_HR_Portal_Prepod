@@ -1,6 +1,6 @@
 export const HoursMinuAbsentCal = () => {
   function calculateTotalWorkingHours(data) {
-    let totalMinutes = 0;
+    let totalHours = 0;
 
     try {
       for (const key in data) {
@@ -10,92 +10,115 @@ export const HoursMinuAbsentCal = () => {
         const xMatch = value?.match(xPattern);
         if (xMatch) {
           const hours = parseFloat(xMatch[3]);
-          totalMinutes +=
-            Math.floor(hours) * 60 + Math.round((hours % 1) * 100);
+          totalHours += hours;
           continue;
         }
 
         const numberPattern = /^\d+(\.\d+)?$/;
         if (value?.match(numberPattern)) {
-          const hours = parseFloat(value);
-          totalMinutes +=
-            Math.floor(hours) * 60 + Math.round((hours % 1) * 100);
+          totalHours += parseFloat(value);
           continue;
         }
 
         const halPattern = /^H[A-Z]*\d+$/;
         if (value?.match(halPattern)) {
           const hours = parseFloat(value.replace(/[^0-9]/g, ""));
-          totalMinutes += Math.floor(hours) * 60;
+          totalHours += hours;
           continue;
         }
       }
 
-      // Convert total minutes back to HH:MM
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = totalMinutes % 60;
-      const formatted = `${String(hours).padStart(2, "0")}.${String(
-        minutes
-      ).padStart(2, "0")}`;
-
-      return formatted;
+      return totalHours.toFixed(2); // HH.100 format
     } catch (err) {
       console.error("Error calculating total working hours:", err);
-      return "00.00";
+      return "0.00";
     }
   }
+  function convertToYYYYMMDD(dateStr) {
+    const [day, month, year] = dateStr?.split(/[-\/]/);
 
-  function calculateTotalAbsence(inputData, getLastIndexOfNWhrs) {
+    // Pad day and month to 2 digits if needed
+    const paddedDay = day.padStart(2, "0");
+    const paddedMonth = month.padStart(2, "0");
+
+    return `${year}-${paddedMonth}-${paddedDay}`;
+  }
+
+  function calculateTotalAbsence(employee, getLastIndexOfNWhrs) {
+    console.log("employee : ", employee);
+    const workingHrsObj = employee?.workingHrs;
+    const lastIndex = parseFloat(getLastIndexOfNWhrs);
+    const getLastIndexOfNWHPM =
+      employee?.workMonth && employee?.workMonth?.length > 0
+        ? employee?.workMonth[employee?.workMonth?.length - 1]
+        : "";
+
     try {
-      let totalMinutes = 0;
+      let totalHours = 0;
 
-      for (let date in inputData) {
-        const value = inputData[date];
+      for (let date in workingHrsObj) {
+        const value = workingHrsObj[date];
 
         if (value?.startsWith("x(")) {
-          const absenceMatch = value?.match(/x\(([\d.]+)\)/);
-          if (absenceMatch) {
-            const num = parseFloat(absenceMatch[1]);
-            const hours = Math.floor(num);
-            const minutes = Math.round((num % 1) * 100);
-            totalMinutes += hours * 60 + minutes;
+          const match = value.match(/x\(([\d.]+)\)/);
+          if (match) {
+            totalHours += parseFloat(match[1]); // Directly add hours in decimal format
           }
         } else if (value === "A") {
-          const num = parseFloat(getLastIndexOfNWhrs);
-          const hours = Math.floor(num);
-          const minutes = Math.round((num % 1) * 100);
-          totalMinutes += hours * 60 + minutes;
+          // totalHours += lastIndex; // Absence counts as full day hours
+
+          let formattedDate = convertToYYYYMMDD(date);
+
+          const currentDay = new Date(formattedDate);
+          const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
+            weekday: "long",
+          }).format(currentDay);
+          if (
+            dayOfWeek === "Saturday" &&
+            getLastIndexOfNWhrs == 8 &&
+            getLastIndexOfNWHPM == 24
+          ) {
+            totalHours += lastIndex / 2;
+          } else {
+            totalHours += lastIndex;
+          }
         }
       }
 
-      const totalHours = Math.floor(totalMinutes / 60);
-      const remainingMinutes = totalMinutes % 60;
-      const formatted = `${String(totalHours).padStart(2, "0")}.${String(
-        remainingMinutes
-      ).padStart(2, "0")}`;
-      return formatted;
+      return totalHours.toFixed(2); // Return in HH.100 format
     } catch (err) {
       console.error("Error in calculateTotalAbsence:", err);
-      return "00.00";
+      return "0.00";
     }
   }
-  const convertNumToHours = (totalWorkHrs, getLastIndexOfNWhrs) => {
-    const [hrsStr, minsStr] = String(totalWorkHrs)?.split(".");
-    const hours = parseInt(hrsStr);
-    const minutes = parseInt(minsStr) || 0;
 
-    const totalMinutes = hours * 60 + minutes;
+  // const convertNumToHours = (totalWorkHrs, getLastIndexOfNWhrs) => {
+  //   const [hrsStr, minsStr] = String(totalWorkHrs)?.split(".");
+  //   const hours = parseInt(hrsStr);
+  //   const minutes = parseInt(minsStr) || 0;
 
+  //   const totalMinutes = hours * 60 + minutes;
+
+  //   const divisor = parseFloat(getLastIndexOfNWhrs);
+  //   const eachMinutes = totalMinutes / divisor;
+
+  //   const resultHours = Math.floor(eachMinutes / 60);
+  //   const resultMinutes = Math.round(eachMinutes % 60);
+
+  //   return `${String(resultHours).padStart(2, "0")}.${String(
+  //     resultMinutes
+  //   ).padStart(2, "0")}`;
+  // };
+
+  function convertNumToHours(totalWorkHrs, getLastIndexOfNWhrs) {
+    const total = parseFloat(totalWorkHrs);
     const divisor = parseFloat(getLastIndexOfNWhrs);
-    const eachMinutes = totalMinutes / divisor;
 
-    const resultHours = Math.floor(eachMinutes / 60);
-    const resultMinutes = Math.round(eachMinutes % 60);
+    if (isNaN(total) || isNaN(divisor) || divisor === 0) return "0.00";
 
-    return `${String(resultHours).padStart(2, "0")}.${String(
-      resultMinutes
-    ).padStart(2, "0")}`;
-  };
+    const result = total / divisor;
+    return result.toFixed(2); // Return HH.100 format
+  }
 
   //   const convertNumToHours = (totalWorkHrs, getLastIndexOfNWhrs) => {
   //     const hoursFloat =
@@ -108,10 +131,103 @@ export const HoursMinuAbsentCal = () => {
   //       "0"
   //     )}`;
   //   };
+  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+  // Auto Calculate x(HH.100)HH.100 locally in the ViewSummary
+  function normalizeHH100(value) {
+    let hours = Math.floor(value);
+    let hundredMinutes = Math.round((value - hours) * 100);
+
+    if (hundredMinutes >= 100) {
+      hours += Math.floor(hundredMinutes / 100);
+      hundredMinutes = hundredMinutes % 100;
+    }
+
+    return parseFloat(`${hours}.${hundredMinutes.toString().padStart(2, "0")}`);
+  }
+
+  function formatToHHColonMM(input) {
+    const str = input?.toString();
+
+    // Case 1: "4" → "4:00"
+    if (/^\d+$/.test(str)) {
+      return `${str}:00`;
+    }
+
+    // Case 2: "5.3" or "5.30" → "5:30" or "5:03" logic based on minute length
+    if (/^\d+\.\d+$/.test(str)) {
+      const [hours, minutes] = str?.split(".");
+      const min = minutes.length === 1 ? `${minutes}0` : minutes;
+      return `${parseInt(hours)}:${min}`;
+    }
+
+    // Case 3: "3:2" or "6:40"
+    if (/^\d{1,2}:\d{1,2}$/.test(str)) {
+      const [hours, minutes] = str?.split(":");
+      const min = minutes.length === 1 ? `${minutes}0` : minutes;
+      return `${parseInt(hours)}:${min}`;
+    }
+
+    // Invalid format
+    return null;
+  }
+
+  function convertHHMMtoHH100(hhmmStr) {
+    const [hoursStr, minutesStr] = hhmmStr?.split(":");
+    const hours = parseInt(hoursStr);
+    const minutes = parseInt(minutesStr);
+
+    const hh100 = parseFloat(`${hours}.${minutes.toString().padStart(2, "0")}`);
+    return normalizeHH100(hh100);
+  }
+
+  async function workHrsAbsentCal(receivedData) {
+    const { NWHPD, NWHPM, workingHrsKey, workingHrs } = receivedData;
+    let formattedDate = convertToYYYYMMDD(workingHrsKey);
+    const currentDay = new Date(formattedDate);
+    const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
+      weekday: "long",
+    }).format(currentDay);
+
+    let formattedNWHPD = NWHPD;
+    if (dayOfWeek === "Saturday" && NWHPD == 8 && NWHPM == 24) {
+      formattedNWHPD = NWHPD / 2; // make 4
+    }
+
+    const formattedWorkHrs = formatToHHColonMM(workingHrs);
+    if (formattedWorkHrs === null) return workingHrs;
+
+    const normalizedWorkHrs = convertHHMMtoHH100(formattedWorkHrs);
+    const normalizedNormalHrs = normalizeHH100(formattedNWHPD);
+
+    if (normalizedWorkHrs > normalizedNormalHrs) {
+      // Working hours cannot exceed normal daily hours (4) for a staff-level employee.
+      if (dayOfWeek === "Saturday" && NWHPD == 8 && NWHPM == 24) {
+        alert(
+          `On Saturdays, working hours cannot exceed the normal daily limit (${formattedNWHPD} hours) for staff-level employees.`
+        );
+
+        return "0.00";
+      } else {
+        alert(
+          `Working hours cannot be greater than normal daily hours (${formattedNWHPD}).`
+        );
+        return "0.00";
+      }
+    }
+
+    const diff = normalizedNormalHrs - normalizedWorkHrs;
+    const absent = normalizeHH100(diff);
+    const absence = parseFloat(absent).toFixed(2);
+    const presentHrs = parseFloat(normalizedWorkHrs).toFixed(2);
+    const workingHrsAbsence =
+      absence === "0.00" ? presentHrs : `x(${absence})${presentHrs}`;
+    return workingHrsAbsence;
+  }
   return {
     calculateTotalWorkingHours,
     calculateTotalAbsence,
     convertNumToHours,
+    workHrsAbsentCal,
     // convertNumToHours,
   };
 };

@@ -24,6 +24,7 @@ export const ViewSummaryTable = ({
   resetTableFunc,
   toggleEditViewSummaryFunc,
   editViewSummaryObject,
+  // resultOfWHrsAbsCal,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [adjustTheaderDownload, setAdjustTheaderDownload] = useState(false);
@@ -93,7 +94,7 @@ export const ViewSummaryTable = ({
               <FaArrowLeft />
             </Link>
           </div>
-          <header className="flex justify-center text_size_2 py-5 text-dark_grey ">
+          <header className="flex justify-center text_size_2 py-5 text-dark_grey">
             <p>View Summary</p>
           </header>
           <div
@@ -182,25 +183,21 @@ export const ViewSummaryTable = ({
                   //   employee?.OVERTIMEHRS || {}
                   // ).reduce((acc, ot) => acc + parseFloat(ot || 0), 0);
 
-                  const totalMinutes = Object.values(
+                  // stage 1
+                  console.log("employee : ", employee);
+
+                  const addAllOT = Object.values(
                     employee?.OVERTIMEHRS || {}
                   ).reduce((acc, ot) => {
-                    const num = parseFloat(ot || 0);
-                    const hours = Math.floor(num);
-                    const minutes = Math.round((num % 1) * 100); // Convert .30 as 30 minutes
-                    return acc + (hours * 60 + minutes);
+                    return acc + parseFloat(ot || 0);
                   }, 0);
+                  const totalOT = addAllOT.toFixed(2);
+                  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-                  const totalHoursOfOT = Math.floor(totalMinutes / 60);
-                  const remainingMinutes = totalMinutes % 60;
-                  const floatTotal = `${String(totalHoursOfOT).padStart(
-                    2,
-                    "0"
-                  )}.${String(remainingMinutes).padStart(2, "0")}`;
-
-                  const totalOT = Number(floatTotal);
+                  // stage 2
                   const getTotalHours =
                     calculateTotalWorkingHours(employee?.workingHrs) || 0;
+
                   const roundedNumberOfTotalHours = Number(getTotalHours);
                   const totalHours = roundedNumberOfTotalHours;
 
@@ -209,6 +206,9 @@ export const ViewSummaryTable = ({
                       ? employee?.workHrs[employee?.workHrs?.length - 1]
                       : "";
 
+                  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+                  // stage 3
                   const getNormalDays = convertNumToHours(
                     totalHours,
                     getLastIndexOfNWhrs
@@ -218,15 +218,13 @@ export const ViewSummaryTable = ({
                   //   totalHours / parseFloat(getLastIndexOfNWhrs) || 0;
                   const roundedNumber = Number(parseFloat(getNormalDays));
                   const NormalDays = roundedNumber;
+                  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
+                  // stage 4
                   const totalAbsence = calculateTotalAbsence(
-                    employee?.workingHrs,
+                    employee,
                     getLastIndexOfNWhrs
                   );
-                  // const totalAbsentiesHrs =
-                  //   totalAbsence / parseFloat(getLastIndexOfNWhrs) || 0;
-
-               
 
                   const totalAbsentiesHrs = convertNumToHours(
                     totalAbsence,
@@ -234,6 +232,9 @@ export const ViewSummaryTable = ({
                   );
                   const roundedTotalAbsentiesHrs = Number(totalAbsentiesHrs);
 
+                  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+                  // stage 5
                   const checkVerifiedAll = Array.from(
                     { length: dayCounts },
                     (_, i) => {
@@ -263,10 +264,16 @@ export const ViewSummaryTable = ({
                     (value) => value === "Yes"
                   );
 
+                  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+                  // stage 6
                   const totalOfALCL =
                     parseFloat(employee?.empLeaveCount?.AL) +
                       parseFloat(employee?.empLeaveCount?.CL) || 0;
 
+                  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+                  // stage 7
                   const getTimeKeeperName = employee?.timeKeeper;
 
                   const timeKeeperName = [...new Set(getTimeKeeperName)];
@@ -350,7 +357,7 @@ export const ViewSummaryTable = ({
                                }`}
                               key={currentDayKey}
                               onClick={() => {
-                                toggleEditViewSummaryFunc();
+                                toggleEditViewSummaryFunc?.();
                                 const empDetails = {
                                   id: employee?.id,
                                   data: employee?.data,
@@ -366,12 +373,16 @@ export const ViewSummaryTable = ({
                                   workHrs:
                                     employee?.workHrs &&
                                     employee?.workHrs.length > 0
-                                      ? employee?.workHrs
+                                      ? employee?.workHrs[
+                                          employee?.workHrs?.length - 1
+                                        ]
                                       : "",
                                   workMonth:
                                     employee?.workMonth &&
                                     employee?.workMonth?.length > 0
-                                      ? employee?.workMonth
+                                      ? employee?.workMonth[
+                                          employee?.workMonth?.length - 1
+                                        ]
                                       : "",
 
                                   workingHrsKey: currentDayKey,
@@ -388,10 +399,10 @@ export const ViewSummaryTable = ({
                           );
                         })}
                         <td className="border px-2 py-1" rowSpan="2">
-                          {totalHours}
+                          {parseFloat(totalHours).toFixed(2)}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
-                          {NormalDays}
+                          {parseFloat(NormalDays).toFixed(2)}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
                           {employee?.hollydayCounts?.PH || 0}
@@ -412,14 +423,14 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1" rowSpan="2">
                           {employee?.hollydayCounts?.OFF || 0}
                         </td>
-                        <td className="border px-2 py-1" rowSpan="2">
-                          {roundedTotalAbsentiesHrs || 0}
+                        <td className="border px-2 py-1 " rowSpan="2">
+                          {parseFloat(roundedTotalAbsentiesHrs).toFixed(2) || 0}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
                           {employee?.empLeaveCount?.UAL || 0}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
-                          {totalOT || 0}
+                          {parseFloat(totalOT).toFixed(2) || 0}
                         </td>
 
                         <td className="border px-2 py-1" rowSpan="2">
@@ -585,8 +596,12 @@ export const ViewSummaryTable = ({
                           );
                         })}
                         {/* ))} */}
-                        <td className="border px-2 py-1">{totalHours}</td>
-                        <td className="border px-2 py-1">{NormalDays}</td>
+                        <td className="border px-2 py-1">
+                          {parseFloat(totalHours).toFixed(2)}
+                        </td>
+                        <td className="border px-2 py-1">
+                          {parseFloat(NormalDays).toFixed(2)}
+                        </td>
 
                         <td className="border px-2 py-1">
                           {employee?.hollydayCounts?.PH || 0}
@@ -608,7 +623,7 @@ export const ViewSummaryTable = ({
                           {employee?.hollydayCounts?.OFF || 0}
                         </td>
                         <td className="border px-2 py-1">
-                          {roundedTotalAbsentiesHrs || 0}
+                          {parseFloat(roundedTotalAbsentiesHrs).toFixed(2) || 0}
                         </td>
                         <td className="border px-2 py-1">
                           {employee?.empLeaveCount?.UAL || 0}
@@ -655,7 +670,7 @@ export const ViewSummaryTable = ({
           <div className="flex-1"></div>
 
           {/* Download Button Section */}
-          <div className="flex-1 flex justify-center ">
+          <div className="flex-1 flex justify-center">
             <button
               className="flex items-center space-x-2 rounded px-4 py-2  bg-[#FEF116] shadow-md"
               onClick={() => {

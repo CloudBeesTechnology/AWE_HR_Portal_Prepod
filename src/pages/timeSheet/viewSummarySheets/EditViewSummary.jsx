@@ -1,12 +1,15 @@
 import { IoCloseCircleOutline } from "react-icons/io5";
 import logo from "../../../assets/logo/logo-with-name.svg";
 import { useEffect, useState } from "react";
+import { HoursMinuAbsentCal } from "../customTimeSheet/HoursMinuAbsentCal";
 
 export const EditViewSummary = ({
   summaryObject,
   toggleEditViewSummaryFunc,
   FinalEditedData,
+  // resultOfWHrsAbsCal,
 }) => {
+  const { workHrsAbsentCal } = HoursMinuAbsentCal();
   const [formData, setFormData] = useState({
     id: summaryObject?.id,
     data: summaryObject?.data,
@@ -48,7 +51,7 @@ export const EditViewSummary = ({
               <IoCloseCircleOutline
                 className="text-[30px]  text-dark_grey cursor-pointer "
                 onClick={() => {
-                  toggleEditViewSummaryFunc();
+                  toggleEditViewSummaryFunc?.();
                 }}
               />
             </p>
@@ -150,14 +153,14 @@ export const EditViewSummary = ({
                   <label className="block text-dark_grey text_size_5">
                     Normal Working Hrs Per Day
                   </label>
-                 
+
                   <input
                     type="text"
                     className={`mt-1 block w-full border outline-none border-lite_grey text_size_7  rounded text-sm py-2 px-3 ${
                       formData.NWHPD ? "bg-lite_skyBlue" : "bg-white"
                     }`}
                     name="NWHPD"
-                    value={formData.NWHPD[formData.NWHPD.length -1]}
+                    value={formData.NWHPD[formData.NWHPD.length - 1]}
                     onChange={handleChange}
                     readOnly
                   />
@@ -201,9 +204,26 @@ export const EditViewSummary = ({
             ) : (
               <button
                 className="px-5 py-2 bg-[#FEF116] text_size_5 text-dark_grey rounded"
-                onClick={() => {
+                onClick={async () => {
+                  let NWHPD = Array.isArray(formData?.NWHPD)
+                    ? formData?.NWHPD[formData?.NWHPD.length - 1]
+                    : formData?.NWHPD;
+
+                  let NWHPM = Array.isArray(formData?.NWHPM)
+                    ? formData?.NWHPM[formData?.NWHPM.length - 1]
+                    : formData?.NWHPM;
+
+                  const getFormatedWorkHrs = await workHrsAbsentCal({
+                    NWHPD: NWHPD,
+                    NWHPM: NWHPM,
+                    workingHrsKey: formData?.workingHrsKey,
+                    workingHrs: formData?.workingHrs,
+                  });
+
+                  if (getFormatedWorkHrs === "0.00") return;
+
                   FinalEditedData(formData);
-                  toggleEditViewSummaryFunc();
+                  toggleEditViewSummaryFunc?.();
                 }}
               >
                 Verify

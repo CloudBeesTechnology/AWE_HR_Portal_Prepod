@@ -493,15 +493,34 @@ export const ApplyVSFunction = ({
               identifyFileType
             );
 
-            const convertNumToHours = (NWHPD) => {
-              const hoursFloat = NWHPD / 2; // 3.75
-              const hours = Math.floor(hoursFloat); // 3 hours
-              const minutes = Math.round((hoursFloat - hours) * 100); // 0.75 * 60 = 45 minutes
+            function convertNumToHours(input) {
+              let hours = 0;
+              let hundredMinutes = 0;
+              let divideBy = 2;
 
-              return `${String(hours).padStart(2, "0")}.${String(
-                minutes
-              ).padStart(2, "0")}`;
-            };
+              if (input?.includes(":")) {
+                [hours, hundredMinutes] = input?.split(":")?.map(Number);
+              } else if (input?.includes(".")) {
+                [hours, hundredMinutes] = input?.split(".")?.map(Number);
+              } else {
+                hours = parseInt(input, 10);
+                hundredMinutes = 0;
+              }
+
+              // Convert HH:100 to total hundred-minutes
+              let totalHundredMinutes = hours * 100 + hundredMinutes;
+
+              // Divide
+              totalHundredMinutes = Math.round(totalHundredMinutes / divideBy);
+
+              // Convert back to HH:100
+              const finalHours = Math.floor(totalHundredMinutes / 100);
+              const finalMinutes = totalHundredMinutes % 100;
+
+              return `${finalHours}:${finalMinutes
+                .toString()
+                .padStart(2, "0")}`;
+            }
 
             function toMinutes(decimalHour) {
               let hours = Math.floor(decimalHour);
@@ -509,45 +528,131 @@ export const ApplyVSFunction = ({
               return hours * 60 + minutes;
             }
 
-            const workHrsAbsentCal = (workingHrs) => {
-              let formattedWorkHrs = toMinutes(workingHrs);
-              let formattedNWHPD = toMinutes(entry?.normalWorkHrs);
+            // const workHrsAbsentCal = (workingHrs) => {
+            //   let formattedWorkHrs = toMinutes(workingHrs);
+            //   let formattedNWHPD = toMinutes(entry?.normalWorkHrs);
 
-              let diffMinutes = formattedNWHPD - formattedWorkHrs;
+            //   let diffMinutes = formattedNWHPD - formattedWorkHrs;
 
-              let resultHours = Math.floor(diffMinutes / 60);
-              let resultMinutes = diffMinutes % 60;
+            //   let resultHours = Math.floor(diffMinutes / 60);
+            //   let resultMinutes = diffMinutes % 60;
 
-              return `${String(resultHours).padStart(2, "0")}.${String(
-                resultMinutes
-              ).padStart(2, "0")}`;
-            };
+            //   return `${String(resultHours).padStart(2, "0")}.${String(
+            //     resultMinutes
+            //   ).padStart(2, "0")}`;
+            // };
+
+            function normalizeHH100(value) {
+              let hours = Math.floor(value);
+              let hundredMinutes = Math.round((value - hours) * 100);
+
+              if (hundredMinutes >= 100) {
+                hours += Math.floor(hundredMinutes / 100);
+                hundredMinutes = hundredMinutes % 100;
+              }
+
+              return parseFloat(
+                `${hours}.${hundredMinutes.toString().padStart(2, "0")}`
+              );
+            }
+
+            function workHrsAbsentCal(workingHrs, empType) {
+              // Normalize both working hours and normal working hours first
+              let formattedNWHPD;
+              if (empType === "staffLevelEmp")
+                formattedNWHPD = entry?.normalWorkHrs / 2;
+
+              if (empType === "normalEmp")
+                formattedNWHPD = entry?.normalWorkHrs;
+
+              const formattedWorkHrs = normalizeHH100(workingHrs);
+              const normalizedNormalHrs = normalizeHH100(formattedNWHPD);
+
+              let diff = normalizedNormalHrs - formattedWorkHrs;
+
+              return normalizeHH100(diff);
+            }
+
+            const normalWorkHrsPerMonth =
+              workInfoData.workMonth[workInfoData.workMonth.length - 1];
+            const normalWorkHrsPerDay =
+              workInfoData.workHrs[workInfoData.workHrs.length - 1];
+
             if (checkEntry) {
               // const result = parseFloat(entry?.normalWorkHrs) / 2;
               const result = convertNumToHours(entry?.normalWorkHrs);
+
               if (isNaN(checkEntry) || !checkEntry) {
                 acc[dayStr] = checkEntry;
               } else if (
                 dayOfWeek === "Saturday" &&
-                result === parseFloat(checkEntry)
+                parseFloat(entry?.normalWorkHrs) === 8 &&
+                parseFloat(normalWorkHrsPerMonth) === 24
+              ) {
+                const workingHrs = parseFloat(checkEntry);
+                let empType = "staffLevelEmp";
+                const formattedAbsentHrs = workHrsAbsentCal(
+                  workingHrs,
+                  empType
+                );
+                const absence = parseFloat(formattedAbsentHrs).toFixed(2);
+                const presentHrs = parseFloat(workingHrs).toFixed(2);
+
+                acc[dayStr] =
+                  absence === "0.00"
+                    ? presentHrs
+                    : `x(${absence})${presentHrs}`;
+              } else if (
+                dayOfWeek === "Saturday" &&
+                parseFloat(result.split(":")[0]) === parseFloat(checkEntry) &&
+                parseFloat(entry?.normalWorkHrs) !== 8 &&
+                parseFloat(normalWorkHrsPerMonth) !== 24
               ) {
                 const salaryType =
                   workInfoData?.salaryType[
                     workInfoData?.salaryType.length - 1
                   ]?.toLowerCase();
 
-                const monthlyTypes = ["monthly", "month", "m"];
+                const monthlyTypes = [
+                  "monthly",
+                  "month",
+                  "m",
+                  "MONTHLY",
+                  "Monthly",
+                  "MONTH",
+                ];
 
                 if (monthlyTypes.includes(salaryType)) {
-                  acc[dayStr] = "HPHD";
+                  // acc[dayStr] = "HPHD";
+
+                  const workingHrs = parseFloat(checkEntry);
+                  let empType = "normalEmp";
+                  const formattedAbsentHrs = workHrsAbsentCal(
+                    workingHrs,
+                    empType
+                  );
+                  const absence = parseFloat(formattedAbsentHrs).toFixed(2);
+                  const presentHrs = parseFloat(workingHrs).toFixed(2);
+                  acc[dayStr] =
+                    absence === "0.00"
+                      ? presentHrs
+                      : `x(${absence})${presentHrs}`;
                 }
               } else {
                 const workingHrs = parseFloat(checkEntry);
 
                 if (workingHrs <= (entry?.normalWorkHrs || 0)) {
-                  const formattedAbsentHrs = workHrsAbsentCal(workingHrs);
+                  let empType = "normalEmp";
+                  const formattedAbsentHrs = workHrsAbsentCal(
+                    workingHrs,
+                    empType
+                  );
                   const absence = parseFloat(formattedAbsentHrs).toFixed(2);
-                  acc[dayStr] = `x(${absence})${workingHrs}`;
+                  const presentHrs = parseFloat(workingHrs).toFixed(2);
+                  acc[dayStr] =
+                    absence === "0.00"
+                      ? presentHrs
+                      : `x(${absence})${presentHrs}`;
                 } else {
                   acc[dayStr] = workingHrs.toString();
                 }
@@ -723,7 +828,7 @@ export const ApplyVSFunction = ({
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-       
+
         const isDateInRange = (date, start, end) => {
           const parsedDate = new Date(date);
           const parsedStart = new Date(start);
@@ -930,7 +1035,7 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-       
+
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {

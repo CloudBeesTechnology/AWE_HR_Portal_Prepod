@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { GoDotFill } from "react-icons/go";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Popup } from "../pages/timeSheet/Popup";
 import { PopupForSave } from "../pages/timeSheet/PopupForSave";
@@ -58,6 +58,8 @@ export const TimeSheetBrowser = ({
   const [restrictSameExcelUpload, setRestrictSameExcelUpload] = useState(false);
 
   const Position = localStorage.getItem("userType");
+
+  const nav = useNavigate();
 
   useEffect(() => {
     if (isChecked === true) {
@@ -331,18 +333,19 @@ export const TimeSheetBrowser = ({
         }  mt-5 `}
       >
         <div className="text-start ">
-          <Link
-            to="/timeSheet"
-            className="text-xl flex-1 text-grey  "
+          <i
+            // to="/timeSheet"
+            className="text-xl flex-1 text-grey cursor-pointer"
             onClick={() => {
               setSearchQuery(null);
               setStartDate(null);
-
               setEndDate(null);
+              nav("/timeSheet");
+              // window.location.reload();
             }}
           >
             <FaArrowLeft />
-          </Link>
+          </i>
         </div>
 
         {Position !== "Manager" && (

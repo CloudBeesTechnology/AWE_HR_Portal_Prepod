@@ -93,5 +93,5 @@ export const useTableMerged = (excelData) => {
       fetchEmployeeData();
     }
   }, [excelData]);
-  return data;
+  return { data };
 };
