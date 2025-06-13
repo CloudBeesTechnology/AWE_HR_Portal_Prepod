@@ -36,8 +36,6 @@ export const ContractReview = () => {
     "Form",
   ].filter(Boolean);
 
-  console.log("UserType", userType);
-
   const formatDate = (date, type) => {
     if (Array.isArray(date)) {
       if (date.length === 0) return "-";
@@ -87,9 +85,6 @@ export const ContractReview = () => {
   };
 
   const contractExpiryMergedData = (data) => {
-    const AWE87901 = data.find((item) => item.empID === "AWE87901");
-    console.log("Full record for employee AWE87901:", AWE87901);
-
     const today = new Date();
     const startOfNextMonth = new Date(
       today.getFullYear(),
@@ -363,6 +358,7 @@ export const ContractReview = () => {
       .sort((a, b) => a.lastDate - b.lastDate)
       .map(({ lastDate, ...rest }) => rest);
 
+console.log(filtered,"filtered Data");
 
 
     setFilteredData(filtered);

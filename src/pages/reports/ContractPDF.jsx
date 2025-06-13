@@ -30,7 +30,7 @@ export const ContractPDF = ({ userID, userType }) => {
       "Contract Start Date",
       "Contract End Date",
       "LD Expiry",
-      userType === "SuperAdmin" && "Status",
+      userType !== "SuperAdmin" && "Status",
       // "Duration of Renewal Contract",
       "Form",
     ].filter(Boolean)

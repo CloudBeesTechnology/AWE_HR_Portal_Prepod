@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/static/css/main.fb7b997f.css",
-    "main.js": "/static/js/main.146dc293.js",
-    "static/js/934.f4175670.chunk.js": "/static/js/934.f4175670.chunk.js",
+    "main.js": "/static/js/main.8434d56f.js",
+    "static/js/934.569fde5d.chunk.js": "/static/js/934.569fde5d.chunk.js",
     "static/js/29.26ab8b8e.chunk.js": "/static/js/29.26ab8b8e.chunk.js",
     "static/js/318.4bbb3162.chunk.js": "/static/js/318.4bbb3162.chunk.js",
     "static/js/574.3c1ee7e4.chunk.js": "/static/js/574.3c1ee7e4.chunk.js",
@@ -73,8 +73,8 @@
     "static/media/employee-requisition.svg": "/static/media/employee-requisition.41b025adf1d775d5ccf3be283b8140f0.svg",
     "index.html": "/index.html",
     "main.fb7b997f.css.map": "/static/css/main.fb7b997f.css.map",
-    "main.146dc293.js.map": "/static/js/main.146dc293.js.map",
-    "934.f4175670.chunk.js.map": "/static/js/934.f4175670.chunk.js.map",
+    "main.8434d56f.js.map": "/static/js/main.8434d56f.js.map",
+    "934.569fde5d.chunk.js.map": "/static/js/934.569fde5d.chunk.js.map",
     "29.26ab8b8e.chunk.js.map": "/static/js/29.26ab8b8e.chunk.js.map",
     "318.4bbb3162.chunk.js.map": "/static/js/318.4bbb3162.chunk.js.map",
     "574.3c1ee7e4.chunk.js.map": "/static/js/574.3c1ee7e4.chunk.js.map",
@@ -92,6 +92,6 @@
   },
   "entrypoints": [
     "static/css/main.fb7b997f.css",
-    "static/js/main.146dc293.js"
+    "static/js/main.8434d56f.js"
   ]
 }
