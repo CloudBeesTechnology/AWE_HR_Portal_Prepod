@@ -116,13 +116,19 @@ export const ContractReview = () => {
         }
 
         const lastDate = contractEndDates[contractEndDates.length - 1];
-        if (!lastDate || item.contStatus) return false;
+        if (!lastDate|| item.contStatus) return false;
 
         const contractEnd = new Date(lastDate);
+
         return (
           contractEnd >= startOfNextMonth && contractEnd <= endOfTwoMonthsAfter
         );
       })
+      // .filter(
+      //   (item) =>
+      //     (item.genManager && item.contStatus === true) ||
+      //     (!item.genManager && !item.contStatus)
+      // )
       .map((item) => {
         const contractEndDates = item.contractEnd || [];
         const lastDate = contractEndDates[contractEndDates.length - 1];
@@ -209,6 +215,7 @@ export const ContractReview = () => {
           otherPosition: Array.isArray(item.otherPosition)
             ? item.otherPosition[item.otherPosition.length - 1]
             : "-",
+          // contStatus: item.contStatus,
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
@@ -228,6 +235,7 @@ export const ContractReview = () => {
         };
       })
       .filter(Boolean)
+
       .sort((a, b) => a.lastDate - b.lastDate);
 
     return sortedData.map(({ lastDate, ...rest }) => rest);
@@ -242,6 +250,7 @@ export const ContractReview = () => {
         userID,
         HRMPosition
       );
+      // console.log(mergedData);
 
       setTableBody(mergedData);
     }
@@ -355,15 +364,11 @@ export const ContractReview = () => {
         };
       })
       .sort((a, b) => a.lastDate - b.lastDate)
-      .sort((a, b) => a.lastDate - b.lastDate)
+
       .map(({ lastDate, ...rest }) => rest);
-
-console.log(filtered,"filtered Data");
-
 
     setFilteredData(filtered);
   };
-
 
   return (
     <div>

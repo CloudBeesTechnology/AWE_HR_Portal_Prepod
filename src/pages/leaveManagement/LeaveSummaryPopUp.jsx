@@ -83,12 +83,332 @@ export const LeaveSummaryPopUp = ({
     return `${year}-${month}-${day}`;
   };
 
+  // useEffect(() => {
+  //   const fetchedData = async () => {
+  //     const result = mergedData.reduce((acc, val) => {
+  //       if (val && val.empID && !acc[val.empID]) {
+  //         // console.log(val.empSickLeaveDate,val.empID,"jii");
+
+  //         acc[val.empID] = {
+  //           gender: val.gender,
+  //           empId: val.empID,
+  //           employeeName: val.empName,
+  //           empBadgeNo: val.empBadgeNo,
+  //           position: val.position,
+  //           department: val.department,
+  //           doj: val.doj,
+  //           annualLeaveBal: val.empPervAnnualLeaveBal,
+  //           empsickLeaveTaken: val.empsickLeaveTaken,
+  //           effectiveDate: val.empSickLeaveDate,
+  //           compassionateLeave: initializeLeaveType(0, true),
+  //           unPaidAuthorisedLeave: initializeLeaveType(0, true),
+  //           unPaidAuthorizeSick: initializeLeaveType(0, true),
+  //           unPaidAuthorizeAnnual: initializeLeaveType(0, true),
+  //           annualLeave: initializeLeaveType(
+  //             formatToTwoDecimals(
+  //               Number(
+  //                 Array.isArray(val.annualLeave) && val.annualLeave.length > 0
+  //                   ? val.annualLeave[val.annualLeave.length - 1]
+  //                   : typeof val.annualLeave === "string"
+  //                   ? parseFloat(val.annualLeave)
+  //                   : 0
+  //               ) + Number(val.empPervAnnualLeaveBal || 0)
+  //             )
+  //           ),
+
+  //           marriageLeave: initializeLeaveType(Number(val.marriageLeave) || 0),
+  //           hospitalisationLeave: initializeLeaveType(
+  //             Number(val.hospitalLeave) || 0
+  //           ),
+  //           maternityLeave: initializeLeaveType(
+  //             Number(val.maternityLeave) || 0
+  //           ),
+  //           sickLeave: initializeLeaveType(Number(val.sickLeave) || 0),
+  //           paternityLeave: initializeLeaveType(
+  //             Number(val.paternityLeave) || 0
+  //           ),
+  //           compensateLeave: initializeLeaveType(0, true),
+  //         };
+  //       }
+
+  //       const leaveTypeKeyMap = {
+  //         "Compassionate Leave": "compassionateLeave",
+  //         "Annual Leave": "annualLeave",
+  //         "Marriage Leave": "marriageLeave",
+  //         "Hospitalisation Leave": "hospitalisationLeave",
+  //         "Maternity Leave": "maternityLeave",
+  //         "Sick Leave": "sickLeave",
+  //         "Paternity Leave": "paternityLeave",
+  //         "Unpaid Authorize Leave": "unPaidAuthorisedLeave",
+  //         "Compensate Leave": "compensateLeave",
+  //         "Unpaid Authorize - Sick": "unPaidAuthorizeSick",
+  //         "Unpaid Authorize - Annual": "unPaidAuthorizeAnnual",
+  //       };
+
+  //       const trimmedLeaveType = val.empLeaveType?.trim();
+  //       const leaveKey = leaveTypeKeyMap[trimmedLeaveType];
+  //       const applicationStartDate = val.empLeaveSelectedFrom
+  //         ? new Date(dateNewFormate(val.empLeaveSelectedFrom))
+  //         : new Date(dateNewFormate(val.empLeaveStartDate));
+
+  //       const applicationEndDate = val.empLeaveSelectedTo
+  //         ? new Date(dateNewFormate(val.empLeaveSelectedTo))
+  //         : new Date(dateNewFormate(val.empLeaveEndDate));
+
+  //       const filterStartDate = new Date(startDate);
+  //       const filterEndDate = new Date(endDate);
+
+  //       let shouldProcessOtherLeave = false;
+  //       if (startDate && endDate) {
+  //         if (
+  //           applicationStartDate >= filterStartDate &&
+  //           applicationStartDate <= filterEndDate
+  //         ) {
+  //           shouldProcessOtherLeave = true;
+  //           // console.log("First Condition");
+  //         }
+
+  //         if (
+  //           applicationEndDate >= filterStartDate &&
+  //           applicationEndDate <= filterEndDate
+  //         ) {
+  //           shouldProcessOtherLeave = true;
+  //           // console.log("second Condition");
+  //         }
+
+  //         if (
+  //           applicationStartDate <= filterStartDate &&
+  //           applicationEndDate >= filterEndDate
+  //         ) {
+  //           shouldProcessOtherLeave = true;
+  //           // console.log("Third Condition");
+  //         }
+  //         if (leaveKey !== "sickLeave") {
+  //           // shouldProcessOtherLeave =
+  //           //   shouldProcessOtherLeave &&
+  //           //   isCurrentYear(dateNewFormate(val.empLeaveSelectedFrom));
+  //           shouldProcessOtherLeave =
+  //             shouldProcessOtherLeave &&
+  //             (isCurrentYear(dateNewFormate(val.empLeaveSelectedFrom)) ||
+  //               isCurrentYear(dateNewFormate(val.empLeaveSelectedTo)));
+  //         }
+  //       } else {
+  //         if (leaveKey !== "sickLeave") {
+  //           shouldProcessOtherLeave = isCurrentYear(
+  //             dateNewFormate(val.empLeaveSelectedFrom)
+  //           );
+  //         }
+  //       }
+
+  //       let shouldProcessLeave = false;
+
+  //       if (leaveKey === "sickLeave") {
+  //         const sickStart = new Date(dateNewFormate(val.empSickLeaveDate));
+  //         const sickEnd = new Date(sickStart);
+  //         sickEnd.setFullYear(sickEnd.getFullYear() + 1);
+  //         sickEnd.setDate(sickEnd.getDate() - 1);
+
+  //         const leaveStart = new Date(
+  //           dateNewFormate(val.empLeaveSelectedFrom || val.empLeaveStartDate)
+  //         );
+  //         const leaveEnd = new Date(
+  //           dateNewFormate(val.empLeaveSelectedTo || val.empLeaveEndDate)
+  //         );
+
+  //         // Initialize sick leave data
+  //         if (!acc[val.empID][leaveKey]) {
+  //           const total = Number(val.sickLeave) || 0;
+  //           acc[val.empID][leaveKey] = {
+  //             total,
+  //             taken: 0,
+  //             waitingLeave: 0,
+  //             remaining: total,
+  //           };
+  //         }
+
+  //         if (startDate && endDate) {
+  //           const filterStart = new Date(startDate);
+  //           const filterEnd = new Date(endDate);
+
+  //           let relevantStart = new Date(sickStart);
+  //           let relevantEnd = new Date(sickEnd);
+
+  //           while (filterStart > relevantEnd) {
+  //             relevantStart.setFullYear(relevantStart.getFullYear() + 1);
+  //             relevantEnd.setFullYear(relevantEnd.getFullYear() + 1);
+  //           }
+  //           while (filterStart < relevantStart) {
+  //             relevantStart.setFullYear(relevantStart.getFullYear() - 1);
+  //             relevantEnd.setFullYear(relevantEnd.getFullYear() - 1);
+  //           }
+
+  //           const isOverlap = (aStart, aEnd, bStart, bEnd) =>
+  //             aStart <= bEnd && bStart <= aEnd;
+
+  //           const overlapsFilter = isOverlap(
+  //             leaveStart,
+  //             leaveEnd,
+  //             filterStart,
+  //             filterEnd
+  //           );
+  //           const overlapsRelevant = isOverlap(
+  //             leaveStart,
+  //             leaveEnd,
+  //             relevantStart,
+  //             relevantEnd
+  //           );
+
+  //           // if (val.empID === "6056") {
+  //           //   console.log({
+  //           //     leaveStart,
+  //           //     leaveEnd,
+  //           //     filterStart,
+  //           //     filterEnd,
+  //           //     relevantStart,
+  //           //     relevantEnd,
+  //           //     overlapsFilter,
+  //           //     overlapsRelevant,
+  //           //   });
+  //           // }
+  //           if (overlapsFilter && overlapsRelevant) {
+  //             // if (val.empID === "6056") {
+  //             //   console.log(val.empSickLeaveDate, "empSickLeave");
+  //             //   console.log(val.leaveDays, "leaveDate");
+  //             // }
+  //             const leaveDays = Number(val.leaveDays) || 0;
+  //             if (
+  //               val.managerStatus === "Approved" &&
+  //               val.empStatus !== "Cancelled"
+  //             ) {
+  //               acc[val.empID][leaveKey].taken += leaveDays;
+  //             } else if (
+  //               val.managerStatus === "Pending" &&
+  //               val.supervisorStatus !== "Rejected" &&
+  //               val.empStatus !== "Cancelled"
+  //             ) {
+  //               acc[val.empID][leaveKey].waitingLeave += leaveDays;
+  //             }
+  //             const { total, taken, waitingLeave } = acc[val.empID][leaveKey];
+  //             const remaining = formatToTwoDecimals(
+  //               total - (taken + waitingLeave)
+  //             );
+  //             acc[val.empID][leaveKey].remaining =
+  //               remaining < 5 ? remaining : remaining;
+  //           }
+  //         } else {
+  //           // Default behavior: show current effective period data
+  //           let currentDate = new Date();
+
+  //           let startED = new Date(dateNewFormate(val.empSickLeaveDate));
+  //           let endED = new Date(startED);
+  //           endED.setFullYear(endED.getFullYear() + 1);
+  //           endED.setDate(endED.getDate() - 1);
+  //           while (endED < currentDate) {
+  //             startED.setFullYear(startED.getFullYear() + 1);
+  //             endED.setFullYear(endED.getFullYear() + 1);
+  //           }
+
+  //           if (
+  //             currentDate >= startED &&
+  //             leaveStart >= startED &&
+  //             leaveEnd <= endED &&
+  //             currentDate <= endED
+  //           ) {
+  //             if (
+  //               val.managerStatus === "Approved" &&
+  //               val.empStatus !== "Cancelled"
+  //             ) {
+  //               acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
+  //             } else if (
+  //               val.managerStatus === "Pending" &&
+  //               val.supervisorStatus !== "Rejected" &&
+  //               val.empStatus !== "Cancelled"
+  //             ) {
+  //               acc[val.empID][leaveKey].waitingLeave +=
+  //                 Number(val.leaveDays) || 0;
+  //             }
+
+  //             // Calculate remaining leave
+  //             const total = acc[val.empID][leaveKey].total || 0;
+  //             const taken = acc[val.empID][leaveKey].taken || 0;
+  //             const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
+  //             const remaining = formatToTwoDecimals(total - (taken + waiting));
+  //             acc[val.empID][leaveKey].remaining =
+  //               remaining < 5 ? remaining : remaining;
+  //           }
+  //         }
+  //       } else {
+  //         // For non-sick leave types, use the original shouldProcessOtherLeave logic
+  //         shouldProcessLeave = shouldProcessOtherLeave;
+  //       }
+
+  //       if (leaveKey && shouldProcessLeave) {
+  //         if (!acc[val.empID][leaveKey]) {
+  //           acc[val.empID][leaveKey] = {
+  //             total: 0,
+  //             taken: 0,
+  //             waitingLeave: 0,
+  //             remaining: 0,
+  //           };
+  //         }
+  //         // if (val.empID === "6056") {
+  //         //   console.log(val, "checking data");
+  //         // }
+  //         if (
+  //           val.managerStatus === "Approved" &&
+  //           val.empStatus !== "Cancelled"
+  //         ) {
+  //           acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
+  //         } else if (
+  //           val.managerStatus === "Pending" &&
+  //           val.supervisorStatus !== "Rejected" &&
+  //           val.empStatus !== "Cancelled"
+  //         ) {
+  //           acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
+  //         }
+
+  //         if (
+  //           ![
+  //             "compassionateLeave",
+  //             "unPaidAuthorisedLeave",
+  //             "compensateLeave",
+  //             "unPaidAuthorizeSick",
+  //             "unPaidAuthorizeAnnual",
+  //           ].includes(leaveKey)
+  //         ) {
+  //           const total = acc[val.empID][leaveKey].total || 0;
+  //           const taken = acc[val.empID][leaveKey].taken || 0;
+  //           const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
+
+  //           const remaining = formatToTwoDecimals(total - (taken + waiting));
+  //           acc[val.empID][leaveKey].remaining =
+  //             remaining < 5 ? remaining : remaining;
+  //         }
+  //       }
+
+  //       return acc;
+  //     }, {});
+
+  //     const summary = result[empDetails.empID];
+  //     // console.log("summary : ", summary);
+  //     setLeaveSummary(summary);
+  //   };
+
+  //   fetchedData();
+  // }, [mergedData, startDate, endDate, empDetails]);
   useEffect(() => {
     const fetchedData = async () => {
+      // ✅ Helper function to calculate overlapping days
+      const getOverlappingDays = (start1, end1, start2, end2) => {
+        const start = new Date(Math.max(start1, start2));
+        const end = new Date(Math.min(end1, end2));
+        const diffTime = end - start;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        return diffDays > 0 ? diffDays : 0;
+      };
+
       const result = mergedData.reduce((acc, val) => {
         if (val && val.empID && !acc[val.empID]) {
-          // console.log(val.empSickLeaveDate,val.empID,"jii");
-
           acc[val.empID] = {
             gender: val.gender,
             empId: val.empID,
@@ -115,7 +435,6 @@ export const LeaveSummaryPopUp = ({
                 ) + Number(val.empPervAnnualLeaveBal || 0)
               )
             ),
-
             marriageLeave: initializeLeaveType(Number(val.marriageLeave) || 0),
             hospitalisationLeave: initializeLeaveType(
               Number(val.hospitalLeave) || 0
@@ -165,7 +484,6 @@ export const LeaveSummaryPopUp = ({
             applicationStartDate <= filterEndDate
           ) {
             shouldProcessOtherLeave = true;
-            // console.log("First Condition");
           }
 
           if (
@@ -173,7 +491,6 @@ export const LeaveSummaryPopUp = ({
             applicationEndDate <= filterEndDate
           ) {
             shouldProcessOtherLeave = true;
-            // console.log("second Condition");
           }
 
           if (
@@ -181,12 +498,13 @@ export const LeaveSummaryPopUp = ({
             applicationEndDate >= filterEndDate
           ) {
             shouldProcessOtherLeave = true;
-            // console.log("Third Condition");
           }
+
           if (leaveKey !== "sickLeave") {
             shouldProcessOtherLeave =
               shouldProcessOtherLeave &&
-              isCurrentYear(dateNewFormate(val.empLeaveSelectedFrom));
+              (isCurrentYear(dateNewFormate(val.empLeaveSelectedFrom)) ||
+                isCurrentYear(dateNewFormate(val.empLeaveSelectedTo)));
           }
         } else {
           if (leaveKey !== "sickLeave") {
@@ -199,6 +517,7 @@ export const LeaveSummaryPopUp = ({
         let shouldProcessLeave = false;
 
         if (leaveKey === "sickLeave") {
+          // 👇 Original sick leave logic
           const sickStart = new Date(dateNewFormate(val.empSickLeaveDate));
           const sickEnd = new Date(sickStart);
           sickEnd.setFullYear(sickEnd.getFullYear() + 1);
@@ -211,7 +530,6 @@ export const LeaveSummaryPopUp = ({
             dateNewFormate(val.empLeaveSelectedTo || val.empLeaveEndDate)
           );
 
-          // Initialize sick leave data
           if (!acc[val.empID][leaveKey]) {
             const total = Number(val.sickLeave) || 0;
             acc[val.empID][leaveKey] = {
@@ -254,23 +572,7 @@ export const LeaveSummaryPopUp = ({
               relevantEnd
             );
 
-            // if (val.empID === "6056") {
-            //   console.log({
-            //     leaveStart,
-            //     leaveEnd,
-            //     filterStart,
-            //     filterEnd,
-            //     relevantStart,
-            //     relevantEnd,
-            //     overlapsFilter,
-            //     overlapsRelevant,
-            //   });
-            // }
             if (overlapsFilter && overlapsRelevant) {
-              // if (val.empID === "6056") {
-              //   console.log(val.empSickLeaveDate, "empSickLeave");
-              //   console.log(val.leaveDays, "leaveDate");
-              // }
               const leaveDays = Number(val.leaveDays) || 0;
               if (
                 val.managerStatus === "Approved" &&
@@ -283,7 +585,6 @@ export const LeaveSummaryPopUp = ({
                 val.empStatus !== "Cancelled"
               ) {
                 acc[val.empID][leaveKey].waitingLeave += leaveDays;
-             
               }
               const { total, taken, waitingLeave } = acc[val.empID][leaveKey];
               const remaining = formatToTwoDecimals(
@@ -293,9 +594,8 @@ export const LeaveSummaryPopUp = ({
                 remaining < 5 ? remaining : remaining;
             }
           } else {
-            // Default behavior: show current effective period data
+            // Default behavior
             let currentDate = new Date();
-
             let startED = new Date(dateNewFormate(val.empSickLeaveDate));
             let endED = new Date(startED);
             endED.setFullYear(endED.getFullYear() + 1);
@@ -325,7 +625,6 @@ export const LeaveSummaryPopUp = ({
                   Number(val.leaveDays) || 0;
               }
 
-              // Calculate remaining leave
               const total = acc[val.empID][leaveKey].total || 0;
               const taken = acc[val.empID][leaveKey].taken || 0;
               const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
@@ -335,7 +634,7 @@ export const LeaveSummaryPopUp = ({
             }
           }
         } else {
-          // For non-sick leave types, use the original shouldProcessOtherLeave logic
+          // ✅ Other leave types
           shouldProcessLeave = shouldProcessOtherLeave;
         }
 
@@ -348,20 +647,29 @@ export const LeaveSummaryPopUp = ({
               remaining: 0,
             };
           }
-          //   if (val.empID === "2667") {
-          //   console.log(val, "checking data");
-          // }
+
+          // ✅ Calculate overlapping leave days
+          let days = Number(val.leaveDays) || 0;
+          if (startDate && endDate) {
+            days = getOverlappingDays(
+              applicationStartDate,
+              applicationEndDate,
+              filterStartDate,
+              filterEndDate
+            );
+          }
+
           if (
             val.managerStatus === "Approved" &&
             val.empStatus !== "Cancelled"
           ) {
-            acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
+            acc[val.empID][leaveKey].taken += days;
           } else if (
             val.managerStatus === "Pending" &&
             val.supervisorStatus !== "Rejected" &&
             val.empStatus !== "Cancelled"
           ) {
-            acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
+            acc[val.empID][leaveKey].waitingLeave += days;
           }
 
           if (
@@ -376,7 +684,6 @@ export const LeaveSummaryPopUp = ({
             const total = acc[val.empID][leaveKey].total || 0;
             const taken = acc[val.empID][leaveKey].taken || 0;
             const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
-
             const remaining = formatToTwoDecimals(total - (taken + waiting));
             acc[val.empID][leaveKey].remaining =
               remaining < 5 ? remaining : remaining;
@@ -387,7 +694,6 @@ export const LeaveSummaryPopUp = ({
       }, {});
 
       const summary = result[empDetails.empID];
-      // console.log("summary : ", summary);
       setLeaveSummary(summary);
     };
 

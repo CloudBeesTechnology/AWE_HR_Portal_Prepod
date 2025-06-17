@@ -180,9 +180,13 @@ export const ProbationPDF = ({ userID, userType }) => {
           }),
         };
 
-        return formattedData;
-      });
-
+          return formattedData;
+      })
+      .sort((a, b) => {
+        if (a.status === "Pending" && b.status !== "Pending") return -1;
+        if (a.status !== "Pending" && b.status === "Pending") return 1;
+        return 0;
+      }); 
     // console.log("✅ Total Employees After Filter:", filteredData.length);
     return filteredData;
   };

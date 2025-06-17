@@ -151,8 +151,12 @@ export const ProbationReview = () => {
         };
       })
       .filter(Boolean)
-      .sort((a, b) => a.lastDate - b.lastDate);
-
+      .sort((a, b) => a.lastDate - b.lastDate)
+      .sort((a, b) => {
+        if (a.status === "Pending" && b.status !== "Pending") return -1;
+        if (a.status !== "Pending" && b.status === "Pending") return 1;
+        return 0;
+      });
     return sortedData.map(({ lastDate, ...rest }) => rest);
   };
 
