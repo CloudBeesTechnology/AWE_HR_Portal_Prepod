@@ -36,9 +36,6 @@ export const ProbationReview = () => {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const navigate = useNavigate();
 
-  // console.log("UserType", userType);
-  console.log("HR", HRMPosition);
-
   const formatDate = (date) => {
     if (Array.isArray(date)) {
       if (date.length === 0) return "-";
@@ -116,8 +113,7 @@ export const ProbationReview = () => {
 
         if (userType === "Manager" && HRMPosition !== "HR MANAGER") {
           return null;
-        } else if (userType === "HR" && HRMPosition !== "HR MANAGER") {
-          return null;
+        } else if (userType === "HR" || HRMPosition === "HR MANAGER") {
         } else if (gmPosition === "GENERAL MANAGER") {
           return null;
         }
@@ -142,9 +138,9 @@ export const ProbationReview = () => {
             : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
-          ...(HRMPosition === "HR MANAGER" && {
-            status: item.hrName ? "Approved" : "Pending",
-          }),
+          ...(HRMPosition === "HR MANAGER" || userType === "HR"
+            ? { status: item.hrName ? "Approved" : "Pending" }
+            : {}),
           ...(userType === "Supervisor" && {
             status: item.supervisorApproved ? "Approved" : "Pending",
           }),
@@ -160,10 +156,6 @@ export const ProbationReview = () => {
     return sortedData.map(({ lastDate, ...rest }) => rest);
   };
 
-  // useEffect(() => {
-  //   const mergedData = probationReviewMergedData(allData);
-  //   setTableBody(mergedData);
-  // }, [allData]);
   useEffect(() => {
     const mergedData = probationReviewMergedData(
       allData,
@@ -176,7 +168,6 @@ export const ProbationReview = () => {
   }, [allData, userType, gmPosition, userID, HRMPosition]);
 
   const handleViewDetails = (personData) => {
-    console.log("Person State:", personData);
     setSelectedPerson(personData);
   };
 
@@ -262,9 +253,9 @@ export const ProbationReview = () => {
             : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
-          ...(HRMPosition === "HR MANAGER" && {
-            status: item.hrName ? "Approved" : "Pending",
-          }),
+          ...(HRMPosition === "HR MANAGER" || userType === "HR"
+            ? { status: item.hrName ? "Approved" : "Pending" }
+            : {}),
           ...(userType === "Supervisor" && {
             status: item.supervisorApproved ? "Approved" : "Pending",
           }),
@@ -275,7 +266,6 @@ export const ProbationReview = () => {
 
     setFilteredData(filtered);
   };
-  // console.log("TableBody", tableBody);
 
   return (
     <div>

@@ -11,7 +11,8 @@ export const ConfirmationForm = ({
   gmPosition,
   workInfoData,
   employeeData,
-  HRMPosition
+  HRMPosition,
+  skillPool,
 }) => {
   const [selectedValue, setSelectedValue] = React.useState("");
   const [hasSupervisor, setHasSupervisor] = React.useState(true);
@@ -335,67 +336,69 @@ export const ConfirmationForm = ({
         </div>
 
         {/* GM Section */}
-        <div className="flex justify-between items-center">
-          <div className="w-[380px]">
-            <label className="text-sm font-medium">Concurred By GM :</label>
+        {skillPool === null && (
+          <div className="flex justify-between items-center">
+            <div className="w-[380px]">
+              <label className="text-sm font-medium">Concurred By GM :</label>
 
-            <input
-              type="text"
-              name="gmName"
-              {...register("gmName")}
-              value={formData.probData.gmName || ""}
-              onChange={handleInputChange}
-              disabled={gmPosition !== "GENERAL MANAGER"}
-              className="border-b outline-none px-1 w-[250px]"
-            />
-            <p className="text-[12px]">(For Staff Category Only)</p>
-          </div>
-          <div className="flex items-center space-x-10 border-b">
-            <div className="flex items-center space-x-2 ">
               <input
-                type="radio"
-                value="Approved"
-                name="gmApproved"
-                {...register("gmApproved")}
-                checked={formData.probData.gmApproved === "Approved"}
+                type="text"
+                name="gmName"
+                {...register("gmName")}
+                value={formData.probData.gmName || ""}
                 onChange={handleInputChange}
-                id="gmApproved"
                 disabled={gmPosition !== "GENERAL MANAGER"}
-                className="h-4 w-4 form-checkbox"
+                className="border-b outline-none px-1 w-[250px]"
               />
-              <label htmlFor="gmApproved" className="text-sm py-2">
-                Approved
-              </label>
+              <p className="text-[12px]">(For Staff Category Only)</p>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-10 border-b">
+              <div className="flex items-center space-x-2 ">
+                <input
+                  type="radio"
+                  value="Approved"
+                  name="gmApproved"
+                  {...register("gmApproved")}
+                  checked={formData.probData.gmApproved === "Approved"}
+                  onChange={handleInputChange}
+                  id="gmApproved"
+                  disabled={gmPosition !== "GENERAL MANAGER"}
+                  className="h-4 w-4 form-checkbox"
+                />
+                <label htmlFor="gmApproved" className="text-sm py-2">
+                  Approved
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  value="Rejected"
+                  name="gmApproved"
+                  {...register("gmApproved")}
+                  checked={formData.probData.gmApproved === "Rejected"}
+                  onChange={handleInputChange}
+                  id="gmReject"
+                  disabled={gmPosition !== "GENERAL MANAGER"}
+                  className="h-4 w-4 form-checkbox"
+                />
+                <label htmlFor="gmReject" className="text-sm py-2">
+                  Rejected
+                </label>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2 border-b ">
               <input
-                type="radio"
-                value="Rejected"
-                name="gmApproved"
-                {...register("gmApproved")}
-                checked={formData.probData.gmApproved === "Rejected"}
+                type="date"
+                name="gmDate"
+                {...register("gmDate")}
+                value={formData.probData.gmDate || ""}
                 onChange={handleInputChange}
-                id="gmReject"
                 disabled={gmPosition !== "GENERAL MANAGER"}
-                className="h-4 w-4 form-checkbox"
+                className="outline-none"
               />
-              <label htmlFor="gmReject" className="text-sm py-2">
-                Rejected
-              </label>
             </div>
           </div>
-          <div className="flex items-center space-x-2 border-b ">
-            <input
-              type="date"
-              name="gmDate"
-              {...register("gmDate")}
-              value={formData.probData.gmDate || ""}
-              onChange={handleInputChange}
-              disabled={gmPosition !== "GENERAL MANAGER"}
-              className="outline-none"
-            />
-          </div>
-        </div>
+        )}
       </div>
 
       {/* HR Section */}
@@ -413,7 +416,7 @@ export const ConfirmationForm = ({
               {...register("hrName")}
               value={formData.probData.hrName || ""}
               onChange={handleInputChange}
-              disabled={HRMPosition !== "HR MANAGER"}
+              disabled={HRMPosition !== "HR MANAGER" && userType !== "HR"}
               className="border-b outline-none px-1"
             />
           </div>
@@ -424,7 +427,7 @@ export const ConfirmationForm = ({
               {...register("hrDate")}
               value={formData.probData.hrDate || ""}
               onChange={handleInputChange}
-              disabled={HRMPosition !== "HR MANAGER"}
+              disabled={HRMPosition !== "HR MANAGER" && userType !== "HR"}
               className="outline-none"
             />
           </div>

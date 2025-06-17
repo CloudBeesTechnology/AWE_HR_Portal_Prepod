@@ -367,19 +367,8 @@ export const ContractFormPDF = ({ contentRef }) => {
         await contractForm(formPayload);
       }
 
-      // Send appropriate notifications --before
-      // if (userType === "HR") {
-      //   // console.log("HR BLOCK");
 
-      //   HRResult = await sendHRNotification(
-      //     empName,
-      //     contractEndFormatted,
-      //     managerData
-      //   );
-
-      // -after
-
-      if (HRMPosition === "HR MANAGER") {
+      if (HRMPosition === "HR MANAGER" || userType === "HR") {
         // console.log("HR BLOCK");
 
         HRResult = await sendHRNotification(
@@ -625,7 +614,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               name="remarkHr"
               value={formData.contract.remarkHr}
               onChange={handleInputChange}
-              disabled={HRMPosition !== "HR MANAGER"}
+              disabled={HRMPosition !== "HR MANAGER" && userType !== "HR"}
               className="border w-full text-sm  rounded resize-none outline-none p-2"
             />
           </div>
@@ -668,7 +657,7 @@ export const ContractFormPDF = ({ contentRef }) => {
                 name="hrManager"
                 value={formData.contract.hrManager}
                 onChange={handleInputChange}
-                disabled={HRMPosition !== "HR MANAGER"}
+                disabled={HRMPosition !== "HR MANAGER" && userType !== "HR"}
                 className="border-b border-black w-56 mx-auto outline-none text-center"
               />
 
