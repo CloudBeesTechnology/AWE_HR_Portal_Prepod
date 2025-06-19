@@ -73,8 +73,7 @@ export const HoursMinuAbsentCal = () => {
         totalStaffLevelEmpWorkHrs / staffLevelempNWHPD;
       let getAvgOfNormalTotalHrs = totalNoramlWorkingHrs / lastIndexOfNWHPD;
 
-      console.log("getAvgOfStaffLevelWorkHrs : ", getAvgOfStaffLevelWorkHrs);
-      console.log("getAvgOfNormalTotalHrs : ", getAvgOfNormalTotalHrs);
+     
       let totalAvgOfND = getAvgOfStaffLevelWorkHrs + getAvgOfNormalTotalHrs;
       Math.floor(totalAvgOfND);
       return totalAvgOfND.toFixed(2); // HH.100 format
@@ -262,7 +261,7 @@ export const HoursMinuAbsentCal = () => {
   // };
 
   function calculateTotalAbsence(employee, getLastIndexOfNWhrs) {
-    console.log("employee : ", employee);
+
     const workingHrsObj = employee?.workingHrs;
     const lastIndex = parseFloat(getLastIndexOfNWhrs);
     const getLastIndexOfNWHPM =
@@ -270,7 +269,7 @@ export const HoursMinuAbsentCal = () => {
         ? employee?.workMonth[employee?.workMonth?.length - 1]
         : "";
 
-    console.log("workingHrsObj : ", workingHrsObj);
+   
     try {
       let totalHours = 0;
       let totalStaffLevelEmpAbsence = 0;
@@ -307,7 +306,7 @@ export const HoursMinuAbsentCal = () => {
           }
         }
       }
-      let staffLevelempNWHPD = lastIndex / 2;
+      let staffLevelempNWHPD = lastIndex;
       let getAvgOfStaffLevel = totalStaffLevelEmpAbsence / staffLevelempNWHPD;
       let getAvgOfNormalAbsence = totalNormalAbsence / lastIndex;
       let totalAvgOfAbsence = getAvgOfStaffLevel + getAvgOfNormalAbsence;

@@ -30,13 +30,11 @@ export const ContractPDF = ({ userID, userType }) => {
       "Contract Start Date",
       "Contract End Date",
       "LD Expiry",
-      userType === "SuperAdmin" && "Status",
+      userType !== "SuperAdmin" && "Status",
       // "Duration of Renewal Contract",
       "Form",
     ].filter(Boolean)
   );
-
-  // console.log("UserType", userType);
 
   const formatDate = (date) => {
     if (Array.isArray(date)) {
@@ -88,8 +86,6 @@ export const ContractPDF = ({ userID, userType }) => {
   };
 
   const contractExpiryMergedData = (data) => {
-    //     const AWE87901 = data.find((item) => item.empID === "AWE87901");
-    // console.log("Full record for employee AWE87901:", AWE87901);
     const filteredData = data
       .filter((item) => {
         if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
@@ -126,37 +122,12 @@ export const ContractPDF = ({ userID, userType }) => {
         const isDepartmentHead = item.depHead;
         const isHr = item.hrManager;
 
-        // console.log("Manager", isDepartmentHead);
-        // console.log("HR", isHr);
 
-        // if (userType === "Supervisor") {
-        //   return null;
-        // }
-
-        // if (HRMPosition === "HR MANAGER" && !isDepartmentHead) {
-        //   return null;
-        // }
-
-        // if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
-        //   if (lastManager !== userID) return null;
-        // }
-
-        // if (userType === "HR" && HRMPosition !== "HR MANAGER") {
-        //   return null;
-        // }
-
-        // if (userType === "Manager" && HRMPosition !== "HR MANAGER") {
-        //   return null;
-        // }
-
-        // if (gmPosition === "GENERAL MANAGER" && !isHr) {
-        //   return null;
-        // }
-
-        // Allow HR user with HR MANAGER role
-        if (userType === "HR" && HRMPosition === "HR MANAGER") {
+        if (userType === "HR" || HRMPosition === "HR MANAGER") {
+          console.log("this");
           // allow
         }
+
         // Allow Manager with any HRMPosition defined
         else if (userType === "Manager" && HRMPosition === "HR MANAGER") {
           // allow
@@ -206,9 +177,9 @@ export const ContractPDF = ({ userID, userType }) => {
             HRMPosition !== "HR MANAGER" && {
               status: item.depHead ? "Approved" : "Pending",
             }),
-          ...(HRMPosition === "HR MANAGER" && {
-            status: item.hrManager ? "Approved" : "Pending",
-          }),
+          ...(HRMPosition === "HR MANAGER" || userType === "HR"
+            ? { status: item.hrManager ? "Approved" : "Pending" }
+            : {}),
           ...(gmPosition === "GENERAL MANAGER" && {
             status: item.genManager ? "Approved" : "Pending",
           }),
@@ -219,15 +190,13 @@ export const ContractPDF = ({ userID, userType }) => {
         if (a.status === "Pending" && b.status !== "Pending") return -1;
         if (a.status !== "Pending" && b.status === "Pending") return 1;
         return 0;
-      })
-    // console.log(filteredData, "azsdxcfgvbhnj");
+      });
+
     setStoreData(filteredData);
     return filteredData;
   };
-  // console.log("GM", gmPosition);
 
   useEffect(() => {
-
     const data = contractExpiryMergedData(
       allData,
       userType,
@@ -314,22 +283,19 @@ export const ContractPDF = ({ userID, userType }) => {
             HRMPosition !== "HR MANAGER" && {
               status: item.depHead ? "Approved" : "Pending",
             }),
-          ...(HRMPosition === "HR MANAGER" && {
-            status: item.hrManager ? "Approved" : "Pending",
-          }),
+          ...(HRMPosition === "HR MANAGER" || userType === "HR"
+            ? { status: item.hrManager ? "Approved" : "Pending" }
+            : {}),
           ...(gmPosition === "GENERAL MANAGER" && {
             status: item.genManager ? "Approved" : "Pending",
           }),
         };
       });
-
     setFilteredData(filtered);
   };
-  // console.log("GM", gmPosition);
 
   const handleViewDetails = (personData) => {
     setSelectedPerson(personData);
-    // console.log(personData);
   };
 
   const closeModal = () => {
@@ -339,8 +305,6 @@ export const ContractPDF = ({ userID, userType }) => {
   const handleNavigate = () => {
     closeModal();
     if (selectedPerson) {
-      // console.log("Current", selectedPerson);
-
       navigate("/contractForms", { state: { employeeData: selectedPerson } });
     }
   };

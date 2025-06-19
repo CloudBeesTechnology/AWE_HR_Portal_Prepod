@@ -1185,22 +1185,21 @@ export const ViewBLNGsheet = ({
       const empInfoMap = new Map();
 
       if (Array.isArray(empAndWorkInfo)) {
-        console.log("empAndWorkInfo:", empAndWorkInfo);
+        
         empAndWorkInfo.forEach((item) => {
           const key = String(item?.sapNo).toUpperCase();
           empInfoMap.set(key, item);
         });
       }
 
-      console.log("empInfoMap:", empInfoMap);
-      console.log("data:", data);
+   
 
       const addedNWHPD =
         Array.isArray(data) &&
         data.map((val) => {
           const badgeKey = String(val?.FID).toUpperCase();
           const workInfoItem = empInfoMap.get(badgeKey);
-          console.log("workInfoItem : ", workInfoItem);
+          
 
           const lastWorkHour =
             workInfoItem?.workHrs && Array.isArray(workInfoItem?.workHrs)

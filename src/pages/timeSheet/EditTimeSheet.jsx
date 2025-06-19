@@ -318,7 +318,7 @@ export const EditTimeSheet = ({
               .padStart(2, "0")}`;
           };
 
-          console.log("sections : ", sections);
+          
           let totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
 
           setFormData((prevFormData) => {
@@ -363,7 +363,7 @@ export const EditTimeSheet = ({
       };
       // End
 
-      console.log("sections : ", sections);
+      
       if (titleName === "HO") {
         updateFormData("TOTALACTUALHOURS", "TOTALACTUALHOURS");
       } else if (titleName === "BLNG") {
@@ -500,7 +500,7 @@ export const EditTimeSheet = ({
         });
       }
     });
-    console.log("newErrors : ", newErrors);
+   
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -624,13 +624,11 @@ export const EditTimeSheet = ({
           empAndWorkInfo,
           editObject?.fileType
         );
-        console.log("getMatchedData : ", getMatchedData);
-        console.log("editObject : ", editObject);
-        console.log("empAndWorkInfo : ", empAndWorkInfo);
+        
         let rawDate =
           editObject?.DATE?.trim() || editObject?.ENTRANCEDATEUSED?.trim();
         let formattedDate = convertToYYYYMMDD(rawDate, editObject.fileType);
-        console.log("formattedDate : ", formattedDate);
+        
         const currentDay = new Date(formattedDate);
         const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
           weekday: "long",
@@ -657,8 +655,7 @@ export const EditTimeSheet = ({
           const normalizedWorkHrs = convertHHMMtoHH100(formattedWorkHrs);
           const normalizedNormalHrs = normalizeHH100(formattedNWHPD);
 
-          console.log("normalizedWorkHrs : ", normalizedWorkHrs);
-          console.log("normalizedNormalHrs : ", normalizedNormalHrs);
+         
           if (normalizedWorkHrs > normalizedNormalHrs) {
             alertShown = false;
             if (dayOfWeek === "Saturday" && NWHPD == 8 && NWHPM == 24) {

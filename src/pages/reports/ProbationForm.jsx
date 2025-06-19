@@ -45,8 +45,6 @@ export const ProbationForm = ({ userID, userType }) => {
     skilledAndUnskilled: null,
   });
 
-  // console.log(ProbFData);
-  // console.log("Date",gmPosition);
 
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
@@ -115,7 +113,7 @@ export const ProbationForm = ({ userID, userType }) => {
 
   if (probationEndDateStr) {
     const [day, month, year] = probationEndDateStr.split("-");
-    const parsedDate = new Date(`${year}-${month}-${day}`); // Format to YYYY-MM-DD
+    const parsedDate = new Date(`${year}-${month}-${day}`); 
 
     if (!isNaN(parsedDate)) {
       probationMonthYear = parsedDate.toLocaleDateString("en-US", {

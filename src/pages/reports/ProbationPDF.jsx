@@ -58,15 +58,9 @@ export const ProbationPDF = ({ userID, userType }) => {
     return date.toISOString().split("T")[0];
   };
 
-  // console.log("GM", gmPosition);
-  // console.log("User", userType);
-
   const probationReviewMergedData = (data, userType, gmPosition, userID) => {
-    // const AWE87865 = data.find((item) => item.empID === "AWE87865");
-    // console.log("Full record for employee AWE87865:", AWE87865);
     const filteredData = data
       .filter((item) => {
-        // Work status check
         if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
           const lastWorkStatus =
             item.workStatus[item.workStatus.length - 1]?.toUpperCase();
@@ -120,7 +114,7 @@ export const ProbationPDF = ({ userID, userType }) => {
           return result;
         }
 
-        if (userType === "HR") {
+        if (userType === "HR" || HRMPosition === "HR MANAGER") {
           const result = isProbationActive && isGmApproved;
 
           return result;
@@ -169,46 +163,37 @@ export const ProbationPDF = ({ userID, userType }) => {
             HRMPosition !== "HR MANAGER" && {
               status: item.managerApproved || "Pending",
             }),
-          // ...(userType === "HR" && {
-          //   status: item.hrName ? "Approved" : "Pending",
-          // }),
-          ...(HRMPosition === "HR MANAGER" && {
-            status: item.hrName ? "Approved" : "Pending",
-          }),
+
+          ...(HRMPosition === "HR MANAGER" || userType === "HR"
+            ? { status: item.hrName ? "Approved" : "Pending" }
+            : {}),
           ...(gmPosition === "GENERAL MANAGER" && {
             status: item.gmApproved || "Pending",
           }),
         };
 
         return formattedData;
+      })
+      .sort((a, b) => {
+        if (a.status === "Pending" && b.status !== "Pending") return -1;
+        if (a.status !== "Pending" && b.status === "Pending") return 1;
+        return 0;
       });
-
-    // console.log("✅ Total Employees After Filter:", filteredData.length);
     return filteredData;
   };
-
-  // console.log("User Type:", userType);
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   const mergedData = probationReviewMergedData(allData);
-  //   setTableBody(mergedData);
-  //   setLoading(false);
-  // }, [allData]);
 
   useEffect(() => {
     setLoading(true);
 
-      const mergedData = probationReviewMergedData(
-        allData,
-        userType,
-        gmPosition,
-        userID,
-        HRMPosition
-      );
-      setTableBody(mergedData);
-      setLoading(false);
-    
+    const mergedData = probationReviewMergedData(
+      allData,
+      userType,
+      gmPosition,
+      userID,
+      HRMPosition
+    );
+    setTableBody(mergedData);
+    setLoading(false);
   }, [allData, userType, gmPosition, userID, HRMPosition]);
 
   const handleViewDetails = (personData) => {
@@ -310,12 +295,9 @@ export const ProbationPDF = ({ userID, userType }) => {
             HRMPosition !== "HR MANAGER" && {
               status: item.managerApproved || "Pending",
             }),
-          // ...(userType === "HR" && {
-          //   status: item.hrName ? "Approved" : "Pending",
-          // }),
-          ...(HRMPosition === "HR MANAGER" && {
-            status: item.hrName ? "Approved" : "Pending",
-          }),
+          ...(HRMPosition === "HR MANAGER" || userType === "HR"
+            ? { status: item.hrName ? "Approved" : "Pending" }
+            : {}),
           ...(gmPosition === "GENERAL MANAGER" && {
             status: item.gmApproved || "Pending",
           }),
@@ -333,10 +315,6 @@ export const ProbationPDF = ({ userID, userType }) => {
     );
   }
 
-  // console.log("HRM", HRMPosition);
-
-  // console.log("Log 6", tableBody);
-  // console.log("Log 2", filteredData);
   return (
     <div>
       <FilterTable

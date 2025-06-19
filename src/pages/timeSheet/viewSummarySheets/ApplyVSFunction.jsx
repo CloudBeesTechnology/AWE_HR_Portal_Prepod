@@ -14,6 +14,7 @@ import { useTempID } from "../../../utils/TempIDContext";
 import { GetViewSummaryUpdater } from "../customTimeSheet/GetViewSummaryUpdater";
 
 const client = generateClient();
+
 export const ApplyVSFunction = ({
   convertedStringToArrayObj,
   ProcessedDataFunc,
@@ -386,7 +387,9 @@ export const ApplyVSFunction = ({
           const end = new Date(toDate);
           const listDate = {};
           const NWHPD =
-            workHrs && workHrs?.length > 0 ? workHrs[workHrs?.length - 1] : 0;
+            Array.isArray(workHrs) && workHrs?.length > 0
+              ? workHrs[workHrs?.length - 1]
+              : workHrs || 0;
           const devidedNWHPD = parseFloat(NWHPD) / 2;
 
           while (start <= end) {
@@ -465,20 +468,18 @@ export const ApplyVSFunction = ({
                 entryDate.getFullYear() === currentDay.getFullYear()
               );
             });
-
+            
             const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
               weekday: "long",
             }).format(currentDay);
 
-            console.log("currentDay : ", currentDay);
-
             const normalWorkHrsPerMonth = Array.isArray(workInfoData.workMonth)
               ? workInfoData.workMonth[workInfoData.workMonth.length - 1]
-              : workInfoData.workMonth;
+              : workInfoData.workMonth || 0;
 
             const normalWorkHrsPerDay = Array.isArray(workInfoData.workHrs)
               ? workInfoData.workHrs[workInfoData.workHrs.length - 1]
-              : workInfoData.workHrs;
+              : workInfoData.workHrs || 0;
 
             const checkEntry = entry?.empWorkInfo[0]?.WORKINGHRS;
 
@@ -513,7 +514,6 @@ export const ApplyVSFunction = ({
                     weekday: "long",
                   }).format(parsedDate);
 
-                  console.log("Date:", dayStr, "is a", dayOfMonth);
 
                   if (
                     dayOfMonth === "Saturday" &&
@@ -617,7 +617,13 @@ export const ApplyVSFunction = ({
 
               return normalizeHH100(diff);
             }
-
+            // console.log(
+            //   "checkEntry Type : ",
+            //   typeof checkEntry,
+            //   " : ",
+            //   "checkEntry : ",
+            //   checkEntry
+            // );
             if (checkEntry) {
               // const result = parseFloat(entry?.normalWorkHrs) / 2;
               const result = convertNumToHours(entry?.normalWorkHrs);
@@ -680,8 +686,10 @@ export const ApplyVSFunction = ({
                 }
               } else {
                 const workingHrs = parseFloat(checkEntry);
-
+                
                 if (workingHrs <= (entry?.normalWorkHrs || 0)) {
+               
+
                   let empType = "normalEmp";
                   const formattedAbsentHrs = workHrsAbsentCal(
                     workingHrs,
@@ -694,6 +702,7 @@ export const ApplyVSFunction = ({
                       ? presentHrs
                       : `x(${absence})${presentHrs}`;
                 } else {
+                  
                   acc[dayStr] = workingHrs.toString();
                 }
               }
@@ -756,7 +765,8 @@ export const ApplyVSFunction = ({
                 id: id,
                 workingHrs: workingHrs,
                 leaveCounts: empLeaveCount.leaveCounts,
-
+                NWHPD: workInfoData?.workHrs,
+                NWHPM: workInfoData?.workMonth,
                 newDate: getDate.date,
                 location: res?.[0],
                 jobcode: jobcode?.[0],
@@ -767,6 +777,8 @@ export const ApplyVSFunction = ({
 
                 workingHrs: workingHrs,
                 leaveCounts: {},
+                NWHPD: workInfoData?.workMonth,
+                NWHPM: workInfoData?.workHrs,
                 newDate: getDate.date,
                 location: res?.[0],
                 jobcode: jobcode?.[0],
@@ -816,10 +828,12 @@ export const ApplyVSFunction = ({
                 }
               }
             });
+
             const holidaysAndAbsent = countOccurrences(
               data.workingHrs,
               keysToCount
             );
+
             holidaysAndAbsent["PHD"] +=
               Object.values(data.workingHrs).filter((value) => value === "HPHD")
                 .length * 0.5;
@@ -868,7 +882,7 @@ export const ApplyVSFunction = ({
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-
+        
         const isDateInRange = (date, start, end) => {
           const parsedDate = new Date(date);
           const parsedStart = new Date(start);
@@ -1075,7 +1089,7 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-
+        
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {

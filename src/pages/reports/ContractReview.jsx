@@ -36,8 +36,6 @@ export const ContractReview = () => {
     "Form",
   ].filter(Boolean);
 
-  console.log("UserType", userType);
-
   const formatDate = (date, type) => {
     if (Array.isArray(date)) {
       if (date.length === 0) return "-";
@@ -87,9 +85,6 @@ export const ContractReview = () => {
   };
 
   const contractExpiryMergedData = (data) => {
-    const AWE87901 = data.find((item) => item.empID === "AWE87901");
-    console.log("Full record for employee AWE87901:", AWE87901);
-
     const today = new Date();
     const startOfNextMonth = new Date(
       today.getFullYear(),
@@ -124,10 +119,16 @@ export const ContractReview = () => {
         if (!lastDate || item.contStatus) return false;
 
         const contractEnd = new Date(lastDate);
+
         return (
           contractEnd >= startOfNextMonth && contractEnd <= endOfTwoMonthsAfter
         );
       })
+      // .filter(
+      //   (item) =>
+      //     (item.genManager && item.contStatus === true) ||
+      //     (!item.genManager && !item.contStatus)
+      // )
       .map((item) => {
         const contractEndDates = item.contractEnd || [];
         const lastDate = contractEndDates[contractEndDates.length - 1];
@@ -147,34 +148,8 @@ export const ContractReview = () => {
         const isDepartmentHead = item.depHead !== null;
         const isHr = item.hrManager !== null;
 
-        // console.log("last", lastManager);
-
-        // if (userType === "Supervisor") {
-        //   return null;
-        // }
-
-        // if (gmPosition === "GENERAL MANAGER") {
-        //   return null;
-        // }
-
-        // if (userType === "Manager") {
-        //   if (lastManager !== userID) return null;
-        // }
-
-        // if (userType === "Manager") {
-        //   return null;
-        // }
-
-        // if (userType === "HR") {
-        //   return null;
-        // }
-
-        // Allow if HR and HRMPosition is HR MANAGER
-        // if (userType === "HR" && HRMPosition === "HR MANAGER") {
-        //   // allow
-        // }
         // Allow if Manager and HRMPosition exists
-        if (HRMPosition === "HR MANAGER") {
+        if (HRMPosition === "HR MANAGER" || userType === "HR") {
           // allow
         }
         // Deny if GM (unless other logic elsewhere handles exceptions)
@@ -214,14 +189,15 @@ export const ContractReview = () => {
           otherPosition: Array.isArray(item.otherPosition)
             ? item.otherPosition[item.otherPosition.length - 1]
             : "-",
+          // contStatus: item.contStatus,
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
             ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
             : "-",
-          ...(HRMPosition === "HR MANAGER" && {
-            status: item.hrManager ? "Approved" : "Pending",
-          }),
+          ...(HRMPosition === "HR MANAGER" || userType === "HR"
+            ? { status: item.hrManager ? "Approved" : "Pending" }
+            : {}),
 
           ...(userType === "Manager" && {
             status: item.depHead ? "Approved" : "Pending",
@@ -233,6 +209,7 @@ export const ContractReview = () => {
         };
       })
       .filter(Boolean)
+
       .sort((a, b) => a.lastDate - b.lastDate);
 
     return sortedData.map(({ lastDate, ...rest }) => rest);
@@ -247,13 +224,9 @@ export const ContractReview = () => {
         userID,
         HRMPosition
       );
-
       setTableBody(mergedData);
     }
   }, [allData, userType, gmPosition, userID, HRMPosition]);
-
-  // console.log("All Data", allData);
-  // console.log("Table body", tableBody);
 
   const handleViewDetails = (personData) => {
     setSelectedPerson(personData);
@@ -346,9 +319,9 @@ export const ContractReview = () => {
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
             ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
             : "-",
-          ...(HRMPosition === "HR MANAGER" && {
-            status: item.hrManager ? "Approved" : "Pending",
-          }),
+          ...(HRMPosition === "HR MANAGER" || userType === "HR"
+            ? { status: item.hrManager ? "Approved" : "Pending" }
+            : {}),
 
           ...(userType === "Manager" && {
             status: item.depHead ? "Approved" : "Pending",
@@ -360,14 +333,11 @@ export const ContractReview = () => {
         };
       })
       .sort((a, b) => a.lastDate - b.lastDate)
-      .sort((a, b) => a.lastDate - b.lastDate)
+
       .map(({ lastDate, ...rest }) => rest);
-
-
 
     setFilteredData(filtered);
   };
-
 
   return (
     <div>
