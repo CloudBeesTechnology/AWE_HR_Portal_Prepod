@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import {
   listEmpPersonalInfos,
   listEmpWorkInfos,
+  listLeaveStatuses,
 } from "../../../graphql/queries";
 const client = generateClient();
 export const useTableMergedData = () => {
   const [empAndWorkInfo, setEmpAndWorkInfo] = useState([]);
+  const [leaveStatuses, setLeaveStatuses] = useState([]);
   useEffect(() => {
     try {
       const fetchData = async () => {
@@ -32,10 +34,12 @@ export const useTableMergedData = () => {
 
           const fetchWorkInfo = async () => {
             try {
-              const [employeeInfo, empWorkInfos] = await Promise.all([
-                fetchAllData(listEmpPersonalInfos),
-                fetchAllData(listEmpWorkInfos),
-              ]);
+              const [employeeInfo, empWorkInfos, leaveStatus] =
+                await Promise.all([
+                  fetchAllData(listEmpPersonalInfos),
+                  fetchAllData(listEmpWorkInfos),
+                  fetchAllData(listLeaveStatuses),
+                ]);
 
               const empInfo = employeeInfo;
               const workInfo = empWorkInfos;
@@ -62,6 +66,7 @@ export const useTableMergedData = () => {
                 .filter((item) => item !== null);
 
               setEmpAndWorkInfo(mergedDatas);
+              setLeaveStatuses(leaveStatus);
             } catch (error) {}
           };
 
@@ -74,7 +79,10 @@ export const useTableMergedData = () => {
 
       fetchData();
       // }
-    } catch (err) {}
+    } catch (err) {
+      console.log("ERROR : ", err);
+    }
   }, []);
-  return { empAndWorkInfo };
+  
+  return { empAndWorkInfo, leaveStatuses };
 };

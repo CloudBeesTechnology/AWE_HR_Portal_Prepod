@@ -1,10 +1,122 @@
 export const HoursMinuAbsentCal = () => {
-  function calculateTotalWorkingHours(data) {
+  function calculateNormalDays(employee) {
+    try {
+      const workingHrsObj = employee?.workingHrs;
+
+      const getLastIndexOfNWhrs =
+        employee?.workHrs && employee?.workHrs?.length > 0
+          ? employee?.workHrs[employee?.workHrs?.length - 1]
+          : "";
+
+      const lastIndexOfNWHPD = parseFloat(getLastIndexOfNWhrs);
+
+      const getLastIndexOfNWHPM =
+        employee?.workMonth && employee?.workMonth?.length > 0
+          ? employee?.workMonth[employee?.workMonth?.length - 1]
+          : "";
+      const lastIndexOfNWHPM = parseFloat(getLastIndexOfNWHPM);
+
+      let totalHours = 0;
+      let totalStaffLevelEmpWorkHrs = 0;
+      let totalNoramlWorkingHrs = 0;
+
+      for (const date in workingHrsObj) {
+        const value = workingHrsObj[date];
+        let formattedDate = convertToYYYYMMDD(date);
+
+        const currentDay = new Date(formattedDate);
+        const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
+          weekday: "long",
+        }).format(currentDay);
+
+        let findStaffLevelEmp =
+          dayOfWeek === "Saturday" &&
+          lastIndexOfNWHPD === 8 &&
+          lastIndexOfNWHPM === 24;
+
+        const xPattern = /^x\((\d+(\.\d+)?)\)(\d+(\.\d+)?)$/;
+        const xMatch = value?.match(xPattern);
+        if (xMatch && findStaffLevelEmp) {
+          const hours = parseFloat(xMatch[3]);
+          totalStaffLevelEmpWorkHrs += hours;
+          // continue;
+        } else if (xMatch) {
+          const hours = parseFloat(xMatch[3]);
+          totalNoramlWorkingHrs += hours;
+          // continue;
+        }
+
+        const numberPattern = /^\d+(\.\d+)?$/;
+        if (value?.match(numberPattern) && findStaffLevelEmp) {
+          totalStaffLevelEmpWorkHrs += parseFloat(value);
+          // continue;
+        } else if (value?.match(numberPattern)) {
+          totalNoramlWorkingHrs += parseFloat(value);
+          // continue;
+        }
+
+        const halPattern = /^H[A-Z]*\d+$/;
+        if (value?.match(halPattern) && findStaffLevelEmp) {
+          const hours = parseFloat(value.replace(/[^0-9]/g, ""));
+          totalStaffLevelEmpWorkHrs += 0;
+
+          // continue;
+        } else if (value?.match(halPattern)) {
+          const hours = parseFloat(value.replace(/[^0-9]/g, ""));
+          totalNoramlWorkingHrs += hours;
+          // continue;
+        }
+      }
+
+      let staffLevelempNWHPD = lastIndexOfNWHPD / 2;
+      let getAvgOfStaffLevelWorkHrs =
+        totalStaffLevelEmpWorkHrs / staffLevelempNWHPD;
+      let getAvgOfNormalTotalHrs = totalNoramlWorkingHrs / lastIndexOfNWHPD;
+
+      console.log("getAvgOfStaffLevelWorkHrs : ", getAvgOfStaffLevelWorkHrs);
+      console.log("getAvgOfNormalTotalHrs : ", getAvgOfNormalTotalHrs);
+      let totalAvgOfND = getAvgOfStaffLevelWorkHrs + getAvgOfNormalTotalHrs;
+      Math.floor(totalAvgOfND);
+      return totalAvgOfND.toFixed(2); // HH.100 format
+    } catch (err) {
+      console.error("Error calculating total working hours:", err);
+      return "0.00";
+    }
+  }
+
+  function calculateTotalWorkingHours(employee) {
     let totalHours = 0;
 
     try {
-      for (const key in data) {
-        const value = data[key];
+      const workingHrsObj = employee?.workingHrs;
+
+      const getLastIndexOfNWhrs =
+        employee?.workHrs && employee?.workHrs?.length > 0
+          ? employee?.workHrs[employee?.workHrs?.length - 1]
+          : "";
+
+      const lastIndexOfNWHPD = parseFloat(getLastIndexOfNWhrs);
+
+      const getLastIndexOfNWHPM =
+        employee?.workMonth && employee?.workMonth?.length > 0
+          ? employee?.workMonth[employee?.workMonth?.length - 1]
+          : "";
+      const lastIndexOfNWHPM = parseFloat(getLastIndexOfNWHPM);
+
+      for (const date in workingHrsObj) {
+        const value = workingHrsObj[date];
+
+        let formattedDate = convertToYYYYMMDD(date);
+
+        const currentDay = new Date(formattedDate);
+        const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
+          weekday: "long",
+        }).format(currentDay);
+
+        let findStaffLevelEmp =
+          dayOfWeek === "Saturday" &&
+          lastIndexOfNWHPD === 8 &&
+          lastIndexOfNWHPM === 24;
 
         const xPattern = /^x\((\d+(\.\d+)?)\)(\d+(\.\d+)?)$/;
         const xMatch = value?.match(xPattern);
@@ -21,10 +133,13 @@ export const HoursMinuAbsentCal = () => {
         }
 
         const halPattern = /^H[A-Z]*\d+$/;
-        if (value?.match(halPattern)) {
+        if (value?.match(halPattern) && findStaffLevelEmp) {
+          const hours = parseFloat(value.replace(/[^0-9]/g, ""));
+          totalHours += 0;
+          continue;
+        } else if (value?.match(halPattern)) {
           const hours = parseFloat(value.replace(/[^0-9]/g, ""));
           totalHours += hours;
-          continue;
         }
       }
 
@@ -34,6 +149,42 @@ export const HoursMinuAbsentCal = () => {
       return "0.00";
     }
   }
+
+  // function calculateTotalWorkingHours(data) {
+  //   let totalHours = 0;
+
+  //   try {
+  //     for (const key in data) {
+  //       const value = data[key];
+
+  //       const xPattern = /^x\((\d+(\.\d+)?)\)(\d+(\.\d+)?)$/;
+  //       const xMatch = value?.match(xPattern);
+  //       if (xMatch) {
+  //         const hours = parseFloat(xMatch[3]);
+  //         totalHours += hours;
+  //         continue;
+  //       }
+
+  //       const numberPattern = /^\d+(\.\d+)?$/;
+  //       if (value?.match(numberPattern)) {
+  //         totalHours += parseFloat(value);
+  //         continue;
+  //       }
+
+  //       const halPattern = /^H[A-Z]*\d+$/;
+  //       if (value?.match(halPattern)) {
+  //         const hours = parseFloat(value.replace(/[^0-9]/g, ""));
+  //         totalHours += hours;
+  //         continue;
+  //       }
+  //     }
+
+  //     return totalHours.toFixed(2); // HH.100 format
+  //   } catch (err) {
+  //     console.error("Error calculating total working hours:", err);
+  //     return "0.00";
+  //   }
+  // }
   function convertToYYYYMMDD(dateStr) {
     const [day, month, year] = dateStr?.split(/[-\/]/);
 
@@ -44,53 +195,53 @@ export const HoursMinuAbsentCal = () => {
     return `${year}-${paddedMonth}-${paddedDay}`;
   }
 
-  function calculateTotalAbsence(employee, getLastIndexOfNWhrs) {
-    console.log("employee : ", employee);
-    const workingHrsObj = employee?.workingHrs;
-    const lastIndex = parseFloat(getLastIndexOfNWhrs);
-    const getLastIndexOfNWHPM =
-      employee?.workMonth && employee?.workMonth?.length > 0
-        ? employee?.workMonth[employee?.workMonth?.length - 1]
-        : "";
+  // function calculateTotalAbsence(employee, getLastIndexOfNWhrs) {
+  //   console.log("employee : ", employee);
+  //   const workingHrsObj = employee?.workingHrs;
+  //   const lastIndex = parseFloat(getLastIndexOfNWhrs);
+  //   const getLastIndexOfNWHPM =
+  //     employee?.workMonth && employee?.workMonth?.length > 0
+  //       ? employee?.workMonth[employee?.workMonth?.length - 1]
+  //       : "";
 
-    try {
-      let totalHours = 0;
+  //   try {
+  //     let totalHours = 0;
 
-      for (let date in workingHrsObj) {
-        const value = workingHrsObj[date];
+  //     for (let date in workingHrsObj) {
+  //       const value = workingHrsObj[date];
 
-        if (value?.startsWith("x(")) {
-          const match = value.match(/x\(([\d.]+)\)/);
-          if (match) {
-            totalHours += parseFloat(match[1]); // Directly add hours in decimal format
-          }
-        } else if (value === "A") {
-          // totalHours += lastIndex; // Absence counts as full day hours
+  //       if (value?.startsWith("x(")) {
+  //         const match = value.match(/x\(([\d.]+)\)/);
+  //         if (match) {
+  //           totalHours += parseFloat(match[1]); // Directly add hours in decimal format
+  //         }
+  //       } else if (value === "A") {
+  //         // totalHours += lastIndex; // Absence counts as full day hours
 
-          let formattedDate = convertToYYYYMMDD(date);
+  //         let formattedDate = convertToYYYYMMDD(date);
 
-          const currentDay = new Date(formattedDate);
-          const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
-            weekday: "long",
-          }).format(currentDay);
-          if (
-            dayOfWeek === "Saturday" &&
-            getLastIndexOfNWhrs == 8 &&
-            getLastIndexOfNWHPM == 24
-          ) {
-            totalHours += lastIndex / 2;
-          } else {
-            totalHours += lastIndex;
-          }
-        }
-      }
+  //         const currentDay = new Date(formattedDate);
+  //         const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
+  //           weekday: "long",
+  //         }).format(currentDay);
+  //         if (
+  //           dayOfWeek === "Saturday" &&
+  //           getLastIndexOfNWhrs == 8 &&
+  //           getLastIndexOfNWHPM == 24
+  //         ) {
+  //           totalHours += lastIndex / 2;
+  //         } else {
+  //           totalHours += lastIndex;
+  //         }
+  //       }
+  //     }
 
-      return totalHours.toFixed(2); // Return in HH.100 format
-    } catch (err) {
-      console.error("Error in calculateTotalAbsence:", err);
-      return "0.00";
-    }
-  }
+  //     return totalHours.toFixed(2); // Return in HH.100 format
+  //   } catch (err) {
+  //     console.error("Error in calculateTotalAbsence:", err);
+  //     return "0.00";
+  //   }
+  // }
 
   // const convertNumToHours = (totalWorkHrs, getLastIndexOfNWhrs) => {
   //   const [hrsStr, minsStr] = String(totalWorkHrs)?.split(".");
@@ -109,6 +260,64 @@ export const HoursMinuAbsentCal = () => {
   //     resultMinutes
   //   ).padStart(2, "0")}`;
   // };
+
+  function calculateTotalAbsence(employee, getLastIndexOfNWhrs) {
+    console.log("employee : ", employee);
+    const workingHrsObj = employee?.workingHrs;
+    const lastIndex = parseFloat(getLastIndexOfNWhrs);
+    const getLastIndexOfNWHPM =
+      employee?.workMonth && employee?.workMonth?.length > 0
+        ? employee?.workMonth[employee?.workMonth?.length - 1]
+        : "";
+
+    console.log("workingHrsObj : ", workingHrsObj);
+    try {
+      let totalHours = 0;
+      let totalStaffLevelEmpAbsence = 0;
+      let totalNormalAbsence = 0;
+
+      for (let date in workingHrsObj) {
+        const value = workingHrsObj[date];
+        let formattedDate = convertToYYYYMMDD(date);
+
+        const currentDay = new Date(formattedDate);
+        const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
+          weekday: "long",
+        }).format(currentDay);
+
+        let findStaffLevelEmp =
+          dayOfWeek === "Saturday" &&
+          getLastIndexOfNWhrs == 8 &&
+          getLastIndexOfNWHPM == 24;
+
+        if (value?.startsWith("x(")) {
+          const match = value.match(/x\(([\d.]+)\)/);
+          if (match && findStaffLevelEmp) {
+            totalStaffLevelEmpAbsence += parseFloat(match[1]);
+          } else if (match) {
+            totalNormalAbsence += parseFloat(match[1]); // Directly add hours in decimal format
+          }
+        } else if (value === "A") {
+          // totalHours += lastIndex; // Absence counts as full day hours
+
+          if (findStaffLevelEmp) {
+            totalStaffLevelEmpAbsence += lastIndex / 2;
+          } else {
+            totalNormalAbsence += lastIndex;
+          }
+        }
+      }
+      let staffLevelempNWHPD = lastIndex / 2;
+      let getAvgOfStaffLevel = totalStaffLevelEmpAbsence / staffLevelempNWHPD;
+      let getAvgOfNormalAbsence = totalNormalAbsence / lastIndex;
+      let totalAvgOfAbsence = getAvgOfStaffLevel + getAvgOfNormalAbsence;
+
+      return totalAvgOfAbsence.toFixed(2); // Return in HH.100 format
+    } catch (err) {
+      console.error("Error in calculateTotalAbsence:", err);
+      return "0.00";
+    }
+  }
 
   function convertNumToHours(totalWorkHrs, getLastIndexOfNWhrs) {
     const total = parseFloat(totalWorkHrs);
@@ -225,6 +434,7 @@ export const HoursMinuAbsentCal = () => {
   }
   return {
     calculateTotalWorkingHours,
+    calculateNormalDays,
     calculateTotalAbsence,
     convertNumToHours,
     workHrsAbsentCal,

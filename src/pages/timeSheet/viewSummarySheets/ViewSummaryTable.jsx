@@ -46,6 +46,7 @@ export const ViewSummaryTable = ({
 
   const {
     calculateTotalWorkingHours,
+    calculateNormalDays,
     calculateTotalAbsence,
     convertNumToHours,
     // convertNumToHours,
@@ -196,7 +197,7 @@ export const ViewSummaryTable = ({
 
                   // stage 2
                   const getTotalHours =
-                    calculateTotalWorkingHours(employee?.workingHrs) || 0;
+                    calculateTotalWorkingHours(employee) || 0;
 
                   const roundedNumberOfTotalHours = Number(getTotalHours);
                   const totalHours = roundedNumberOfTotalHours;
@@ -209,14 +210,12 @@ export const ViewSummaryTable = ({
                   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
                   // stage 3
-                  const getNormalDays = convertNumToHours(
-                    totalHours,
-                    getLastIndexOfNWhrs
-                  );
+
+                  const getAvgOfWorkingHrs = calculateNormalDays(employee) || 0;
 
                   // const getNormalDays =
                   //   totalHours / parseFloat(getLastIndexOfNWhrs) || 0;
-                  const roundedNumber = Number(parseFloat(getNormalDays));
+                  const roundedNumber = Number(parseFloat(getAvgOfWorkingHrs));
                   const NormalDays = roundedNumber;
                   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
@@ -226,11 +225,11 @@ export const ViewSummaryTable = ({
                     getLastIndexOfNWhrs
                   );
 
-                  const totalAbsentiesHrs = convertNumToHours(
-                    totalAbsence,
-                    getLastIndexOfNWhrs
-                  );
-                  const roundedTotalAbsentiesHrs = Number(totalAbsentiesHrs);
+                  // const totalAbsentiesHrs = convertNumToHours(
+                  //   totalAbsence,
+                  //   getLastIndexOfNWhrs
+                  // );
+                  const roundedTotalAbsentiesHrs = Number(totalAbsence);
 
                   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 

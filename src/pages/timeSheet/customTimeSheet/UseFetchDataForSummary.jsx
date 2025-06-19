@@ -66,7 +66,7 @@ export const UseFetchDataForSummary = (
               if (
                 item?.status &&
                 (item.status === "Approved" || item.status === "Verified") &&
-                item?.companyName === location &&
+                // item?.companyName === location &&
                 item?.date &&
                 isDateInRange(item.date, startDate, endDate)
               ) {
@@ -75,7 +75,43 @@ export const UseFetchDataForSummary = (
             }
           }
 
-         
+          async function filterTimesheetByLocation(data, targetLocation) {
+            return data
+              .map((entry) => {
+                if (entry?.fileType === "HO") {
+                  // Parse empWorkInfo JSON string
+                  const parsedWorkInfo = JSON.parse(entry.empWorkInfo[0]);
+
+                  // Filter by matching LOCATION
+                  const filteredWorkInfo = parsedWorkInfo.filter(
+                    (info) => info.LOCATION === targetLocation
+                  );
+
+                  // If no matching LOCATION, return null (we'll filter this out later)
+                  if (filteredWorkInfo.length === 0) return null;
+
+                  // Update companyName and assign filtered work info
+                  return {
+                    ...entry,
+                    companyName: targetLocation,
+                    empWorkInfo: [JSON.stringify(filteredWorkInfo)],
+                  };
+                } else {
+                  // For non-HO entries, keep only if companyName matches
+                  if (entry.companyName === targetLocation) {
+                    return entry;
+                  }
+                  return null;
+                }
+              })
+              .filter(Boolean); // Remove null entries
+          }
+
+          filteredData = await filterTimesheetByLocation(
+            filteredData,
+            location
+          );
+
           if (offshoreType === "Direct" || offshoreType === "Indirect") {
             // filteredData = filteredData.filter((fil) =>
             //   fil.fileName.toUpperCase().includes(offshoreType.toUpperCase())
@@ -87,7 +123,6 @@ export const UseFetchDataForSummary = (
                 .split(/[ .,\\-_]+/)
                 .includes(offshoreType.toUpperCase());
             });
-
           }
 
           if (filteredData.length > 0) {

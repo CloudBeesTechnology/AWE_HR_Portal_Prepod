@@ -107,6 +107,7 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
       const year = dateObj?.getFullYear();
       return `${day}-${month}-${year}`;
     };
+    
     const unMatchedObject = async (inputData, grouped) => {
       const getEmpBadgeNo = inputData?.data[0].empBadgeNo;
       const getFidNo = inputData?.data[0].fidNo;
@@ -153,6 +154,7 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
         return null;
       }
     };
+
     const MatchingObject = async (existingObj, outputData) => {
       if (!existingObj?.grouped || !Array.isArray(existingObj.grouped)) {
         return null;

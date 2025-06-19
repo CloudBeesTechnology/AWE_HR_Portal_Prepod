@@ -4,6 +4,7 @@ import {
   dummyLeaveStatus,
   LocationData,
 } from "./customTimeSheet/JobcodeAndLocation";
+import { generateClient } from "@aws-amplify/api";
 import { UpdateViewSummary } from "./customTimeSheet/UpdateViewSummary";
 import { UseFetchDataForSummary } from "./customTimeSheet/UseFetchDataForSummary";
 import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
@@ -16,12 +17,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GetHolidayList } from "./customTimeSheet/GetHolidayList";
 import { HoursMinuAbsentCal } from "./customTimeSheet/HoursMinuAbsentCal";
 
+import { useTableMergedData } from "./customTimeSheet/useTableMergedData";
+
 export const ViewSummary = () => {
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [toggleForEVSummary, setToggleForEVSummary] = useState(null);
   const [loadingMess, setLoadingMess] = useState(true);
   const [summaryObject, setSummaryObject] = useState(null);
+  // const [mergedData, setMergedData] = useState([]);
+  // const [leaveStatuses, setLeaveStatuses] = useState([]);
   // const [resultOfWHrsAbsCal, setResultOfWHrsAbsCal] = useState("");
 
   const {
@@ -38,6 +43,8 @@ export const ViewSummary = () => {
   const { workHrsAbsentCal } = HoursMinuAbsentCal();
 
   const publicHoliday = GetHolidayList();
+
+  const { empAndWorkInfo: mergedData, leaveStatuses } = useTableMergedData();
 
   const ProcessedDataFunc = async (data) => {
     setData(data);
@@ -461,6 +468,8 @@ export const ViewSummary = () => {
         publicHoliday={publicHoliday}
         dummyLeaveStatus={dummyLeaveStatus}
         dayCounts={dayCounts}
+        mergedData={mergedData}
+        leaveStatuses={leaveStatuses}
       />
 
       <ViewSummaryTable
