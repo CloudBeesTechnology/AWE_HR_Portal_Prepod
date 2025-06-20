@@ -46,6 +46,7 @@ export const ViewSummaryTable = ({
 
   const {
     calculateTotalWorkingHours,
+    calculateNormalDays,
     calculateTotalAbsence,
     convertNumToHours,
     // convertNumToHours,
@@ -184,7 +185,6 @@ export const ViewSummaryTable = ({
                   // ).reduce((acc, ot) => acc + parseFloat(ot || 0), 0);
 
                   // stage 1
-                  console.log("employee : ", employee);
 
                   const addAllOT = Object.values(
                     employee?.OVERTIMEHRS || {}
@@ -196,28 +196,44 @@ export const ViewSummaryTable = ({
 
                   // stage 2
                   const getTotalHours =
-                    calculateTotalWorkingHours(employee?.workingHrs) || 0;
+                    calculateTotalWorkingHours(employee) || 0;
 
                   const roundedNumberOfTotalHours = Number(getTotalHours);
                   const totalHours = roundedNumberOfTotalHours;
 
                   const getLastIndexOfNWhrs =
-                    employee?.workHrs && employee?.workHrs?.length > 0
+                    Array.isArray(employee?.workHrs) && employee?.workHrs?.length > 0
                       ? employee?.workHrs[employee?.workHrs?.length - 1]
-                      : "";
+                      : employee?.workHrs || "0";
 
                   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
                   // stage 3
-                  const getNormalDays = convertNumToHours(
-                    totalHours,
-                    getLastIndexOfNWhrs
-                  );
-
-                  // const getNormalDays =
-                  //   totalHours / parseFloat(getLastIndexOfNWhrs) || 0;
-                  const roundedNumber = Number(parseFloat(getNormalDays));
+                  let NWHPD = parseFloat(getLastIndexOfNWhrs);
+                  let roundedNumber = Number(parseFloat(totalHours)) / NWHPD;
                   const NormalDays = roundedNumber;
+
+                  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+                  // stage 4
+                  const calculatePHDforStaffLeveEmp = (emp) => {
+                    const getLastWorkHr = parseFloat(
+                      emp?.workHrs?.at(-1) || "0"
+                    );
+                    const getLastWorkMonth = parseFloat(
+                      emp?.workMonth?.at(-1) || "0"
+                    );
+
+                    // Condition: 8 hrs and last workMonth = 24
+                    if (getLastWorkHr === 8 && getLastWorkMonth === 24) {
+                      return (parseFloat(emp.hollydayCounts?.PHD) || 0) / 2;
+                    }
+
+                    // Return original if condition not met
+                    return emp.hollydayCounts?.PHD || 0;
+                  };
+
+                  const calculatedPHD = calculatePHDforStaffLeveEmp(employee);
                   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
                   // stage 4
@@ -226,11 +242,13 @@ export const ViewSummaryTable = ({
                     getLastIndexOfNWhrs
                   );
 
-                  const totalAbsentiesHrs = convertNumToHours(
-                    totalAbsence,
-                    getLastIndexOfNWhrs
+                  // const totalAbsentiesHrs = convertNumToHours(
+                  //   totalAbsence,
+                  //   getLastIndexOfNWhrs
+                  // );
+                  const roundedTotalAbsentiesHrs = Number(
+                    parseFloat(totalAbsence).toFixed(2)
                   );
-                  const roundedTotalAbsentiesHrs = Number(totalAbsentiesHrs);
 
                   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
@@ -371,19 +389,19 @@ export const ViewSummaryTable = ({
                                     employee?.workingHrs?.[currentDayKey],
                                   ot: employee?.OVERTIMEHRS?.[currentDayKey],
                                   workHrs:
-                                    employee?.workHrs &&
+                                    Array.isArray(employee?.workHrs) &&
                                     employee?.workHrs.length > 0
                                       ? employee?.workHrs[
                                           employee?.workHrs?.length - 1
                                         ]
-                                      : "",
+                                      : employee?.workHrs || "0",
                                   workMonth:
-                                    employee?.workMonth &&
+                                    Array.isArray(employee?.workMonth) &&
                                     employee?.workMonth?.length > 0
                                       ? employee?.workMonth[
                                           employee?.workMonth?.length - 1
                                         ]
-                                      : "",
+                                      : employee?.workMonth || "0",
 
                                   workingHrsKey: currentDayKey,
                                   verify: employee?.getVerify?.[currentDayKey],
@@ -408,7 +426,8 @@ export const ViewSummaryTable = ({
                           {employee?.hollydayCounts?.PH || 0}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
-                          {employee?.hollydayCounts?.PHD || 0}
+                          {/* {employee?.hollydayCounts?.PHD || 0} */}
+                          {calculatedPHD || 0}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
                           {/* {`${employee?.empLeaveCount?.AL || 0} /
@@ -607,7 +626,8 @@ export const ViewSummaryTable = ({
                           {employee?.hollydayCounts?.PH || 0}
                         </td>
                         <td className="border px-2 py-1">
-                          {employee?.hollydayCounts?.PHD || 0}
+                          {/* {employee?.hollydayCounts?.PHD || 0}*/}
+                          {calculatedPHD || 0}
                         </td>
                         <td className="border px-2 py-1">
                           {/* {`${employee?.empLeaveCount?.AL || 0} /

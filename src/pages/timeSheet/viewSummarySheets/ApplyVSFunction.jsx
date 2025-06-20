@@ -14,67 +14,70 @@ import { useTempID } from "../../../utils/TempIDContext";
 import { GetViewSummaryUpdater } from "../customTimeSheet/GetViewSummaryUpdater";
 
 const client = generateClient();
+
 export const ApplyVSFunction = ({
   convertedStringToArrayObj,
   ProcessedDataFunc,
   publicHoliday,
   dummyLeaveStatus,
   dayCounts,
+  mergedData,
+  leaveStatuses,
 }) => {
   const { getStartDate, getEndDate } = useTempID();
 
   const identifyFileType = convertedStringToArrayObj?.[0]?.fileType;
 
   try {
-    const fetchAllData = async (queryName) => {
-      let allData = [];
-      let nextToken = null;
+    // const fetchAllData = async (queryName) => {
+    //   let allData = [];
+    //   let nextToken = null;
 
-      do {
-        const response = await client.graphql({
-          query: queryName,
-          variables: { nextToken },
-        });
+    //   do {
+    //     const response = await client.graphql({
+    //       query: queryName,
+    //       variables: { nextToken },
+    //     });
 
-        const items = response.data[Object.keys(response.data)[0]].items;
-        allData = [...allData, ...items];
-        nextToken = response.data[Object.keys(response.data)[0]].nextToken;
-      } while (nextToken);
+    //     const items = response.data[Object.keys(response.data)[0]].items;
+    //     allData = [...allData, ...items];
+    //     nextToken = response.data[Object.keys(response.data)[0]].nextToken;
+    //   } while (nextToken);
 
-      return allData;
-    };
+    //   return allData;
+    // };
 
     useEffect(() => {
       const fetchData = async () => {
-        const [empPersonalInfos, empWorkInfos, leaveStatuses] =
-          await Promise.all([
-            fetchAllData(listEmpPersonalInfos),
-            fetchAllData(listEmpWorkInfos),
-            fetchAllData(listLeaveStatuses),
-          ]);
+        // const [empPersonalInfos, empWorkInfos, leaveStatuses] =
+        //   await Promise.all([
+        //     fetchAllData(listEmpPersonalInfos),
+        //     fetchAllData(listEmpWorkInfos),
+        //     fetchAllData(listLeaveStatuses),
+        //   ]);
 
-        const mergedData = empPersonalInfos
-          .map((candidate) => {
-            const sapNoRemoved = empWorkInfos?.map((item) => {
-              const { sapNo, ...rest } = item;
-              return rest;
-            });
+        // const mergedData = empPersonalInfos
+        //   .map((candidate) => {
+        //     const sapNoRemoved = empWorkInfos?.map((item) => {
+        //       const { sapNo, ...rest } = item;
+        //       return rest;
+        //     });
 
-            const interviewDetails = sapNoRemoved.find(
-              (item) => item.empID === candidate.empID
-            );
+        //     const interviewDetails = sapNoRemoved.find(
+        //       (item) => item.empID === candidate.empID
+        //     );
 
-            if (!interviewDetails) {
-              return null;
-            }
+        //     if (!interviewDetails) {
+        //       return null;
+        //     }
 
-            return {
-              ...candidate,
-              ...interviewDetails,
-              // ...leaveDetail,
-            };
-          })
-          .filter((item) => item !== null);
+        //     return {
+        //       ...candidate,
+        //       ...interviewDetails,
+        //       // ...leaveDetail,
+        //     };
+        //   })
+        //   .filter((item) => item !== null);
 
         convertedStringToArrayObj?.forEach((sheet) => {
           try {
@@ -384,7 +387,9 @@ export const ApplyVSFunction = ({
           const end = new Date(toDate);
           const listDate = {};
           const NWHPD =
-            workHrs && workHrs?.length > 0 ? workHrs[workHrs?.length - 1] : 0;
+            Array.isArray(workHrs) && workHrs?.length > 0
+              ? workHrs[workHrs?.length - 1]
+              : workHrs || 0;
           const devidedNWHPD = parseFloat(NWHPD) / 2;
 
           while (start <= end) {
@@ -463,10 +468,18 @@ export const ApplyVSFunction = ({
                 entryDate.getFullYear() === currentDay.getFullYear()
               );
             });
-
+            
             const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
               weekday: "long",
             }).format(currentDay);
+
+            const normalWorkHrsPerMonth = Array.isArray(workInfoData.workMonth)
+              ? workInfoData.workMonth[workInfoData.workMonth.length - 1]
+              : workInfoData.workMonth || 0;
+
+            const normalWorkHrsPerDay = Array.isArray(workInfoData.workHrs)
+              ? workInfoData.workHrs[workInfoData.workHrs.length - 1]
+              : workInfoData.workHrs || 0;
 
             const checkEntry = entry?.empWorkInfo[0]?.WORKINGHRS;
 
@@ -480,11 +493,43 @@ export const ApplyVSFunction = ({
               }
             );
 
+            const formattedDate = (date) => {
+              const [day, month, year] = date.split("-");
+              return `${year}-${month.padStart(2, "0")}-${day.padStart(
+                2,
+                "0"
+              )}`;
+            };
+
             let leaveType = null;
             if (empLeaveCount) {
               empLeaveCount.dateDifferences.forEach((leave) => {
                 if (leave.listDate.hasOwnProperty(dayStr)) {
-                  leaveType = leave.listDate[dayStr];
+                  // Only process this dayStr
+                  let leaves = leave.listDate[dayStr];
+                  let getFormattedDate = formattedDate(dayStr);
+                  let parsedDate = new Date(getFormattedDate);
+
+                  const dayOfMonth = new Intl.DateTimeFormat("en-BN", {
+                    weekday: "long",
+                  }).format(parsedDate);
+
+
+                  if (
+                    dayOfMonth === "Saturday" &&
+                    parseFloat(normalWorkHrsPerDay) === 8 &&
+                    parseFloat(normalWorkHrsPerMonth) === 24
+                  ) {
+                    let getHalfNWHPD = parseFloat(normalWorkHrsPerDay) / 2;
+
+                    if (!leaves?.startsWith("H")) {
+                      leaveType = `H${leaves}${getHalfNWHPD}`;
+                    } else {
+                      leaveType = leaves;
+                    }
+                  } else {
+                    leaveType = leaves;
+                  }
                 }
               });
             }
@@ -572,12 +617,13 @@ export const ApplyVSFunction = ({
 
               return normalizeHH100(diff);
             }
-
-            const normalWorkHrsPerMonth =
-              workInfoData.workMonth[workInfoData.workMonth.length - 1];
-            const normalWorkHrsPerDay =
-              workInfoData.workHrs[workInfoData.workHrs.length - 1];
-
+            // console.log(
+            //   "checkEntry Type : ",
+            //   typeof checkEntry,
+            //   " : ",
+            //   "checkEntry : ",
+            //   checkEntry
+            // );
             if (checkEntry) {
               // const result = parseFloat(entry?.normalWorkHrs) / 2;
               const result = convertNumToHours(entry?.normalWorkHrs);
@@ -640,8 +686,10 @@ export const ApplyVSFunction = ({
                 }
               } else {
                 const workingHrs = parseFloat(checkEntry);
-
+                
                 if (workingHrs <= (entry?.normalWorkHrs || 0)) {
+               
+
                   let empType = "normalEmp";
                   const formattedAbsentHrs = workHrsAbsentCal(
                     workingHrs,
@@ -654,6 +702,7 @@ export const ApplyVSFunction = ({
                       ? presentHrs
                       : `x(${absence})${presentHrs}`;
                 } else {
+                  
                   acc[dayStr] = workingHrs.toString();
                 }
               }
@@ -716,7 +765,8 @@ export const ApplyVSFunction = ({
                 id: id,
                 workingHrs: workingHrs,
                 leaveCounts: empLeaveCount.leaveCounts,
-
+                NWHPD: workInfoData?.workHrs,
+                NWHPM: workInfoData?.workMonth,
                 newDate: getDate.date,
                 location: res?.[0],
                 jobcode: jobcode?.[0],
@@ -727,6 +777,8 @@ export const ApplyVSFunction = ({
 
                 workingHrs: workingHrs,
                 leaveCounts: {},
+                NWHPD: workInfoData?.workMonth,
+                NWHPM: workInfoData?.workHrs,
                 newDate: getDate.date,
                 location: res?.[0],
                 jobcode: jobcode?.[0],
@@ -776,10 +828,12 @@ export const ApplyVSFunction = ({
                 }
               }
             });
+
             const holidaysAndAbsent = countOccurrences(
               data.workingHrs,
               keysToCount
             );
+
             holidaysAndAbsent["PHD"] +=
               Object.values(data.workingHrs).filter((value) => value === "HPHD")
                 .length * 0.5;
@@ -828,7 +882,7 @@ export const ApplyVSFunction = ({
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-
+        
         const isDateInRange = (date, start, end) => {
           const parsedDate = new Date(date);
           const parsedStart = new Date(start);
@@ -1035,7 +1089,7 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-
+        
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {

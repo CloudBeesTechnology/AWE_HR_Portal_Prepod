@@ -26,7 +26,7 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
       workingHrs: object?.workingHrs || "",
       location: object?.location || "",
       ot: object?.overtimeHrs || "",
-      normalWorkHrs: object?.NWHPD || "",
+      normalWorkHrs: String(object?.NWHPD) || "",
     };
     const UpdateMethodForJobcode = async (finalData) => {
       if (finalData) {
@@ -107,6 +107,7 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
       const year = dateObj?.getFullYear();
       return `${day}-${month}-${year}`;
     };
+
     const unMatchedObject = async (inputData, grouped) => {
       const getEmpBadgeNo = inputData?.data[0].empBadgeNo;
       const getFidNo = inputData?.data[0].fidNo;
@@ -153,6 +154,7 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
         return null;
       }
     };
+
     const MatchingObject = async (existingObj, outputData) => {
       if (!existingObj?.grouped || !Array.isArray(existingObj.grouped)) {
         return null;
@@ -221,20 +223,20 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
         actualWorkHrs: object?.workingHrs || "",
         companyName: object?.location || "",
         otTime: object?.overtimeHrs || "",
-        normalWorkHrs: object?.NWHPD[object?.NWHPD.length - 1] || "",
+        normalWorkHrs: String(object?.NWHPD) || "",
         empWorkInfo: [JSON.stringify(jobLocaWhrs)] || [],
         fileType: object.firstFileType || "",
         status: "Verified",
         // verify: "Yes",
       };
-
+     
       try {
         const response = await client.graphql({
           query: createTimeSheet,
           variables: { input: item },
         });
         const Responses = response?.data?.createTimeSheet;
-        console.log("Responses : ", Responses);
+        // console.log("Responses : ", Responses);
         newresData = [Responses];
       } catch (err) {
         console.log("Error : ", err);
@@ -252,7 +254,7 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
             variables: { input: validTimeSheet },
           });
           const Responses = response?.data?.updateTimeSheet;
-          console.log("Responses : ", Responses);
+          // console.log("Responses : ", Responses);
           resData = [Responses];
           if (Responses) {
             return true;

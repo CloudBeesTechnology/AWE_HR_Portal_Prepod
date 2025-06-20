@@ -32,7 +32,7 @@ export const TimeSheet = () => {
               link="/timesheetHO"
             />
           )}
-          
+
           {timeSheetPermissions.includes("SBW") && (
             <SelectTiles
               img={icon1}
@@ -58,7 +58,7 @@ export const TimeSheet = () => {
           timeSheetPermissions.includes("Offshore's ORMC") ? (
             <SelectTiles
               img={icon3}
-              text1="Offshore's "
+              text1="Offshore's"
               text2="excel Sheet"
               borderColor="border-[#B70BA0]"
               bgColor="bg-white"
