@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { FaArrowLeft } from "react-icons/fa";
 
@@ -24,12 +24,14 @@ export const ViewSummaryTable = ({
   resetTableFunc,
   toggleEditViewSummaryFunc,
   editViewSummaryObject,
+
   // resultOfWHrsAbsCal,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [adjustTheaderDownload, setAdjustTheaderDownload] = useState(false);
   const {
     selectedLocation,
+    setSelectedLocation,
     getStartDate,
     getEndDate,
     startDate,
@@ -89,6 +91,7 @@ export const ViewSummaryTable = ({
               onClick={() => {
                 setStartDate("");
                 setEndDate("");
+                setSelectedLocation("");
                 setOffshoreType("");
               }}
             >
@@ -202,7 +205,8 @@ export const ViewSummaryTable = ({
                   const totalHours = roundedNumberOfTotalHours;
 
                   const getLastIndexOfNWhrs =
-                    Array.isArray(employee?.workHrs) && employee?.workHrs?.length > 0
+                    Array.isArray(employee?.workHrs) &&
+                    employee?.workHrs?.length > 0
                       ? employee?.workHrs[employee?.workHrs?.length - 1]
                       : employee?.workHrs || "0";
 
@@ -677,10 +681,21 @@ export const ViewSummaryTable = ({
                         ? "Processing your request... This may take a moment."
                         : emptyTableMess === true
                         ? "No records available. Try selecting different dates or locations."
-                        : "Processing your request... This may take a moment."}
+                        : "Unable to process your request. Kindly refresh and select valid dates and location."}
                     </p>
                   </td>
                 </tr>
+                // <p className="px-6 py-6">
+                //   {emptyTableMess
+                //     ? "No records available. Try selecting different dates or locations."
+                //     : !startDate || !endDate
+                //     ? "Your table is currently empty. Set a date range to view employee records."
+                //     : !selectedLocation
+                //     ? "Please choose a location to filter records within the selected date range."
+                //     : loading
+                //     ? "Processing your request... This may take a moment."
+                //     : ""}
+                // </p>
               )}
             </tbody>
           </table>

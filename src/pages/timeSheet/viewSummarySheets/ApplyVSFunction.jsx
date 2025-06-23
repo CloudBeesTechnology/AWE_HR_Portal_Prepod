@@ -617,13 +617,7 @@ export const ApplyVSFunction = ({
 
               return normalizeHH100(diff);
             }
-            // console.log(
-            //   "checkEntry Type : ",
-            //   typeof checkEntry,
-            //   " : ",
-            //   "checkEntry : ",
-            //   checkEntry
-            // );
+            
             if (checkEntry) {
               // const result = parseFloat(entry?.normalWorkHrs) / 2;
               const result = convertNumToHours(entry?.normalWorkHrs);

@@ -18,6 +18,7 @@ import { GetHolidayList } from "./customTimeSheet/GetHolidayList";
 import { HoursMinuAbsentCal } from "./customTimeSheet/HoursMinuAbsentCal";
 
 import { useTableMergedData } from "./customTimeSheet/useTableMergedData";
+import { useGetTimeSheetData } from "./customTimeSheet/useGetTimeSheetData";
 
 export const ViewSummary = () => {
   const [data, setData] = useState(null);
@@ -25,6 +26,7 @@ export const ViewSummary = () => {
   const [toggleForEVSummary, setToggleForEVSummary] = useState(null);
   const [loadingMess, setLoadingMess] = useState(true);
   const [summaryObject, setSummaryObject] = useState(null);
+
   // const [mergedData, setMergedData] = useState([]);
   // const [leaveStatuses, setLeaveStatuses] = useState([]);
   // const [resultOfWHrsAbsCal, setResultOfWHrsAbsCal] = useState("");
@@ -164,28 +166,31 @@ export const ViewSummary = () => {
     setLoadingMess(true);
   };
 
+  const { allData } = useGetTimeSheetData();
   const {
     convertedStringToArrayObj,
     loading,
     emptyTableMess,
     setEmptyTableMess,
     setLoading,
+    // finalFiltered,
   } = UseFetchDataForSummary(
     startDate,
     endDate,
     selectedLocation,
     ProcessedDataFunc,
-    offshoreType
+    offshoreType,
+    allData
   );
 
   useEffect(() => {
     if (startDate) {
       setGetStartDate(new Date(startDate.replace(/-/g, "/")));
-      setEmptyTableMess(false);
+      // setEmptyTableMess(false);
     }
     if (endDate) {
       setGetEndDate(new Date(endDate.replace(/-/g, "/")));
-      setEmptyTableMess(false);
+      // setEmptyTableMess(false);
     }
   }, [startDate, endDate]);
 
@@ -196,7 +201,7 @@ export const ViewSummary = () => {
   }, []);
 
   const resetTableFunc = useCallback(() => {
-    setEmptyTableMess(false);
+    // setEmptyTableMess(false);
     setLoading(false);
   }, []);
 

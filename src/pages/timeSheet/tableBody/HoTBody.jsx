@@ -7,7 +7,9 @@ export const HoTBody = ({
   message,
   assignObjectFun,
   toggleFunction,
-  editFormTitleFunc
+  editFormTitleFunc,
+  itemsPerPage,
+  currentPage,
 }) => {
   useEffect(() => {
     if (loading === false) {
@@ -40,6 +42,7 @@ export const HoTBody = ({
       {loading === false && data && data?.length > 0
         ? data.map((value, index) => {
             const renderRows = (m, ind) => {
+              const serialNumber = (currentPage - 1) * itemsPerPage + index + 1;
               return (
                 <tr
                   key={index}
@@ -51,7 +54,7 @@ export const HoTBody = ({
                   }}
                 >
                   {/* <td className="text-start px-4 flex-1">{index + 1}</td> */}
-                  <td className="text-start px-4 flex-1">{index + 1}</td>
+                  <td className="text-start px-4 flex-1">{serialNumber}</td>
                   <td className="text-center px-4 flex-1">{m.ctr}</td>
                   <td className="text-center px-4 flex-1">{m.empDept}</td>
                   <td className="text-center px-4 flex-1">{m.empID}</td>

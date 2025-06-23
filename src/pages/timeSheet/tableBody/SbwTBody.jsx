@@ -7,7 +7,9 @@ export const SbwTBody = ({
   message,
   assignObjectFun,
   toggleFunction,
-  editFormTitleFunc
+  editFormTitleFunc,
+  itemsPerPage,
+  currentPage,
 }) => {
   useEffect(() => {
     if (loading === false) {
@@ -41,6 +43,7 @@ export const SbwTBody = ({
       {loading === false && data && data?.length > 0
         ? data.map((value, index) => {
             const renderRows = (m, ind) => {
+              const serialNumber = (currentPage - 1) * itemsPerPage + index + 1;
               return (
                 <tr
                   key={index}
@@ -51,7 +54,7 @@ export const SbwTBody = ({
                     editFormTitleFunc("View Form");
                   }}
                 >
-                  <td className="text-start px-4 flex-1">{index + 1}</td>
+                  <td className="text-start px-4 flex-1">{serialNumber}</td>
                   <td className="text-start px-4 flex-1">{m.empName}</td>
                   <td className="text-center px-4 flex-1">{m.empDept}</td>
                   <td className="text-center px-4 flex-1">{m.empBadgeNo}</td>
@@ -60,14 +63,20 @@ export const SbwTBody = ({
                   </td>
                   <td className="text-center px-4 flex-1">{m.inTime || 0}</td>
                   <td className="text-center px-4 flex-1">{m.outTime || 0}</td>
-                  <td className="text-center px-4 flex-1">{m.totalInOut || 0}</td>
-                  <td className="text-center px-4 flex-1">{m.allDayHrs || 0}</td>
+                  <td className="text-center px-4 flex-1">
+                    {m.totalInOut || 0}
+                  </td>
+                  <td className="text-center px-4 flex-1">
+                    {m.allDayHrs || 0}
+                  </td>
                   <td className="text-center px-4 flex-1">{m.netMins || 0}</td>
                   <td className="text-center px-4 flex-1">{m.totalHrs || 0}</td>
                   <td className="text-center px-4 flex-1">
                     {m.normalWorkHrs || 0}
                   </td>
-                  <td className="text-center px-4 flex-1">{m.actualWorkHrs || 0}</td>
+                  <td className="text-center px-4 flex-1">
+                    {m.actualWorkHrs || 0}
+                  </td>
                   <td className="text-center px-4 flex-1">{m.otTime || 0}</td>
                   <td className="text-center px-4 flex-1">{m.remarks}</td>
                 </tr>
