@@ -2,12 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { useReactToPrint } from "react-to-print";
-import {
-  capitalizedLetter,
-  DateFormat,
-  DateNewFormat,
-  FTDateFormat,
-} from "../../utils/DateFormat";
+import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 
 export const LeaveSummaryPopUp = ({
   handleClosePopup,
@@ -399,13 +394,6 @@ export const LeaveSummaryPopUp = ({
   useEffect(() => {
     const fetchedData = async () => {
       // ✅ Helper function to calculate overlapping days
-      const getOverlappingDays = (start1, end1, start2, end2) => {
-        const start = new Date(Math.max(start1, start2));
-        const end = new Date(Math.min(end1, end2));
-        const diffTime = end - start;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-        return diffDays > 0 ? diffDays : 0;
-      };
 
       const result = mergedData.reduce((acc, val) => {
         if (val && val.empID && !acc[val.empID]) {
@@ -479,27 +467,28 @@ export const LeaveSummaryPopUp = ({
 
         let shouldProcessOtherLeave = false;
         if (startDate && endDate) {
-          if (
-            applicationStartDate >= filterStartDate &&
-            applicationStartDate <= filterEndDate
-          ) {
-            shouldProcessOtherLeave = true;
-          }
+          // if (
+          //   applicationStartDate >= filterStartDate &&
+          //   applicationStartDate <= filterEndDate &&
+          //   applicationEndDate >= filterStartDate &&
+          //   applicationEndDate <= filterEndDate
+          // ) {
+          //   shouldProcessOtherLeave = true;
+          // }
 
+          // if (
+          //   applicationStartDate <= filterStartDate &&
+          //   applicationEndDate >= filterEndDate
+          // ) {
+          //   shouldProcessOtherLeave = true;
+          // }
           if (
             applicationEndDate >= filterStartDate &&
-            applicationEndDate <= filterEndDate
+            applicationStartDate <= filterEndDate
           ) {
+            console.log("checking filter");
             shouldProcessOtherLeave = true;
           }
-
-          if (
-            applicationStartDate <= filterStartDate &&
-            applicationEndDate >= filterEndDate
-          ) {
-            shouldProcessOtherLeave = true;
-          }
-
           if (leaveKey !== "sickLeave") {
             shouldProcessOtherLeave =
               shouldProcessOtherLeave &&
@@ -647,23 +636,20 @@ export const LeaveSummaryPopUp = ({
               remaining: 0,
             };
           }
+          // console.log("leaveKey");
 
           // ✅ Calculate overlapping leave days
           let days = Number(val.leaveDays) || 0;
-          if (startDate && endDate) {
-            days = getOverlappingDays(
-              applicationStartDate,
-              applicationEndDate,
-              filterStartDate,
-              filterEndDate
-            );
-          }
+       
 
           if (
             val.managerStatus === "Approved" &&
             val.empStatus !== "Cancelled"
           ) {
             acc[val.empID][leaveKey].taken += days;
+            if (val.empID === "6056" && leaveKey === "annualLeave") {
+              console.log(days, "val");
+            }
           } else if (
             val.managerStatus === "Pending" &&
             val.supervisorStatus !== "Rejected" &&
