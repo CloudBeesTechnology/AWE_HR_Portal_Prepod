@@ -585,7 +585,7 @@ export const ContractFormPDF = ({ contentRef }) => {
           </div>
 
           {/* Notes */}
-          <div className="mt-7 text-sm">
+          <div className="mt-4 text-sm">
             <p>
               Notes: Deadline return to HRD after one week from the date
               received of Contract Completion Report
@@ -593,7 +593,7 @@ export const ContractFormPDF = ({ contentRef }) => {
           </div>
 
           {/* Remarks Section */}
-          <div className="mt-7">
+          <div className="mt-4">
             <label className="text-sm block py-4">Manager Remarks:</label>
             <textarea
               type="text"
@@ -607,7 +607,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               className="border w-full text-sm  rounded resize-none outline-none p-2"
             />
           </div>
-          <div className="mt-7">
+          <div className="mt-4">
             <label className="text-sm block py-4">HRM Remarks:</label>
             <textarea
               type="text"
@@ -618,7 +618,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               className="border w-full text-sm  rounded resize-none outline-none p-2"
             />
           </div>
-          <div className="mt-7">
+          <div className="mt-4">
             <label className="text-sm block py-4">GM Remarks:</label>
             <textarea
               type="text"
@@ -631,7 +631,7 @@ export const ContractFormPDF = ({ contentRef }) => {
           </div>
 
           {/* Footer */}
-          <div className="mt-20 flex justify-between items-center">
+          <div className="my-10 flex justify-between items-center">
             <div className="text-center">
               <p className=" mb-5 text-sm">Recommended By:</p>
               <input

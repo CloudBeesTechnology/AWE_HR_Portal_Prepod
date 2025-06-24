@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { FilterTable } from "./FilterTable";
-import logo from "../../assets/logo/logo-with-name.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import { VscClose } from "react-icons/vsc";
 import { useTempID } from "../../utils/TempIDContext";
+import { DataSupply } from "../../utils/DataStoredContext";
+import logo from "../../assets/logo/logo-with-name.svg";
 
 export const ProbationReview = () => {
   const location = useLocation();
@@ -13,9 +14,10 @@ export const ProbationReview = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-
   const userID = localStorage.getItem("userID");
   const userType = localStorage.getItem("userType");
+  const [skilled, setSkilled] = useState(null);
+  const { empPIData, workInfoData, ProbFData } = useContext(DataSupply);
   const [tableHead] = useState(
     [
       "Emp ID",
@@ -188,89 +190,38 @@ export const ProbationReview = () => {
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
 
-    const start =
-      type === "startDate"
-        ? new Date(value)
-        : startDate
-        ? new Date(startDate)
-        : null;
-    const end =
-      type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+    const start = type === "startDate" ? value : startDate;
+    const end = type === "endDate" ? value : endDate;
 
-    const filtered = allData
-      ?.filter((item) => {
-        if (!Array.isArray(item.workStatus) || item.workStatus.length === 0) {
-          return false;
-        }
+    if (!start && !end) {
+      setFilteredData([]);
+      return;
+    }
 
-        const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+    const filtered = tableBody.filter((item) => {
+      // Convert probationEndDate (DD-MM-YYYY) back to Date object for comparison
+      const [day, month, year] = item.probationEndDate.split("-");
+      const probationEnd = new Date(`${year}-${month}-${day}`);
 
-        if (
-          lastWorkStatus?.toUpperCase() === "TERMINATION" ||
-          lastWorkStatus?.toUpperCase() === "RESIGNATION" ||
-          lastWorkStatus.toUpperCase() === "ACTIVE"
-        ) {
-          return false;
-        }
-        const probationEndDates = item.probationEnd || [];
-        const lastDate =
-          probationEndDates.length > 0
-            ? new Date(probationEndDates[probationEndDates.length - 1])
-            : null;
+      const startDateObj = start ? new Date(start) : null;
+      const endDateObj = end ? new Date(end) : null;
 
-        if (!lastDate || isNaN(lastDate.getTime())) return false;
+      if (startDateObj && endDateObj) {
+        return probationEnd >= startDateObj && probationEnd <= endDateObj;
+      } else if (startDateObj) {
+        return probationEnd >= startDateObj;
+      } else if (endDateObj) {
+        return probationEnd <= endDateObj;
+      }
+      return true;
+    });
 
-        if (start && end) return lastDate >= start && lastDate <= end;
-        if (start) return lastDate >= start;
-        if (end) return lastDate <= end;
-
-        return true;
-      })
-      .map((item) => {
-        const probationEndDates = item.probationEnd || [];
-        const lastDate =
-          probationEndDates.length > 0
-            ? probationEndDates[probationEndDates.length - 1]
-            : null;
-
-        return {
-          lastDate: new Date(lastDate),
-          empID: item.empID || "-",
-          empBadgeNo: item.empBadgeNo || "-",
-          name: item.name || "-",
-          dateOfJoin: formatDate(item.doj) || "-",
-          department: Array.isArray(item.department)
-            ? item.department[item.department.length - 1]
-            : "-",
-          otherDepartment: Array.isArray(item.otherDepartment)
-            ? item.otherDepartment[item.otherDepartment.length - 1]
-            : "-",
-          position: Array.isArray(item.position)
-            ? item.position[item.position.length - 1]
-            : "-",
-          otherPosition: Array.isArray(item.otherPosition)
-            ? item.otherPosition[item.otherPosition.length - 1]
-            : "-",
-          probationEndDate: formatDate(lastDate) || "-",
-          deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
-          ...(HRMPosition === "HR MANAGER" || userType === "HR"
-            ? { status: item.hrName ? "Approved" : "Pending" }
-            : {}),
-          ...(userType === "Supervisor" && {
-            status: item.supervisorApproved ? "Approved" : "Pending",
-          }),
-        };
-      })
-      .sort((a, b) => a.lastDate - b.lastDate)
-      .map(({ lastDate, ...rest }) => rest);
-
-    setFilteredData(filtered);
+    setTableBody(filtered);
   };
-
   return (
     <div>
       <FilterTable
-        tableBody={filteredData.length ? filteredData : tableBody}
+        tableBody={tableBody}
         tableHead={tableHead}
         title={title}
         startDate={startDate}

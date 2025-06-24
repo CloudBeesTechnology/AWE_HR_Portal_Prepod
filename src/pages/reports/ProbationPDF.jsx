@@ -59,6 +59,7 @@ export const ProbationPDF = ({ userID, userType }) => {
   };
 
   const probationReviewMergedData = (data, userType, gmPosition, userID) => {
+    // console.log("Data", data)
     const filteredData = data
       .filter((item) => {
         if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
@@ -84,6 +85,11 @@ export const ProbationPDF = ({ userID, userType }) => {
             ? item.manager[item.manager.length - 1]
             : null;
 
+        const skillPool = item.skillPool ? item.skillPool.toUpperCase() : "";
+
+        //  console.log(`skillPool: ${skillPool}, empID: ${item.empID}`);
+
+
         const isSupervisorApproved =
           item.supervisorApproved?.toUpperCase() === "APPROVED";
         const isManagerApproved =
@@ -108,16 +114,30 @@ export const ProbationPDF = ({ userID, userType }) => {
           return result;
         }
 
-        if (gmPosition === "GENERAL MANAGER") {
-          const result = isProbationActive && isManagerApproved;
+        // if (gmPosition === "GENERAL MANAGER") {
+        //   const result = isProbationActive && isManagerApproved;
 
-          return result;
+        //   return result;
+        // }
+
+        if (gmPosition === "GENERAL MANAGER") {
+          if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {
+            return false;
+          }
+          return isProbationActive && isManagerApproved;
         }
 
-        if (userType === "HR" || HRMPosition === "HR MANAGER") {
-          const result = isProbationActive && isGmApproved;
+        // if (userType === "HR" || HRMPosition === "HR MANAGER") {
+        //   const result = isProbationActive && isGmApproved;
 
-          return result;
+        //   return result;
+        // }
+
+        if (userType === "HR" || HRMPosition === "HR MANAGER") {
+          if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {                     
+            return isProbationActive; 
+          }
+          return isProbationActive && isGmApproved; 
         }
 
         return isProbationActive;
@@ -211,100 +231,135 @@ export const ProbationPDF = ({ userID, userType }) => {
     }
   };
 
+  // const handleDate = (e, type) => {
+  //   const value = e.target.value;
+
+  //   if (type === "startDate") setStartDate(value);
+  //   if (type === "endDate") setEndDate(value);
+
+  //   const start =
+  //     type === "startDate"
+  //       ? new Date(value)
+  //       : startDate
+  //       ? new Date(startDate)
+  //       : null;
+  //   const end =
+  //     type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+
+  //   const filtered = tableBody
+  //     .filter(
+  //       (item) =>
+  //         item.probStatus === true &&
+  //         item.probationEnd &&
+  //         item.probationEnd.length > 0 &&
+  //         (() => {
+  //           if (
+  //             !Array.isArray(item.workStatus) ||
+  //             item.workStatus.length === 0
+  //           ) {
+  //             return false;
+  //           }
+
+  //           const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+
+  //           if (
+  //             lastWorkStatus?.toUpperCase() === "TERMINATION" ||
+  //             lastWorkStatus?.toUpperCase() === "RESIGNATION" ||
+  //             lastWorkStatus.toUpperCase() === "ACTIVE"
+  //           ) {
+  //             return false;
+  //           }
+
+  //           const expiryArray = item.probationEnd || [];
+  //           const expiryDate = expiryArray.length
+  //             ? new Date(expiryArray[expiryArray.length - 1])
+  //             : null;
+
+  //           if (!expiryDate || isNaN(expiryDate.getTime())) return false;
+
+  //           if (start && end) return expiryDate >= start && expiryDate <= end;
+  //           if (start) return expiryDate >= start;
+  //           if (end) return expiryDate <= end;
+
+  //           return true;
+  //         })()
+  //     )
+  //     .map((item) => {
+  //       const probationEndDates = item.probationEnd || [];
+  //       const lastDate = probationEndDates[probationEndDates.length - 1];
+
+  //       return {
+  //         empID: item.empID || "-",
+  //         empBadgeNo: item.empBadgeNo || "-",
+  //         name: item.name || "-",
+  //         dateOfJoin: formatDate(item.doj) || "-",
+  //         department: Array.isArray(item.department)
+  //           ? item.department[item.department.length - 1]
+  //           : "-",
+  //         otherDepartment: Array.isArray(item.otherDepartment)
+  //           ? item.otherDepartment[item.otherDepartment.length - 1]
+  //           : "-",
+  //         position: Array.isArray(item.position)
+  //           ? item.position[item.position.length - 1]
+  //           : "-",
+  //         otherPosition: Array.isArray(item.otherPosition)
+  //           ? item.otherPosition[item.otherPosition.length - 1]
+  //           : "-",
+  //         probationEndDate: formatDate(lastDate) || "-",
+  //         deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
+  //         ...(userType === "Supervisor" && {
+  //           status: item.supervisorApproved || "Pending",
+  //         }),
+  //         ...(userType === "Manager" &&
+  //           gmPosition !== "GENERAL MANAGER" &&
+  //           HRMPosition !== "HR MANAGER" && {
+  //             status: item.managerApproved || "Pending",
+  //           }),
+  //         ...(HRMPosition === "HR MANAGER" || userType === "HR"
+  //           ? { status: item.hrName ? "Approved" : "Pending" }
+  //           : {}),
+  //         ...(gmPosition === "GENERAL MANAGER" && {
+  //           status: item.gmApproved || "Pending",
+  //         }),
+  //       };
+  //     });
+
+  //   setFilteredData(filtered);
+  // };
+
   const handleDate = (e, type) => {
     const value = e.target.value;
 
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
 
-    const start =
-      type === "startDate"
-        ? new Date(value)
-        : startDate
-        ? new Date(startDate)
-        : null;
-    const end =
-      type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+    const start = type === "startDate" ? value : startDate;
+    const end = type === "endDate" ? value : endDate;
 
-    const filtered = allData
-      .filter(
-        (item) =>
-          item.probStatus === true &&
-          item.probationEnd &&
-          item.probationEnd.length > 0 &&
-          (() => {
-            if (
-              !Array.isArray(item.workStatus) ||
-              item.workStatus.length === 0
-            ) {
-              return false;
-            }
+    if (!start && !end) {
+      setFilteredData([]);
+      return;
+    }
 
-            const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+    const filtered = tableBody.filter((item) => {
+      // Convert probationEndDate (DD-MM-YYYY) back to Date object for comparison
+      const [day, month, year] = item.probationEndDate.split("-");
+      const probationEnd = new Date(`${year}-${month}-${day}`);
 
-            if (
-              lastWorkStatus?.toUpperCase() === "TERMINATION" ||
-              lastWorkStatus?.toUpperCase() === "RESIGNATION" ||
-              lastWorkStatus.toUpperCase() === "ACTIVE"
-            ) {
-              return false;
-            }
+      const startDateObj = start ? new Date(start) : null;
+      const endDateObj = end ? new Date(end) : null;
 
-            const expiryArray = item.probationEnd || [];
-            const expiryDate = expiryArray.length
-              ? new Date(expiryArray[expiryArray.length - 1])
-              : null;
+      if (startDateObj && endDateObj) {
+        return probationEnd >= startDateObj && probationEnd <= endDateObj;
+      } else if (startDateObj) {
+        return probationEnd >= startDateObj;
+      } else if (endDateObj) {
+        return probationEnd <= endDateObj;
+      }
+      return true;
+    });
 
-            if (!expiryDate || isNaN(expiryDate.getTime())) return false;
-
-            if (start && end) return expiryDate >= start && expiryDate <= end;
-            if (start) return expiryDate >= start;
-            if (end) return expiryDate <= end;
-
-            return true;
-          })()
-      )
-      .map((item) => {
-        const probationEndDates = item.probationEnd || [];
-        const lastDate = probationEndDates[probationEndDates.length - 1];
-
-        return {
-          empID: item.empID || "-",
-          empBadgeNo: item.empBadgeNo || "-",
-          name: item.name || "-",
-          dateOfJoin: formatDate(item.doj) || "-",
-          department: Array.isArray(item.department)
-            ? item.department[item.department.length - 1]
-            : "-",
-          otherDepartment: Array.isArray(item.otherDepartment)
-            ? item.otherDepartment[item.otherDepartment.length - 1]
-            : "-",
-          position: Array.isArray(item.position)
-            ? item.position[item.position.length - 1]
-            : "-",
-          otherPosition: Array.isArray(item.otherPosition)
-            ? item.otherPosition[item.otherPosition.length - 1]
-            : "-",
-          probationEndDate: formatDate(lastDate) || "-",
-          deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
-          ...(userType === "Supervisor" && {
-            status: item.supervisorApproved || "Pending",
-          }),
-          ...(userType === "Manager" &&
-            gmPosition !== "GENERAL MANAGER" &&
-            HRMPosition !== "HR MANAGER" && {
-              status: item.managerApproved || "Pending",
-            }),
-          ...(HRMPosition === "HR MANAGER" || userType === "HR"
-            ? { status: item.hrName ? "Approved" : "Pending" }
-            : {}),
-          ...(gmPosition === "GENERAL MANAGER" && {
-            status: item.gmApproved || "Pending",
-          }),
-        };
-      });
-
-    setFilteredData(filtered);
+    setTableBody(filtered);
   };
 
   if (loading) {
@@ -315,10 +370,11 @@ export const ProbationPDF = ({ userID, userType }) => {
     );
   }
 
+ 
   return (
     <div>
       <FilterTable
-        tableBody={filteredData.length ? filteredData : tableBody}
+        tableBody={tableBody}
         tableHead={tableHead}
         title={title}
         startDate={startDate}

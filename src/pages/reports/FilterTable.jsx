@@ -227,7 +227,7 @@ export const FilterTable = ({
             type="text"
             placeholder="Search"
             value={searchQuery}
-            onChange={handleSearchChange} 
+            onChange={handleSearchChange}
             className="outline-none rounded-lg px-4 py-2 shadow-md border border-[#C5C5C5] text-grey"
           />
           <div className=" absolute right-3 top-2 bg-white text-[24px]">
@@ -381,6 +381,10 @@ export const FilterTable = ({
               </tbody>
             </table>
           </div>
+        </div>
+      ) : filteredTableBody?.length === 0 && (startDate || endDate) ? (
+        <div className="text-center mt-10">
+          No data available on this date range
         </div>
       ) : (
         <div className="text-center mt-10">No Report List Available Here</div>
