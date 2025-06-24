@@ -8,6 +8,8 @@ export const OffshoreTBody = ({
   assignObjectFun,
   toggleFunction,
   editFormTitleFunc,
+  itemsPerPage,
+  currentPage,
 }) => {
   useEffect(() => {
     if (loading === false) {
@@ -40,6 +42,7 @@ export const OffshoreTBody = ({
       {loading === false && data && data?.length > 0
         ? data.map((value, index) => {
             const renderRows = (m, ind) => {
+              const serialNumber = (currentPage - 1) * itemsPerPage + index + 1;
               return (
                 <tr
                   key={index}
@@ -50,7 +53,7 @@ export const OffshoreTBody = ({
                     editFormTitleFunc("View Form");
                   }}
                 >
-                  <td className="text-start px-4 flex-1">{index + 1}</td>
+                  <td className="text-start px-4 flex-1">{serialNumber}</td>
                   <td className="text-start px-4 flex-1">{m.empName}</td>
                   <td className="text-start px-4 flex-1">{m.trade}</td>
                   <td className="text-center px-4 flex-1">{m.fidNo}</td>

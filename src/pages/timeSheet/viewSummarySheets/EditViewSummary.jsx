@@ -160,7 +160,11 @@ export const EditViewSummary = ({
                       formData.NWHPD ? "bg-lite_skyBlue" : "bg-white"
                     }`}
                     name="NWHPD"
-                    value={formData.NWHPD[formData.NWHPD.length - 1]}
+                    value={
+                      Array.isArray(formData?.NWHPD) && formData?.NWHPD.length > 0
+                        ? formData?.NWHPD[formData?.NWHPD?.length - 1]
+                        : formData?.NWHPD || "0"
+                    }
                     onChange={handleChange}
                     readOnly
                   />
@@ -207,11 +211,11 @@ export const EditViewSummary = ({
                 onClick={async () => {
                   let NWHPD = Array.isArray(formData?.NWHPD)
                     ? formData?.NWHPD[formData?.NWHPD.length - 1]
-                    : formData?.NWHPD;
+                    : formData?.NWHPD || "0";
 
                   let NWHPM = Array.isArray(formData?.NWHPM)
                     ? formData?.NWHPM[formData?.NWHPM.length - 1]
-                    : formData?.NWHPM;
+                    : formData?.NWHPM || "0";
 
                   const getFormatedWorkHrs = await workHrsAbsentCal({
                     NWHPD: NWHPD,

@@ -67,7 +67,7 @@ export const VTimeSheetTable = () => {
   const AllFieldData = useTableFieldData(categoryFilters);
 
   const safeData = data || [];
-  const itemsPerPage = 25;
+  const itemsPerPage = 500;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);
@@ -184,6 +184,8 @@ export const VTimeSheetTable = () => {
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
                 editFormTitleFunc={editFormTitleFunc}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
               />
             )}
             {categoryFilters === "HO" && (
@@ -195,6 +197,8 @@ export const VTimeSheetTable = () => {
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
                 editFormTitleFunc={editFormTitleFunc}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
               />
             )}
             {categoryFilters === "SBW" && (
@@ -206,6 +210,8 @@ export const VTimeSheetTable = () => {
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
                 editFormTitleFunc={editFormTitleFunc}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
               />
             )}
             {categoryFilters === "ORMC" && (
@@ -217,6 +223,8 @@ export const VTimeSheetTable = () => {
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
                 editFormTitleFunc={editFormTitleFunc}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
               />
             )}
 
@@ -229,6 +237,8 @@ export const VTimeSheetTable = () => {
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
                 editFormTitleFunc={editFormTitleFunc}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
               />
             )}
             {categoryFilters === "Offshore" && (
@@ -240,6 +250,8 @@ export const VTimeSheetTable = () => {
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
                 editFormTitleFunc={editFormTitleFunc}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
               />
             )}
           </table>

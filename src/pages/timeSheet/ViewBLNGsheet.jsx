@@ -852,13 +852,22 @@ export const ViewBLNGsheet = ({
     let message = "";
 
     for (let emp of data) {
-      const fid = emp.fidNo?.toString()?.trim();
-      const workHrs = emp.normalWorkHrs?.toString()?.trim();
+      const fid = emp?.fidNo?.toString()?.trim();
+      const workHrs = emp?.normalWorkHrs?.toString()?.trim();
+      const date = emp?.date?.toString()?.trim();
 
       if (!fid || fid === "N/A" || fid === "0") {
         hasMissingField = true;
         message =
           "Some records are missing the FID or SAP NO. Please update the Excel sheet accordingly.";
+        // return true;
+        break;
+      }
+
+      if (!date || date === "N/A" || date === "0") {
+        hasMissingField = true;
+        message =
+          "Some records are missing the 'DATE'. Please update the Excel sheet accordingly.";
         // return true;
         break;
       }
@@ -1135,33 +1144,83 @@ export const ViewBLNGsheet = ({
     }
   }, [startDate, endDate, secondaryData, searchQuery]);
 
+  // useEffect(() => {
+  //   if (!Array.isArray(empAndWorkInfo) || !Array.isArray(data)) return;
+  //   // Create a map for quick lookup
+  //   const empInfoMap = new Map();
+
+  //   if (Array.isArray(empAndWorkInfo)) {
+  //     console.log("empAndWorkInfo : ", empAndWorkInfo);
+  //     empAndWorkInfo.forEach((item) => {
+  //       empInfoMap.set(String(item?.sapNo).toUpperCase() || "0", item);
+  //     });
+  //   }
+  //   console.log("empAndWorkInfo : ",empAndWorkInfo)
+  //   console.log("empInfoMap : ", empInfoMap);
+  //   console.log("data : ", data);
+  //   // Process visibleData
+  //   const addedNWHPD =
+  //     Array.isArray(data) &&
+  //     data.map((val) => {
+  //       const badgeKey = String(val?.FID).toUpperCase();
+  //       const workInfoItem = empInfoMap?.get(badgeKey);
+
+  //       return {
+  //         ...val,
+  //         NORMALWORKINGHRSPERDAY:
+  //           Array.isArray(workInfoItem.workHrs) && workInfoItem.workHrs
+  //             ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
+  //             : "0",
+  //       };
+  //     });
+
+  //   setFinalData(addedNWHPD);
+  // }, [empAndWorkInfo, data]);
+
   useEffect(() => {
-    if (!Array.isArray(empAndWorkInfo) || !Array.isArray(data)) return;
-    // Create a map for quick lookup
-    const empInfoMap = new Map();
+    try {
+      if (!Array.isArray(empAndWorkInfo) || !Array.isArray(data)) return;
 
-    if (Array.isArray(empAndWorkInfo)) {
-      empAndWorkInfo.forEach((item) => {
-        empInfoMap.set(String(item.sapNo).toUpperCase(), item);
-      });
+      // Create a map for quick lookup
+      const empInfoMap = new Map();
+
+      if (Array.isArray(empAndWorkInfo)) {
+        empAndWorkInfo.forEach((item) => {
+          const key = String(item?.sapNo).toUpperCase();
+          empInfoMap.set(key, item);
+        });
+      }
+
+      const addedNWHPD =
+        Array.isArray(data) &&
+        data.map((val) => {
+          const badgeKey = String(val?.FID).toUpperCase();
+          const workInfoItem = empInfoMap.get(badgeKey);
+
+          const lastWorkHour =
+            workInfoItem?.workHrs && Array.isArray(workInfoItem?.workHrs)
+              ? workInfoItem?.workHrs[workInfoItem?.workHrs?.length - 1]
+              : "0";
+
+          return {
+            ...val,
+            NORMALWORKINGHRSPERDAY: lastWorkHour,
+          };
+        });
+
+      setFinalData(addedNWHPD);
+    } catch (err) {
+      console.log("ERROR : ", err);
+      const addedNWHPD =
+        Array.isArray(data) &&
+        data.map((val) => {
+          return {
+            ...val,
+            NORMALWORKINGHRSPERDAY: "0",
+          };
+        });
+      setFinalData(addedNWHPD);
     }
-
-    // Process visibleData
-    const addedNWHPD =
-      Array.isArray(data) &&
-      data.map((val) => {
-        const badgeKey = String(val.FID).toUpperCase();
-        const workInfoItem = empInfoMap.get(badgeKey);
-
-        return {
-          ...val,
-          NORMALWORKINGHRSPERDAY: workInfoItem
-            ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
-            : "0",
-        };
-      });
-
-    setFinalData(addedNWHPD);
   }, [empAndWorkInfo, data]);
 
   const safeData = finalData || [];
@@ -1670,6 +1729,67 @@ export const ViewBLNGsheet = ({
           alertMessage={alertMessage}
         />
       )}
+
+     
+   {/* <button
+  onClick={async () => {
+    try {
+      console.log("Fetching and Deleting BLNG Data...");
+      let nextToken = null;
+      let deleteCount = 0;  // 🟢 Counter to track deletions
+
+      do {
+        const filter = {
+          and: [{ fileType: { eq: "BLNG" } }],
+        };
+
+        const response = await client.graphql({
+          query: listTimeSheets,
+          variables: {
+            filter: filter,
+            nextToken: nextToken,
+            limit: 1000, // optional: ensure limit is large enough
+          },
+        });
+
+        const SBWdata = response?.data?.listTimeSheets?.items || [];
+        nextToken = response?.data?.listTimeSheets?.nextToken;
+
+        console.log(`Fetched ${SBWdata.length} BLNG items in this batch.`);
+
+        await Promise.all(
+          SBWdata.map(async (item) => {
+            try {
+              const deleteResponse = await client.graphql({
+                query: deleteTimeSheet,
+                variables: { input: { id: item.id } },
+              });
+              deleteCount++; // ✅ Increment counter
+              console.log(`Deleted item ID: ${item.id}`);
+            } catch (deleteError) {
+              console.error(
+                `Error deleting item with ID ${item.id}:`,
+                deleteError
+              );
+            }
+          })
+        );
+
+        console.log(`Batch deletion completed. Total deleted so far: ${deleteCount}`);
+
+      } while (nextToken);
+
+      console.log(`✅ All BLNG items deletion process completed. Total deleted: ${deleteCount}`);
+
+    } catch (fetchError) {
+      console.error("❌ Error in fetchDataAndDelete:", fetchError);
+    }
+  }}
+>
+  Delete BLNG Data
+</button> */}
+
+
     </div>
   );
 };

@@ -4,6 +4,7 @@ import {
   dummyLeaveStatus,
   LocationData,
 } from "./customTimeSheet/JobcodeAndLocation";
+import { generateClient } from "@aws-amplify/api";
 import { UpdateViewSummary } from "./customTimeSheet/UpdateViewSummary";
 import { UseFetchDataForSummary } from "./customTimeSheet/UseFetchDataForSummary";
 import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
@@ -16,12 +17,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GetHolidayList } from "./customTimeSheet/GetHolidayList";
 import { HoursMinuAbsentCal } from "./customTimeSheet/HoursMinuAbsentCal";
 
+import { useTableMergedData } from "./customTimeSheet/useTableMergedData";
+import { useGetTimeSheetData } from "./customTimeSheet/useGetTimeSheetData";
+
 export const ViewSummary = () => {
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [toggleForEVSummary, setToggleForEVSummary] = useState(null);
   const [loadingMess, setLoadingMess] = useState(true);
   const [summaryObject, setSummaryObject] = useState(null);
+
+  // const [mergedData, setMergedData] = useState([]);
+  // const [leaveStatuses, setLeaveStatuses] = useState([]);
   // const [resultOfWHrsAbsCal, setResultOfWHrsAbsCal] = useState("");
 
   const {
@@ -38,6 +45,8 @@ export const ViewSummary = () => {
   const { workHrsAbsentCal } = HoursMinuAbsentCal();
 
   const publicHoliday = GetHolidayList();
+
+  const { empAndWorkInfo: mergedData, leaveStatuses } = useTableMergedData();
 
   const ProcessedDataFunc = async (data) => {
     setData(data);
@@ -157,28 +166,31 @@ export const ViewSummary = () => {
     setLoadingMess(true);
   };
 
+  const { allData } = useGetTimeSheetData();
   const {
     convertedStringToArrayObj,
     loading,
     emptyTableMess,
     setEmptyTableMess,
     setLoading,
+    // finalFiltered,
   } = UseFetchDataForSummary(
     startDate,
     endDate,
     selectedLocation,
     ProcessedDataFunc,
-    offshoreType
+    offshoreType,
+    allData
   );
 
   useEffect(() => {
     if (startDate) {
       setGetStartDate(new Date(startDate.replace(/-/g, "/")));
-      setEmptyTableMess(false);
+      // setEmptyTableMess(false);
     }
     if (endDate) {
       setGetEndDate(new Date(endDate.replace(/-/g, "/")));
-      setEmptyTableMess(false);
+      // setEmptyTableMess(false);
     }
   }, [startDate, endDate]);
 
@@ -189,7 +201,7 @@ export const ViewSummary = () => {
   }, []);
 
   const resetTableFunc = useCallback(() => {
-    setEmptyTableMess(false);
+    // setEmptyTableMess(false);
     setLoading(false);
   }, []);
 
@@ -461,6 +473,8 @@ export const ViewSummary = () => {
         publicHoliday={publicHoliday}
         dummyLeaveStatus={dummyLeaveStatus}
         dayCounts={dayCounts}
+        mergedData={mergedData}
+        leaveStatuses={leaveStatuses}
       />
 
       <ViewSummaryTable

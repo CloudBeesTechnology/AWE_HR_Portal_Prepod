@@ -790,11 +790,20 @@ export const ViewTSTBeforeSave = ({
     for (let emp of data) {
       const fid = emp.fidNo?.toString()?.trim();
       const workHrs = emp.normalWorkHrs?.toString()?.trim();
+      const date = emp?.date?.toString()?.trim();
 
       if (!fid || fid === "N/A" || fid === "0") {
         hasMissingField = true;
         message =
           "Some records are missing the FID or SAP NO. Please update the Excel sheet accordingly.";
+        // return true;
+        break;
+      }
+
+      if (!date || date === "N/A" || date === "0") {
+        hasMissingField = true;
+        message =
+          "Some records are missing the 'DATE'. Please update the Excel sheet accordingly.";
         // return true;
         break;
       }
@@ -1030,32 +1039,49 @@ export const ViewTSTBeforeSave = ({
   }, [startDate, endDate, secondaryData, searchQuery]);
 
   useEffect(() => {
-    if (!Array.isArray(empAndWorkInfo) || !Array.isArray(data)) return;
-    // Create a map for quick lookup
-    const empInfoMap = new Map();
+    try {
+      if (!Array.isArray(empAndWorkInfo) || !Array.isArray(data)) return;
 
-    if (Array.isArray(empAndWorkInfo)) {
-      empAndWorkInfo.forEach((item) => {
-        empInfoMap.set(String(item.sapNo).toUpperCase(), item);
-      });
+      // Create a map for quick lookup
+      const empInfoMap = new Map();
+
+      if (Array.isArray(empAndWorkInfo)) {
+        empAndWorkInfo.forEach((item) => {
+          const key = String(item?.sapNo).toUpperCase();
+          empInfoMap.set(key, item);
+        });
+      }
+
+      const addedNWHPD =
+        Array.isArray(data) &&
+        data.map((val) => {
+          const badgeKey = String(val?.NO).toUpperCase();
+          const workInfoItem = empInfoMap.get(badgeKey);
+
+          const lastWorkHour =
+            workInfoItem?.workHrs && Array.isArray(workInfoItem?.workHrs)
+              ? workInfoItem?.workHrs[workInfoItem?.workHrs?.length - 1]
+              : "0";
+
+          return {
+            ...val,
+            NORMALWORKINGHRSPERDAY: lastWorkHour,
+          };
+        });
+
+      setFinalData(addedNWHPD);
+    } catch (err) {
+      console.log("ERROR : ", err);
+      const addedNWHPD =
+        Array.isArray(data) &&
+        data.map((val) => {
+          return {
+            ...val,
+            NORMALWORKINGHRSPERDAY: "0",
+          };
+        });
+      setFinalData(addedNWHPD);
     }
-
-    // Process visibleData
-    const addedNWHPD =
-      Array.isArray(data) &&
-      data.map((val) => {
-        const badgeKey = String(val?.NO).toUpperCase();
-        const workInfoItem = empInfoMap.get(badgeKey);
-
-        return {
-          ...val,
-          NORMALWORKINGHRSPERDAY: workInfoItem
-            ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
-            : "0",
-        };
-      });
-
-    setFinalData(addedNWHPD);
   }, [empAndWorkInfo, data]);
 
   const safeData = finalData || [];
