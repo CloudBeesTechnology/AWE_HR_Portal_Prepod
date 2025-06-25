@@ -272,7 +272,7 @@ export const TrainingCertificatesForm = () => {
   };
 
   const searchResult = (result) => {
-    console.log("Res", result);
+    // console.log("Res", result.trainingProof[0]);
 
     if (!result) {
       console.warn("Search result is undefined or null");
@@ -346,8 +346,11 @@ export const TrainingCertificatesForm = () => {
 
         // Then process trainingProof data (for other fields)
         parsedProofData.forEach((trainingItem, idx) => {
+          // console.log(idx,"idx");
+
           if (trainingItem.certifiExpiry) {
             setValue("certifiExpiry", formatDate(trainingItem.certifiExpiry));
+            // console.log(trainingItem.certifiExpiry ,"trainingItem.certifiExpiry");
           }
           if (trainingItem.eCertifiDate) {
             setValue("eCertifiDate", formatDate(trainingItem.eCertifiDate));
@@ -396,22 +399,33 @@ export const TrainingCertificatesForm = () => {
           }
         });
 
-        const mergedData = parsedTrackData.map((trackItem, idx) => {
-          const proofItem = parsedProofData?.[idx] || {};
+        const mergedData = parsedProofData.map((trackItem, idx) => {
+          const proofItem = parsedTrackData?.[idx] || {};
+          console.log(trackItem, "proofItem");
+
           return {
-            ...trackItem,
-            certifiExpiry: proofItem.certifiExpiry || trackItem.certifiExpiry,
-            eCertifiDate: proofItem.eCertifiDate || trackItem.eCertifiDate,
+            ...proofItem,
+            MRNo: proofItem.MRNo,
+            company: proofItem.company,
+            courseCode: proofItem.courseCode,
+            courseName: proofItem.courseName,
+            traineeCourseFee: proofItem.traineeCourseFee,
+            traineeED: proofItem.traineeED,
+            traineeSD: proofItem.traineeSD,
+            traineeStatus: proofItem.traineeStatus,
+            certifiExpiry: trackItem.certifiExpiry || proofItem.certifiExpiry,
+            eCertifiDate: trackItem.eCertifiDate || proofItem.eCertifiDate,
             orgiCertifiDate:
-              proofItem.orgiCertifiDate || trackItem.orgiCertifiDate,
-            poNo: proofItem.poNo || trackItem.poNo,
+              trackItem.orgiCertifiDate || proofItem.orgiCertifiDate,
+            poNo: trackItem.poNo || proofItem.poNo,
             addDescretion:
-              proofItem.addDescretion || trackItem.addDescretion || [],
-            tcRemarks: proofItem.tcRemarks || trackItem.tcRemarks,
+              trackItem.addDescretion || proofItem.addDescretion || [],
+            tcRemarks: trackItem.tcRemarks || proofItem.tcRemarks,
             trainingUpCertifi:
-              proofItem.trainingUpCertifi || trackItem.trainingUpCertifi || [],
+              trackItem.trainingUpCertifi || proofItem.trainingUpCertifi || [],
           };
         });
+        console.log(mergedData, "mergedData");
 
         setValue("trainingProof", mergedData);
       } catch (error) {
@@ -563,7 +577,7 @@ export const TrainingCertificatesForm = () => {
             addDescretion,
             trainingUpCertifi,
             traineeSD,
-            traineeED
+            traineeED,
           }) => ({
             certifiExpiry,
             eCertifiDate,
@@ -573,7 +587,7 @@ export const TrainingCertificatesForm = () => {
             addDescretion,
             trainingUpCertifi,
             traineeSD,
-            traineeED
+            traineeED,
           })
         );
       };
@@ -836,7 +850,7 @@ export const TrainingCertificatesForm = () => {
                 )}
               </div>
 
-                            <div>
+              <div>
                 <label className="text_size_5">Start Date</label>
                 <input
                   type="date"
