@@ -11,8 +11,8 @@ export const AddEmpFun = () => {
 
     const totalData = {
       empID:AddEmpValue.empID,
-      // traineeTrack:[JSON.stringify(AddEmpValue.traineeTrack)]
-      traineeTrack:JSON.stringify(AddEmpValue.trainingTrack)
+      traineeTrack:[JSON.stringify(AddEmpValue.traineeTrack)]
+      // traineeTrack:JSON.stringify(AddEmpValue.trainingTrack)
     };
     // console.log(totalData,"create");
 

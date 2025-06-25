@@ -34,13 +34,14 @@ console.log(AddEmpReq);
 // Link 15:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Set6-2.csv"
 // Link 16:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set9.csv"
 // Link 17:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TraininReq_Data_Set10.csv"
+// Link 18:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq+BLNG+Prod.csv"
+// Link 19:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq+OME+Prod.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TraininReq_Data_Set10.csv",
-   
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq+OME+Prod.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -88,9 +89,22 @@ console.log(AddEmpReq);
 
         if (checkingBJLTable) {
         //   console.log(AddEmpValue, "update");
+          const existingProof = JSON.parse(checkingBJLTable.traineeTrack);
+          const convterEval = eval(existingProof);
+          // console.log(existingProof);
+          // console.log("Raw newProof:", TCValue.trainingProof);
+          const newProof = eval(AddEmpValue.traineeTrack); // now this will work
+          // console.log(AddEmpValue,"AddEmpValue");
+          // console.log(newProof);
+
+          const mergedProof = [...convterEval, ...newProof];
+          // console.log(mergedProof);
+
+          const mergedProofStr = JSON.stringify(mergedProof);
           const TMRDataUp = {
             ...AddEmpValue,
             id: checkingBJLTable.id,
+            traineeTrack: mergedProofStr,
           };
           // console.log(TMRDataUp, "UPDATE");
 

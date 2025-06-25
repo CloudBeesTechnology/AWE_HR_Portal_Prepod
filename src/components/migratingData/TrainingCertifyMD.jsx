@@ -25,12 +25,14 @@ export const TrainingCertifyMD = () => {
   // Link 5:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingcertifi+OME+Set2.csv"
   // Link 6:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingcertifi+OME+Set3.csv"
   // Link 7:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingcertifi+OME+Set1.csv"
+  // Link 8:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi+BLNG+Prod.csv"
+  // Link 9:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi+OME+Prod.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingcertifi+OME+Set1.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi+OME+Prod.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -76,9 +78,23 @@ export const TrainingCertifyMD = () => {
 
         if (checkingBJLTable) {
           //   console.log(TCValue, "update");
+         const existingProof = JSON.parse(checkingBJLTable.trainingProof);
+          const convterEval = eval(existingProof);
+          // console.log(existingProof);
+          // console.log("Raw newProof:", TCValue.trainingProof);
+          const newProof = eval(TCValue.trainingProof); // now this will work
+          // console.log(newProof);
+
+          const mergedProof = [...convterEval, ...newProof];
+          // console.log(mergedProof);
+
+          const mergedProofStr = JSON.stringify(mergedProof);
+
+          // console.log(mergedProofStr, "mergedProofStr");
           const TCDataUp = {
             ...TCValue,
             id: checkingBJLTable.id,
+            trainingProof: mergedProofStr,
           };
           // console.log(TCDataUp, "UPDATE");
 
