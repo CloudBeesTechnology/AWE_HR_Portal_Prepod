@@ -130,10 +130,10 @@ export const SearchDisplay = ({
               key={index}
               className="m-2 p-1 hover:bg-grey hover:text-white cursor-pointer flex justify-between items-center transition-all duration-200"
               onClick={() => {
-                console.log(employee);
+                // console.log(employee);
 
                 if (employee.empID || employee.name) {
-                  console.log(`${employee.empID} - ${employee.name || ""}`);
+                  // console.log(`${employee.empID} - ${employee.name || ""}`);
 
                   setSearchQuery(`${employee.empID} - ${employee.name || ""}`);
                   searchResult(employee);

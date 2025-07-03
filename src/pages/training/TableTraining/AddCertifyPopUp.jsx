@@ -39,10 +39,15 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
         raw = JSON.parse(raw);
       }
 
-      const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
-      const parsed = JSON.parse(fixedJSON);
+          if (typeof raw === "string") {
+        const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
+        const parsed = JSON.parse(fixedJSON);
 
-      return Array.isArray(parsed) ? parsed : [parsed];
+        return Array.isArray(parsed) ? parsed : [parsed];
+      }
+
+      // ✅ If raw is already an object or array, wrap if needed
+      return Array.isArray(raw) ? raw : [raw];
     } catch (error) {
       console.error("Error normalizing traineeTrackData:", error);
       return [];
