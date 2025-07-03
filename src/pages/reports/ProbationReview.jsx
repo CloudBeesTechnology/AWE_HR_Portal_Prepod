@@ -14,6 +14,7 @@ export const ProbationReview = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [originalTableBody, setOriginalTableBody] = useState([]);
   const userID = localStorage.getItem("userID");
   const userType = localStorage.getItem("userType");
   const [skilled, setSkilled] = useState(null);
@@ -167,6 +168,7 @@ export const ProbationReview = () => {
       HRMPosition
     );
     setTableBody(mergedData);
+    setOriginalTableBody(mergedData);
   }, [allData, userType, gmPosition, userID, HRMPosition]);
 
   const handleViewDetails = (personData) => {
@@ -198,7 +200,7 @@ export const ProbationReview = () => {
       return;
     }
 
-    const filtered = tableBody.filter((item) => {
+    const filtered = originalTableBody.filter((item) => {
       // Convert probationEndDate (DD-MM-YYYY) back to Date object for comparison
       const [day, month, year] = item.probationEndDate.split("-");
       const probationEnd = new Date(`${year}-${month}-${day}`);
