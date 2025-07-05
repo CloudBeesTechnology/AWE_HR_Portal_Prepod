@@ -608,7 +608,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     );
   };
 
-  console.log("IMG",imageUrl);
+  // console.log("IMG",imageUrl);
   
 
   return (
