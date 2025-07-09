@@ -185,6 +185,8 @@ type ProbForm @model @auth(rules: [{allow: public}]) {
   probStatus: Boolean
   gmName: String
   extendDate: String
+  prevProbExDate: String
+  probExtendStatus: String
 }
 
 type EmailNotifi @model @auth(rules: [{allow: public}]) {

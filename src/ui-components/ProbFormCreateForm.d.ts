@@ -62,6 +62,8 @@ export declare type ProbFormCreateFormInputValues = {
     probStatus?: boolean;
     gmName?: string;
     extendDate?: string;
+    prevProbExDate?: string;
+    probExtendStatus?: string;
 };
 export declare type ProbFormCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -104,6 +106,8 @@ export declare type ProbFormCreateFormValidationValues = {
     probStatus?: ValidationFunction<boolean>;
     gmName?: ValidationFunction<string>;
     extendDate?: ValidationFunction<string>;
+    prevProbExDate?: ValidationFunction<string>;
+    probExtendStatus?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ProbFormCreateFormOverridesProps = {
@@ -148,6 +152,8 @@ export declare type ProbFormCreateFormOverridesProps = {
     probStatus?: PrimitiveOverrideProps<SwitchFieldProps>;
     gmName?: PrimitiveOverrideProps<TextFieldProps>;
     extendDate?: PrimitiveOverrideProps<TextFieldProps>;
+    prevProbExDate?: PrimitiveOverrideProps<TextFieldProps>;
+    probExtendStatus?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type ProbFormCreateFormProps = React.PropsWithChildren<{
     overrides?: ProbFormCreateFormOverridesProps | undefined | null;

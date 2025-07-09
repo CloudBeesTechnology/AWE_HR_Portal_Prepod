@@ -207,6 +207,8 @@ type ProbForm @aws_iam @aws_api_key {
   probStatus: Boolean
   gmName: String
   extendDate: String
+  prevProbExDate: String
+  probExtendStatus: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -2385,6 +2387,8 @@ input ModelProbFormFilterInput {
   probStatus: ModelBooleanInput
   gmName: ModelStringInput
   extendDate: ModelStringInput
+  prevProbExDate: ModelStringInput
+  probExtendStatus: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelProbFormFilterInput]
@@ -2433,6 +2437,8 @@ input ModelProbFormConditionInput {
   probStatus: ModelBooleanInput
   gmName: ModelStringInput
   extendDate: ModelStringInput
+  prevProbExDate: ModelStringInput
+  probExtendStatus: ModelStringInput
   and: [ModelProbFormConditionInput]
   or: [ModelProbFormConditionInput]
   not: ModelProbFormConditionInput
@@ -2482,6 +2488,8 @@ input CreateProbFormInput {
   probStatus: Boolean
   gmName: String
   extendDate: String
+  prevProbExDate: String
+  probExtendStatus: String
 }
 
 input UpdateProbFormInput {
@@ -2526,6 +2534,8 @@ input UpdateProbFormInput {
   probStatus: Boolean
   gmName: String
   extendDate: String
+  prevProbExDate: String
+  probExtendStatus: String
 }
 
 input DeleteProbFormInput {
@@ -2574,6 +2584,8 @@ input ModelSubscriptionProbFormFilterInput {
   probStatus: ModelSubscriptionBooleanInput
   gmName: ModelSubscriptionStringInput
   extendDate: ModelSubscriptionStringInput
+  prevProbExDate: ModelSubscriptionStringInput
+  probExtendStatus: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionProbFormFilterInput]

@@ -780,6 +780,8 @@ export const createProbForm = /* GraphQL */ `
       probStatus
       gmName
       extendDate
+      prevProbExDate
+      probExtendStatus
       createdAt
       updatedAt
       __typename
@@ -833,6 +835,8 @@ export const updateProbForm = /* GraphQL */ `
       probStatus
       gmName
       extendDate
+      prevProbExDate
+      probExtendStatus
       createdAt
       updatedAt
       __typename
@@ -886,6 +890,8 @@ export const deleteProbForm = /* GraphQL */ `
       probStatus
       gmName
       extendDate
+      prevProbExDate
+      probExtendStatus
       createdAt
       updatedAt
       __typename

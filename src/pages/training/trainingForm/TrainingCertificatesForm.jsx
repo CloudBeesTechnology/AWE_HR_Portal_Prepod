@@ -401,7 +401,7 @@ export const TrainingCertificatesForm = () => {
 
         const mergedData = parsedProofData.map((trackItem, idx) => {
           const proofItem = parsedTrackData?.[idx] || {};
-          console.log(trackItem, "proofItem");
+          // console.log(trackItem, "proofItem");
 
           return {
             ...proofItem,
