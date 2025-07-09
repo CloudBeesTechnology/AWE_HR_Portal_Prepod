@@ -17,6 +17,7 @@ import Resignation from "../../assets/ReportIcon/Resignation.svg";
 import leavePass from "../../assets/ReportIcon/leavePass.svg";
 import promotion from "../../assets/ReportIcon/promotion.svg";
 import usePermission from "../../hooks/usePermissionDashInside";
+import useProbData from "../../hooks/useProbData";
 
 export const Reports = () => {
   const {
@@ -37,34 +38,19 @@ export const Reports = () => {
     contractForms,
     IVSSDetails,
     WPTrackings,
-    localMobiliz,
-    empPDData,
+    localMobiliz,SRData
   } = useContext(DataSupply);
-  // console.log(leaveDetailsData);
 
   const reportPermissions = usePermission("userID", "Report");
-  // console.log(IVSSDetails);
 
   IVSSDetails.forEach((employee) => {
     if (employee.tempID === "TEMP015") {
-      // console.log(employee);
     }
   });
   const [mergedData, setMergeData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [userID, setUserID] = useState("");
-  const [userType, setUserType] = useState("");
+  const { mergedProbData } = useProbData();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const userID = localStorage.getItem("userID");
-    setUserID(userID);
-    const userType = localStorage.getItem("userType");
-    setUserType(userType);
-  }, []);
-
-  // console.log(userType);
-  // console.log(userType);
   const reportTiles = [
     { title: "Recruitment & Mobilization", icon: rm, path: "/rm" },
     { title: "Resignation", icon: Resignation, path: "/resignation" },
@@ -108,7 +94,6 @@ export const Reports = () => {
 
     const mergedExampleData = IVSSDetails.map((item1) => {
       const { empID, tempID } = item1;
-//hello
       // Step 2: Find matching tempID data in WPTrackings and localMobiliz
       const matchingData2 =
         WPTrackings.find((item2) => item2.tempID === tempID) || {};
@@ -146,6 +131,8 @@ export const Reports = () => {
         ...(contractForms?.find((item) => item.empID === empID) || {}),
         ...(IVSSDetails?.find((item) => item.empID === empID) || {}),
         ...additionalData, // Add the merged example data
+        ...(SRData?.find((item) => item.empID === empID) || {}),
+       
         ...(workInfoData?.find((item) => item.empID === empID) || {}),
       };
     });
@@ -155,8 +142,6 @@ export const Reports = () => {
       const isEqual = JSON.stringify(prev) === JSON.stringify(finalMergedData);
       return isEqual ? prev : finalMergedData;
     });
-
-    setLoading(false);
   }, [
     empPIData,
     IDData,
@@ -175,7 +160,7 @@ export const Reports = () => {
     contractForms,
     IVSSDetails,
     WPTrackings,
-    localMobiliz,
+    localMobiliz,SRData
   ]);
 
   const filteredCards = reportTiles.filter((card) =>
@@ -193,7 +178,14 @@ export const Reports = () => {
             className="flex flex-col justify-center items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer border-2 border-[#EAD892] w-[200px] h-[150px]"
             onClick={() =>
               navigate(tile.path, {
-                state: { allData: mergedData, title: tile.title },
+                state: {
+                  allData:
+                    tile.title === "Probation Review" ||
+                    tile.title === "Probation Form Update"
+                      ? mergedProbData
+                      : mergedData,
+                  title: tile.title,
+                },
               })
             }
           >

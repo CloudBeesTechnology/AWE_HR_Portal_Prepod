@@ -57,6 +57,7 @@ import { ORMC } from "../pages/timeSheet/ORMC";
 import { ListofCandi } from "../pages/recruitments/ListofCandi";
 import { ApplyEmployReq } from "../pages/recruitments/empRequisition/ApplyEmployReq";
 import { ProbationForm } from "../pages/reports/ProbationForm";
+import { ProbReviewForm } from "../pages/reports/ProbReviewForm";
 import { ViewSummary } from "../pages/timeSheet/ViewSummary";
 import { HrInsuranceNav } from "../pages/insuranceSid/HrInsuranceNav";
 import { InsuranceClaim } from "../pages/insuranceSid/InsuranceClaim";
@@ -422,6 +423,10 @@ const NavigationLinks = () => {
           <Route
             path="/probFormUpdate"
             element={<ProbationPDF userID={userID} userType={userType} />}
+          />
+          <Route
+            path="/probReviewForm"
+            element={<ProbReviewForm userID={userID} userType={userType} />}
           />
           <Route
             path="/ContractUp"

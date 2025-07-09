@@ -16,6 +16,8 @@ export const FilterTable = ({
   handleDate,
   startDate,
   endDate,
+  testDate,
+  setTestDate
 }) => {
   const { dropDownVal } = useContext(DataSupply);
   const [searchQuery, setSearchQuery] = useState("");
@@ -112,7 +114,6 @@ export const FilterTable = ({
     setCurrentPage(1);
   };
 
-  // Rest of your code remains the same...
   const downloadExcel = () => {
     const formatKey = (key) => {
       return key
@@ -209,6 +210,15 @@ export const FilterTable = ({
       saveAs(blob, `${title}.xlsx`);
     });
   };
+
+  const isClickableRow = [
+    "Probation Review",
+    "Probation Form Update",
+    "Recruitment & Mobilization",
+    "Contract Expiry Review",
+    "Contract Expiry Form Update",
+  ].includes(title);
+
   return (
     <div className="w-full px-7 bg-[#F5F6F1CC]">
       <div className="w-full flex items-center justify-between gap-5 ">
@@ -228,6 +238,7 @@ export const FilterTable = ({
             placeholder="Search"
             value={searchQuery}
             onChange={handleSearchChange}
+   
             className="outline-none rounded-lg px-4 py-2 shadow-md border border-[#C5C5C5] text-grey"
           />
           <div className=" absolute right-3 top-2 bg-white text-[24px]">
@@ -265,6 +276,22 @@ export const FilterTable = ({
                   id="end-date"
                   type="date"
                   onChange={(e) => handleDate(e, "endDate")}
+                  className="outline-none text-grey border rounded-md p-2"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="test-date"
+                  className="block text-[16px] font-medium"
+                >
+                  Today
+                </label>
+                <input
+                  id="test-date"
+                  type="date"
+                  value={testDate}
+                  onChange={(e) => setTestDate(e.target.value)}
                   className="outline-none text-grey border rounded-md p-2"
                 />
               </div>
@@ -319,63 +346,53 @@ export const FilterTable = ({
                 {currentItems.map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
-                    className="text-sm border-b-2 border-[#CECECE]"
+                    className={`text-sm border-b-2 border-[#CECECE] ${
+                      isClickableRow ? "hover:bg-gray-100 cursor-pointer" : ""
+                    }`}
+                    onClick={() => isClickableRow && handleViewDetails(row)}
                   >
-                    {Object.entries(row).map(([key, col], colIndex) => {
-                      // console.log("Key", key + "Col", col);
-                      // console.log("Col", col);
-
-                      const isExpired =
-                        key === "expAndValid" && col === "EXPIRED";
-                      const displayValue =
-                        col == null
-                          ? "N/A"
-                          : Array.isArray(col)
-                          ? `${col[col.length - 1]}`
-                          : `${col}`;
-                      return (
-                        // <td
-                        //   key={colIndex}
-                        //   className={`border-b-2 text-center uppercase border-[#CECECE] p-2 ${
-                        //     isExpired ? "text-[red]" : ""
-                        //   }  `}
-                        // >
-                        //   {displayValue}
-                        // </td>
-                        <td
-                          key={colIndex}
-                          className={`font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2 ${
-                            isExpired ? "text-[red]" : ""
-                          } ${
-                            key === "status"
-                              ? col?.toLowerCase() === "approved"
-                                ? "text-[#339933]"
-                                : col?.toLowerCase() === "reject"
-                                ? "text-[red]"
-                                : col?.toLowerCase() === "pending"
-                                ? "text-[#E8A317]"
+                    {Object.entries(row)
+                      .filter(
+                        ([key]) =>
+                          key !== "probExtendStatus" &&
+                          key !== "prevProbExDate" &&
+                          key !== "probCreatedAt" &&
+                          key !== "headStatus" &&
+                          key !== "hrmStatus" &&
+                          key !== "gmStatus" &&
+                          key !== "contractEndDate" &&
+                          key !== "matchedID"
+                      )
+                      .map(([key, col], colIndex) => {
+                        const isExpired =
+                          key === "expAndValid" && col === "EXPIRED";
+                        const displayValue =
+                          col == null
+                            ? "N/A"
+                            : Array.isArray(col)
+                            ? `${col[col.length - 1]}`
+                            : `${col}`;
+                        return (
+                          <td
+                            key={colIndex}
+                            className={`font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2 ${
+                              isExpired ? "text-[red]" : ""
+                            } ${
+                              key === "status"
+                                ? col?.toLowerCase() === "approved"
+                                  ? "text-[#339933]"
+                                  : col?.toLowerCase() === "reject"
+                                  ? "text-[red]"
+                                  : col?.toLowerCase() === "pending"
+                                  ? "text-[#E8A317]"
+                                  : ""
                                 : ""
-                              : ""
-                          }`}
-                        >
-                          {displayValue}
-                        </td>
-                      );
-                    })}
-                    {[
-                      "Probation Review",
-                      "Probation Form Update",
-                      "Recruitment & Mobilization",
-                      "Contract Expiry Review",
-                      "Contract Expiry Form Update",
-                    ].includes(title) && (
-                      <td
-                        className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
-                        onClick={() => handleViewDetails(row)}
-                      >
-                        View Details
-                      </td>
-                    )}
+                            }`}
+                          >
+                            {displayValue}
+                          </td>
+                        );
+                      })}
                   </tr>
                 ))}
               </tbody>
@@ -389,8 +406,6 @@ export const FilterTable = ({
       ) : (
         <div className="text-center mt-10">No Report List Available Here</div>
       )}
-
-      {/* Pagination Controls */}
       <div className="flex justify-center w-full my-5">
         <div className="flex justify-center gap-6 w-3/5 items-center">
           {totalPages > 1 && (
@@ -431,3 +446,4 @@ export const FilterTable = ({
     </div>
   );
 };
+
