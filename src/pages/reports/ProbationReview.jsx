@@ -98,18 +98,6 @@ export const ProbationReview = () => {
     );
     lastDayOfNextMonth.setMilliseconds(-1);
 
-    //range 2 month ex. From: 01-07-2025 To: 31-08-2025
-    // const firstDayOfNextMonth = new Date(
-    //   today.getFullYear(),
-    //   today.getMonth() + 1,
-    //   1
-    // );
-    // const lastDayOfNextMonth = new Date(
-    //   today.getFullYear(),
-    //   today.getMonth() + 2,
-    //   1
-    // );
-    // lastDayOfNextMonth.setMilliseconds(-1);
 
     const sortedData = data
       ?.filter((item) => {
@@ -129,10 +117,6 @@ export const ProbationReview = () => {
 
           if (!lastDate) return false;
 
-          // const probationEnd = new Date(lastDate);
-          // console.log("end date", probationEnd.getTime());
-          // console.log("Prev end date", new Date(item.prevProbExDate).getTime());
-
           const probationEnd = new Date(lastDate);
 
           let prevProbExDate = null;
@@ -148,14 +132,12 @@ export const ProbationReview = () => {
             return false;
           }
 
-          // if (item.probStatus && item.probExtendStatus !== "Extended") {
-          //   return false;
-          // }
-
-          if (item.probExtendStatus === "probup" || item.probExtendStatus === "completed") {
+          if (
+            item.probExtendStatus === "probup" ||
+            item.probExtendStatus === "completed"
+          ) {
             return false;
           }
-
 
           return (
             probationEnd >= firstDayOfNextMonth &&
@@ -250,7 +232,7 @@ export const ProbationReview = () => {
           // ...(HRMPosition === "HR MANAGER" || userType === "HR"
           //   ? { status: item.hrName ? "Approved" : "Pending" }
           //   : {}),
-       
+
           ...(userType === "Supervisor" && {
             status:
               item.probExtendStatus === "Extended"
@@ -320,59 +302,7 @@ export const ProbationReview = () => {
     }
   };
 
-  console.log("sl",selectedPerson)
-
-  // const handleDate = (e, type) => {
-  //   const value = e.target.value;
-
-  //   if (type === "startDate") setStartDate(value);
-  //   if (type === "endDate") setEndDate(value);
-
-  //   const start = type === "startDate" ? value : startDate;
-  //   const end = type === "endDate" ? value : endDate;
-
-  //   if (!start && !end) {
-  //     // setFilteredData([]);
-  //     setTableBody([]);
-  //     return;
-  //   }
-
-  //   const filtered = originalTableBody.filter((item) => {
-  //     const [day, month, year] = item.probationEndDate.split("-");
-  //     const probationEnd = new Date(`${year}-${month}-${day}`);
-
-  //     const startDateObj = start ? new Date(start) : null;
-  //     const endDateObj = end ? new Date(end) : null;
-
-  //     console.log("Selected Start Date:", start);
-  //     console.log("Selected End Date:", end);
-
-  //     console.log(
-  //       "Checking item:",
-  //       item.probationEndDate,
-  //       "->",
-  //       probationEnd.toDateString()
-  //     );
-  //     console.log(
-  //       "StartDateObj:",
-  //       startDateObj?.toDateString(),
-  //       "EndDateObj:",
-  //       endDateObj?.toDateString()
-  //     );
-
-  //     if (startDateObj && endDateObj) {
-  //       return probationEnd >= startDateObj && probationEnd <= endDateObj;
-  //     } else if (startDateObj) {
-  //       return probationEnd >= startDateObj;
-  //     } else if (endDateObj) {
-  //       return probationEnd <= endDateObj;
-  //     }
-  //     return true;
-  //   });
-
-  //   setTableBody(filtered);
-  // };
-
+ 
   const handleDate = (e, type) => {
     const value = e.target.value;
 
@@ -493,7 +423,7 @@ export const ProbationReview = () => {
               </div>
             </div>
 
-            {selectedPerson.probExtendStatus === "Extended" && (
+            {selectedPerson.probExtendStatus === "Extended" ? (
               <div className="mt-6 center">
                 <div className="mt-6 border border-lite_grey h-[171px] w-[263px] p-4 rounded">
                   <div className="text-center mb-4">
@@ -520,42 +450,22 @@ export const ProbationReview = () => {
                           <td className="px-6 py-2">
                             {formatDate(selectedPerson.prevProbExDate)}
                           </td>
-                           <td onClick={handleDownload} className="px-3 py-2 text-blue underline cursor-pointer">View</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
-                </div>
-                {/* <div className="text-center my-5">
-                  <span className="text-sm font-semibold mb-5">
-                    Probation Extension History
-                  </span>
-
-                  <span className="block mt-2 text-xs font-medium text-[#303030]">
-                    1st Expiry Date
-                  </span>
-                </div>
-
-                <div className="center">
-                  <div className="flex items-center justify-between gap-12 bg-medium_white border border-lite_grey rounded px-12 py-2 shadow-sm">
-                    <span className="w-20 text-sm font-normal">Date</span>
-                    <span className="w-4 text-center">:</span>
-                    <span className="flex-1 text-xs font-semibold text-[#6666]">
-                      {selectedPerson.prevProbExDate}
-                    </span>
-                  </div>
-                </div> */}
+                </div>           
+              </div>
+            ) : (
+              <div className="flex justify-center items-center py-6 px-4">
+                <button
+                  className="bg-primary text-sm font-bold py-2 px-6 text-dark_grey rounded-md"
+                  onClick={handleDownload}
+                >
+                  Go to <strong>Probation</strong> Form
+                </button>
               </div>
             )}
-
-            {/* <div className="flex justify-center items-center py-6 px-4">
-              <button
-                className="bg-primary text-sm font-bold py-2 px-6 text-dark_grey rounded-md"
-                onClick={handleDownload}
-              >
-                Go to <strong>Probation</strong> Form
-              </button>
-            </div> */}
           </div>
         </div>
       )}
