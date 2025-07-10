@@ -29,7 +29,7 @@ export const ConfirmationForm = ({
   }, [formData]);
 
   const probDatafilter = probData.filter(
-    (item) => item.empID === employeeData.empID
+    (item) => item?.empID === employeeData?.empID
   );
 
   // console.log("Data", formData);
@@ -40,7 +40,7 @@ export const ConfirmationForm = ({
     }
 
     const workInfo = workInfoData.find(
-      (data) => data.empID === employeeData.empID
+      (data) => data.empID === employeeData?.empID
     );
 
     if (workInfo) {
@@ -437,7 +437,7 @@ export const ConfirmationForm = ({
             Extend probation
           </label>
         </div>
-      )} */}
+      )} */} 
 
       {userType === "HR" && (
         <div className="mt-10 flex items-center">

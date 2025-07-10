@@ -78,89 +78,315 @@ export const ProbationPDF = ({ userID, userType }) => {
     return date.toISOString().split("T")[0];
   };
 
+  // const probationReviewMergedData = (data, userType, gmPosition, userID) => {
+  //   const filteredData = data
+  //     .filter((item) => {
+  //       if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+  //         const lastWorkStatus =
+  //           item.workStatus[item.workStatus.length - 1]?.toUpperCase();
+  //         if (
+  //           ["TERMINATION", "RESIGNATION", "ACTIVE"].includes(lastWorkStatus)
+  //         ) {
+  //           return false;
+  //         }
+  //       }
+
+  //       const isProbationActive =
+  //         item.probStatus === true && item.probationEnd?.length > 0;
+
+  //       const lastSupervisor =
+  //         Array.isArray(item.supervisor) && item.supervisor.length > 0
+  //           ? item.supervisor[item.supervisor.length - 1]
+  //           : null;
+
+  //       const lastManager =
+  //         Array.isArray(item.manager) && item.manager.length > 0
+  //           ? item.manager[item.manager.length - 1]
+  //           : null;
+
+  //       const skillPool = item.skillPool ? item.skillPool.toUpperCase() : "";
+
+  //       const isSupervisorApproved =
+  //         item.supervisorApproved?.toUpperCase() === "APPROVED";
+  //       const isManagerApproved =
+  //         item.managerApproved?.toUpperCase() === "APPROVED";
+  //       const isGmApproved = item.gmApproved?.toUpperCase() === "APPROVED";
+
+  //       // Conditional filters by user role
+  //       if (userType === "Supervisor") {
+  //         const result = isProbationActive;
+
+  //         return result;
+  //       }
+
+  //       if (
+  //         userType === "Manager" &&
+  //         gmPosition !== "GENERAL MANAGER" &&
+  //         HRMPosition !== "HR MANAGER"
+  //       ) {
+  //         const result =
+  //           isProbationActive && lastManager === userID && isSupervisorApproved;
+
+  //         return result;
+  //       }
+
+  //       if (gmPosition === "GENERAL MANAGER") {
+  //         if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {
+  //           return false;
+  //         }
+  //         return isProbationActive && isManagerApproved;
+  //       }
+
+  //       if (userType === "HR" || HRMPosition === "HR MANAGER") {
+  //         if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {
+  //           return isProbationActive;
+  //         }
+  //         return isProbationActive && isGmApproved;
+  //       }
+
+  //       return isProbationActive;
+  //     })
+  //     .map((item) => {
+  //       if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+  //         const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+  //         if (
+  //           lastWorkStatus.toUpperCase() === "TERMINATION" ||
+  //           lastWorkStatus.toUpperCase() === "RESIGNATION"
+  //         ) {
+  //           return false;
+  //         }
+  //       }
+
+  //       const probationEndDates = item.probationEnd || [];
+  //       const lastDate = probationEndDates[probationEndDates.length - 1];
+
+  //       // console.log(item, "items");
+
+  //       const today = new Date();
+  //       const positionRevDate =
+  //         item.positionRevDate?.[item.positionRevDate.length - 1];
+  //       const positionRev = item.positionRev?.[item.positionRev.length - 1];
+  //       const upgradePosition =
+  //         item.upgradePosition?.[item.upgradePosition.length - 1];
+  //       const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
+  //       let finalPosition;
+  //       // Convert to dates for comparison (ensure dates are valid before comparing)
+  //       const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
+  //       const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+  //       if (revDateObj && upgradeDateObj) {
+  //         // console.log("two");
+  //         if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
+  //           finalPosition = item.position?.[item.position.length - 1];
+  //         } else if (revDateObj > upgradeDateObj) {
+  //           // finalPosition = today >= revDateObj && positionRev;
+  //           finalPosition =
+  //             today >= revDateObj
+  //               ? positionRev
+  //               : today >= upgradeDateObj
+  //               ? upgradePosition
+  //               : item.position?.[item.position.length - 1];
+  //         } else if (upgradeDateObj > revDateObj) {
+  //           // finalPosition = today >= upgradeDateObj && upgradePosition;
+  //           finalPosition =
+  //             today >= upgradeDateObj
+  //               ? upgradePosition
+  //               : today >= revDateObj
+  //               ? positionRev
+  //               : item.position?.[item.position.length - 1];
+  //         }
+  //       } else if (revDateObj && !upgradeDateObj) {
+  //         finalPosition = today >= revDateObj && positionRev;
+  //         // console.log("rev");
+  //       } else if (upgradeDateObj && !revDateObj) {
+  //         // console.log("po");
+  //         finalPosition = today >= upgradeDateObj && upgradePosition;
+  //       } else {
+  //         finalPosition = item.position?.[item.position.length - 1];
+  //       }
+
+  //       let status = "";
+
+  //       // Skip logic for SuperAdmin
+  //       if (userType !== "SuperAdmin") {
+  //         if (
+  //           item.probExtendStatus?.trim().toLowerCase() === "extended" ||
+  //           item.probExtendStatus === "completed"
+  //         ) {
+  //           status = "Extended";
+  //         } else if (userType === "Supervisor") {
+  //           status = item.supervisorApproved ? "Approved" : "Pending";
+  //         } else if (HRMPosition === "HR MANAGER" || userType === "HR") {
+  //           status = item.hrName ? "Approved" : "Pending";
+  //         } else if (
+  //           userType === "Manager" &&
+  //           gmPosition !== "GENERAL MANAGER" &&
+  //           HRMPosition !== "HR MANAGER"
+  //         ) {
+  //           status = item.managerApproved ? "Approved" : "Pending";
+  //         } else if (gmPosition === "GENERAL MANAGER") {
+  //           status =
+  //             item.probExtendStatus === "Extended"
+  //               ? "Extended"
+  //               : item.gmApproved || "Pending";
+  //         }
+  //       }
+
+  //       const formattedData = {
+  //         probCreatedAt: item.probCreatedAt,
+  //         empID: item.empID || "-",
+  //         empBadgeNo: item.empBadgeNo || "-",
+  //         name: item.name || "-",
+  //         dateOfJoin: formatDate(item.doj) || "-",
+  //         department: Array.isArray(item.department)
+  //           ? item.department[item.department.length - 1]
+  //           : "-",
+  //         otherDepartment: Array.isArray(item.otherDepartment)
+  //           ? item.otherDepartment[item.otherDepartment.length - 1]
+  //           : "-",
+  //         position: finalPosition,
+  //         otherPosition: item.otherPosition?.[item.otherPosition.length - 1],
+  //         // position: Array.isArray(item.position)
+  //         //   ? item.position[item.position.length - 1]
+  //         //   : "-",
+  //         // otherPosition: Array.isArray(item.otherPosition)
+  //         //   ? item.otherPosition[item.otherPosition.length - 1]
+  //         //   : "-",
+  //         probationEndDate: item.prevProbExDate
+  //           ? formatDate(item.prevProbExDate)
+  //           : formatDate(lastDate),
+  //         deadline: item.prevProbExDate
+  //           ? formatDate(calculateDeadline(item.prevProbExDate))
+  //           : formatDate(calculateDeadline(lastDate)),
+  //         probExtendStatus: item.probExtendStatus,
+  //         prevProbExDate: item.prevProbExDate,
+  //         status,
+  //         // ...(userType === "Supervisor" && {
+  //         //   status:
+  //         //     item.probExtendStatus === "Extended"
+  //         //       ? "Extended"
+  //         //       : item.supervisorApproved || "Pending",
+  //         // }),
+  //         // ...(userType === "Manager" &&
+  //         //   gmPosition !== "GENERAL MANAGER" &&
+  //         //   HRMPosition !== "HR MANAGER" && {
+  //         //     status:
+  //         //       item.probExtendStatus === "Extended"
+  //         //         ? "Extended"
+  //         //         : item.managerApproved || "Pending",
+  //         //   }),
+  //         // ...(HRMPosition === "HR MANAGER" || userType === "HR"
+  //         //   ? {
+  //         //       status:
+  //         //         item.probExtendStatus === "Extended"
+  //         //           ? "Extended"
+  //         //           : item.hrName
+  //         //           ? "Approved"
+  //         //           : "Pending",
+  //         //     }
+  //         //   : {}),
+  //         // ...(gmPosition === "GENERAL MANAGER" && {
+  //         //   status:
+  //         // item.probExtendStatus === "Extended"
+  //         //   ? "Extended"
+  //         //   : item.gmApproved || "Pending",
+  //         // }),
+  //       };
+
+  //       return formattedData;
+  //     })
+  //     .sort((a, b) => {
+  //       if (a.status === "Pending" && b.status !== "Pending") return -1;
+  //       if (a.status !== "Pending" && b.status === "Pending") return 1;
+  //       return 0;
+  //     });
+  //   return filteredData;
+  // };
+
   const probationReviewMergedData = (data, userType, gmPosition, userID) => {
-    const filteredData = data
-      .filter((item) => {
-        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
-          const lastWorkStatus =
-            item.workStatus[item.workStatus.length - 1]?.toUpperCase();
-          if (
-            ["TERMINATION", "RESIGNATION", "ACTIVE"].includes(lastWorkStatus)
-          ) {
-            return false;
-          }
+    // Step 1: Filter data based on role logic
+    const filteredData = data.filter((item) => {
+      if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+        const lastWorkStatus =
+          item.workStatus[item.workStatus.length - 1]?.toUpperCase();
+        if (["TERMINATION", "RESIGNATION", "ACTIVE"].includes(lastWorkStatus)) {
+          return false;
         }
+      }
 
-        const isProbationActive =
-          item.probStatus === true && item.probationEnd?.length > 0;
+      const isProbationActive =
+        item.probStatus === true && item.probationEnd?.length > 0;
 
-        const lastSupervisor =
-          Array.isArray(item.supervisor) && item.supervisor.length > 0
-            ? item.supervisor[item.supervisor.length - 1]
-            : null;
+      const lastSupervisor =
+        Array.isArray(item.supervisor) && item.supervisor.length > 0
+          ? item.supervisor[item.supervisor.length - 1]
+          : null;
 
-        const lastManager =
-          Array.isArray(item.manager) && item.manager.length > 0
-            ? item.manager[item.manager.length - 1]
-            : null;
+      const lastManager =
+        Array.isArray(item.manager) && item.manager.length > 0
+          ? item.manager[item.manager.length - 1]
+          : null;
 
-        const skillPool = item.skillPool ? item.skillPool.toUpperCase() : "";
+      const skillPool = item.skillPool ? item.skillPool.toUpperCase() : "";
 
-        const isSupervisorApproved =
-          item.supervisorApproved?.toUpperCase() === "APPROVED";
-        const isManagerApproved =
-          item.managerApproved?.toUpperCase() === "APPROVED";
-        const isGmApproved = item.gmApproved?.toUpperCase() === "APPROVED";
+      const isSupervisorApproved =
+        item.supervisorApproved?.toUpperCase() === "APPROVED";
+      const isManagerApproved =
+        item.managerApproved?.toUpperCase() === "APPROVED";
+      const isGmApproved = item.gmApproved?.toUpperCase() === "APPROVED";
 
-        // Conditional filters by user role
-        if (userType === "Supervisor") {
-          const result = isProbationActive;
-
-          return result;
-        }
-
-        if (
-          userType === "Manager" &&
-          gmPosition !== "GENERAL MANAGER" &&
-          HRMPosition !== "HR MANAGER"
-        ) {
-          const result =
-            isProbationActive && lastManager === userID && isSupervisorApproved;
-
-          return result;
-        }
-
-        if (gmPosition === "GENERAL MANAGER") {
-          if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {
-            return false;
-          }
-          return isProbationActive && isManagerApproved;
-        }
-
-        if (userType === "HR" || HRMPosition === "HR MANAGER") {
-          if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {
-            return isProbationActive;
-          }
-          return isProbationActive && isGmApproved;
-        }
-
+      if (userType === "Supervisor") {
         return isProbationActive;
-      })
-      .map((item) => {
-        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
-          const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
-          if (
-            lastWorkStatus.toUpperCase() === "TERMINATION" ||
-            lastWorkStatus.toUpperCase() === "RESIGNATION"
-          ) {
-            return false;
-          }
-        }
+      }
 
+      if (
+        userType === "Manager" &&
+        gmPosition !== "GENERAL MANAGER" &&
+        HRMPosition !== "HR MANAGER"
+      ) {
+        return (
+          isProbationActive && lastManager === userID && isSupervisorApproved
+        );
+      }
+
+      if (gmPosition === "GENERAL MANAGER") {
+        if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {
+          return false;
+        }
+        return isProbationActive && isManagerApproved;
+      }
+
+      if (userType === "HR" || HRMPosition === "HR MANAGER") {
+        if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {
+          return isProbationActive;
+        }
+        return isProbationActive && isGmApproved;
+      }
+
+      return isProbationActive;
+    });
+
+    // Step 2: Pick latest record per empID (based on last probationEnd)
+    const latestRecordsMap = new Map();
+
+    for (const item of filteredData) {
+      const currentEnd = new Date(item.probationEnd?.slice(-1)[0] || 0);
+      const existing = latestRecordsMap.get(item.empID);
+
+      if (
+        !existing ||
+        currentEnd > new Date(existing.probationEnd?.slice(-1)[0] || 0)
+      ) {
+        latestRecordsMap.set(item.empID, item);
+      }
+    }
+
+    const latestFilteredData = Array.from(latestRecordsMap.values());
+
+    // Step 3: Map and transform data
+    const finalData = latestFilteredData
+      .map((item) => {
         const probationEndDates = item.probationEnd || [];
         const lastDate = probationEndDates[probationEndDates.length - 1];
-
-        // console.log(item, "items");
 
         const today = new Date();
         const positionRevDate =
@@ -170,23 +396,21 @@ export const ProbationPDF = ({ userID, userType }) => {
           item.upgradePosition?.[item.upgradePosition.length - 1];
         const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
         let finalPosition;
-        // Convert to dates for comparison (ensure dates are valid before comparing)
+
         const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
         const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+
         if (revDateObj && upgradeDateObj) {
-          // console.log("two");
           if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
             finalPosition = item.position?.[item.position.length - 1];
           } else if (revDateObj > upgradeDateObj) {
-            // finalPosition = today >= revDateObj && positionRev;
             finalPosition =
               today >= revDateObj
                 ? positionRev
                 : today >= upgradeDateObj
                 ? upgradePosition
                 : item.position?.[item.position.length - 1];
-          } else if (upgradeDateObj > revDateObj) {
-            // finalPosition = today >= upgradeDateObj && upgradePosition;
+          } else {
             finalPosition =
               today >= upgradeDateObj
                 ? upgradePosition
@@ -194,11 +418,9 @@ export const ProbationPDF = ({ userID, userType }) => {
                 ? positionRev
                 : item.position?.[item.position.length - 1];
           }
-        } else if (revDateObj && !upgradeDateObj) {
+        } else if (revDateObj) {
           finalPosition = today >= revDateObj && positionRev;
-          // console.log("rev");
-        } else if (upgradeDateObj && !revDateObj) {
-          // console.log("po");
+        } else if (upgradeDateObj) {
           finalPosition = today >= upgradeDateObj && upgradePosition;
         } else {
           finalPosition = item.position?.[item.position.length - 1];
@@ -206,11 +428,9 @@ export const ProbationPDF = ({ userID, userType }) => {
 
         let status = "";
 
-        // Skip logic for SuperAdmin
         if (userType !== "SuperAdmin") {
           if (
-            item.probExtendStatus?.trim().toLowerCase() === "extended" ||
-            item.probExtendStatus === "completed"
+            item.probExtendStatus?.trim().toLowerCase() === "extended"
           ) {
             status = "Extended";
           } else if (userType === "Supervisor") {
@@ -231,7 +451,8 @@ export const ProbationPDF = ({ userID, userType }) => {
           }
         }
 
-        const formattedData = {
+        return {
+          probID: item.probID,
           probCreatedAt: item.probCreatedAt,
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
@@ -255,15 +476,14 @@ export const ProbationPDF = ({ userID, userType }) => {
           prevProbExDate: item.prevProbExDate,
           status,
         };
-
-        return formattedData;
       })
       .sort((a, b) => {
         if (a.status === "Pending" && b.status !== "Pending") return -1;
         if (a.status !== "Pending" && b.status === "Pending") return 1;
         return 0;
       });
-    return filteredData;
+
+    return finalData;
   };
 
   useEffect(() => {
@@ -280,48 +500,69 @@ export const ProbationPDF = ({ userID, userType }) => {
     setLoading(false);
   }, [allData, userType, gmPosition, userID, HRMPosition]);
 
+  const closeModal = () => {
+    setSelectedPerson(null);
+  };
   const handleViewDetails = (personData) => {
     setSelectedPerson(personData);
   };
 
-  const closeModal = () => {
-    setSelectedPerson(null);
-  };
-
-  const handleDownload = () => {
+  const handleSingleData = () => {
     closeModal();
     if (selectedPerson) {
       navigate("/probForm", { state: { employeeData: selectedPerson } });
     }
   };
 
+  // useEffect(() => {
+  //   if (selectedPerson) {
+  //     const empRecords = allData.filter(
+  //       (item) => item.empID === selectedPerson.empID
+  //     );
+
+  //     // console.log("EmpRecords:", empRecords);
+  //     const hasExtended = empRecords.some(
+  //       (item) =>
+  //         item.probExtendStatus?.trim().toLowerCase() === "extended" ||
+  //         item.probExtendStatus?.trim().toLowerCase() === "completed"
+  //     );
+
+  //     if (hasExtended) {
+  //       setExtenFlag(empRecords);
+  //     } else {
+  //       setExtenFlag([]);
+  //     }
+  //   }
+  // }, [allData, selectedPerson]);
 
   useEffect(() => {
-  if (selectedPerson) {
-    const empRecords = allData.filter(
-      (item) => item.empID === selectedPerson.empID
-    );
+    if (selectedPerson) {
+      console.log("Selected Person:", selectedPerson);
+      const empRecords = allData.filter(
+        (item) => item.empID === selectedPerson.empID
+      );
 
-    // Filter out records where probExtendStatus === "item.probExtendStatus"
-    const filteredRecords = empRecords.filter(
-      (item) => item.probExtendStatus !== "probup"
-    );
+      // Filter out records where probExtendStatus === "item.probExtendStatus"
+      const filteredRecords = empRecords.filter(
+        (item) => item.probExtendStatus !== "probup"
+      );
 
-    // Check if any remaining records have "extended" or "completed"
-    const hasExtended = filteredRecords.some(
-      (item) =>
-        item.probExtendStatus?.trim().toLowerCase() === "extended" ||
-        item.probExtendStatus?.trim().toLowerCase() === "completed"
-    );
+      // Check if any remaining records have "extended" or "completed"
+      const hasExtended = filteredRecords.some(
+        (item) =>
+          item.probExtendStatus?.trim().toLowerCase() === "extended" ||
+          item.probExtendStatus?.trim().toLowerCase() === "completed"
+      );
 
-    if (hasExtended) {
-      setExtenFlag(filteredRecords);
-    } else {
-      setExtenFlag([]);
+      if (hasExtended) {
+        setExtenFlag(filteredRecords);
+      } else {
+        setExtenFlag([]);
+      }
     }
-  }
-}, [allData, selectedPerson]);
-  // console.log("extendedFlag", extenFlag);
+  }, [allData, selectedPerson]);
+  
+  console.log("extendedFlag", extenFlag);
 
   const handleDate = (e, type) => {
     const value = e.target.value;
@@ -366,6 +607,9 @@ export const ProbationPDF = ({ userID, userType }) => {
     );
   }
 
+  console.log("employeeData", selectedPerson);
+  console.log("extensionFlag", extenFlag);
+
   return (
     <div>
       <FilterTable
@@ -380,7 +624,7 @@ export const ProbationPDF = ({ userID, userType }) => {
 
       {selectedPerson && (
         <div className="fixed inset-0 center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+          <div className="bg-white p-6 rounded-lg shadow-lg h-[80vh] overflow-y-auto w-1/3">
             <section className="flex justify-between gap-10 items-center mb-5">
               <div className="w-full flex-1 center">
                 <img className="max-w-[200px]" src={logo} alt="Logo" />
@@ -437,19 +681,11 @@ export const ProbationPDF = ({ userID, userType }) => {
                     : selectedPerson.department}
                 </span>
               </div>
-
-              <div className="flex">
-                <span className="w-40">Probation End Date</span>
-                <span className="w-4 text-center">:</span>
-                <span className="flex-1 text-[#666666]">
-                  {selectedPerson.probationEndDate}
-                </span>
-              </div>
             </div>
 
             {extenFlag.length > 0 && (
               <div className="mt-6 center">
-                <div className="mt-6 border border-lite_grey h-auto w-[263px] p-4 rounded">
+                <div className="mt-6 border border-lite_grey h-auto w-[400px] p-4 rounded">
                   <div className="text-center mb-4">
                     <span className="text-base font-semibold">
                       Probation Extension History
@@ -464,6 +700,8 @@ export const ProbationPDF = ({ userID, userType }) => {
                             No of time
                           </th>
                           <th className="text-center px-6 py-2">Date</th>
+                          {/* <th className="text-center px-6 py-2">Status</th> */}
+                          <th className="text-center px-6 py-2">Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -471,7 +709,7 @@ export const ProbationPDF = ({ userID, userType }) => {
                           .sort(
                             (a, b) =>
                               new Date(b.prevProbExDate) -
-                              new Date(a.prevProbExDate) 
+                              new Date(a.prevProbExDate)
                           )
                           .map((record, index) => (
                             <tr
@@ -484,6 +722,18 @@ export const ProbationPDF = ({ userID, userType }) => {
                               <td className="px-6 py-2">
                                 {formatDate(record.prevProbExDate)}
                               </td>
+                              {/* <td className="px-6 py-2">{record.probExtendStatus}</td> */}
+                              <td
+                                onClick={() => {
+                                  closeModal();
+                                  navigate("/probForm", {
+                                    state: { employeeData: record },
+                                  });
+                                }}
+                                className="px-3 py-2 text-blue underline cursor-pointer"
+                              >
+                                View
+                              </td>
                             </tr>
                           ))}
                       </tbody>
@@ -493,14 +743,16 @@ export const ProbationPDF = ({ userID, userType }) => {
               </div>
             )}
 
-            <div className="flex justify-center items-center py-6 px-4">
-              <button
-                className="bg-primary text-sm font-bold py-2 px-6 text-dark_grey rounded-md"
-                onClick={handleDownload}
-              >
-                Go to <strong>Probation</strong> Form
-              </button>
-            </div>
+            {selectedPerson?.probExtendStatus !== "Extended" && (
+              <div className="flex justify-center items-center py-6 px-4">
+                <button
+                  className="bg-primary text-sm font-bold py-2 px-6 text-dark_grey rounded-md"
+                  onClick={handleSingleData}
+                >
+                  Go to <strong>Probation</strong> Form
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

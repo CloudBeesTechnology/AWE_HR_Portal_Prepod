@@ -24,7 +24,7 @@ export const ProbationForm = ({ userID, userType }) => {
   const location = useLocation();
   const { gmPosition, supervisorCheck, PDInfo, HRMPosition } = useTempID();
   const { createNotification } = useCreateNotification();
-  const { employeeData } = location.state || {};
+  const { employeeData, probForm } = location.state || {};
   const probationEndDateStr = employeeData?.probationEndDate;
   const { ProbFormsData } = ProbFormFun();
   const { UpdateProb } = UpdateProbForm();
@@ -94,6 +94,8 @@ export const ProbationForm = ({ userID, userType }) => {
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const GM = "GENERAL MANAGER";
+
+  console.log("probForm", probForm);
 
   const {
     register,
@@ -272,9 +274,6 @@ export const ProbationForm = ({ userID, userType }) => {
 
   useEffect(() => {
     if (ProbFData.length === 0 || !employeeData?.empID) {
-      // console.log(
-      //   ProbFData.length === 0 ? "No data in ProbFData" : "No employee ID found"
-      // );
       return;
     }
 
@@ -284,7 +283,6 @@ export const ProbationForm = ({ userID, userType }) => {
     );
 
     if (matchedRecords.length === 0) {
-      console.log("No matching contract data found");
       return;
     }
 
@@ -292,6 +290,7 @@ export const ProbationForm = ({ userID, userType }) => {
     const targetRecord = matchedRecords.find(
       (record) => record.createdAt === employeeData.probCreatedAt
     );
+    console.log("Target Record:", targetRecord);
 
     if (!targetRecord) {
       console.log(

@@ -81,9 +81,9 @@ export const ProbationReview = () => {
   };
 
   const probationReviewMergedData = (data) => {
-    const today = new Date();
+    // const today = new Date();
     // const today = new Date("2025-07-01");
-    // const today = testDate ? new Date(testDate) : new Date();
+    const today = testDate ? new Date(testDate) : new Date();
 
     //range 1 month ex. From: 01-08-2025 To: 31-08-2025
     const firstDayOfNextMonth = new Date(
@@ -97,6 +97,19 @@ export const ProbationReview = () => {
       1
     );
     lastDayOfNextMonth.setMilliseconds(-1);
+
+    //range 2 month ex. From: 01-07-2025 To: 31-08-2025
+    // const firstDayOfNextMonth = new Date(
+    //   today.getFullYear(),
+    //   today.getMonth() + 1,
+    //   1
+    // );
+    // const lastDayOfNextMonth = new Date(
+    //   today.getFullYear(),
+    //   today.getMonth() + 2,
+    //   1
+    // );
+    // lastDayOfNextMonth.setMilliseconds(-1);
 
     const sortedData = data
       ?.filter((item) => {
@@ -115,6 +128,11 @@ export const ProbationReview = () => {
           const lastDate = probationEndDates[probationEndDates.length - 1];
 
           if (!lastDate) return false;
+
+          // const probationEnd = new Date(lastDate);
+          // console.log("end date", probationEnd.getTime());
+          // console.log("Prev end date", new Date(item.prevProbExDate).getTime());
+
           const probationEnd = new Date(lastDate);
 
           let prevProbExDate = null;
@@ -129,6 +147,10 @@ export const ProbationReview = () => {
           ) {
             return false;
           }
+
+          // if (item.probStatus && item.probExtendStatus !== "Extended") {
+          //   return false;
+          // }
 
           if (item.probExtendStatus === "probup" || item.probExtendStatus === "completed") {
             return false;
@@ -214,6 +236,10 @@ export const ProbationReview = () => {
             ? item.otherDepartment[item.otherDepartment.length - 1]
             : "-",
           position: finalPosition,
+          // otherPosition: item.otherPosition?.[item.otherPosition.length - 1],
+          // position: Array.isArray(item.position)
+          //   ? item.position[item.position.length - 1]
+          //   : "-",
           otherPosition: Array.isArray(item.otherPosition)
             ? item.otherPosition[item.otherPosition.length - 1]
             : "-",
@@ -221,6 +247,10 @@ export const ProbationReview = () => {
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
           probExtendStatus: item.probExtendStatus,
           prevProbExDate: item.prevProbExDate,
+          // ...(HRMPosition === "HR MANAGER" || userType === "HR"
+          //   ? { status: item.hrName ? "Approved" : "Pending" }
+          //   : {}),
+       
           ...(userType === "Supervisor" && {
             status:
               item.probExtendStatus === "Extended"
@@ -290,6 +320,58 @@ export const ProbationReview = () => {
     }
   };
 
+  // console.log("sl",selectedPerson)
+
+  // const handleDate = (e, type) => {
+  //   const value = e.target.value;
+
+  //   if (type === "startDate") setStartDate(value);
+  //   if (type === "endDate") setEndDate(value);
+
+  //   const start = type === "startDate" ? value : startDate;
+  //   const end = type === "endDate" ? value : endDate;
+
+  //   if (!start && !end) {
+  //     // setFilteredData([]);
+  //     setTableBody([]);
+  //     return;
+  //   }
+
+  //   const filtered = originalTableBody.filter((item) => {
+  //     const [day, month, year] = item.probationEndDate.split("-");
+  //     const probationEnd = new Date(`${year}-${month}-${day}`);
+
+  //     const startDateObj = start ? new Date(start) : null;
+  //     const endDateObj = end ? new Date(end) : null;
+
+  //     console.log("Selected Start Date:", start);
+  //     console.log("Selected End Date:", end);
+
+  //     console.log(
+  //       "Checking item:",
+  //       item.probationEndDate,
+  //       "->",
+  //       probationEnd.toDateString()
+  //     );
+  //     console.log(
+  //       "StartDateObj:",
+  //       startDateObj?.toDateString(),
+  //       "EndDateObj:",
+  //       endDateObj?.toDateString()
+  //     );
+
+  //     if (startDateObj && endDateObj) {
+  //       return probationEnd >= startDateObj && probationEnd <= endDateObj;
+  //     } else if (startDateObj) {
+  //       return probationEnd >= startDateObj;
+  //     } else if (endDateObj) {
+  //       return probationEnd <= endDateObj;
+  //     }
+  //     return true;
+  //   });
+
+  //   setTableBody(filtered);
+  // };
 
   const handleDate = (e, type) => {
     const value = e.target.value;
@@ -338,6 +420,8 @@ export const ProbationReview = () => {
         endDate={endDate}
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
+        testDate={testDate}
+        setTestDate={setTestDate}
       />
 
       {selectedPerson && (
@@ -399,14 +483,6 @@ export const ProbationReview = () => {
                     : selectedPerson.department}
                 </span>
               </div>
-
-              <div className="flex">
-                <span className="w-40">Probation End Date</span>
-                <span className="w-4 text-center">:</span>
-                <span className="flex-1 text-[#666666]">
-                  {selectedPerson.probationEndDate}
-                </span>
-              </div>
             </div>
 
             {selectedPerson.probExtendStatus === "Extended" && (
@@ -441,6 +517,25 @@ export const ProbationReview = () => {
                     </table>
                   </div>
                 </div>
+                {/* <div className="text-center my-5">
+                  <span className="text-sm font-semibold mb-5">
+                    Probation Extension History
+                  </span>
+
+                  <span className="block mt-2 text-xs font-medium text-[#303030]">
+                    1st Expiry Date
+                  </span>
+                </div>
+
+                <div className="center">
+                  <div className="flex items-center justify-between gap-12 bg-medium_white border border-lite_grey rounded px-12 py-2 shadow-sm">
+                    <span className="w-20 text-sm font-normal">Date</span>
+                    <span className="w-4 text-center">:</span>
+                    <span className="flex-1 text-xs font-semibold text-[#6666]">
+                      {selectedPerson.prevProbExDate}
+                    </span>
+                  </div>
+                </div> */}
               </div>
             )}
 

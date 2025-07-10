@@ -16,6 +16,8 @@ export const FilterTable = ({
   handleDate,
   startDate,
   endDate,
+  testDate,
+  setTestDate
 }) => {
   const { dropDownVal } = useContext(DataSupply);
   const [searchQuery, setSearchQuery] = useState("");
@@ -277,6 +279,22 @@ export const FilterTable = ({
                   className="outline-none text-grey border rounded-md p-2"
                 />
               </div>
+
+              <div>
+                <label
+                  htmlFor="test-date"
+                  className="block text-[16px] font-medium"
+                >
+                  Today
+                </label>
+                <input
+                  id="test-date"
+                  type="date"
+                  value={testDate}
+                  onChange={(e) => setTestDate(e.target.value)}
+                  className="outline-none text-grey border rounded-md p-2"
+                />
+              </div>
             </div>
           )}
 
@@ -311,7 +329,7 @@ export const FilterTable = ({
       {currentItems?.length > 0 ? (
         <div>
           <div className="w-full overflow-x-auto overflow-y-auto h-[500px] shadow-lg my-5">
-            <table className=" border-collapse w-full">
+            <table className=" border-collapse w-full"> 
               <thead className="w-full sticky top-0">
                 <tr className="bg-[#939393] rounded-sm">
                   {tableHead.map((head, idx) => (
@@ -339,6 +357,9 @@ export const FilterTable = ({
                           key !== "probExtendStatus" &&
                           key !== "prevProbExDate" &&
                           key !== "probCreatedAt" &&
+                          key !== "empInfoId" &&
+                          key !== "probID" &&
+                          key !== "workInfoId" &&
                           key !== "headStatus" &&
                           key !== "hrmStatus" &&
                           key !== "gmStatus" &&
