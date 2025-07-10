@@ -81,9 +81,9 @@ export const ProbationReview = () => {
   };
 
   const probationReviewMergedData = (data) => {
-    // const today = new Date();
+    const today = new Date();
     // const today = new Date("2025-07-01");
-    const today = testDate ? new Date(testDate) : new Date();
+    // const today = testDate ? new Date(testDate) : new Date();
 
     //range 1 month ex. From: 01-08-2025 To: 31-08-2025
     const firstDayOfNextMonth = new Date(
@@ -420,8 +420,6 @@ export const ProbationReview = () => {
         endDate={endDate}
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
-        testDate={testDate}
-        setTestDate={setTestDate}
       />
 
       {selectedPerson && (
