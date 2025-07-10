@@ -81,9 +81,9 @@ export const ProbationReview = () => {
   };
 
   const probationReviewMergedData = (data) => {
-    // const today = new Date();
+    const today = new Date();
     // const today = new Date("2025-07-01");
-    const today = testDate ? new Date(testDate) : new Date();
+    // const today = testDate ? new Date(testDate) : new Date();
 
     //range 1 month ex. From: 01-08-2025 To: 31-08-2025
     const firstDayOfNextMonth = new Date(
@@ -97,7 +97,6 @@ export const ProbationReview = () => {
       1
     );
     lastDayOfNextMonth.setMilliseconds(-1);
-
 
     const sortedData = data
       ?.filter((item) => {
@@ -116,7 +115,6 @@ export const ProbationReview = () => {
           const lastDate = probationEndDates[probationEndDates.length - 1];
 
           if (!lastDate) return false;
-
           const probationEnd = new Date(lastDate);
 
           let prevProbExDate = null;
@@ -132,12 +130,10 @@ export const ProbationReview = () => {
             return false;
           }
 
-          if (
-            item.probExtendStatus === "probup" ||
-            item.probExtendStatus === "completed"
-          ) {
+          if (item.probExtendStatus === "probup" || item.probExtendStatus === "completed") {
             return false;
           }
+
 
           return (
             probationEnd >= firstDayOfNextMonth &&
@@ -218,10 +214,6 @@ export const ProbationReview = () => {
             ? item.otherDepartment[item.otherDepartment.length - 1]
             : "-",
           position: finalPosition,
-          // otherPosition: item.otherPosition?.[item.otherPosition.length - 1],
-          // position: Array.isArray(item.position)
-          //   ? item.position[item.position.length - 1]
-          //   : "-",
           otherPosition: Array.isArray(item.otherPosition)
             ? item.otherPosition[item.otherPosition.length - 1]
             : "-",
@@ -229,10 +221,6 @@ export const ProbationReview = () => {
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
           probExtendStatus: item.probExtendStatus,
           prevProbExDate: item.prevProbExDate,
-          // ...(HRMPosition === "HR MANAGER" || userType === "HR"
-          //   ? { status: item.hrName ? "Approved" : "Pending" }
-          //   : {}),
-
           ...(userType === "Supervisor" && {
             status:
               item.probExtendStatus === "Extended"
@@ -302,7 +290,7 @@ export const ProbationReview = () => {
     }
   };
 
- 
+
   const handleDate = (e, type) => {
     const value = e.target.value;
 
@@ -350,8 +338,6 @@ export const ProbationReview = () => {
         endDate={endDate}
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
-        testDate={testDate}
-        setTestDate={setTestDate}
       />
 
       {selectedPerson && (
@@ -423,7 +409,7 @@ export const ProbationReview = () => {
               </div>
             </div>
 
-            {selectedPerson.probExtendStatus === "Extended" ? (
+            {selectedPerson.probExtendStatus === "Extended" && (
               <div className="mt-6 center">
                 <div className="mt-6 border border-lite_grey h-[171px] w-[263px] p-4 rounded">
                   <div className="text-center mb-4">
@@ -454,18 +440,18 @@ export const ProbationReview = () => {
                       </tbody>
                     </table>
                   </div>
-                </div>           
-              </div>
-            ) : (
-              <div className="flex justify-center items-center py-6 px-4">
-                <button
-                  className="bg-primary text-sm font-bold py-2 px-6 text-dark_grey rounded-md"
-                  onClick={handleDownload}
-                >
-                  Go to <strong>Probation</strong> Form
-                </button>
+                </div>
               </div>
             )}
+
+            <div className="flex justify-center items-center py-6 px-4">
+              <button
+                className="bg-primary text-sm font-bold py-2 px-6 text-dark_grey rounded-md"
+                onClick={handleDownload}
+              >
+                Go to <strong>Probation</strong> Form
+              </button>
+            </div>
           </div>
         </div>
       )}

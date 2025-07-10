@@ -297,40 +297,30 @@ export const ProbationPDF = ({ userID, userType }) => {
 
 
   useEffect(() => {
-    if (selectedPerson) {
-      // console.log("✅ Selected Person:", selectedPerson);
+  if (selectedPerson) {
+    const empRecords = allData.filter(
+      (item) => item.empID === selectedPerson.empID
+    );
 
-      const empRecords = allData.filter(
-        (item) => item.empID === selectedPerson.empID
-      );
-      // console.log("✅ Step 1 - empRecords (matched by empID):", empRecords);
+    // Filter out records where probExtendStatus === "item.probExtendStatus"
+    const filteredRecords = empRecords.filter(
+      (item) => item.probExtendStatus !== "probup"
+    );
 
-      const targetRecord = empRecords.find(
-        (record) =>
-          new Date(record.probCreatedAt).getTime() ===
-          new Date(selectedPerson.probCreatedAt).getTime()
-      );
-      const status = targetRecord.probExtendStatus?.trim().toLowerCase();
+    // Check if any remaining records have "extended" or "completed"
+    const hasExtended = filteredRecords.some(
+      (item) =>
+        item.probExtendStatus?.trim().toLowerCase() === "extended" ||
+        item.probExtendStatus?.trim().toLowerCase() === "completed"
+    );
 
-      const isValid = status !== "probup";
-      // console.log("✅ Step 3 - isValid (status !== 'probup'):", isValid);
-
-      const hasExtended = status === "extended" || status === "completed";
-
-      // console.log("✅ Step 4 - hasExtended flag:", hasExtended);
-
-      if (isValid && hasExtended) {
-        setExtenFlag([targetRecord]); // wrap it in an array for consistency
-        // console.log("✅ Step 5 - setExtenFlag with targetRecord");
-      } else {
-        setExtenFlag([]);
-        // console.log(
-        //   "✅ Step 5 - No extended/completed found or probup. Flag set to empty."
-        // );
-      }
+    if (hasExtended) {
+      setExtenFlag(filteredRecords);
+    } else {
+      setExtenFlag([]);
     }
-  }, [allData, selectedPerson]);
-
+  }
+}, [allData, selectedPerson]);
   // console.log("extendedFlag", extenFlag);
 
   const handleDate = (e, type) => {
@@ -375,7 +365,6 @@ export const ProbationPDF = ({ userID, userType }) => {
       </div>
     );
   }
-
 
   return (
     <div>
@@ -458,9 +447,9 @@ export const ProbationPDF = ({ userID, userType }) => {
               </div>
             </div>
 
-            {extenFlag.length > 0 ? (
+            {extenFlag.length > 0 && (
               <div className="mt-6 center">
-                <div className="mt-6 border border-lite_grey h-auto w-[400px] p-4 rounded">
+                <div className="mt-6 border border-lite_grey h-auto w-[263px] p-4 rounded">
                   <div className="text-center mb-4">
                     <span className="text-base font-semibold">
                       Probation Extension History
@@ -475,7 +464,6 @@ export const ProbationPDF = ({ userID, userType }) => {
                             No of time
                           </th>
                           <th className="text-center px-6 py-2">Date</th>
-                          <th className="text-center px-6 py-2">Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -483,7 +471,7 @@ export const ProbationPDF = ({ userID, userType }) => {
                           .sort(
                             (a, b) =>
                               new Date(b.prevProbExDate) -
-                              new Date(a.prevProbExDate)
+                              new Date(a.prevProbExDate) 
                           )
                           .map((record, index) => (
                             <tr
@@ -496,12 +484,6 @@ export const ProbationPDF = ({ userID, userType }) => {
                               <td className="px-6 py-2">
                                 {formatDate(record.prevProbExDate)}
                               </td>
-                              <td
-                                onClick={handleDownload}
-                                className="px-3 py-2 text-blue underline cursor-pointer"
-                              >
-                                View
-                              </td>
                             </tr>
                           ))}
                       </tbody>
@@ -509,16 +491,16 @@ export const ProbationPDF = ({ userID, userType }) => {
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="flex justify-center items-center py-6 px-4">
-                <button
-                  className="bg-primary text-sm font-bold py-2 px-6 text-dark_grey rounded-md"
-                  onClick={handleDownload}
-                >
-                  Go to <strong>Probation</strong> Form
-                </button>
-              </div>
             )}
+
+            <div className="flex justify-center items-center py-6 px-4">
+              <button
+                className="bg-primary text-sm font-bold py-2 px-6 text-dark_grey rounded-md"
+                onClick={handleDownload}
+              >
+                Go to <strong>Probation</strong> Form
+              </button>
+            </div>
           </div>
         </div>
       )}

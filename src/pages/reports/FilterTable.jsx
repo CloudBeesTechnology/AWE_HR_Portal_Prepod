@@ -16,8 +16,6 @@ export const FilterTable = ({
   handleDate,
   startDate,
   endDate,
-  testDate,
-  setTestDate
 }) => {
   const { dropDownVal } = useContext(DataSupply);
   const [searchQuery, setSearchQuery] = useState("");
@@ -276,22 +274,6 @@ export const FilterTable = ({
                   id="end-date"
                   type="date"
                   onChange={(e) => handleDate(e, "endDate")}
-                  className="outline-none text-grey border rounded-md p-2"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="test-date"
-                  className="block text-[16px] font-medium"
-                >
-                  Today
-                </label>
-                <input
-                  id="test-date"
-                  type="date"
-                  value={testDate}
-                  onChange={(e) => setTestDate(e.target.value)}
                   className="outline-none text-grey border rounded-md p-2"
                 />
               </div>

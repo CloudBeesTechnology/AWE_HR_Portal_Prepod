@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import logo from "../../assets/logo/logo-with-name.svg";
@@ -236,9 +236,9 @@ export const ProbReviewForm = ({ userID, userType }) => {
   // auto fetch
   useEffect(() => {
     if (ProbFData.length === 0 || !employeeData?.empID) {
-      console.log(
-        ProbFData.length === 0 ? "No data in ProbFData" : "No employee ID found"
-      );
+      // console.log(
+      //   ProbFData.length === 0 ? "No data in ProbFData" : "No employee ID found"
+      // );
       return;
     }
 
@@ -247,12 +247,12 @@ export const ProbReviewForm = ({ userID, userType }) => {
     );
 
     if (!fetchedProbData) {
-      console.log("No matching contract data found");
+      // console.log("No matching contract data found");
       return;
     }
 
     if (fetchedProbData.probExtendStatus === "Extended") {
-      console.log("Contract extended data found");
+      // console.log("Contract extended data found");
       return;
     }
     const defaultFormData = Object.keys(fetchedProbData).reduce((acc, key) => {
@@ -302,8 +302,6 @@ export const ProbReviewForm = ({ userID, userType }) => {
       const PFDataRecordTwo = ProbFData.filter(
         (match) => match.empID === data.empID
       );
-
-      console.log("PFDataRecordTwo:", PFDataRecordTwo);
 
       // ✅ Get the record where probExtendStatus is exactly "Extended"
       const extendedRecord = PFDataRecordTwo.find(
@@ -468,11 +466,11 @@ export const ProbReviewForm = ({ userID, userType }) => {
           probExtendStatus: "completed",
         };
         await UpdateProb({ PbFDataUp: probUpNew });
-        console.log("✅ Found and updated record:", probUpNew);
+        // console.log("✅ Found and updated record:", probUpNew);
       }
 
       await ProbFormsData({ ProbValue });
-      console.log("CR", ProbValue);
+      // console.log("CR", ProbValue);
 
       setIsLoading(false);
 
@@ -610,8 +608,7 @@ export const ProbReviewForm = ({ userID, userType }) => {
           // alert(`Email sent successfully to HR's mail: ${emailData.hrOfficialmail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name || "Not mentioned"}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been reviewed and ${data?.managerApproved || PFDataRecord.managerApproved} by the Manager, ${emailData?.managerName || "Not Mentioned"}.\n\nPlease proceed with the necessary actions.`);
         }
       } else if (gmPosition === GM) {
-        console.log("HR Block");
-
+       
         // Sending email to HR if GM position is set
         await sendEmail(
           hrSubject,
