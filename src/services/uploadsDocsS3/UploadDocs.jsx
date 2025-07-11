@@ -116,8 +116,16 @@ export const uploadReqString = async (file, fileType, tempID) => {
         // alert("File uploaded successfully!");
       })
       .catch((err) => {
-        console.error("Error uploading file:", err);
-        alert("Error uploading file. Please try again.");
+        console.error("Network error uploading file:", err);
+        if (err.response) {
+          alert("The server is having issues. Please try again later.");
+        } else if (err.request) {
+          alert(
+            "Unable to connect to the server. Please check your internet connection."
+          );
+        } else {
+          alert("Something went wrong during the upload. Please try again.");
+        }
         throw err;
       });
 
@@ -129,8 +137,7 @@ export const uploadReqString = async (file, fileType, tempID) => {
 
     return uploadedFileUrl;
   } catch (error) {
-    console.error("Error during file upload process:", error);
-    alert("An unexpected error occurred during the upload.");
+    console.error("Network error uploading file, try again later:", error);
     throw error;
   }
 };

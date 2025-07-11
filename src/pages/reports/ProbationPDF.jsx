@@ -44,7 +44,6 @@ export const ProbationPDF = ({ userID, userType }) => {
 
     let parsedDate;
 
-    // Check if format is DD/MM/YYYY
     if (typeof date === "string" && date.includes("/")) {
       const [day, month, year] = date.split("/");
       parsedDate = new Date(`${year}-${month}-${day}`);
@@ -64,7 +63,6 @@ export const ProbationPDF = ({ userID, userType }) => {
   const calculateDeadline = (probationEndDate) => {
     let date;
 
-    // Handle both ISO (YYYY-MM-DD) and DD/MM/YYYY
     if (probationEndDate.includes("/")) {
       const [day, month, year] = probationEndDate.split("/");
       date = new Date(`${year}-${month}-${day}`);
@@ -77,230 +75,6 @@ export const ProbationPDF = ({ userID, userType }) => {
     date.setDate(date.getDate() - 7);
     return date.toISOString().split("T")[0];
   };
-
-  // const probationReviewMergedData = (data, userType, gmPosition, userID) => {
-  //   const filteredData = data
-  //     .filter((item) => {
-  //       if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
-  //         const lastWorkStatus =
-  //           item.workStatus[item.workStatus.length - 1]?.toUpperCase();
-  //         if (
-  //           ["TERMINATION", "RESIGNATION", "ACTIVE"].includes(lastWorkStatus)
-  //         ) {
-  //           return false;
-  //         }
-  //       }
-
-  //       const isProbationActive =
-  //         item.probStatus === true && item.probationEnd?.length > 0;
-
-  //       const lastSupervisor =
-  //         Array.isArray(item.supervisor) && item.supervisor.length > 0
-  //           ? item.supervisor[item.supervisor.length - 1]
-  //           : null;
-
-  //       const lastManager =
-  //         Array.isArray(item.manager) && item.manager.length > 0
-  //           ? item.manager[item.manager.length - 1]
-  //           : null;
-
-  //       const skillPool = item.skillPool ? item.skillPool.toUpperCase() : "";
-
-  //       const isSupervisorApproved =
-  //         item.supervisorApproved?.toUpperCase() === "APPROVED";
-  //       const isManagerApproved =
-  //         item.managerApproved?.toUpperCase() === "APPROVED";
-  //       const isGmApproved = item.gmApproved?.toUpperCase() === "APPROVED";
-
-  //       // Conditional filters by user role
-  //       if (userType === "Supervisor") {
-  //         const result = isProbationActive;
-
-  //         return result;
-  //       }
-
-  //       if (
-  //         userType === "Manager" &&
-  //         gmPosition !== "GENERAL MANAGER" &&
-  //         HRMPosition !== "HR MANAGER"
-  //       ) {
-  //         const result =
-  //           isProbationActive && lastManager === userID && isSupervisorApproved;
-
-  //         return result;
-  //       }
-
-  //       if (gmPosition === "GENERAL MANAGER") {
-  //         if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {
-  //           return false;
-  //         }
-  //         return isProbationActive && isManagerApproved;
-  //       }
-
-  //       if (userType === "HR" || HRMPosition === "HR MANAGER") {
-  //         if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {
-  //           return isProbationActive;
-  //         }
-  //         return isProbationActive && isGmApproved;
-  //       }
-
-  //       return isProbationActive;
-  //     })
-  //     .map((item) => {
-  //       if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
-  //         const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
-  //         if (
-  //           lastWorkStatus.toUpperCase() === "TERMINATION" ||
-  //           lastWorkStatus.toUpperCase() === "RESIGNATION"
-  //         ) {
-  //           return false;
-  //         }
-  //       }
-
-  //       const probationEndDates = item.probationEnd || [];
-  //       const lastDate = probationEndDates[probationEndDates.length - 1];
-
-  //       // console.log(item, "items");
-
-  //       const today = new Date();
-  //       const positionRevDate =
-  //         item.positionRevDate?.[item.positionRevDate.length - 1];
-  //       const positionRev = item.positionRev?.[item.positionRev.length - 1];
-  //       const upgradePosition =
-  //         item.upgradePosition?.[item.upgradePosition.length - 1];
-  //       const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
-  //       let finalPosition;
-  //       // Convert to dates for comparison (ensure dates are valid before comparing)
-  //       const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
-  //       const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
-  //       if (revDateObj && upgradeDateObj) {
-  //         // console.log("two");
-  //         if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
-  //           finalPosition = item.position?.[item.position.length - 1];
-  //         } else if (revDateObj > upgradeDateObj) {
-  //           // finalPosition = today >= revDateObj && positionRev;
-  //           finalPosition =
-  //             today >= revDateObj
-  //               ? positionRev
-  //               : today >= upgradeDateObj
-  //               ? upgradePosition
-  //               : item.position?.[item.position.length - 1];
-  //         } else if (upgradeDateObj > revDateObj) {
-  //           // finalPosition = today >= upgradeDateObj && upgradePosition;
-  //           finalPosition =
-  //             today >= upgradeDateObj
-  //               ? upgradePosition
-  //               : today >= revDateObj
-  //               ? positionRev
-  //               : item.position?.[item.position.length - 1];
-  //         }
-  //       } else if (revDateObj && !upgradeDateObj) {
-  //         finalPosition = today >= revDateObj && positionRev;
-  //         // console.log("rev");
-  //       } else if (upgradeDateObj && !revDateObj) {
-  //         // console.log("po");
-  //         finalPosition = today >= upgradeDateObj && upgradePosition;
-  //       } else {
-  //         finalPosition = item.position?.[item.position.length - 1];
-  //       }
-
-  //       let status = "";
-
-  //       // Skip logic for SuperAdmin
-  //       if (userType !== "SuperAdmin") {
-  //         if (
-  //           item.probExtendStatus?.trim().toLowerCase() === "extended" ||
-  //           item.probExtendStatus === "completed"
-  //         ) {
-  //           status = "Extended";
-  //         } else if (userType === "Supervisor") {
-  //           status = item.supervisorApproved ? "Approved" : "Pending";
-  //         } else if (HRMPosition === "HR MANAGER" || userType === "HR") {
-  //           status = item.hrName ? "Approved" : "Pending";
-  //         } else if (
-  //           userType === "Manager" &&
-  //           gmPosition !== "GENERAL MANAGER" &&
-  //           HRMPosition !== "HR MANAGER"
-  //         ) {
-  //           status = item.managerApproved ? "Approved" : "Pending";
-  //         } else if (gmPosition === "GENERAL MANAGER") {
-  //           status =
-  //             item.probExtendStatus === "Extended"
-  //               ? "Extended"
-  //               : item.gmApproved || "Pending";
-  //         }
-  //       }
-
-  //       const formattedData = {
-  //         probCreatedAt: item.probCreatedAt,
-  //         empID: item.empID || "-",
-  //         empBadgeNo: item.empBadgeNo || "-",
-  //         name: item.name || "-",
-  //         dateOfJoin: formatDate(item.doj) || "-",
-  //         department: Array.isArray(item.department)
-  //           ? item.department[item.department.length - 1]
-  //           : "-",
-  //         otherDepartment: Array.isArray(item.otherDepartment)
-  //           ? item.otherDepartment[item.otherDepartment.length - 1]
-  //           : "-",
-  //         position: finalPosition,
-  //         otherPosition: item.otherPosition?.[item.otherPosition.length - 1],
-  //         // position: Array.isArray(item.position)
-  //         //   ? item.position[item.position.length - 1]
-  //         //   : "-",
-  //         // otherPosition: Array.isArray(item.otherPosition)
-  //         //   ? item.otherPosition[item.otherPosition.length - 1]
-  //         //   : "-",
-  //         probationEndDate: item.prevProbExDate
-  //           ? formatDate(item.prevProbExDate)
-  //           : formatDate(lastDate),
-  //         deadline: item.prevProbExDate
-  //           ? formatDate(calculateDeadline(item.prevProbExDate))
-  //           : formatDate(calculateDeadline(lastDate)),
-  //         probExtendStatus: item.probExtendStatus,
-  //         prevProbExDate: item.prevProbExDate,
-  //         status,
-  //         // ...(userType === "Supervisor" && {
-  //         //   status:
-  //         //     item.probExtendStatus === "Extended"
-  //         //       ? "Extended"
-  //         //       : item.supervisorApproved || "Pending",
-  //         // }),
-  //         // ...(userType === "Manager" &&
-  //         //   gmPosition !== "GENERAL MANAGER" &&
-  //         //   HRMPosition !== "HR MANAGER" && {
-  //         //     status:
-  //         //       item.probExtendStatus === "Extended"
-  //         //         ? "Extended"
-  //         //         : item.managerApproved || "Pending",
-  //         //   }),
-  //         // ...(HRMPosition === "HR MANAGER" || userType === "HR"
-  //         //   ? {
-  //         //       status:
-  //         //         item.probExtendStatus === "Extended"
-  //         //           ? "Extended"
-  //         //           : item.hrName
-  //         //           ? "Approved"
-  //         //           : "Pending",
-  //         //     }
-  //         //   : {}),
-  //         // ...(gmPosition === "GENERAL MANAGER" && {
-  //         //   status:
-  //         // item.probExtendStatus === "Extended"
-  //         //   ? "Extended"
-  //         //   : item.gmApproved || "Pending",
-  //         // }),
-  //       };
-
-  //       return formattedData;
-  //     })
-  //     .sort((a, b) => {
-  //       if (a.status === "Pending" && b.status !== "Pending") return -1;
-  //       if (a.status !== "Pending" && b.status === "Pending") return 1;
-  //       return 0;
-  //     });
-  //   return filteredData;
-  // };
 
   const probationReviewMergedData = (data, userType, gmPosition, userID) => {
     // Step 1: Filter data based on role logic
@@ -429,10 +203,10 @@ export const ProbationPDF = ({ userID, userType }) => {
         let status = "";
 
         if (userType !== "SuperAdmin") {
-          if (
-            item.probExtendStatus?.trim().toLowerCase() === "extended"
-          ) {
+          if (item.probExtendStatus?.trim().toLowerCase() === "extended") {
             status = "Extended";
+          } else if (item.hrName && item.probExtendStatus !== "Extended") {
+            status = "Not extended";
           } else if (userType === "Supervisor") {
             status = item.supervisorApproved ? "Approved" : "Pending";
           } else if (HRMPosition === "HR MANAGER" || userType === "HR") {
@@ -514,30 +288,8 @@ export const ProbationPDF = ({ userID, userType }) => {
     }
   };
 
-  // useEffect(() => {
-  //   if (selectedPerson) {
-  //     const empRecords = allData.filter(
-  //       (item) => item.empID === selectedPerson.empID
-  //     );
-
-  //     // console.log("EmpRecords:", empRecords);
-  //     const hasExtended = empRecords.some(
-  //       (item) =>
-  //         item.probExtendStatus?.trim().toLowerCase() === "extended" ||
-  //         item.probExtendStatus?.trim().toLowerCase() === "completed"
-  //     );
-
-  //     if (hasExtended) {
-  //       setExtenFlag(empRecords);
-  //     } else {
-  //       setExtenFlag([]);
-  //     }
-  //   }
-  // }, [allData, selectedPerson]);
-
   useEffect(() => {
     if (selectedPerson) {
-      console.log("Selected Person:", selectedPerson);
       const empRecords = allData.filter(
         (item) => item.empID === selectedPerson.empID
       );
@@ -561,8 +313,6 @@ export const ProbationPDF = ({ userID, userType }) => {
       }
     }
   }, [allData, selectedPerson]);
-  
-  console.log("extendedFlag", extenFlag);
 
   const handleDate = (e, type) => {
     const value = e.target.value;
@@ -574,12 +324,10 @@ export const ProbationPDF = ({ userID, userType }) => {
     const end = type === "endDate" ? value : endDate;
 
     if (!start && !end) {
-      // setFilteredData([]);
       return;
     }
 
     const filtered = tableBody.filter((item) => {
-      // Convert probationEndDate (DD-MM-YYYY) back to Date object for comparison
       const [day, month, year] = item.probationEndDate.split("-");
       const probationEnd = new Date(`${year}-${month}-${day}`);
 
@@ -607,9 +355,6 @@ export const ProbationPDF = ({ userID, userType }) => {
     );
   }
 
-  console.log("employeeData", selectedPerson);
-  console.log("extensionFlag", extenFlag);
-
   return (
     <div>
       <FilterTable
@@ -624,7 +369,7 @@ export const ProbationPDF = ({ userID, userType }) => {
 
       {selectedPerson && (
         <div className="fixed inset-0 center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg h-[80vh] overflow-y-auto w-1/3">
+          <div className="bg-white p-6 rounded-lg overflow-y-auto max-h-[80vh] shadow-lg w-1/3">
             <section className="flex justify-between gap-10 items-center mb-5">
               <div className="w-full flex-1 center">
                 <img className="max-w-[200px]" src={logo} alt="Logo" />

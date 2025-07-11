@@ -156,7 +156,7 @@ export const FilterTable = ({
     }
 
     worksheet.addRow(dateRow);
-    worksheet.addRow([]); // Add another blank row for spacing
+    worksheet.addRow([]); 
 
     // Add header row with formatted keys
     const tableHeader = Object.keys(processedData[0]).map(formatKey);
@@ -179,7 +179,7 @@ export const FilterTable = ({
         horizontal: "center",
         vertical: "middle",
         wrapText: true,
-      }; // Center alignment with wrap text
+      }; 
     });
 
     // Apply styles for all data rows
@@ -369,8 +369,12 @@ export const FilterTable = ({
                                   ? "text-[red]"
                                   : col?.toLowerCase() === "pending"
                                   ? "text-[#E8A317]"
+                                  : col?.toLowerCase() === "extended"
+                                  ? "text-[#339933]"
+                                  : col?.toLowerCase() === "not extended"
+                                  ? "text-[#E8A317]" 
                                   : ""
-                                : ""
+                                  : ""
                             }`}
                           >
                             {displayValue}
@@ -430,4 +434,3 @@ export const FilterTable = ({
     </div>
   );
 };
-

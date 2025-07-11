@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FilterTable } from "./FilterTable";
-import logo from "../../assets/logo/logo-with-name.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import { VscClose } from "react-icons/vsc";
 import { useTempID } from "../../utils/TempIDContext";
+import logo from "../../assets/logo/logo-with-name.svg";
 
 export const ProbationReview = () => {
   const userID = localStorage.getItem("userID");
@@ -15,7 +15,7 @@ export const ProbationReview = () => {
   const [originalTableBody, setOriginalTableBody] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [testDate, setTestDate] = useState("");
+  const [extenFlag, setExtenFlag] = useState([]);
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [tableHead] = useState(
     [
@@ -46,7 +46,6 @@ export const ProbationReview = () => {
 
     let parsedDate;
 
-    // Check if format is DD/MM/YYYY
     if (typeof date === "string" && date.includes("/")) {
       const [day, month, year] = date.split("/");
       parsedDate = new Date(`${year}-${month}-${day}`);
@@ -66,7 +65,6 @@ export const ProbationReview = () => {
   const calculateDeadline = (probationEndDate) => {
     let date;
 
-    // Handle both ISO (YYYY-MM-DD) and DD/MM/YYYY
     if (probationEndDate.includes("/")) {
       const [day, month, year] = probationEndDate.split("/");
       date = new Date(`${year}-${month}-${day}`);
@@ -82,6 +80,7 @@ export const ProbationReview = () => {
 
   const probationReviewMergedData = (data) => {
     const today = new Date();
+
     // const today = new Date("2025-07-01");
     // const today = testDate ? new Date(testDate) : new Date();
 
@@ -97,19 +96,6 @@ export const ProbationReview = () => {
       1
     );
     lastDayOfNextMonth.setMilliseconds(-1);
-
-    //range 2 month ex. From: 01-07-2025 To: 31-08-2025
-    // const firstDayOfNextMonth = new Date(
-    //   today.getFullYear(),
-    //   today.getMonth() + 1,
-    //   1
-    // );
-    // const lastDayOfNextMonth = new Date(
-    //   today.getFullYear(),
-    //   today.getMonth() + 2,
-    //   1
-    // );
-    // lastDayOfNextMonth.setMilliseconds(-1);
 
     const sortedData = data
       ?.filter((item) => {
@@ -129,10 +115,6 @@ export const ProbationReview = () => {
 
           if (!lastDate) return false;
 
-          // const probationEnd = new Date(lastDate);
-          // console.log("end date", probationEnd.getTime());
-          // console.log("Prev end date", new Date(item.prevProbExDate).getTime());
-
           const probationEnd = new Date(lastDate);
 
           let prevProbExDate = null;
@@ -148,14 +130,12 @@ export const ProbationReview = () => {
             return false;
           }
 
-          // if (item.probStatus && item.probExtendStatus !== "Extended") {
-          //   return false;
-          // }
-
-          if (item.probExtendStatus === "probup" || item.probExtendStatus === "completed") {
+          if (
+            item.probExtendStatus === "probup" ||
+            item.probExtendStatus === "completed"
+          ) {
             return false;
           }
-
 
           return (
             probationEnd >= firstDayOfNextMonth &&
@@ -168,17 +148,12 @@ export const ProbationReview = () => {
         const probationEndDates = item.probationEnd || [];
         const lastDate = probationEndDates[probationEndDates.length - 1];
 
-        // const contractStartDates = item.contractStart || [];
-        // const startDate = contractStartDates[contractStartDates.length - 1];
-
         if (userType === "Manager" && HRMPosition !== "HR MANAGER") {
           return null;
         } else if (userType === "HR" || HRMPosition === "HR MANAGER") {
         } else if (gmPosition === "GENERAL MANAGER") {
           return null;
         }
-
-        // console.log(item, "items");
 
         const today = new Date();
         const positionRevDate =
@@ -189,15 +164,12 @@ export const ProbationReview = () => {
         const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
         let finalPosition;
 
-        // Convert to dates for comparison (ensure dates are valid before comparing)
         const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
         const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
         if (revDateObj && upgradeDateObj) {
-          // console.log("two");
           if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
             finalPosition = item.position?.[item.position.length - 1];
           } else if (revDateObj > upgradeDateObj) {
-            // finalPosition = today >= revDateObj && positionRev;
             finalPosition =
               today >= revDateObj
                 ? positionRev
@@ -205,7 +177,6 @@ export const ProbationReview = () => {
                 ? upgradePosition
                 : item.position?.[item.position.length - 1];
           } else if (upgradeDateObj > revDateObj) {
-            // finalPosition = today >= upgradeDateObj && upgradePosition;
             finalPosition =
               today >= upgradeDateObj
                 ? upgradePosition
@@ -215,9 +186,7 @@ export const ProbationReview = () => {
           }
         } else if (revDateObj && !upgradeDateObj) {
           finalPosition = today >= revDateObj && positionRev;
-          // console.log("rev");
         } else if (upgradeDateObj && !revDateObj) {
-          // console.log("po");
           finalPosition = today >= upgradeDateObj && upgradePosition;
         } else {
           finalPosition = item.position?.[item.position.length - 1];
@@ -236,10 +205,6 @@ export const ProbationReview = () => {
             ? item.otherDepartment[item.otherDepartment.length - 1]
             : "-",
           position: finalPosition,
-          // otherPosition: item.otherPosition?.[item.otherPosition.length - 1],
-          // position: Array.isArray(item.position)
-          //   ? item.position[item.position.length - 1]
-          //   : "-",
           otherPosition: Array.isArray(item.otherPosition)
             ? item.otherPosition[item.otherPosition.length - 1]
             : "-",
@@ -247,10 +212,7 @@ export const ProbationReview = () => {
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
           probExtendStatus: item.probExtendStatus,
           prevProbExDate: item.prevProbExDate,
-          // ...(HRMPosition === "HR MANAGER" || userType === "HR"
-          //   ? { status: item.hrName ? "Approved" : "Pending" }
-          //   : {}),
-       
+
           ...(userType === "Supervisor" && {
             status:
               item.probExtendStatus === "Extended"
@@ -297,15 +259,13 @@ export const ProbationReview = () => {
       userType,
       gmPosition,
       userID,
-      HRMPosition,
-      testDate
+      HRMPosition
     );
     setTableBody(mergedData);
     setOriginalTableBody(mergedData);
-  }, [allData, userType, gmPosition, userID, HRMPosition, testDate]);
+  }, [allData, userType, gmPosition, userID, HRMPosition]);
 
   const handleViewDetails = (personData) => {
-    // console.log("Person State:", personData);
     setSelectedPerson(personData);
   };
 
@@ -320,58 +280,31 @@ export const ProbationReview = () => {
     }
   };
 
-  // console.log("sl",selectedPerson)
+  useEffect(() => {
+    if (selectedPerson) {
+      const empRecords = allData.filter(
+        (item) => item.empID === selectedPerson.empID
+      );
 
-  // const handleDate = (e, type) => {
-  //   const value = e.target.value;
+      // Filter out records where probExtendStatus === "item.probExtendStatus"
+      const filteredRecords = empRecords.filter(
+        (item) => item.probExtendStatus !== "probup"
+      );
 
-  //   if (type === "startDate") setStartDate(value);
-  //   if (type === "endDate") setEndDate(value);
+      // Check if any remaining records have "extended" or "completed"
+      const hasExtended = filteredRecords.some(
+        (item) =>
+          item.probExtendStatus?.trim().toLowerCase() === "extended" ||
+          item.probExtendStatus?.trim().toLowerCase() === "completed"
+      );
 
-  //   const start = type === "startDate" ? value : startDate;
-  //   const end = type === "endDate" ? value : endDate;
-
-  //   if (!start && !end) {
-  //     // setFilteredData([]);
-  //     setTableBody([]);
-  //     return;
-  //   }
-
-  //   const filtered = originalTableBody.filter((item) => {
-  //     const [day, month, year] = item.probationEndDate.split("-");
-  //     const probationEnd = new Date(`${year}-${month}-${day}`);
-
-  //     const startDateObj = start ? new Date(start) : null;
-  //     const endDateObj = end ? new Date(end) : null;
-
-  //     console.log("Selected Start Date:", start);
-  //     console.log("Selected End Date:", end);
-
-  //     console.log(
-  //       "Checking item:",
-  //       item.probationEndDate,
-  //       "->",
-  //       probationEnd.toDateString()
-  //     );
-  //     console.log(
-  //       "StartDateObj:",
-  //       startDateObj?.toDateString(),
-  //       "EndDateObj:",
-  //       endDateObj?.toDateString()
-  //     );
-
-  //     if (startDateObj && endDateObj) {
-  //       return probationEnd >= startDateObj && probationEnd <= endDateObj;
-  //     } else if (startDateObj) {
-  //       return probationEnd >= startDateObj;
-  //     } else if (endDateObj) {
-  //       return probationEnd <= endDateObj;
-  //     }
-  //     return true;
-  //   });
-
-  //   setTableBody(filtered);
-  // };
+      if (hasExtended) {
+        setExtenFlag(filteredRecords);
+      } else {
+        setExtenFlag([]);
+      }
+    }
+  }, [allData, selectedPerson]);
 
   const handleDate = (e, type) => {
     const value = e.target.value;
@@ -424,7 +357,7 @@ export const ProbationReview = () => {
 
       {selectedPerson && (
         <div className="fixed inset-0 center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+          <div className="bg-white p-6 rounded-lg overflow-y-auto max-h-[80vh] shadow-lg w-1/3">
             <section className="flex justify-between gap-10 items-center mb-5">
               <div className="w-full flex-1 center">
                 <img className="max-w-[200px]" src={logo} alt="Logo" />
@@ -483,9 +416,9 @@ export const ProbationReview = () => {
               </div>
             </div>
 
-            {selectedPerson.probExtendStatus === "Extended" && (
+            {extenFlag.length > 0 && (
               <div className="mt-6 center">
-                <div className="mt-6 border border-lite_grey h-[171px] w-[263px] p-4 rounded">
+                <div className="mt-6 border border-lite_grey h-auto w-[400px] p-4 rounded">
                   <div className="text-center mb-4">
                     <span className="text-base font-semibold">
                       Probation Extension History
@@ -503,37 +436,29 @@ export const ProbationReview = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr className="text-xs border-t border-[#F0F0F0] text-center">
-                          <td className="px-6 py-2 border-r border-[#F0F0F0]">
-                            1
-                          </td>
-                          <td className="px-6 py-2">
-                            {formatDate(selectedPerson.prevProbExDate)}
-                          </td>
-                        </tr>
+                        {[...extenFlag]
+                          .sort(
+                            (a, b) =>
+                              new Date(b.prevProbExDate) -
+                              new Date(a.prevProbExDate)
+                          )
+                          .map((record, index) => (
+                            <tr
+                              key={index}
+                              className="text-xs border-t border-[#F0F0F0] text-center"
+                            >
+                              <td className="px-6 py-2 border-r border-[#F0F0F0]">
+                                {index + 1}
+                              </td>
+                              <td className="px-6 py-2">
+                                {formatDate(record.prevProbExDate)}
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>
                 </div>
-                {/* <div className="text-center my-5">
-                  <span className="text-sm font-semibold mb-5">
-                    Probation Extension History
-                  </span>
-
-                  <span className="block mt-2 text-xs font-medium text-[#303030]">
-                    1st Expiry Date
-                  </span>
-                </div>
-
-                <div className="center">
-                  <div className="flex items-center justify-between gap-12 bg-medium_white border border-lite_grey rounded px-12 py-2 shadow-sm">
-                    <span className="w-20 text-sm font-normal">Date</span>
-                    <span className="w-4 text-center">:</span>
-                    <span className="flex-1 text-xs font-semibold text-[#6666]">
-                      {selectedPerson.prevProbExDate}
-                    </span>
-                  </div>
-                </div> */}
               </div>
             )}
 

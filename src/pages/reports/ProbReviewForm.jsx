@@ -1,7 +1,6 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import logo from "../../assets/logo/logo-with-name.svg";
 import { ConfirmationForm } from "./ConfirmationForm";
 import { ContractChoose } from "./ContractChoose";
 import { Link, useLocation } from "react-router-dom";
@@ -18,7 +17,7 @@ import { FaArrowLeft, FaSave, FaPrint, FaDownload } from "react-icons/fa";
 import { useTempID } from "../../utils/TempIDContext";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { useReactToPrint } from "react-to-print";
-import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
+import logo from "../../assets/logo/logo-with-name.svg";
 
 export const ProbReviewForm = ({ userID, userType }) => {
   const location = useLocation();
@@ -46,8 +45,6 @@ export const ProbReviewForm = ({ userID, userType }) => {
     skilledAndUnskilled: null,
   });
 
-  // console.log(ProbFData);
-  // console.log("Date",gmPosition);
 
   const [formData, setFormData] = useState({
     probData: {
@@ -100,7 +97,6 @@ export const ProbReviewForm = ({ userID, userType }) => {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(probationFormSchema),
@@ -124,15 +120,6 @@ export const ProbReviewForm = ({ userID, userType }) => {
       });
     }
   }
-
-  const [personalInfo, setPersonalInfo] = useState(null);
-  const { personalInfo: fetchedPersonalInfo } = useEmployeePersonalInfo(userID);
-
-  useEffect(() => {
-    if (fetchedPersonalInfo) {
-      setPersonalInfo(fetchedPersonalInfo);
-    }
-  }, [fetchedPersonalInfo]);
 
   useEffect(() => {
     if (!workInfoData.length || !empPIData.length || !employeeData?.empID) {
@@ -294,7 +281,6 @@ export const ProbReviewForm = ({ userID, userType }) => {
   const from = "hr_no-reply@adininworks.com";
   const gmSubject = "Probation Assessment Review";
   const hrSubject = "Probation Period Expiry Notification";
-  // const to = "hariharanofficial2812@gmail.com"
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -303,9 +289,7 @@ export const ProbReviewForm = ({ userID, userType }) => {
         (match) => match.empID === data.empID
       );
 
-      console.log("PFDataRecordTwo:", PFDataRecordTwo);
-
-      // ✅ Get the record where probExtendStatus is exactly "Extended"
+      // Get the record where probExtendStatus is exactly "Extended"
       const extendedRecord = PFDataRecordTwo.find(
         (record) => record.probExtendStatus?.trim().toLowerCase() === "extended"
       );
@@ -414,15 +398,23 @@ export const ProbReviewForm = ({ userID, userType }) => {
         probExtendStatus: "probup",
       };
 
-      // console.log("Form Data Values:", formDataValues);
-      // console.log("data Value:", data);
-
+      if (userType === "Supervisor" && !formData.probData.supervisorName) {
+        alert("Supervisor Name is is required!");
+        setIsLoading(false);
+        return;
+      }
       if (
         userType === "Supervisor" &&
         !formData.probData.supervisorApproved &&
         !formData.probData.supervisorDate
       ) {
-        alert("Supervisor approval or Rejection and date is is required!");
+        alert("Supervisor approval or Rejection required!");
+        setIsLoading(false);
+        return;
+      }
+
+      if (userType === "Supervisor" && !formData.probData.supervisorDate) {
+        alert("Supervisor Date is is required!");
         setIsLoading(false);
         return;
       }
@@ -444,9 +436,20 @@ export const ProbReviewForm = ({ userID, userType }) => {
         userType === "Manager" &&
         gmPosition !== GM &&
         HRMPosition !== "HR MANAGER" &&
+        !formData.probData.managerName
+      ) {
+        alert("Manager name is required!");
+        setIsLoading(false);
+        return;
+      }
+
+      if (
+        userType === "Manager" &&
+        gmPosition !== GM &&
+        HRMPosition !== "HR MANAGER" &&
         !formData.probData.managerApproved
       ) {
-        alert("Manager approval or Rejection is required!");
+        alert("Manager approval or rejection is required!");
         setIsLoading(false);
         return;
       }
@@ -468,12 +471,10 @@ export const ProbReviewForm = ({ userID, userType }) => {
           probExtendStatus: "completed",
         };
         await UpdateProb({ PbFDataUp: probUpNew });
-        console.log("✅ Found and updated record:", probUpNew);
       }
 
       await ProbFormsData({ ProbValue });
-      console.log("CR", ProbValue);
-
+   
       setIsLoading(false);
 
       setTimeout(() => {

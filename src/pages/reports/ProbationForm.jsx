@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import logo from "../../assets/logo/logo-with-name.svg";
 import { ConfirmationForm } from "./ConfirmationForm";
 import { ContractChoose } from "./ContractChoose";
 import { Link, useLocation } from "react-router-dom";
@@ -18,13 +17,13 @@ import { FaArrowLeft, FaSave, FaPrint, FaDownload } from "react-icons/fa";
 import { useTempID } from "../../utils/TempIDContext";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { useReactToPrint } from "react-to-print";
-import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
+import logo from "../../assets/logo/logo-with-name.svg";
 
 export const ProbationForm = ({ userID, userType }) => {
   const location = useLocation();
   const { gmPosition, supervisorCheck, PDInfo, HRMPosition } = useTempID();
   const { createNotification } = useCreateNotification();
-  const { employeeData, probForm } = location.state || {};
+  const { employeeData } = location.state || {};
   const probationEndDateStr = employeeData?.probationEndDate;
   const { ProbFormsData } = ProbFormFun();
   const { UpdateProb } = UpdateProbForm();
@@ -95,12 +94,9 @@ export const ProbationForm = ({ userID, userType }) => {
   const [showTitle, setShowTitle] = useState("");
   const GM = "GENERAL MANAGER";
 
-  console.log("probForm", probForm);
-
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(probationFormSchema),
@@ -111,39 +107,12 @@ export const ProbationForm = ({ userID, userType }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // let probationMonthYear = "Invalid Date";
-
-  // if (probationEndDateStr) {
-  //   const [day, month, year] = probationEndDateStr.split("-");
-  //   const parsedDate = new Date(`${year}-${month}-${day}`);
-
-  //   if (!isNaN(parsedDate)) {
-  //     probationMonthYear = parsedDate.toLocaleDateString("en-US", {
-  //       month: "long",
-  //       year: "numeric",
-  //     });
-  //   }
-  // }
   let probationMonthYear = "Invalid Date";
-
-  // if (probationEndDateStr) {
-  //   const [day, month, year] = probationEndDateStr.split("/");
-
-  //   const parsedDate = new Date(`${year}-${month}-${day}`);
-
-  //   if (!isNaN(parsedDate)) {
-  //     probationMonthYear = parsedDate.toLocaleDateString("en-US", {
-  //       month: "long",
-  //       year: "numeric",
-  //     });
-  //   }
-  // }
 
   if (probationEndDateStr) {
     const separator = probationEndDateStr.includes("/") ? "/" : "-";
     const [day, month, year] = probationEndDateStr.split(separator);
 
-    // Construct ISO date string (YYYY-MM-DD)
     const isoDateStr = `${year}-${month}-${day}`;
     const parsedDate = new Date(isoDateStr);
 
@@ -153,22 +122,9 @@ export const ProbationForm = ({ userID, userType }) => {
         year: "numeric",
       });
     } else {
-      console.log("[6] Date is invalid ❌");
     }
   } else {
-    console.log("[1] probationEndDateStr is falsy (empty/null/undefined)");
   }
-
-  const [personalInfo, setPersonalInfo] = useState(null);
-  const { personalInfo: fetchedPersonalInfo } = useEmployeePersonalInfo(userID);
-
-  useEffect(() => {
-    if (fetchedPersonalInfo) {
-      setPersonalInfo(fetchedPersonalInfo);
-    }
-  }, [fetchedPersonalInfo]);
-
-  // console.log(probationEndDateStr, "yfgtyhjk");
 
   useEffect(() => {
     if (!workInfoData.length || !empPIData.length || !employeeData?.empID) {
@@ -290,27 +246,16 @@ export const ProbationForm = ({ userID, userType }) => {
     const targetRecord = matchedRecords.find(
       (record) => record.createdAt === employeeData.probCreatedAt
     );
-    console.log("Target Record:", targetRecord);
 
     if (!targetRecord) {
-      console.log(
-        "No record found with matching probCreatedAt:",
-        employeeData.probCreatedAt
-      );
       return;
     }
-
-    // if (targetRecord.probExtendStatus === "Extended") {
-    //   console.log("Record is extended; skipping autofill:", targetRecord);
-    //   return;
-    // }
 
     const defaultFormData = Object.keys(targetRecord).reduce((acc, key) => {
       acc[key] = targetRecord[key] || "";
       return acc;
     }, {});
 
-    // console.log("defaultValues", defaultFormData);
 
     setFormData({ probData: defaultFormData });
     setIsExtended(defaultFormData.probExtendStatus === "Extended");
@@ -346,8 +291,7 @@ export const ProbationForm = ({ userID, userType }) => {
   const from = "hr_no-reply@adininworks.com";
   const gmSubject = "Probation Assessment Review";
   const hrSubject = "Probation Period Expiry Notification";
-  // const to = "hariharanofficial2812@gmail.com"
-
+ 
   const onSubmit = async (data) => {
     console.log("Data", data);
     setIsLoading(true);
@@ -407,9 +351,6 @@ export const ProbationForm = ({ userID, userType }) => {
         (match) => match.id === formDataValues.id
       );
 
-      // console.log("UpD", PFDataRecord);
-      // console.log("PFExisit", PFDataRecord);
-      // console.log("Data", data);
 
       const empPIRecord = empPIData.find((match) => match.empID === data.empID);
       const WorkInfoRecord = workInfoData.find(
@@ -462,15 +403,24 @@ export const ProbationForm = ({ userID, userType }) => {
           probStatus: true,
         };
 
-        console.log("formDataValues", formDataValues);
-
         if (
           userType === "Manager" &&
           gmPosition !== GM &&
           formData.probData.supervisorApproved === null &&
           supervisorCheck === true
         ) {
-          alert("Supervisor Approval required!");
+          alert("Supervisor approval or rejection required!");
+          setIsLoading(false);
+          return;
+        }
+
+        if (
+          userType === "Manager" &&
+          gmPosition !== GM &&
+          HRMPosition !== "HR MANAGER" &&
+          !formData.probData.managerName
+        ) {
+          alert("Manager name is required!");
           setIsLoading(false);
           return;
         }
@@ -481,7 +431,7 @@ export const ProbationForm = ({ userID, userType }) => {
           HRMPosition !== "HR MANAGER" &&
           formData.probData.managerApproved === null
         ) {
-          alert("Manager Approval or Rejection is required!");
+          alert("Manager approval or rejection is required!");
           setIsLoading(false);
           return;
         }
@@ -490,7 +440,7 @@ export const ProbationForm = ({ userID, userType }) => {
           userType === "Manager" &&
           gmPosition !== GM &&
           HRMPosition !== "HR MANAGER" &&
-          formData.probData.managerDate === null
+          !formData.probData.managerDate
         ) {
           alert("Manager date is is required!");
           setIsLoading(false);
@@ -498,18 +448,24 @@ export const ProbationForm = ({ userID, userType }) => {
         }
 
         if (gmPosition === GM && formData.probData.managerApproved === null) {
-          alert("Manager Approval or Rejection is required!");
+          alert("Manager approval or rejection is required!");
           setIsLoading(false);
           return;
         }
 
-        if (gmPosition === GM && formData.probData.gmApproved === null) {
-          alert("GM Approval or Rejection is required!");
+        if (gmPosition === GM && formData.probData.gmName === null) {
+          alert("GM name is required!");
           setIsLoading(false);
           return;
         }
 
-        if (gmPosition === GM && formData.probData.gmDate === null) {
+        if (gmPosition === GM && !formData.probData.gmApproved) {
+          alert("GM approval or rejection is required!");
+          setIsLoading(false);
+          return;
+        }
+
+        if (gmPosition === GM && !formData.probData.gmDate) {
           alert("GM date is is required!");
           setIsLoading(false);
           return;
@@ -517,9 +473,9 @@ export const ProbationForm = ({ userID, userType }) => {
 
         if (
           HRMPosition === "HR MANAGER" &&
-          formData.probData.gmApproved === null
+          !formData.probData.gmApproved
         ) {
-          alert("GM Approval or Rejection is required!");
+          alert("GM approval or rejection is required!");
           setIsLoading(false);
           return;
         }
@@ -530,14 +486,14 @@ export const ProbationForm = ({ userID, userType }) => {
           return;
         }
 
-        if (HRMPosition === "HR MANAGER" && formData.probData.hrDate === null) {
+        if (HRMPosition === "HR MANAGER" && !formData.probData.hrDate) {
           alert("HR date is is required!");
           setIsLoading(false);
           return;
         }
 
         await UpdateProb({ PbFDataUp: formattedData });
-        console.log("update", formattedData);
+        // console.log("update", formattedData);
 
         setIsLoading(false);
 
