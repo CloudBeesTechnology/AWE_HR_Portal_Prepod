@@ -399,7 +399,7 @@ export const ProbReviewForm = ({ userID, userType }) => {
       };
 
       if (userType === "Supervisor" && !formData.probData.supervisorName) {
-        alert("Supervisor Name is is required!");
+        alert("Supervisor Name is required!");
         setIsLoading(false);
         return;
       }
@@ -414,7 +414,7 @@ export const ProbReviewForm = ({ userID, userType }) => {
       }
 
       if (userType === "Supervisor" && !formData.probData.supervisorDate) {
-        alert("Supervisor Date is is required!");
+        alert("Supervisor Date is required!");
         setIsLoading(false);
         return;
       }
@@ -460,7 +460,7 @@ export const ProbReviewForm = ({ userID, userType }) => {
         HRMPosition !== "HR MANAGER" &&
         !formData.probData.managerDate
       ) {
-        alert("Manager date is is required!");
+        alert("Manager date is required!");
         setIsLoading(false);
         return;
       }

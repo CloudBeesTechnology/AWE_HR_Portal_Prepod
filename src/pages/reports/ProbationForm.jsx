@@ -442,7 +442,7 @@ export const ProbationForm = ({ userID, userType }) => {
           HRMPosition !== "HR MANAGER" &&
           !formData.probData.managerDate
         ) {
-          alert("Manager date is is required!");
+          alert("Manager date is required!");
           setIsLoading(false);
           return;
         }
@@ -466,7 +466,7 @@ export const ProbationForm = ({ userID, userType }) => {
         }
 
         if (gmPosition === GM && !formData.probData.gmDate) {
-          alert("GM date is is required!");
+          alert("GM date is required!");
           setIsLoading(false);
           return;
         }
@@ -487,7 +487,7 @@ export const ProbationForm = ({ userID, userType }) => {
         }
 
         if (HRMPosition === "HR MANAGER" && !formData.probData.hrDate) {
-          alert("HR date is is required!");
+          alert("HR date is required!");
           setIsLoading(false);
           return;
         }
@@ -526,7 +526,7 @@ export const ProbationForm = ({ userID, userType }) => {
           !formData.probData.supervisorApproved &&
           !formData.probData.supervisorDate
         ) {
-          alert("Supervisor approval or Rejection and date is is required!");
+          alert("Supervisor approval or Rejection and date is required!");
           setIsLoading(false);
           return;
         }
@@ -561,7 +561,7 @@ export const ProbationForm = ({ userID, userType }) => {
           HRMPosition !== "HR MANAGER" &&
           !formData.probData.managerDate
         ) {
-          alert("Manager date is is required!");
+          alert("Manager date is required!");
           setIsLoading(false);
           return;
         }
