@@ -143,12 +143,12 @@ export const ProbationPDF = ({ userID, userType }) => {
     const latestRecordsMap = new Map();
 
     for (const item of filteredData) {
-      const currentEnd = new Date(item.probationEnd?.slice(-1)[0] || 0);
+      const currentCreatedAt = new Date(item.probCreatedAt || 0);
       const existing = latestRecordsMap.get(item.empID);
 
       if (
         !existing ||
-        currentEnd > new Date(existing.probationEnd?.slice(-1)[0] || 0)
+        currentCreatedAt > new Date(existing.probCreatedAt || 0)
       ) {
         latestRecordsMap.set(item.empID, item);
       }
