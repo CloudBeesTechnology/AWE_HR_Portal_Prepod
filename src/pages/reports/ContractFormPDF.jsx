@@ -19,13 +19,14 @@ export const ContractFormPDF = ({ contentRef }) => {
   const { contractDetails } = UpdateContractData();
   const { contractForms, workInfoData, empPIData } = useContext(DataSupply);
   const location = useLocation();
-  const { employeeData } = location.state || {};
+  const { employeeData,matchedID } = location.state || {};
   const { createNotification } = useCreateNotification();
   const [userType, setUserType] = useState("");
   const [showTitle, setShowTitle] = useState("");
   const [notification, setNotification] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+    const [isExtended, setIsExtended] = useState(false);
 
   const contractEndDateStr = employeeData?.contractEndDate;
 
@@ -46,10 +47,16 @@ export const ContractFormPDF = ({ contentRef }) => {
       genManager: "",
       remarks: "",
       remarkHr: "",
+      hrmDate: "",
+      managerDate: "",
       remarkGm: "",
+      extendedStatus: "noExtended", // Default value
+      gmDate: "",
       renewalContract: "",
       status: "",
       createdAt: "",
+      hrSign: "",
+      hrDate: ""
     },
   });
 
@@ -63,7 +70,17 @@ export const ContractFormPDF = ({ contentRef }) => {
       },
     }));
   };
-
+ const handleCheckboxChange = (e) => {
+    const { checked } = e.target;
+    setIsExtended(checked);
+    setFormData((prevState) => ({
+      ...prevState,
+      contract: {
+        ...prevState.contract,
+        extendedStatus: checked ? "extended" : "noExtended",
+      },
+    }));
+  };
   useEffect(() => {
     // const userID = localStorage.getItem("userID");
     // setUserID(userID);
@@ -134,11 +151,12 @@ export const ContractFormPDF = ({ contentRef }) => {
 
   // console.log(managerData);
 
-  useEffect(() => {
+   useEffect(() => {
     if (contractForms.length > 0) {
-      const contractData = contractForms.find(
+      const contractValue = contractForms.filter((val) => val.id === matchedID);
+      const contractData = contractValue.find(
         (data) => data.empID === employeeData?.empID
-      ); // Assuming we want to take the first item
+      );
       if (contractData) {
         setFormData({
           contract: {
@@ -147,18 +165,23 @@ export const ContractFormPDF = ({ contentRef }) => {
             hrManager: contractData.hrManager,
             genManager: contractData.genManager,
             remarks: contractData.remarks,
+            managerDate: contractData.managerDate,
             remarkHr: contractData.remarkHr,
+            hrmDate: contractData.hrmDate,
             remarkGm: contractData.remarkGm,
+            gmDate: contractData.gmDate,
+            hrDate: contractData.hrDate,
+            hrSign: contractData.hrSign,
+            extendedStatus: contractData.extendedStatus || "noExtended",
             createdAt: contractData.createdAt,
             renewalContract: contractData.renewalContract,
           },
         });
+        setIsExtended(contractData.extendedStatus === "extended");
       }
     }
   }, [contractForms, employeeData?.empID]);
 
-  const subject = "Contract Completion Form Review";
-  const from = "hr_no-reply@adininworks.com";
 
   const sendHRNotification = async (
     empName,
@@ -295,20 +318,39 @@ export const ContractFormPDF = ({ contentRef }) => {
 
   // Main submission handler
   const handleSubmit = async () => {
-    setIsLoading(true);
+    // console.log(contractEndDateStr,"aaaaaaaaaaaaaaaaaaaa");
+
     let HRResult = null;
     let managerResult = null;
     let GMResult = null;
 
     try {
-      // Validate required fields based on user type
-      if (HRMPosition === "HR MANAGER" && !formData.contract.hrManager) {
-        alert("HRM Name is required!");
+      if (
+        HRMPosition === "HR MANAGER" &&
+        (!formData.contract.hrManager || !formData.contract.hrmDate) &&
+        (formData.contract.hrManager.trim() === "" ||
+          formData.contract.hrmDate.trim() === "")
+      ) {
+        alert("HRM Name and Date is required!");
         return;
       }
 
-      if (gmPosition === "GENERAL MANAGER" && !formData.contract.genManager) {
-        alert("GM Name is required!");
+      if (
+        gmPosition === "GENERAL MANAGER" &&
+        (!formData.contract.genManager || !formData.contract.gmDate) &&
+        (formData.contract.genManager.trim() === "" ||
+          formData.contract.gmDate.trim() === "")
+      ) {
+        alert("GM Name and Date is required!");
+        return;
+      }
+      if (
+        userType === "HR" &&
+        (!formData.contract.hrSign || !formData.contract.hrDate) &&
+        (formData.contract.hrSign.trim() === "" ||
+          formData.contract.hrDate.trim() === "")
+      ) {
+        alert("HR Name and Date is required!");
         return;
       }
 
@@ -316,13 +358,14 @@ export const ContractFormPDF = ({ contentRef }) => {
         userType === "Manager" &&
         gmPosition !== "GENERAL MANAGER" &&
         HRMPosition !== "HR MANAGER" &&
-        !formData.contract.depHead
+        (!formData.contract.depHead || !formData.contract.managerDate) &&
+        (formData.contract.depHead.trim() === "" ||
+          formData.contract.managerDate.trim() === "")
       ) {
-        alert("Manager Name is required!");
+        alert(" Department Head Name and Date is required!");
         return;
       }
-
-      // Find existing records
+      setIsLoading(true);
       const selectedData = contractForms.find(
         (data) => data.empID === employeeData?.empID
       );
@@ -333,19 +376,36 @@ export const ContractFormPDF = ({ contentRef }) => {
         (match) => match?.empID === employeeData?.empID
       );
 
-      // Prepare common data
       const empName = empPIRecord?.name;
 
       const contractEndFormatted =
         Array.isArray(WorkInfoRecord?.contractEnd) &&
-        WorkInfoRecord?.contractEnd?.length > 0
+          WorkInfoRecord?.contractEnd?.length > 0
           ? WorkInfoRecord.contractEnd[WorkInfoRecord.contractEnd.length - 1]
-              .split("-")
-              .reverse()
-              .join("/")
+            .split("-")
+            .reverse()
+            .join("/")
           : "Not mentioned";
 
-      // Prepare form data
+      let renewalStatus = "";
+      if (HRMPosition === "HR MANAGER") {
+        renewalStatus = !isExtended && "gmView";
+      }
+      if (gmPosition === "GENERAL MANAGER") {
+        renewalStatus = !isExtended && "noExtended";
+      }
+      if (userType === "HR") {
+        renewalStatus = isExtended && "extended";
+      }
+
+      if (
+        userType === "Manager" &&
+        gmPosition !== "GENERAL MANAGER" &&
+        HRMPosition !== "HR MANAGER"
+      ) {
+        renewalStatus = !isExtended && "hrmView";
+      }
+      //created form
       const formPayload = {
         empID: employeeData.empID,
         conAttn: formData.contract.conAttn,
@@ -353,60 +413,60 @@ export const ContractFormPDF = ({ contentRef }) => {
         hrManager: formData.contract.hrManager,
         genManager: formData.contract.genManager,
         remarks: formData.contract.remarks,
+        managerDate: formData.contract.managerDate,
         remarkHr: formData.contract.remarkHr,
+        hrmDate: formData.contract.hrmDate,
         remarkGm: formData.contract.remarkGm,
+        gmDate: formData.contract.gmDate,
+        hrDate: formData.contract.hrDate,
+        hrSign: formData.contract.hrSign,
+        extendedStatus: renewalStatus,
         renewalContract: formData.contract.renewalContract,
         contStatus: true,
+        oldCED: contractEndDateStr,
+        // status:"Approved"
       };
-
-      // Update or create record
-      if (selectedData) {
-        const formattedData = { ...formPayload, id: selectedData.id };
+        
+      if (matchedID) {
+        const formattedData = { ...formPayload, id: matchedID };
         await contractDetails({ ContractValue: formattedData });
-      } else {
+        // console.log(formattedData, "update");
+      } else { 
+        // console.log(formPayload, "create");
         await contractForm(formPayload);
       }
 
-
       if (HRMPosition === "HR MANAGER" || userType === "HR") {
-        // console.log("HR BLOCK");
-
         HRResult = await sendHRNotification(
           empName,
           contractEndFormatted,
           managerData
         );
-
-        // console.log("HRResult", HRResult);
       } else if (
         userType === "Manager" &&
         gmPosition !== "GENERAL MANAGER" &&
         HRMPosition !== "HR MANAGER"
       ) {
-        // console.log("Manager BLOCK");
         managerResult = await sendManagerNotification(
           empName,
           contractEndFormatted,
           PDInfo,
           managerData
         );
-        // console.log("Result : ", managerResult);
-      } else if (gmPosition === "GENERAL MANAGER") {
-        // console.log("GM BLOCK");
+      }
+       else if (gmPosition === "GENERAL MANAGER") {
         GMResult = await sendGMNotification(
           empName,
           contractEndFormatted,
           managerData
         );
-        // console.log("GMResult", GMResult);
       }
+
 
       const notificationRes =
         managerResult === "success" ||
         HRResult === "success" ||
         GMResult === "success";
-
-      // console.log("NO", notificationRes);
 
       if (notificationRes) {
         setShowTitle(
@@ -473,10 +533,10 @@ export const ContractFormPDF = ({ contentRef }) => {
   };
 
   return (
-    <>
+   <>
       <div
         id="capture-section"
-        className="container mx-auto px-8"
+        className="container mx-auto px-8 print-contract-form"
         ref={contractFormRef}
       >
         <div className="relative">
@@ -485,11 +545,12 @@ export const ContractFormPDF = ({ contentRef }) => {
               @media print {
                    .no-print, .no-print-parent {
                       display: none !important;
+                     
                    }
                 }
            `}
           </style>
-          <section className="flex items-center pt-4">
+          <section className="flex items-center pt-4 ">
             <Link
               to="/reports"
               id="left-button"
@@ -516,8 +577,8 @@ export const ContractFormPDF = ({ contentRef }) => {
             />
           </div>
 
-          <div className="w-full">
-            <table className="min-w-full table-fixed text-xs text-center border-collapse border">
+          <div className="w-full print-box">
+            <table className="min-w-full table-fixed print-box text-xs text-center border-collapse border">
               <thead>
                 <tr>
                   <th className="border p-1 py-4">No.</th>
@@ -544,10 +605,14 @@ export const ContractFormPDF = ({ contentRef }) => {
                       {employeeData?.empBadgeNo}
                     </td>
                     <td className="border p-1 py-4">
-                      {employeeData?.position || "N/A"}
+                      {employeeData?.position === "OTHER"
+                        ? employeeData.otherPosition
+                        : employeeData.position || "N/A"}
                     </td>
                     <td className="border p-1 py-4">
-                      {employeeData?.department || "N/A"}
+                      {employeeData?.department === "OTHER"
+                        ? employeeData.otherDepartment
+                        : employeeData.department || "N/A"}
                     </td>
                     <td className="border p-1 py-4">
                       {employeeData?.nationality || "N/A"}
@@ -559,23 +624,23 @@ export const ContractFormPDF = ({ contentRef }) => {
                       {employeeData?.contractStartDate || "N/A"}
                     </td>
                     <td className="border p-1 py-4">
-                      {employeeData?.contractEndDate || "N/A"}
+                      {employeeData?.oldCED?.trim()
+                        ? employeeData.oldCED
+                        : employeeData?.contractEndDate
+                          ? employeeData.contractEndDate
+                          : "N/A"}
                     </td>
                     <td className="border p-1 py-4">
                       {employeeData?.nlmsEmpApproval || "N/A"}
                     </td>
                     <td className="border p-1 py-4">
-                      <input
-                        type="text"
-                        className="border-none outline-none p-1 py-4 w-full text-xs"
+                      <textarea
                         name="renewalContract"
                         value={formData.contract.renewalContract}
                         onChange={handleInputChange}
-                        disabled={
-                          (userType !== "Manager" &&
-                            gmPosition === "GENERAL MANAGER") ||
-                          HRMPosition === "HR MANAGER"
-                        }
+                        disabled={userType !== "Manager"}
+                        className="outline-none p-1 w-full print-renewalContract text-xs resize-none break-words whitespace-normal"
+                        rows={3} // or any number based on height you want
                       />
                     </td>
                   </tr>
@@ -585,7 +650,7 @@ export const ContractFormPDF = ({ contentRef }) => {
           </div>
 
           {/* Notes */}
-          <div className="mt-4 text-sm">
+          <div className="mt-7 text-sm">
             <p>
               Notes: Deadline return to HRD after one week from the date
               received of Contract Completion Report
@@ -593,7 +658,7 @@ export const ContractFormPDF = ({ contentRef }) => {
           </div>
 
           {/* Remarks Section */}
-          <div className="mt-4">
+          <div className="mt-10">
             <label className="text-sm block py-4">Manager Remarks:</label>
             <textarea
               type="text"
@@ -607,7 +672,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               className="border w-full text-sm  rounded resize-none outline-none p-2"
             />
           </div>
-          <div className="mt-4">
+          <div className="mt-10">
             <label className="text-sm block py-4">HRM Remarks:</label>
             <textarea
               type="text"
@@ -618,7 +683,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               className="border w-full text-sm  rounded resize-none outline-none p-2"
             />
           </div>
-          <div className="mt-4">
+          <div className="mt-10 ">
             <label className="text-sm block py-4">GM Remarks:</label>
             <textarea
               type="text"
@@ -630,9 +695,26 @@ export const ContractFormPDF = ({ contentRef }) => {
             />
           </div>
 
+          {/* Extended Status Checkbox */}
+          {userType === "HR" && (
+            <div className="mt-10 flex items-center">
+              <input
+                type="checkbox"
+                id="extendedStatus"
+                checked={isExtended}
+                onChange={handleCheckboxChange}
+           
+                className="mr-2"
+              />
+              <label htmlFor="extendedStatus" className="text-sm">
+                Extended Contract
+              </label>
+            </div>
+          )}
+
           {/* Footer */}
-          <div className="my-10 flex justify-between items-center">
-            <div className="text-center">
+          <div className="mt-14 mb-10 flex justify-between items-center gap-x-5">
+            <div className="text-center ">
               <p className=" mb-5 text-sm">Recommended By:</p>
               <input
                 type="text"
@@ -644,13 +726,27 @@ export const ContractFormPDF = ({ contentRef }) => {
                     gmPosition === "GENERAL MANAGER") ||
                   HRMPosition === "HR MANAGER"
                 }
-                className="border-b border-black w-56 mx-auto outline-none text-center"
+                className="border-b border-black w-56 print-width mx-auto outline-none text-center leading-loose"
               />
 
               <p className="mt-3 text-sm">Department Head</p>
+              <div className=" mt-5">
+                <input
+                  type="date"
+                  name="managerDate"
+                  value={formData.contract.managerDate}
+                  onChange={handleInputChange}
+                  disabled={
+                    (userType !== "Manager" &&
+                      gmPosition === "GENERAL MANAGER") ||
+                    HRMPosition === "HR MANAGER"
+                  }
+                  className="outline-none text-dark_grey border rounded-md p-2"
+                />
+              </div>
             </div>
 
-            <div className="text-center">
+            <div className="text-center ">
               <p className=" mb-5 text-sm">Acknowledged & Checked By:</p>
               <input
                 type="text"
@@ -658,10 +754,20 @@ export const ContractFormPDF = ({ contentRef }) => {
                 value={formData.contract.hrManager}
                 onChange={handleInputChange}
                 disabled={HRMPosition !== "HR MANAGER" && userType !== "HR"}
-                className="border-b border-black w-56 mx-auto outline-none text-center"
+                className="border-b border-black w-56 print-width mx-auto outline-none text-center leading-loose"
               />
 
               <p className="mt-3 text-sm">HRM</p>
+              <div className=" mt-5">
+                <input
+                  type="date"
+                  name="hrmDate"
+                  value={formData.contract.hrmDate}
+                  onChange={handleInputChange}
+                  disabled={HRMPosition !== "HR MANAGER" && userType !== "HR"}
+                  className="outline-none text-dark_grey border rounded-md p-2"
+                />
+              </div>
             </div>
             <div className="text-center">
               <p className=" mb-5 text-sm">Approved By:</p>
@@ -671,10 +777,43 @@ export const ContractFormPDF = ({ contentRef }) => {
                 value={formData.contract.genManager}
                 onChange={handleInputChange}
                 disabled={gmPosition !== "GENERAL MANAGER"}
-                className="border-b border-black w-56 mx-auto outline-none text-center"
+                className="border-b border-black w-56 print-width mx-auto outline-none text-center leading-loose"
               />
 
               <p className="mt-3 text-sm">GM</p>
+              <div className=" mt-5">
+                <input
+                  type="date"
+                  name="gmDate"
+                  value={formData.contract.gmDate}
+                  onChange={handleInputChange}
+                  disabled={gmPosition !== "GENERAL MANAGER"}
+                  className="outline-none text-dark_grey border rounded-md p-2"
+                />
+              </div>
+            </div>
+            <div className="text-center">
+              <p className=" mb-5 text-sm">Verified By:</p>
+              <input
+                type="text"
+                name="hrSign"
+                value={formData.contract.hrSign}
+                onChange={handleInputChange}
+                disabled={userType !== "HR"}
+                className="border-b border-black w-56 print-width mx-auto outline-none text-center leading-loose"
+              />
+
+              <p className="mt-3 text-sm">HR</p>
+              <div className=" mt-5">
+                <input
+                  type="date"
+                  name="hrDate"
+                  value={formData.contract.hrDate}
+                  onChange={handleInputChange}
+                  disabled={userType !== "HR"}
+                  className="outline-none text-dark_grey border rounded-md p-2"
+                />
+              </div>
             </div>
           </div>
 

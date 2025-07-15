@@ -17,6 +17,7 @@ import Resignation from "../../assets/ReportIcon/Resignation.svg";
 import leavePass from "../../assets/ReportIcon/leavePass.svg";
 import promotion from "../../assets/ReportIcon/promotion.svg";
 import usePermission from "../../hooks/usePermissionDashInside";
+import useProbData from "../../hooks/useProbData";
 
 export const Reports = () => {
   const {
@@ -37,31 +38,16 @@ export const Reports = () => {
     contractForms,
     IVSSDetails,
     WPTrackings,
-    localMobiliz,
-    empPDData,
+    localMobiliz,SRData
   } = useContext(DataSupply);
   // console.log(leaveDetailsData);
 
   const reportPermissions = usePermission("userID", "Report");
   // console.log(IVSSDetails);
 
-  IVSSDetails.forEach((employee) => {
-    if (employee.tempID === "TEMP015") {
-      // console.log(employee);
-    }
-  });
   const [mergedData, setMergeData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [userID, setUserID] = useState("");
-  const [userType, setUserType] = useState("");
+  const { mergedProbData } = useProbData();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const userID = localStorage.getItem("userID");
-    setUserID(userID);
-    const userType = localStorage.getItem("userType");
-    setUserType(userType);
-  }, []);
 
   // console.log(userType);
   // console.log(userType);
