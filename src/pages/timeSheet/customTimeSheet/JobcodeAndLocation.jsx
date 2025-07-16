@@ -26,6 +26,20 @@ export const JOBCODES = [
   { id: 25, JOBCODE: "J9073M431" },
   { id: 26, JOBCODE: "J9074M433" },
   { id: 27, JOBCODE: "J9075M433" },
+  { id: 28, JOBCODE: "M43-J9010M43" },
+  { id: 29, JOBCODE: "M43-J9092M43" },
+  { id: 30, JOBCODE: "M43-J9094M433" },
+  { id: 31, JOBCODE: "M43-J9095M431" },
+  { id: 32, JOBCODE: "M43-J9093M433" },
+  { id: 33, JOBCODE: "M43-J9096M433" },
+  { id: 34, JOBCODE: "M43-J9097M433" },
+  { id: 35, JOBCODE: "M43-J9098M433" },
+  { id: 36, JOBCODE: "M43-J9099M433" },
+  { id: 37, JOBCODE: "M43-J9100M433" },
+  { id: 38, JOBCODE: "M43-NA" },
+  { id: 39, JOBCODE: "M43-J9991" },
+  { id: 40, JOBCODE: "M47-J9001" },
+  { id: 41, JOBCODE: "M42-J9002" },
 ];
 
 export const LocationData = [
@@ -46,7 +60,13 @@ export const LocationData = [
   { id: 15, location: "PURCHASING" },
   { id: 16, location: "CORPORATE" },
   { id: 17, location: "CPD" },
+  { id: 18, location: "BLNG-MGT" },
+  { id: 19, location: "BLNG-BT" },
+  { id: 20, location: "BLNG-PROJ" },
+  { id: 21, location: "THIRD PARTY SERVICES" },
+  { id: 22, location: "CERMAT" },
 ];
+
 // 27-4-2025, 29-4-2025, 5-4-2025, 12-4-2025, 15-4-2025,
 export const dummyLeaveStatus = [
   {

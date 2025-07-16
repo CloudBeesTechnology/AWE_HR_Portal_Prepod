@@ -44,6 +44,7 @@ import PopupForDuplicateFileAlert from "./ModelForSuccessMess/PopupForDuplicateF
 
 import { useTableMergedData } from "./customTimeSheet/useTableMergedData";
 import PopupForCheckBadgeNo from "./ModelForSuccessMess/PopupForCheckBadgeNo";
+import LocationFilter from "./timeSheetSearch/locationFilter";
 
 const client = generateClient();
 
@@ -108,7 +109,12 @@ export const ViewTSTBeforeSave = ({
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
   const [editFormTitle, setEditFormTitle] = useState("");
+  const [storeLocation, setStoreLocation] = useState(["All"]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isApprovedChecked, setIsApprovedChecked] = useState(false);
+
   // const [empAndWorkInfo, setEmpAndWorkInfo] = useState([]);
+  const [selectedOption, setSelectedOption] = useState("");
   const { startDate, endDate, searchQuery, setSearchQuery } = useTempID();
   const { selectedRows, setSelectedRows, handleCheckboxChange, handleSubmit } =
     useRowSelection();
@@ -211,13 +217,33 @@ export const ViewTSTBeforeSave = ({
     } catch (err) {}
   }, [excelData]);
 
+  function autoEditFunction(data) {
+    return data.map((item) => ({
+      ...item,
+      companyName: item?.LOCATION,
+      WORKINGHOURS: item.TOTALHOURS ?? "0",
+      OT: item.TOTALHOURS2 ?? "0",
+      jobLocaWhrs: [
+        {
+          JOBCODE: "",
+          LOCATION: item.LOCATION,
+          OVERTIMEHRS: item.TOTALHOURS2 ?? "0",
+          WORKINGHRS: item.TOTALHOURS ?? "0", // ensure it's a number
+          id: 1,
+        },
+      ],
+    }));
+  }
+
   useEffect(() => {
     if (submittedData && submittedData.length > 0) {
       setShowStatusCol(true);
       setCurrentStatus(true);
 
-      setData(submittedData);
-      setSecondaryData(submittedData);
+      const autoEditedData = autoEditFunction(submittedData);
+      setSelectedRows(autoEditedData);
+      setData(autoEditedData);
+      setSecondaryData(autoEditedData);
     }
   }, [submittedData]);
 
@@ -343,6 +369,12 @@ export const ViewTSTBeforeSave = ({
             const finalData = await SendDataToManager(fetchedData);
 
             pendingData(fetchedData);
+
+            const getLocation = Array.isArray(fetchedData) && [
+              ...new Set(fetchedData.map((val) => val.location)),
+            ];
+
+            setStoreLocation([...storeLocation, ...getLocation]);
           }
         } catch (err) {
         } finally {
@@ -513,7 +545,9 @@ export const ViewTSTBeforeSave = ({
             id: val.id,
             empName: val.NAME || "",
             fidNo: val.NO || "",
-            companyName: val.LOCATIONATTOP || "",
+            companyName: val.LOCATIONATTOP
+              ? val.LOCATIONATTOP
+              : val.LOCATION || "",
             location: val.LOCATION || "",
             trade: val.TRADE || "",
             date: val.DATE || "",
@@ -541,6 +575,23 @@ export const ViewTSTBeforeSave = ({
         };
       });
 
+      // console.log("finalResult : ", finalResult);
+      // let tempVar = null;
+      // finalResult?.map((val) => {
+      //   if (
+      //     parseFloat(val?.actualWorkHrs) > parseFloat(val?.normalWorkHrs) &&
+      //     !tempVar
+      //   ) {
+      //     tempVar = true;
+      //   }
+      // });
+
+      // if (tempVar === true) {
+      //   alert(
+      //     `Working hours cannot be greater than 'Normal Working Hrs Per Day`
+      //   );
+      //   return;
+      // }
       let identifier = "updateStoredData";
       const { filteredResults, deleteDuplicateData } =
         await UnlockVerifiedCellVS({
@@ -679,6 +730,8 @@ export const ViewTSTBeforeSave = ({
         );
 
         storeApproveRej = [];
+        setIsApprovedChecked(false);
+        unCheckAllData();
         await handleManagerReload();
       }
     } else if (
@@ -696,7 +749,9 @@ export const ViewTSTBeforeSave = ({
                 empName: val.NAME || "",
                 fidNo: val.NO || "",
                 location: val.LOCATION || "",
-                companyName: val.LOCATIONATTOP || "",
+                companyName: val.LOCATIONATTOP
+                  ? val.LOCATIONATTOP
+                  : val.LOCATION || "",
                 trade: val.TRADE || "",
                 date: val.DATE || "",
                 totalNT: val.TOTALHOURS || "",
@@ -846,7 +901,9 @@ export const ViewTSTBeforeSave = ({
           fileName: fileName,
           empName: val.NAME || "",
           fidNo: val.NO || "N/A",
-          companyName: val.LOCATIONATTOP || "",
+          companyName: val.LOCATIONATTOP
+            ? val.LOCATIONATTOP
+            : val.LOCATION || "",
           location: val.LOCATION || "",
           trade: val.TRADE || "",
           date: val.DATE || "",
@@ -1033,10 +1090,55 @@ export const ViewTSTBeforeSave = ({
           return itemDate >= start && itemDate <= end;
         });
       }
+      if (selectedOption) {
+        if (selectedOption === "All") {
+          filteredData = filteredData;
+        } else {
+          filteredData = filteredData.filter(
+            (item) => item.LOCATION === selectedOption
+          );
+        }
+      }
 
       setData(filteredData);
     }
-  }, [startDate, endDate, secondaryData, searchQuery]);
+  }, [startDate, endDate, secondaryData, searchQuery, selectedOption]);
+
+  const autoApproveFunction = useCallback(() => {
+    if (!data || !Array.isArray(data)) return;
+
+    // Create approved data
+    const approveSelectedData = data.map((val) => ({
+      ...val,
+      status: "Approved",
+    }));
+
+    // Update approved data state
+    setAllApprovedData(approveSelectedData);
+
+    // Update checked items for all approved items
+    const updatedCheckedItems = data.reduce((acc, val) => {
+      acc[val.id] = true;
+      return acc;
+    }, {});
+    setCheckedItems((prev) => ({
+      ...prev,
+      ...updatedCheckedItems,
+    }));
+  }, [data, setAllApprovedData, setCheckedItems]);
+
+  const unCheckAllData = useCallback(() => {
+    if (!data || !Array.isArray(data)) return;
+    setAllApprovedData([]);
+    const updatedCheckedItems = data.reduce((acc, val) => {
+      acc[val.id] = false;
+      return acc;
+    }, {});
+    setCheckedItems((prev) => ({
+      ...prev,
+      ...updatedCheckedItems,
+    }));
+  }, [data, setAllApprovedData, setCheckedItems]);
 
   useEffect(() => {
     try {
@@ -1084,6 +1186,10 @@ export const ViewTSTBeforeSave = ({
     }
   }, [empAndWorkInfo, data]);
 
+  const handleSelectItem = (option) => {
+    setSelectedOption(option);
+  };
+
   const safeData = finalData || [];
   const itemsPerPage = 25;
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -1096,14 +1202,68 @@ export const ViewTSTBeforeSave = ({
   // currentData.sort((a, b) => a.NAME.localeCompare(b.NAME));
   visibleData = currentData;
   return (
-    <div>
+    <div onClick={() => setIsOpen(false)}>
       {currentStatus ? (
         <div>
           <div className="flex justify-between w-full mr-7">
             <div>
               <DateFilter />
             </div>
-            <div className="pt-5">
+
+            <div className="flex justify-between items-center gap-5 pt-5">
+              {Array.isArray(ManagerData) &&
+              ManagerData.length > 0 &&
+              Array.isArray(visibleData) &&
+              visibleData.length > 0 ? (
+                <div className="flex justify-between items-center gap-3">
+                  <p className="text_size_5 text-dark_grey">Approve All</p>
+                  <input
+                    type="checkbox"
+                    id="exampleCheckbox"
+                    className="h-4 w-4 cursor-pointer"
+                    checked={isApprovedChecked}
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      setIsApprovedChecked(isChecked);
+                      if (isChecked) {
+                        autoApproveFunction();
+                      } else {
+                        unCheckAllData();
+                      }
+                    }}
+                  />
+                </div>
+              ) : (
+                ""
+              )}
+              {/* Dropdown */}
+              {/* <select
+                className="border rounded p-2 w-full text-gray-700"
+                value={selectedOption}
+                onChange={(e) => setSelectedOption(e.target.value)}
+              >
+                <option value="">Select Category</option>
+                {["Offshore", "Day Tripping", "Third Party Services"].map(
+                  (cat, index) => (
+                    <option key={index} value={cat}>
+                      {cat}
+                    </option>
+                  )
+                )}
+              </select> */}
+
+              {Array.isArray(storeLocation) &&
+              storeLocation?.length > 0 &&
+              Array.isArray(ManagerData) &&
+              ManagerData?.length > 0 ? (
+                <LocationFilter
+                  handleSelectItem={handleSelectItem}
+                  storeLocation={storeLocation}
+                  setIsOpen={setIsOpen}
+                  isOpen={isOpen}
+                />
+              ) : null}
+
               <SearchBoxForTimeSheet
                 allEmpDetails={data}
                 searchResult={searchResult}
@@ -1387,65 +1547,33 @@ export const ViewTSTBeforeSave = ({
                 onClick={() => {
                   if (userIdentification !== "Manager") {
                     if (selectedRows && selectedRows.length > 0) {
+                      let tempVar = null;
+
+                      if (
+                        Array.isArray(visibleData) &&
+                        visibleData.length > 0
+                      ) {
+                        visibleData.forEach((val) => {
+                          if (
+                            parseFloat(val?.WORKINGHOURS) >
+                              parseFloat(val?.NORMALWORKINGHRSPERDAY) &&
+                            !tempVar
+                          ) {
+                            tempVar = true;
+                          }
+                        });
+                      }
+
+                      if (tempVar === true) {
+                        alert(
+                          `Working hours cannot be greater than 'Normal Working Hrs Per Day`
+                        );
+                        return;
+                      }
                       toggleFunctionForAssiMana();
                     } else if (excelData && excelData) {
                       storeInitialData();
                     }
-                    // const fetchDataAndDelete = async () => {
-                    //   try {
-                    //     console.log("Fetching and Deleting SBW Data...");
-                    //     // setIsDeleting(true); // Set loading state
-                    //     let nextToken = null; // Initialize nextToken for pagination
-                    //     do {
-                    //       // Define the filter for fetching SBW data
-                    //       const filter = {
-                    //         and: [{ fileType: { eq: "Offshore" } }],
-                    //       };
-                    //       // Fetch the BLNG data using GraphQL with pagination
-                    //       const response = await client.graphql({
-                    //         query: listTimeSheets,
-                    //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
-                    //       });
-                    //       // Extract data and nextToken
-                    //       const SBWdata =
-                    //         response?.data?.listTimeSheets?.items || [];
-                    //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
-                    //       console.log("Fetched SBW Data:", SBWdata);
-                    //       // Delete each item in the current batch
-                    //       await Promise.all(
-                    //         SBWdata.map(async (item) => {
-                    //           try {
-                    //             const deleteResponse = await client.graphql({
-                    //               query: deleteTimeSheet,
-                    //               variables: { input: { id: item.id } },
-                    //             });
-                    //             console.log(
-                    //               "Deleted Item Response:",
-                    //               deleteResponse
-                    //             );
-                    //           } catch (deleteError) {
-                    //             console.error(
-                    //               `Error deleting item with ID ${item.id}:`,
-                    //               deleteError
-                    //             );
-                    //           }
-                    //         })
-                    //       );
-                    //       console.log("Batch deletion completed.");
-                    //     } while (nextToken); // Continue fetching until no more data
-                    //     console.log(
-                    //       "All SBW items deletion process completed."
-                    //     );
-                    //   } catch (fetchError) {
-                    //     console.error(
-                    //       "Error in fetchDataAndDelete:",
-                    //       fetchError
-                    //     );
-                    //   } finally {
-                    //     // setIsDeleting(false); // Reset loading state
-                    //   }
-                    // };
-                    // fetchDataAndDelete();
                   } else if (userIdentification === "Manager") {
                     removeCheckedItem();
                     renameKeysFunctionAndSubmit();
@@ -1580,6 +1708,69 @@ export const ViewTSTBeforeSave = ({
           alertMessage={alertMessage}
         />
       )}
+
+      {/* <button
+        className="text_size_5 text-dark_grey px-3 py-2 rounded bg-yellow"
+        onClick={async () => {
+          try {
+            console.log("Fetching and Deleting BLNG Data...");
+            let nextToken = null;
+            let deleteCount = 0; // 🟢 Counter to track deletions
+
+            do {
+              const filter = {
+                and: [{ fileType: { eq: "Offshore" } }],
+              };
+
+              const response = await client.graphql({
+                query: listTimeSheets,
+                variables: {
+                  filter: filter,
+                  nextToken: nextToken,
+                  limit: 1000, // optional: ensure limit is large enough
+                },
+              });
+
+              const SBWdata = response?.data?.listTimeSheets?.items || [];
+              nextToken = response?.data?.listTimeSheets?.nextToken;
+
+              console.log(
+                `Fetched ${SBWdata.length} BLNG items in this batch.`
+              );
+
+              await Promise.all(
+                SBWdata.map(async (item) => {
+                  try {
+                    const deleteResponse = await client.graphql({
+                      query: deleteTimeSheet,
+                      variables: { input: { id: item.id } },
+                    });
+                    deleteCount++; // ✅ Increment counter
+                    console.log(`Deleted item ID: ${item.id}`);
+                  } catch (deleteError) {
+                    console.error(
+                      `Error deleting item with ID ${item.id}:`,
+                      deleteError
+                    );
+                  }
+                })
+              );
+
+              console.log(
+                `Batch deletion completed. Total deleted so far: ${deleteCount}`
+              );
+            } while (nextToken);
+
+            console.log(
+              `✅ All BLNG items deletion process completed. Total deleted: ${deleteCount}`
+            );
+          } catch (fetchError) {
+            console.error("❌ Error in fetchDataAndDelete:", fetchError);
+          }
+        }}
+      >
+        Delete Offshore Data
+      </button> */}
     </div>
   );
 };
