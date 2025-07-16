@@ -46,9 +46,9 @@ export const Termination = () => {
     const sortedData = data
       ?.filter((item) => item.termiDate) // Only include items with termiDate
       .map((item) => {
-        const termiDate = new Date(item.termiDate); 
+        const termiDate = new Date(item.termiDate); // Parse termiDate for sorting
         return {
-          termiDate,
+          termiDate, // Keep raw date for sorting
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
@@ -60,18 +60,56 @@ export const Termination = () => {
           otherDepartment:Array.isArray(item.otherDepartment)
           ? item.otherDepartment[item.otherDepartment.length - 1]
           : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+          position: (() => {
+            const today = new Date();
+            const positionRevDate = item.positionRevDate?.[item.positionRevDate.length - 1];
+            const positionRev = item.positionRev?.[item.positionRev.length - 1];
+            const upgradePosition = item.upgradePosition?.[item.upgradePosition.length - 1];
+            const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
+            let finalPosition;
+  
+            // Convert to dates for comparison (ensure dates are valid before comparing)
+            const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
+            const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+  
+            if (revDateObj && upgradeDateObj) {
+              if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
+                finalPosition = item.position?.[item.position.length - 1];
+              } else if (revDateObj > upgradeDateObj) {
+                finalPosition =
+                  today >= revDateObj
+                    ? positionRev
+                    : today >= upgradeDateObj
+                    ? upgradePosition
+                    : item.position?.[item.position.length - 1];
+              } else if (upgradeDateObj > revDateObj) {
+                finalPosition =
+                  today >= upgradeDateObj
+                    ? upgradePosition
+                    : today >= revDateObj
+                    ? positionRev
+                    : item.position?.[item.position.length - 1];
+              }
+            } else if (revDateObj && !upgradeDateObj) {
+              finalPosition = today >= revDateObj && positionRev;
+            } else if (upgradeDateObj && !revDateObj) {
+              finalPosition = today >= upgradeDateObj && upgradePosition;
+            } else {
+              finalPosition = item.position?.[item.position.length - 1];
+            }
+  
+            return finalPosition || "-";
+          })(),
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
-          terminateDate: formatDate(item.termiDate) || "-",
-          reasonTerminate: item.reasonTerminate || "-", 
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
+          terminateDate: formatDate(item.termiDate) || "-", // Display termination date
+          reasonTerminate: item.reasonTerminate || "-", // Display termination note (if any)
         };
       })
-      .sort((a, b) => a.termiDate - b.termiDate) 
-      .map(({ termiDate, ...rest }) => rest); 
+      .sort((a, b) => a.termiDate - b.termiDate) // Sort by termiDate in ascending order
+      .map(({ termiDate, ...rest }) => rest); // Remove termiDate after sorting
+  
     return sortedData; // Return the sorted and formatted data
   };
   
@@ -118,9 +156,46 @@ export const Termination = () => {
         otherDepartment:Array.isArray(item.otherDepartment)
         ? item.otherDepartment[item.otherDepartment.length - 1]
         : "-",
-      position: Array.isArray(item.position)
-        ? item.position[item.position.length - 1]
-        : "-",
+        position: (() => {
+          const today = new Date();
+          const positionRevDate = item.positionRevDate?.[item.positionRevDate.length - 1];
+          const positionRev = item.positionRev?.[item.positionRev.length - 1];
+          const upgradePosition = item.upgradePosition?.[item.upgradePosition.length - 1];
+          const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
+          let finalPosition;
+
+          // Convert to dates for comparison (ensure dates are valid before comparing)
+          const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
+          const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+
+          if (revDateObj && upgradeDateObj) {
+            if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
+              finalPosition = item.position?.[item.position.length - 1];
+            } else if (revDateObj > upgradeDateObj) {
+              finalPosition =
+                today >= revDateObj
+                  ? positionRev
+                  : today >= upgradeDateObj
+                  ? upgradePosition
+                  : item.position?.[item.position.length - 1];
+            } else if (upgradeDateObj > revDateObj) {
+              finalPosition =
+                today >= upgradeDateObj
+                  ? upgradePosition
+                  : today >= revDateObj
+                  ? positionRev
+                  : item.position?.[item.position.length - 1];
+            }
+          } else if (revDateObj && !upgradeDateObj) {
+            finalPosition = today >= revDateObj && positionRev;
+          } else if (upgradeDateObj && !revDateObj) {
+            finalPosition = today >= upgradeDateObj && upgradePosition;
+          } else {
+            finalPosition = item.position?.[item.position.length - 1];
+          }
+
+          return finalPosition || "-";
+        })(),
         otherPosition: Array.isArray(item.otherPosition)
           ? item.otherPosition[item.otherPosition.length - 1]
           : "-",

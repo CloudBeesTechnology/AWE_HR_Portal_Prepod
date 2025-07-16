@@ -54,13 +54,50 @@ export const Resignation = () => {
         department: Array.isArray(item.department)
           ? item.department[item.department.length - 1]
           : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
+        otherDepartment: Array.isArray(item.otherDepartment)
           ? item.otherDepartment[item.otherDepartment.length - 1]
           : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
-          otherPosition: Array.isArray(item.otherPosition)
+        position: (() => {
+          const today = new Date();
+          const positionRevDate = item.positionRevDate?.[item.positionRevDate.length - 1];
+          const positionRev = item.positionRev?.[item.positionRev.length - 1];
+          const upgradePosition = item.upgradePosition?.[item.upgradePosition.length - 1];
+          const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
+          let finalPosition;
+
+          // Convert to dates for comparison (ensure dates are valid before comparing)
+          const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
+          const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+
+          if (revDateObj && upgradeDateObj) {
+            if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
+              finalPosition = item.position?.[item.position.length - 1];
+            } else if (revDateObj > upgradeDateObj) {
+              finalPosition =
+                today >= revDateObj
+                  ? positionRev
+                  : today >= upgradeDateObj
+                  ? upgradePosition
+                  : item.position?.[item.position.length - 1];
+            } else if (upgradeDateObj > revDateObj) {
+              finalPosition =
+                today >= upgradeDateObj
+                  ? upgradePosition
+                  : today >= revDateObj
+                  ? positionRev
+                  : item.position?.[item.position.length - 1];
+            }
+          } else if (revDateObj && !upgradeDateObj) {
+            finalPosition = today >= revDateObj && positionRev;
+          } else if (upgradeDateObj && !revDateObj) {
+            finalPosition = today >= upgradeDateObj && upgradePosition;
+          } else {
+            finalPosition = item.position?.[item.position.length - 1];
+          }
+
+          return finalPosition || "-";
+        })(),
+        otherPosition: Array.isArray(item.otherPosition)
           ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
         resignDate: formatDate(item.resignDate) || "-", // Display formatted resignDate
@@ -116,12 +153,49 @@ export const Resignation = () => {
           otherDepartment:Array.isArray(item.otherDepartment)
           ? item.otherDepartment[item.otherDepartment.length - 1]
           : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+          position: (() => {
+            const today = new Date();
+            const positionRevDate = item.positionRevDate?.[item.positionRevDate.length - 1];
+            const positionRev = item.positionRev?.[item.positionRev.length - 1];
+            const upgradePosition = item.upgradePosition?.[item.upgradePosition.length - 1];
+            const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
+            let finalPosition;
+  
+            // Convert to dates for comparison (ensure dates are valid before comparing)
+            const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
+            const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+  
+            if (revDateObj && upgradeDateObj) {
+              if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
+                finalPosition = item.position?.[item.position.length - 1];
+              } else if (revDateObj > upgradeDateObj) {
+                finalPosition =
+                  today >= revDateObj
+                    ? positionRev
+                    : today >= upgradeDateObj
+                    ? upgradePosition
+                    : item.position?.[item.position.length - 1];
+              } else if (upgradeDateObj > revDateObj) {
+                finalPosition =
+                  today >= upgradeDateObj
+                    ? upgradePosition
+                    : today >= revDateObj
+                    ? positionRev
+                    : item.position?.[item.position.length - 1];
+              }
+            } else if (revDateObj && !upgradeDateObj) {
+              finalPosition = today >= revDateObj && positionRev;
+            } else if (upgradeDateObj && !revDateObj) {
+              finalPosition = today >= upgradeDateObj && upgradePosition;
+            } else {
+              finalPosition = item.position?.[item.position.length - 1];
+            }
+  
+            return finalPosition || "-";
+          })(),
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
         resignDate: formatDate(item.resignDate) || "-",
         rawResignDate: new Date(item.resignDate), // Add raw date for sorting
         reasonResign: item.reasonResign || "-",
