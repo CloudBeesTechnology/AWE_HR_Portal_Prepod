@@ -90,8 +90,7 @@ export const ContractPDF = ({ userID, userType }) => {
         const startDate = contractStartDates[contractStartDates.length - 1];
 
         const today = new Date();
-        const positionRevDate =
-          emp.positionRevDate?.[emp.positionRevDate.length - 1];
+        const positionRevDate = emp.positionRevDate?.[emp.positionRevDate.length - 1];
         const positionRev = emp.positionRev?.[emp.positionRev.length - 1];
         const upgradePosition =
           emp.upgradePosition?.[emp.upgradePosition.length - 1];
@@ -146,7 +145,7 @@ export const ContractPDF = ({ userID, userType }) => {
             emp.otherPosition[emp.otherPosition.length - 1],
           contractStartDate: formatDate(startDate),
           contractEndDate: formatDate(lastDate),
-          oldCED: contract.oldCED,
+          oldCED: formatDate(contract.oldCED),
           nlmsEmpApproval: Array.isArray(emp.nlmsEmpValid)
             ? formatDate(emp.nlmsEmpValid[emp.nlmsEmpValid.length - 1])
             : "N/A",
@@ -343,10 +342,13 @@ export const ContractPDF = ({ userID, userType }) => {
     setSelectedPerson(null);
   };
 
-  const handleNavigate = () => {
+
+  const handleNavigate = (id) => {
     closeModal();
     if (selectedPerson) {
-      navigate("/contractForms", { state: { employeeData: selectedPerson , matchedID: id} });
+      navigate("/contractForms", {
+        state: { employeeData: selectedPerson, matchedID: id },
+      });
     }
   };
 
@@ -453,7 +455,7 @@ export const ContractPDF = ({ userID, userType }) => {
                                 val.genManager.trim() !== "") && (
                                   <>
                                     <th className="border px-3 py-2 text-dark_grey">
-                                      {val.oldCED}
+                                      {formatDate(val.oldCED)}
                                     </th>
                                
                                     <th

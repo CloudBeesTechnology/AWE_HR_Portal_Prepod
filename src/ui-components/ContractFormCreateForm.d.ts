@@ -32,6 +32,13 @@ export declare type ContractFormCreateFormInputValues = {
     remarkHr?: string;
     remarkGm?: string;
     renewalContract?: string;
+    managerDate?: string;
+    hrmDate?: string;
+    gmDate?: string;
+    extendedStatus?: string;
+    oldCED?: string;
+    hrSign?: string;
+    hrDate?: string;
 };
 export declare type ContractFormCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -44,6 +51,13 @@ export declare type ContractFormCreateFormValidationValues = {
     remarkHr?: ValidationFunction<string>;
     remarkGm?: ValidationFunction<string>;
     renewalContract?: ValidationFunction<string>;
+    managerDate?: ValidationFunction<string>;
+    hrmDate?: ValidationFunction<string>;
+    gmDate?: ValidationFunction<string>;
+    extendedStatus?: ValidationFunction<string>;
+    oldCED?: ValidationFunction<string>;
+    hrSign?: ValidationFunction<string>;
+    hrDate?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ContractFormCreateFormOverridesProps = {
@@ -58,6 +72,13 @@ export declare type ContractFormCreateFormOverridesProps = {
     remarkHr?: PrimitiveOverrideProps<TextFieldProps>;
     remarkGm?: PrimitiveOverrideProps<TextFieldProps>;
     renewalContract?: PrimitiveOverrideProps<TextFieldProps>;
+    managerDate?: PrimitiveOverrideProps<TextFieldProps>;
+    hrmDate?: PrimitiveOverrideProps<TextFieldProps>;
+    gmDate?: PrimitiveOverrideProps<TextFieldProps>;
+    extendedStatus?: PrimitiveOverrideProps<TextFieldProps>;
+    oldCED?: PrimitiveOverrideProps<TextFieldProps>;
+    hrSign?: PrimitiveOverrideProps<TextFieldProps>;
+    hrDate?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type ContractFormCreateFormProps = React.PropsWithChildren<{
     overrides?: ContractFormCreateFormOverridesProps | undefined | null;

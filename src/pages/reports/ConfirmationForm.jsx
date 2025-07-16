@@ -13,6 +13,9 @@ export const ConfirmationForm = ({
   employeeData,
   HRMPosition,
   skillPool,
+  probData,
+  isExtended,
+  handleCheckboxChange,
 }) => {
   const [selectedValue, setSelectedValue] = React.useState("");
   const [hasSupervisor, setHasSupervisor] = React.useState(true);
@@ -25,13 +28,19 @@ export const ConfirmationForm = ({
     }
   }, [formData]);
 
+  const probDatafilter = probData.filter(
+    (item) => item?.empID === employeeData?.empID
+  );
+
+  // console.log("Data", formData);
+
   useEffect(() => {
     if (!workInfoData.length || !employeeData?.empID) {
       return;
     }
 
     const workInfo = workInfoData.find(
-      (data) => data.empID === employeeData.empID
+      (data) => data.empID === employeeData?.empID
     );
 
     if (workInfo) {
@@ -59,8 +68,6 @@ export const ConfirmationForm = ({
       setSupervisorCheck(supervisorExists);
     }
   }, [workInfoData, employeeData?.empID]);
-
-  // console.log(hasSupervisor);
 
   const handleChange = (event) => {
     event.persist();
@@ -271,8 +278,11 @@ export const ConfirmationForm = ({
               value={formData.probData.managerName || ""}
               onChange={handleInputChange}
               disabled={
-                (userType !== "Manager" && gmPosition === "GENERAL MANAGER") ||
-                HRMPosition === "HR MANAGER"
+                userType === "Supervisor" ||
+                userType === "HR" ||
+                (userType === "Manager" &&
+                  (HRMPosition === "HR MANAGER" ||
+                    gmPosition === "GENERAL MANAGER"))
               }
               className="border-b outline-none px-1 w-full"
             />
@@ -287,11 +297,7 @@ export const ConfirmationForm = ({
                 checked={formData.probData.managerApproved === "Approved"}
                 onChange={handleInputChange}
                 id="managerApproved"
-                disabled={
-                  (userType !== "Manager" &&
-                    gmPosition === "GENERAL MANAGER") ||
-                  HRMPosition === "HR MANAGER"
-                }
+                disabled={userType !== "Manager"}
                 className="h-4 w-4 form-checkbox"
               />
               <label htmlFor="managerApproved" className="text-sm py-2">
@@ -307,11 +313,7 @@ export const ConfirmationForm = ({
                 checked={formData.probData.managerApproved === "Rejected"}
                 onChange={handleInputChange}
                 id="managerReject"
-                disabled={
-                  (userType !== "Manager" &&
-                    gmPosition === "GENERAL MANAGER") ||
-                  HRMPosition === "HR MANAGER"
-                }
+                disabled={userType !== "Manager"}
                 className="h-4 w-4 form-checkbox"
               />
               <label htmlFor="managerReject" className="text-sm py-2">
@@ -326,10 +328,7 @@ export const ConfirmationForm = ({
               {...register("managerDate")}
               value={formData.probData.managerDate || ""}
               onChange={handleInputChange}
-              disabled={
-                (userType !== "Manager" && gmPosition === "GENERAL MANAGER") ||
-                HRMPosition === "HR MANAGER"
-              }
+              disabled={userType !== "Manager"}
               className="outline-none"
             />
           </div>
@@ -400,6 +399,63 @@ export const ConfirmationForm = ({
           </div>
         )}
       </div>
+
+      {/* {userType === "HR" && (
+        <div className="mt-10 flex items-center gap-4">
+          <input
+            type="checkbox"
+            value="Extended"
+            name="probExtendStatus"
+            {...register("probExtendStatus")}
+            onChange={handleInputChange}
+            id="probExtendStatus"
+            className="h-4 w-4 form-checkbox"
+          />
+          <label htmlFor="probExtendStatus" className="text-lg font-medium">
+            Extend probation
+          </label>
+        </div>
+      )} */}
+
+      {/* {userType === "HR" && (
+        <div className="mt-10 flex items-center gap-4">
+          <input
+            type="checkbox"
+            
+            name="probExtendStatus"
+            checked={
+              formData?.probData?.probExtendStatus === "Extended" ||
+              formData?.probData?.probExtendStatus === "completed"
+            }
+            onChange={
+              handleInputChange
+            }
+            id="probExtendStatus"
+            className="h-4 w-4 form-checkbox"
+          />
+          <label htmlFor="probExtendStatus" className="text-lg font-medium">
+            Extend probation
+          </label>
+        </div>
+      )} */} 
+
+      {userType === "HR" && (
+        <div className="mt-10 flex items-center">
+          <input
+            type="checkbox"
+            id="probExtendStatus"
+            checked={isExtended}
+            onChange={handleCheckboxChange}
+            // value={formData.probData.probExtendStatus}
+            //  onChange={handleInputChange}
+
+            className="mr-2 h-4 w-4"
+          />
+        <label htmlFor="probExtendStatus" className="text-lg font-medium">
+            Extend probation
+          </label>
+        </div>
+      )}
 
       {/* HR Section */}
       <div className="border pt-4 mt-5">

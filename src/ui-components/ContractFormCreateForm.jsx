@@ -39,6 +39,13 @@ export default function ContractFormCreateForm(props) {
     remarkHr: "",
     remarkGm: "",
     renewalContract: "",
+    managerDate: "",
+    hrmDate: "",
+    gmDate: "",
+    extendedStatus: "",
+    oldCED: "",
+    hrSign: "",
+    hrDate: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [conAttn, setConAttn] = React.useState(initialValues.conAttn);
@@ -52,6 +59,17 @@ export default function ContractFormCreateForm(props) {
   const [renewalContract, setRenewalContract] = React.useState(
     initialValues.renewalContract
   );
+  const [managerDate, setManagerDate] = React.useState(
+    initialValues.managerDate
+  );
+  const [hrmDate, setHrmDate] = React.useState(initialValues.hrmDate);
+  const [gmDate, setGmDate] = React.useState(initialValues.gmDate);
+  const [extendedStatus, setExtendedStatus] = React.useState(
+    initialValues.extendedStatus
+  );
+  const [oldCED, setOldCED] = React.useState(initialValues.oldCED);
+  const [hrSign, setHrSign] = React.useState(initialValues.hrSign);
+  const [hrDate, setHrDate] = React.useState(initialValues.hrDate);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -64,6 +82,13 @@ export default function ContractFormCreateForm(props) {
     setRemarkHr(initialValues.remarkHr);
     setRemarkGm(initialValues.remarkGm);
     setRenewalContract(initialValues.renewalContract);
+    setManagerDate(initialValues.managerDate);
+    setHrmDate(initialValues.hrmDate);
+    setGmDate(initialValues.gmDate);
+    setExtendedStatus(initialValues.extendedStatus);
+    setOldCED(initialValues.oldCED);
+    setHrSign(initialValues.hrSign);
+    setHrDate(initialValues.hrDate);
     setErrors({});
   };
   const validations = {
@@ -77,6 +102,13 @@ export default function ContractFormCreateForm(props) {
     remarkHr: [],
     remarkGm: [],
     renewalContract: [],
+    managerDate: [],
+    hrmDate: [],
+    gmDate: [],
+    extendedStatus: [],
+    oldCED: [],
+    hrSign: [],
+    hrDate: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -114,6 +146,13 @@ export default function ContractFormCreateForm(props) {
           remarkHr,
           remarkGm,
           renewalContract,
+          managerDate,
+          hrmDate,
+          gmDate,
+          extendedStatus,
+          oldCED,
+          hrSign,
+          hrDate,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -186,6 +225,13 @@ export default function ContractFormCreateForm(props) {
               remarkHr,
               remarkGm,
               renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -219,6 +265,13 @@ export default function ContractFormCreateForm(props) {
               remarkHr,
               remarkGm,
               renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
             };
             const result = onChange(modelFields);
             value = result?.conAttn ?? value;
@@ -252,6 +305,13 @@ export default function ContractFormCreateForm(props) {
               remarkHr,
               remarkGm,
               renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
             };
             const result = onChange(modelFields);
             value = result?.depHead ?? value;
@@ -285,6 +345,13 @@ export default function ContractFormCreateForm(props) {
               remarkHr,
               remarkGm,
               renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
             };
             const result = onChange(modelFields);
             value = result?.hrManager ?? value;
@@ -318,6 +385,13 @@ export default function ContractFormCreateForm(props) {
               remarkHr,
               remarkGm,
               renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
             };
             const result = onChange(modelFields);
             value = result?.genManager ?? value;
@@ -351,6 +425,13 @@ export default function ContractFormCreateForm(props) {
               remarkHr,
               remarkGm,
               renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
             };
             const result = onChange(modelFields);
             value = result?.remarks ?? value;
@@ -384,6 +465,13 @@ export default function ContractFormCreateForm(props) {
               remarkHr,
               remarkGm,
               renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
             };
             const result = onChange(modelFields);
             value = result?.contStatus ?? value;
@@ -417,6 +505,13 @@ export default function ContractFormCreateForm(props) {
               remarkHr: value,
               remarkGm,
               renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
             };
             const result = onChange(modelFields);
             value = result?.remarkHr ?? value;
@@ -450,6 +545,13 @@ export default function ContractFormCreateForm(props) {
               remarkHr,
               remarkGm: value,
               renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
             };
             const result = onChange(modelFields);
             value = result?.remarkGm ?? value;
@@ -483,6 +585,13 @@ export default function ContractFormCreateForm(props) {
               remarkHr,
               remarkGm,
               renewalContract: value,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
             };
             const result = onChange(modelFields);
             value = result?.renewalContract ?? value;
@@ -496,6 +605,286 @@ export default function ContractFormCreateForm(props) {
         errorMessage={errors.renewalContract?.errorMessage}
         hasError={errors.renewalContract?.hasError}
         {...getOverrideProps(overrides, "renewalContract")}
+      ></TextField>
+      <TextField
+        label="Manager date"
+        isRequired={false}
+        isReadOnly={false}
+        value={managerDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
+              managerDate: value,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.managerDate ?? value;
+          }
+          if (errors.managerDate?.hasError) {
+            runValidationTasks("managerDate", value);
+          }
+          setManagerDate(value);
+        }}
+        onBlur={() => runValidationTasks("managerDate", managerDate)}
+        errorMessage={errors.managerDate?.errorMessage}
+        hasError={errors.managerDate?.hasError}
+        {...getOverrideProps(overrides, "managerDate")}
+      ></TextField>
+      <TextField
+        label="Hrm date"
+        isRequired={false}
+        isReadOnly={false}
+        value={hrmDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
+              managerDate,
+              hrmDate: value,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.hrmDate ?? value;
+          }
+          if (errors.hrmDate?.hasError) {
+            runValidationTasks("hrmDate", value);
+          }
+          setHrmDate(value);
+        }}
+        onBlur={() => runValidationTasks("hrmDate", hrmDate)}
+        errorMessage={errors.hrmDate?.errorMessage}
+        hasError={errors.hrmDate?.hasError}
+        {...getOverrideProps(overrides, "hrmDate")}
+      ></TextField>
+      <TextField
+        label="Gm date"
+        isRequired={false}
+        isReadOnly={false}
+        value={gmDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate: value,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.gmDate ?? value;
+          }
+          if (errors.gmDate?.hasError) {
+            runValidationTasks("gmDate", value);
+          }
+          setGmDate(value);
+        }}
+        onBlur={() => runValidationTasks("gmDate", gmDate)}
+        errorMessage={errors.gmDate?.errorMessage}
+        hasError={errors.gmDate?.hasError}
+        {...getOverrideProps(overrides, "gmDate")}
+      ></TextField>
+      <TextField
+        label="Extended status"
+        isRequired={false}
+        isReadOnly={false}
+        value={extendedStatus}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus: value,
+              oldCED,
+              hrSign,
+              hrDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.extendedStatus ?? value;
+          }
+          if (errors.extendedStatus?.hasError) {
+            runValidationTasks("extendedStatus", value);
+          }
+          setExtendedStatus(value);
+        }}
+        onBlur={() => runValidationTasks("extendedStatus", extendedStatus)}
+        errorMessage={errors.extendedStatus?.errorMessage}
+        hasError={errors.extendedStatus?.hasError}
+        {...getOverrideProps(overrides, "extendedStatus")}
+      ></TextField>
+      <TextField
+        label="Old ced"
+        isRequired={false}
+        isReadOnly={false}
+        value={oldCED}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED: value,
+              hrSign,
+              hrDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.oldCED ?? value;
+          }
+          if (errors.oldCED?.hasError) {
+            runValidationTasks("oldCED", value);
+          }
+          setOldCED(value);
+        }}
+        onBlur={() => runValidationTasks("oldCED", oldCED)}
+        errorMessage={errors.oldCED?.errorMessage}
+        hasError={errors.oldCED?.hasError}
+        {...getOverrideProps(overrides, "oldCED")}
+      ></TextField>
+      <TextField
+        label="Hr sign"
+        isRequired={false}
+        isReadOnly={false}
+        value={hrSign}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign: value,
+              hrDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.hrSign ?? value;
+          }
+          if (errors.hrSign?.hasError) {
+            runValidationTasks("hrSign", value);
+          }
+          setHrSign(value);
+        }}
+        onBlur={() => runValidationTasks("hrSign", hrSign)}
+        errorMessage={errors.hrSign?.errorMessage}
+        hasError={errors.hrSign?.hasError}
+        {...getOverrideProps(overrides, "hrSign")}
+      ></TextField>
+      <TextField
+        label="Hr date"
+        isRequired={false}
+        isReadOnly={false}
+        value={hrDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.hrDate ?? value;
+          }
+          if (errors.hrDate?.hasError) {
+            runValidationTasks("hrDate", value);
+          }
+          setHrDate(value);
+        }}
+        onBlur={() => runValidationTasks("hrDate", hrDate)}
+        errorMessage={errors.hrDate?.errorMessage}
+        hasError={errors.hrDate?.hasError}
+        {...getOverrideProps(overrides, "hrDate")}
       ></TextField>
       <Flex
         justifyContent="space-between"

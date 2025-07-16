@@ -17,6 +17,13 @@ export const onCreateContractForm = /* GraphQL */ `
       remarkHr
       remarkGm
       renewalContract
+      managerDate
+      hrmDate
+      gmDate
+      extendedStatus
+      oldCED
+      hrSign
+      hrDate
       createdAt
       updatedAt
       __typename
@@ -39,6 +46,13 @@ export const onUpdateContractForm = /* GraphQL */ `
       remarkHr
       remarkGm
       renewalContract
+      managerDate
+      hrmDate
+      gmDate
+      extendedStatus
+      oldCED
+      hrSign
+      hrDate
       createdAt
       updatedAt
       __typename
@@ -61,6 +75,13 @@ export const onDeleteContractForm = /* GraphQL */ `
       remarkHr
       remarkGm
       renewalContract
+      managerDate
+      hrmDate
+      gmDate
+      extendedStatus
+      oldCED
+      hrSign
+      hrDate
       createdAt
       updatedAt
       __typename

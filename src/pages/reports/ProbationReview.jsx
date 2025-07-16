@@ -1,24 +1,22 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { FilterTable } from "./FilterTable";
 import { useLocation, useNavigate } from "react-router-dom";
 import { VscClose } from "react-icons/vsc";
 import { useTempID } from "../../utils/TempIDContext";
-import { DataSupply } from "../../utils/DataStoredContext";
 import logo from "../../assets/logo/logo-with-name.svg";
 
 export const ProbationReview = () => {
+  const userID = localStorage.getItem("userID");
+  const userType = localStorage.getItem("userType");
   const location = useLocation();
   const { allData, title } = location.state || {};
   const { gmPosition, HRMPosition } = useTempID();
   const [tableBody, setTableBody] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  const [originalTableBody, setOriginalTableBody] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [originalTableBody, setOriginalTableBody] = useState([]);
-  const userID = localStorage.getItem("userID");
-  const userType = localStorage.getItem("userType");
-  const [skilled, setSkilled] = useState(null);
-  const { empPIData, workInfoData, ProbFData } = useContext(DataSupply);
+  const [extenFlag, setExtenFlag] = useState([]);
+  const [selectedPerson, setSelectedPerson] = useState(null);
   const [tableHead] = useState(
     [
       "Emp ID",
@@ -32,11 +30,9 @@ export const ProbationReview = () => {
       "Probation Expiry Date",
       "Deadline to Return to HRD",
       userType !== "SuperAdmin" && "Status",
-      "Probation Form",
     ].filter(Boolean)
   );
 
-  const [selectedPerson, setSelectedPerson] = useState(null);
   const navigate = useNavigate();
 
   const formatDate = (date) => {
@@ -47,7 +43,16 @@ export const ProbationReview = () => {
     }
 
     if (!date) return "-";
-    const parsedDate = new Date(date);
+
+    let parsedDate;
+
+    if (typeof date === "string" && date.includes("/")) {
+      const [day, month, year] = date.split("/");
+      parsedDate = new Date(`${year}-${month}-${day}`);
+    } else {
+      parsedDate = new Date(date);
+    }
+
     if (isNaN(parsedDate.getTime())) return "-";
 
     const day = String(parsedDate.getDate()).padStart(2, "0");
@@ -58,13 +63,28 @@ export const ProbationReview = () => {
   };
 
   const calculateDeadline = (probationEndDate) => {
-    const date = new Date(probationEndDate);
+    let date;
+
+    if (probationEndDate.includes("/")) {
+      const [day, month, year] = probationEndDate.split("/");
+      date = new Date(`${year}-${month}-${day}`);
+    } else {
+      date = new Date(probationEndDate);
+    }
+
+    if (isNaN(date)) return "Invalid Date";
+
     date.setDate(date.getDate() - 7);
     return date.toISOString().split("T")[0];
   };
 
   const probationReviewMergedData = (data) => {
     const today = new Date();
+
+    // const today = new Date("2025-07-01");
+    // const today = testDate ? new Date(testDate) : new Date();
+
+    //range 1 month ex. From: 01-08-2025 To: 31-08-2025
     const firstDayOfNextMonth = new Date(
       today.getFullYear(),
       today.getMonth() + 1,
@@ -79,11 +99,7 @@ export const ProbationReview = () => {
 
     const sortedData = data
       ?.filter((item) => {
-        if (
-          !item.probStatus &&
-          Array.isArray(item.workStatus) &&
-          item.workStatus.length > 0
-        ) {
+        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
           const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
 
           if (
@@ -100,6 +116,27 @@ export const ProbationReview = () => {
           if (!lastDate) return false;
 
           const probationEnd = new Date(lastDate);
+
+          let prevProbExDate = null;
+          if (item.prevProbExDate) {
+            const [day, month, year] = item.prevProbExDate.split("/");
+            prevProbExDate = new Date(`${year}-${month}-${day}`);
+          }
+
+          if (
+            prevProbExDate &&
+            probationEnd.toDateString() === prevProbExDate.toDateString()
+          ) {
+            return false;
+          }
+
+          if (
+            item.probExtendStatus === "probup" ||
+            item.probExtendStatus === "completed"
+          ) {
+            return false;
+          }
+
           return (
             probationEnd >= firstDayOfNextMonth &&
             probationEnd <= lastDayOfNextMonth
@@ -111,14 +148,48 @@ export const ProbationReview = () => {
         const probationEndDates = item.probationEnd || [];
         const lastDate = probationEndDates[probationEndDates.length - 1];
 
-        const contractStartDates = item.contractStart || [];
-        const startDate = contractStartDates[contractStartDates.length - 1];
-
         if (userType === "Manager" && HRMPosition !== "HR MANAGER") {
           return null;
         } else if (userType === "HR" || HRMPosition === "HR MANAGER") {
         } else if (gmPosition === "GENERAL MANAGER") {
           return null;
+        }
+
+        const today = new Date();
+        const positionRevDate =
+          item.positionRevDate?.[item.positionRevDate.length - 1];
+        const positionRev = item.positionRev?.[item.positionRev.length - 1];
+        const upgradePosition =
+          item.upgradePosition?.[item.upgradePosition.length - 1];
+        const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
+        let finalPosition;
+
+        const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
+        const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+        if (revDateObj && upgradeDateObj) {
+          if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
+            finalPosition = item.position?.[item.position.length - 1];
+          } else if (revDateObj > upgradeDateObj) {
+            finalPosition =
+              today >= revDateObj
+                ? positionRev
+                : today >= upgradeDateObj
+                ? upgradePosition
+                : item.position?.[item.position.length - 1];
+          } else if (upgradeDateObj > revDateObj) {
+            finalPosition =
+              today >= upgradeDateObj
+                ? upgradePosition
+                : today >= revDateObj
+                ? positionRev
+                : item.position?.[item.position.length - 1];
+          }
+        } else if (revDateObj && !upgradeDateObj) {
+          finalPosition = today >= revDateObj && positionRev;
+        } else if (upgradeDateObj && !revDateObj) {
+          finalPosition = today >= upgradeDateObj && upgradePosition;
+        } else {
+          finalPosition = item.position?.[item.position.length - 1];
         }
 
         return {
@@ -133,20 +204,42 @@ export const ProbationReview = () => {
           otherDepartment: Array.isArray(item.otherDepartment)
             ? item.otherDepartment[item.otherDepartment.length - 1]
             : "-",
-          position: Array.isArray(item.position)
-            ? item.position[item.position.length - 1]
-            : "-",
+          position: finalPosition,
           otherPosition: Array.isArray(item.otherPosition)
             ? item.otherPosition[item.otherPosition.length - 1]
             : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
-          ...(HRMPosition === "HR MANAGER" || userType === "HR"
-            ? { status: item.hrName ? "Approved" : "Pending" }
-            : {}),
+          probExtendStatus: item.probExtendStatus,
+          prevProbExDate: item.prevProbExDate,
+
           ...(userType === "Supervisor" && {
-            status: item.supervisorApproved ? "Approved" : "Pending",
+            status:
+              item.probExtendStatus === "Extended"
+                ? "Pending"
+                : item.supervisorApproved
+                ? "Approved"
+                : "Pending",
           }),
+          ...(HRMPosition === "HR MANAGER"
+            ? {
+                status:
+                  item.probExtendStatus === "Extended"
+                    ? "Pending"
+                    : item.hrName
+                    ? "Approved"
+                    : "Pending",
+              }
+            : userType === "HR"
+            ? {
+                status:
+                  item.probExtendStatus === "Extended"
+                    ? "Pending"
+                    : item.hrName
+                    ? "Approved"
+                    : "Pending",
+              }
+            : {}),
         };
       })
       .filter(Boolean)
@@ -156,7 +249,8 @@ export const ProbationReview = () => {
         if (a.status !== "Pending" && b.status === "Pending") return 1;
         return 0;
       });
-    return sortedData.map(({ lastDate, ...rest }) => rest);
+
+    return sortedData?.map(({ lastDate, ...rest }) => rest);
   };
 
   useEffect(() => {
@@ -182,9 +276,35 @@ export const ProbationReview = () => {
   const handleDownload = () => {
     closeModal();
     if (selectedPerson) {
-      navigate("/probForm", { state: { employeeData: selectedPerson } });
+      navigate("/probReviewForm", { state: { employeeData: selectedPerson } });
     }
   };
+
+  useEffect(() => {
+    if (selectedPerson) {
+      const empRecords = allData.filter(
+        (item) => item.empID === selectedPerson.empID
+      );
+
+      // Filter out records where probExtendStatus === "item.probExtendStatus"
+      const filteredRecords = empRecords.filter(
+        (item) => item.probExtendStatus !== "probup"
+      );
+
+      // Check if any remaining records have "extended" or "completed"
+      const hasExtended = filteredRecords.some(
+        (item) =>
+          item.probExtendStatus?.trim().toLowerCase() === "extended" ||
+          item.probExtendStatus?.trim().toLowerCase() === "completed"
+      );
+
+      if (hasExtended) {
+        setExtenFlag(filteredRecords);
+      } else {
+        setExtenFlag([]);
+      }
+    }
+  }, [allData, selectedPerson]);
 
   const handleDate = (e, type) => {
     const value = e.target.value;
@@ -195,31 +315,34 @@ export const ProbationReview = () => {
     const start = type === "startDate" ? value : startDate;
     const end = type === "endDate" ? value : endDate;
 
-    if (!start && !end) {
-      setFilteredData([]);
-      return;
-    }
-
+    // Always filter from the original data
     const filtered = originalTableBody.filter((item) => {
-      // Convert probationEndDate (DD-MM-YYYY) back to Date object for comparison
+      if (!item.probationEndDate || item.probationEndDate === "-") return false;
+
       const [day, month, year] = item.probationEndDate.split("-");
       const probationEnd = new Date(`${year}-${month}-${day}`);
 
       const startDateObj = start ? new Date(start) : null;
       const endDateObj = end ? new Date(end) : null;
 
-      if (startDateObj && endDateObj) {
-        return probationEnd >= startDateObj && probationEnd <= endDateObj;
-      } else if (startDateObj) {
-        return probationEnd >= startDateObj;
-      } else if (endDateObj) {
-        return probationEnd <= endDateObj;
+      // If both dates are empty, include all items
+      if (!startDateObj && !endDateObj) return true;
+
+      // Filter logic
+      let includeItem = true;
+      if (startDateObj) {
+        includeItem = includeItem && probationEnd >= startDateObj;
       }
-      return true;
+      if (endDateObj) {
+        includeItem = includeItem && probationEnd <= endDateObj;
+      }
+
+      return includeItem;
     });
 
     setTableBody(filtered);
   };
+
   return (
     <div>
       <FilterTable
@@ -234,44 +357,117 @@ export const ProbationReview = () => {
 
       {selectedPerson && (
         <div className="fixed inset-0 center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+          <div className="bg-white p-6 rounded-lg overflow-y-auto max-h-[80vh] shadow-lg w-1/3">
             <section className="flex justify-between gap-10 items-center mb-5">
-              <div className="w-full flex-1  center">
-                <img className="max-w-[200px] " src={logo} alt="Logo" />
+              <div className="w-full flex-1 center">
+                <img className="max-w-[200px]" src={logo} alt="Logo" />
               </div>
               <button className="text-[24px] rounded" onClick={closeModal}>
                 <VscClose />
               </button>
             </section>
+
             <h2 className="text-xl font-semibold underline text-center mb-5">
               Person Details
             </h2>
-            <p className="flex justify-between mb-2">
-              <strong>Name:</strong> {selectedPerson.name}
-            </p>
-            <p className="flex justify-between mb-2">
-              <strong>Emp ID:</strong> {selectedPerson.empID}
-            </p>
-            <p className="flex justify-between mb-2">
-              <strong>Emp Badge No:</strong> {selectedPerson.empBadgeNo}
-            </p>
-            <p className="flex justify-between mb-2">
-              <strong>Position:</strong> {selectedPerson.position}
-            </p>
-            <p className="flex justify-between mb-2">
-              <strong>Department:</strong> {selectedPerson.department}
-            </p>
-            <p className="flex justify-between mb-2">
-              <strong>Date Of Join:</strong> {selectedPerson.dateOfJoin}
-            </p>
-            <p className="flex justify-between mb-2">
-              <strong>Probation End Date:</strong>{" "}
-              {selectedPerson.probationEndDate}
-            </p>
+            <div className="space-y-2 text-sm font-semibold px-12">
+              <div className="flex">
+                <span className="w-40">Badge No</span>
+                <span className="w-4 text-center">:</span>
+                <span className="flex-1 text-[#666666]">
+                  {selectedPerson.name}
+                </span>
+              </div>
 
-            <div className="flex justify-evenly items-center p-3">
-              <button className="primary_btn" onClick={handleDownload}>
-                Go to Probation Form
+              <div className="flex">
+                <span className="w-40">Emp Badge No</span>
+                <span className="w-4 text-center">:</span>
+                <span className="flex-1 text-[#666666]">
+                  {selectedPerson.empBadgeNo}
+                </span>
+              </div>
+
+              <div className="flex">
+                <span className="w-40">Date of Join</span>
+                <span className="w-4 text-center">:</span>
+                <span className="flex-1 text-[#666666]">
+                  {selectedPerson.dateOfJoin}
+                </span>
+              </div>
+
+              <div className="flex">
+                <span className="w-40">Position</span>
+                <span className="w-4 text-center">:</span>
+                <span className="flex-1 text-[#666666]">
+                  {selectedPerson.position === "OTHER"
+                    ? selectedPerson.otherPosition
+                    : selectedPerson.position}
+                </span>
+              </div>
+
+              <div className="flex">
+                <span className="w-40">Department</span>
+                <span className="w-4 text-center">:</span>
+                <span className="flex-1 text-[#666666]">
+                  {selectedPerson.department === "OTHER"
+                    ? selectedPerson.otherDepartment
+                    : selectedPerson.department}
+                </span>
+              </div>
+            </div>
+
+            {extenFlag.length > 0 && (
+              <div className="mt-6 center">
+                <div className="mt-6 border border-lite_grey h-auto w-[400px] p-4 rounded">
+                  <div className="text-center mb-4">
+                    <span className="text-base font-semibold">
+                      Probation Extension History
+                    </span>
+                  </div>
+
+                  <div className="center">
+                    <table className="border border-[#D3D3D3] rounded-md shadow-sm">
+                      <thead>
+                        <tr className="bg-[#E5E5E5] text-xs">
+                          <th className="text-center px-6 py-2 border-r border-[#D3D3D3]">
+                            No of time
+                          </th>
+                          <th className="text-center px-6 py-2">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...extenFlag]
+                          .sort(
+                            (a, b) =>
+                              new Date(b.prevProbExDate) -
+                              new Date(a.prevProbExDate)
+                          )
+                          .map((record, index) => (
+                            <tr
+                              key={index}
+                              className="text-xs border-t border-[#F0F0F0] text-center"
+                            >
+                              <td className="px-6 py-2 border-r border-[#F0F0F0]">
+                                {index + 1}
+                              </td>
+                              <td className="px-6 py-2">
+                                {formatDate(record.prevProbExDate)}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-center items-center py-6 px-4">
+              <button
+                className="bg-primary text-sm font-bold py-2 px-6 text-dark_grey rounded-md"
+                onClick={handleDownload}
+              >
+                Go to <strong>Probation</strong> Form
               </button>
             </div>
           </div>

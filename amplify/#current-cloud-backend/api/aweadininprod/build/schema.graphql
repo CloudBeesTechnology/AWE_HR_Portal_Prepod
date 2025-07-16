@@ -10,6 +10,13 @@ type ContractForm @aws_iam @aws_api_key {
   remarkHr: String
   remarkGm: String
   renewalContract: String
+  managerDate: String
+  hrmDate: String
+  gmDate: String
+  extendedStatus: String
+  oldCED: String
+  hrSign: String
+  hrDate: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -1053,6 +1060,13 @@ input ModelContractFormFilterInput {
   remarkHr: ModelStringInput
   remarkGm: ModelStringInput
   renewalContract: ModelStringInput
+  managerDate: ModelStringInput
+  hrmDate: ModelStringInput
+  gmDate: ModelStringInput
+  extendedStatus: ModelStringInput
+  oldCED: ModelStringInput
+  hrSign: ModelStringInput
+  hrDate: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelContractFormFilterInput]
@@ -1156,6 +1170,13 @@ input ModelContractFormConditionInput {
   remarkHr: ModelStringInput
   remarkGm: ModelStringInput
   renewalContract: ModelStringInput
+  managerDate: ModelStringInput
+  hrmDate: ModelStringInput
+  gmDate: ModelStringInput
+  extendedStatus: ModelStringInput
+  oldCED: ModelStringInput
+  hrSign: ModelStringInput
+  hrDate: ModelStringInput
   and: [ModelContractFormConditionInput]
   or: [ModelContractFormConditionInput]
   not: ModelContractFormConditionInput
@@ -1175,6 +1196,13 @@ input CreateContractFormInput {
   remarkHr: String
   remarkGm: String
   renewalContract: String
+  managerDate: String
+  hrmDate: String
+  gmDate: String
+  extendedStatus: String
+  oldCED: String
+  hrSign: String
+  hrDate: String
 }
 
 input UpdateContractFormInput {
@@ -1189,6 +1217,13 @@ input UpdateContractFormInput {
   remarkHr: String
   remarkGm: String
   renewalContract: String
+  managerDate: String
+  hrmDate: String
+  gmDate: String
+  extendedStatus: String
+  oldCED: String
+  hrSign: String
+  hrDate: String
 }
 
 input DeleteContractFormInput {
@@ -1333,6 +1368,13 @@ input ModelSubscriptionContractFormFilterInput {
   remarkHr: ModelSubscriptionStringInput
   remarkGm: ModelSubscriptionStringInput
   renewalContract: ModelSubscriptionStringInput
+  managerDate: ModelSubscriptionStringInput
+  hrmDate: ModelSubscriptionStringInput
+  gmDate: ModelSubscriptionStringInput
+  extendedStatus: ModelSubscriptionStringInput
+  oldCED: ModelSubscriptionStringInput
+  hrSign: ModelSubscriptionStringInput
+  hrDate: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionContractFormFilterInput]

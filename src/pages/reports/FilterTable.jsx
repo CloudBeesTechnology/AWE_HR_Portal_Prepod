@@ -11,7 +11,6 @@ export const FilterTable = ({
   tableBody,
   tableHead,
   title,
-  allData,
   handleViewDetails,
   handleDate,
   startDate,
@@ -114,7 +113,6 @@ export const FilterTable = ({
     setCurrentPage(1);
   };
 
-  // Rest of your code remains the same...
   const downloadExcel = () => {
     const formatKey = (key) => {
       return key
@@ -175,7 +173,7 @@ export const FilterTable = ({
     }
 
     worksheet.addRow(dateRow);
-    worksheet.addRow([]); // Add another blank row for spacing
+    worksheet.addRow([]); 
 
     // Add header row with formatted keys
     const tableHeader = Object.keys(processedData[0]).map(formatKey);
@@ -198,7 +196,7 @@ export const FilterTable = ({
         horizontal: "center",
         vertical: "middle",
         wrapText: true,
-      }; // Center alignment with wrap text
+      }; 
     });
 
     // Apply styles for all data rows
@@ -254,6 +252,7 @@ export const FilterTable = ({
             placeholder="Search"
             value={searchQuery}
             onChange={handleSearchChange}
+   
             className="outline-none rounded-lg px-4 py-2 shadow-md border border-[#C5C5C5] text-grey"
           />
           <div className=" absolute right-3 top-2 bg-white text-[24px]">
@@ -344,7 +343,7 @@ export const FilterTable = ({
       {currentItems?.length > 0 ? (
         <div>
           <div className="w-full overflow-x-auto overflow-y-auto h-[500px] shadow-lg my-5">
-            <table className=" border-collapse w-full">
+            <table className=" border-collapse w-full"> 
               <thead className="w-full sticky top-0">
                 <tr className="bg-[#939393] rounded-sm">
                   {tableHead.map((head, idx) => (

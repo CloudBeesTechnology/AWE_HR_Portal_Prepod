@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import logo from "../../assets/logo/logo-with-name.svg";
 import { ConfirmationForm } from "./ConfirmationForm";
 import { ContractChoose } from "./ContractChoose";
 import { Link, useLocation } from "react-router-dom";
@@ -18,7 +17,7 @@ import { FaArrowLeft, FaSave, FaPrint, FaDownload } from "react-icons/fa";
 import { useTempID } from "../../utils/TempIDContext";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { useReactToPrint } from "react-to-print";
-import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
+import logo from "../../assets/logo/logo-with-name.svg";
 
 export const ProbationForm = ({ userID, userType }) => {
   const location = useLocation();
@@ -30,6 +29,7 @@ export const ProbationForm = ({ userID, userType }) => {
   const { UpdateProb } = UpdateProbForm();
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isExtended, setIsExtended] = useState(false);
   const { empPIData, workInfoData, ProbFData } = useContext(DataSupply);
 
   const [emailData, setEmailData] = useState({
@@ -45,11 +45,9 @@ export const ProbationForm = ({ userID, userType }) => {
     skilledAndUnskilled: null,
   });
 
-
-  const [userDetails, setUserDetails] = useState([]);
-  const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [formData, setFormData] = useState({
     probData: {
+      id: "",
       adaptability: "",
       additionalInfo: "",
       attention: "",
@@ -89,6 +87,7 @@ export const ProbationForm = ({ userID, userType }) => {
       createdAt: "",
       commitmentDetails: "",
       extendDate: "",
+      probExtendStatus: "Review",
     },
   });
   const [notification, setNotification] = useState(false);
@@ -98,7 +97,6 @@ export const ProbationForm = ({ userID, userType }) => {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(probationFormSchema),
@@ -112,25 +110,21 @@ export const ProbationForm = ({ userID, userType }) => {
   let probationMonthYear = "Invalid Date";
 
   if (probationEndDateStr) {
-    const [day, month, year] = probationEndDateStr.split("-");
-    const parsedDate = new Date(`${year}-${month}-${day}`); 
+    const separator = probationEndDateStr.includes("/") ? "/" : "-";
+    const [day, month, year] = probationEndDateStr.split(separator);
+
+    const isoDateStr = `${year}-${month}-${day}`;
+    const parsedDate = new Date(isoDateStr);
 
     if (!isNaN(parsedDate)) {
       probationMonthYear = parsedDate.toLocaleDateString("en-US", {
         month: "long",
         year: "numeric",
       });
+    } else {
     }
+  } else {
   }
-
-  const [personalInfo, setPersonalInfo] = useState(null);
-  const { personalInfo: fetchedPersonalInfo } = useEmployeePersonalInfo(userID);
-
-  useEffect(() => {
-    if (fetchedPersonalInfo) {
-      setPersonalInfo(fetchedPersonalInfo);
-    }
-  }, [fetchedPersonalInfo]);
 
   useEffect(() => {
     if (!workInfoData.length || !empPIData.length || !employeeData?.empID) {
@@ -166,7 +160,7 @@ export const ProbationForm = ({ userID, userType }) => {
             managerName: managerInfo.name,
           }));
         } else {
-          // console.log("Manager Info not found.");
+          console.log("Manager Info not found.");
         }
       }
 
@@ -182,12 +176,11 @@ export const ProbationForm = ({ userID, userType }) => {
             supervisorName: supervisorInfo.name,
           }));
         } else {
-          // console.log("Supervisor Info not found.");
+          console.log("Supervisor Info not found.");
         }
       }
 
       if (workInfo.skillPool) {
-        // console.log("Work info",workInfo)
         if (
           workInfo.skillPool.includes("SKILLED") ||
           workInfo.skillPool.includes("UNSKILLED")
@@ -205,8 +198,6 @@ export const ProbationForm = ({ userID, userType }) => {
         )
       );
 
-      // console.log("Filtered GENERAL MANAGER Positions:", generalManagerPositions);
-
       if (generalManagerPositions?.length > 0) {
         const gmEmails = [];
         const gmName = [];
@@ -223,100 +214,52 @@ export const ProbationForm = ({ userID, userType }) => {
               gmOfficialMail: gmEmails,
               gmName: gmName,
             }));
-            // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
           } else {
-            // console.log("GM Info not found.");
+            console.log("GM Info not found.");
           }
         });
       } else {
-        // console.log("No General Manager positions found.");
+        console.log("No General Manager positions found.");
       }
     } else {
-      // console.log("No work info found for employee ID:", employeeData?.empID);
+      console.log("No work info found for employee ID:", employeeData?.empID);
     }
   }, [workInfoData, employeeData?.empID, empPIData]);
 
-  useEffect(() => {
-    // console.log("Email Data has changed:", emailData);
-  }, [emailData]);
+  useEffect(() => {}, [emailData]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const mergedData = empPIData
-          .map((emp) => {
-            const WIDetails = workInfoData
-              ? workInfoData.find((user) => user.empID === emp.empID)
-              : {};
-            const provDetails = ProbFData
-              ? ProbFData.find((user) => user.empID === emp.empID)
-              : {};
-
-            return {
-              ...emp,
-              ...WIDetails,
-              ...provDetails,
-            };
-          })
-          .filter(Boolean);
-
-        setUserDetails(mergedData);
-        setAllEmpDetails(mergedData);
-      } catch (err) {
-        // console.log(err);
-      }
-    };
-    fetchData();
-  }, [empPIData, workInfoData, ProbFData]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const mergedData = empPIData.map((emp) => {
-          const WIDetails =
-            workInfoData?.find((user) => user.empID === emp.empID) || {};
-          const provDetails =
-            ProbFData?.find((user) => user.empID === emp.empID) || {};
-
-          return {
-            ...emp,
-            ...WIDetails,
-            ...provDetails,
-          };
-        });
-        setUserDetails(mergedData);
-      } catch (err) {
-        // console.error("Error fetching data:", err);
-      }
-    };
-    fetchData();
-  }, [empPIData, workInfoData, ProbFData]);
-
-  // auto fetch
   useEffect(() => {
     if (ProbFData.length === 0 || !employeeData?.empID) {
-      // console.log(
-      //   ProbFData.length === 0 ? "No data in ProbFData" : "No employee ID found"
-      // );
       return;
     }
 
-    const fetchedProbData = ProbFData.find(
+    // Filter records with matching empID
+    const matchedRecords = ProbFData.filter(
       (data) => data.empID === employeeData.empID
     );
 
-    if (!fetchedProbData) {
-      // console.log("No matching contract data found");
+    if (matchedRecords.length === 0) {
       return;
     }
 
-    const defaultFormData = Object.keys(fetchedProbData).reduce((acc, key) => {
-      acc[key] = fetchedProbData[key] || "";
+    // Find record that matches both empID and probCreatedAt
+    const targetRecord = matchedRecords.find(
+      (record) => record.createdAt === employeeData.probCreatedAt
+    );
+
+    if (!targetRecord) {
+      return;
+    }
+
+    const defaultFormData = Object.keys(targetRecord).reduce((acc, key) => {
+      acc[key] = targetRecord[key] || "";
       return acc;
     }, {});
 
+
     setFormData({ probData: defaultFormData });
-  }, [ProbFData, employeeData?.empID]);
+    setIsExtended(defaultFormData.probExtendStatus === "Extended");
+  }, [ProbFData, employeeData?.empID, employeeData?.probCreatedAt]);
 
   const handleInputChange = (e) => {
     if (!e.target) {
@@ -333,57 +276,28 @@ export const ProbationForm = ({ userID, userType }) => {
     }));
   };
 
+  const handleCheckboxChange = (e) => {
+    const { checked } = e.target;
+    setIsExtended(checked);
+    setFormData((prevState) => ({
+      ...prevState,
+      probData: {
+        ...prevState.probData,
+        probExtendStatus: checked ? "Extended" : "Not Extended",
+      },
+    }));
+  };
+
   const from = "hr_no-reply@adininworks.com";
   const gmSubject = "Probation Assessment Review";
   const hrSubject = "Probation Period Expiry Notification";
-  // const to = "hariharanofficial2812@gmail.com"
-
-  // console.log("EmailData", emailData);
-
+ 
   const onSubmit = async (data) => {
+    console.log("Data", data);
     setIsLoading(true);
     try {
-      const PFDataRecord = ProbFData.find(
-        (match) => match.empID === data.empID
-      );
-      const empPIRecord = empPIData.find((match) => match.empID === data.empID);
-      const WorkInfoRecord = workInfoData.find(
-        (match) => match.empID === data.empID
-      );
-      const probationEndFormatted =
-        Array.isArray(WorkInfoRecord.probationEnd) &&
-        WorkInfoRecord.probationEnd.length > 0
-          ? WorkInfoRecord.probationEnd[WorkInfoRecord.probationEnd.length - 1]
-              .split("-")
-              .reverse()
-              .join("/")
-          : "Not mentioned";
-
-      const subject = "Probation Assessment Review";
-
-      const notifyMessageSup = `Your Employee Mr./Ms. ${
-        empPIRecord?.name
-      }'s probation period ending on ${
-        probationEndFormatted || "Not Mentioned"
-      } has been ${
-        data?.supervisorApproved || PFDataRecord?.supervisorApproved
-      } by Supervisor, ${PDInfo || "Not Mentioned"}.`;
-
-      const notifyMessageManager = `Your Employee Mr./Ms. ${
-        empPIRecord?.name
-      }'s probation period ending on ${probationEndFormatted || "Not Mentioned"}
-      has been reviewed and ${
-        data?.managerApproved || PFDataRecord?.managerApproved
-      } by the Manager, ${emailData?.managerName || "Not Mentioned"}.`;
-
-      const notifyMessageGM = `Your Employee Mr./Ms. ${
-        empPIRecord?.name
-      }'s probation period ending on ${probationEndFormatted || "Not Mentioned"}
-      has been reviewed and ${
-        data?.gmApproved || PFDataRecord?.gmApproved
-      } by the General Manager, ${emailData?.managerName || "Not Mentioned"}.`;
-
       const probFields = [
+        "id",
         "adaptability",
         "additionalInfo",
         "attention",
@@ -424,6 +338,8 @@ export const ProbationForm = ({ userID, userType }) => {
         "commitmentDetails",
         "probStatus",
         "createdAt",
+        "probExtendStatus",
+        "prevProbExDate",
       ];
 
       const formDataValues = probFields.reduce((acc, field) => {
@@ -431,10 +347,59 @@ export const ProbationForm = ({ userID, userType }) => {
         return acc;
       }, {});
 
+      const PFDataRecord = ProbFData.find(
+        (match) => match.id === formDataValues.id
+      );
+
+
+      const empPIRecord = empPIData.find((match) => match.empID === data.empID);
+      const WorkInfoRecord = workInfoData.find(
+        (match) => match.empID === data.empID
+      );
+      const probationEndFormatted =
+        Array.isArray(WorkInfoRecord.probationEnd) &&
+        WorkInfoRecord.probationEnd.length > 0
+          ? WorkInfoRecord.probationEnd[WorkInfoRecord.probationEnd.length - 1]
+              .split("-")
+              .reverse()
+              .join("/")
+          : "Not mentioned";
+
+      const prevProbDate =
+        Array.isArray(WorkInfoRecord.probationEnd) &&
+        WorkInfoRecord.probationEnd.length > 0
+          ? WorkInfoRecord.probationEnd[WorkInfoRecord.probationEnd.length - 1]
+          : "Not mentioned";
+
+      const subject = "Probation Assessment Review";
+
+      const notifyMessageSup = `Your Employee Mr./Ms. ${
+        empPIRecord?.name
+      }'s probation period ending on ${
+        probationEndFormatted || "Not Mentioned"
+      } has been ${
+        data?.supervisorApproved || PFDataRecord?.supervisorApproved
+      } by Supervisor, ${PDInfo || "Not Mentioned"}.`;
+
+      const notifyMessageManager = `Your Employee Mr./Ms. ${
+        empPIRecord?.name
+      }'s probation period ending on ${probationEndFormatted || "Not Mentioned"}
+      has been reviewed and ${
+        data?.managerApproved || PFDataRecord?.managerApproved
+      } by the Manager, ${emailData?.managerName || "Not Mentioned"}.`;
+
+      const notifyMessageGM = `Your Employee Mr./Ms. ${
+        empPIRecord?.name
+      }'s probation period ending on ${probationEndFormatted || "Not Mentioned"}
+      has been reviewed and ${
+        data?.gmApproved || PFDataRecord?.gmApproved
+      } by the General Manager, ${emailData?.managerName || "Not Mentioned"}.`;
+
       if (PFDataRecord) {
         const formattedData = {
           id: PFDataRecord.id,
           ...formDataValues,
+          prevProbExDate: probationEndFormatted,
           probStatus: true,
         };
 
@@ -444,7 +409,18 @@ export const ProbationForm = ({ userID, userType }) => {
           formData.probData.supervisorApproved === null &&
           supervisorCheck === true
         ) {
-          alert("Supervisor Approval required!");
+          alert("Supervisor approval or rejection required!");
+          setIsLoading(false);
+          return;
+        }
+
+        if (
+          userType === "Manager" &&
+          gmPosition !== GM &&
+          HRMPosition !== "HR MANAGER" &&
+          !formData.probData.managerName
+        ) {
+          alert("Manager name is required!");
           setIsLoading(false);
           return;
         }
@@ -455,7 +431,7 @@ export const ProbationForm = ({ userID, userType }) => {
           HRMPosition !== "HR MANAGER" &&
           formData.probData.managerApproved === null
         ) {
-          alert("Manager Approval or Rejection is required!");
+          alert("Manager approval or rejection is required!");
           setIsLoading(false);
           return;
         }
@@ -464,36 +440,42 @@ export const ProbationForm = ({ userID, userType }) => {
           userType === "Manager" &&
           gmPosition !== GM &&
           HRMPosition !== "HR MANAGER" &&
-          formData.probData.managerDate === null
+          !formData.probData.managerDate
         ) {
-          alert("Manager date is is required!");
+          alert("Manager date is required!");
           setIsLoading(false);
           return;
         }
 
         if (gmPosition === GM && formData.probData.managerApproved === null) {
-          alert("Manager Approval or Rejection is required!");
+          alert("Manager approval or rejection is required!");
           setIsLoading(false);
           return;
         }
 
-        if (gmPosition === GM && formData.probData.gmApproved === null) {
-          alert("GM Approval or Rejection is required!");
+        if (gmPosition === GM && formData.probData.gmName === null) {
+          alert("GM name is required!");
           setIsLoading(false);
           return;
         }
 
-        if (gmPosition === GM && formData.probData.gmDate === null) {
-          alert("GM date is is required!");
+        if (gmPosition === GM && !formData.probData.gmApproved) {
+          alert("GM approval or rejection is required!");
+          setIsLoading(false);
+          return;
+        }
+
+        if (gmPosition === GM && !formData.probData.gmDate) {
+          alert("GM date is required!");
           setIsLoading(false);
           return;
         }
 
         if (
           HRMPosition === "HR MANAGER" &&
-          formData.probData.gmApproved === null
+          !formData.probData.gmApproved
         ) {
-          alert("GM Approval or Rejection is required!");
+          alert("GM approval or rejection is required!");
           setIsLoading(false);
           return;
         }
@@ -504,8 +486,8 @@ export const ProbationForm = ({ userID, userType }) => {
           return;
         }
 
-        if (HRMPosition === "HR MANAGER" && formData.probData.hrDate === null) {
-          alert("HR date is is required!");
+        if (HRMPosition === "HR MANAGER" && !formData.probData.hrDate) {
+          alert("HR date is required!");
           setIsLoading(false);
           return;
         }
@@ -520,8 +502,6 @@ export const ProbationForm = ({ userID, userType }) => {
           setShowTitle("Probation form updated successfully");
         }, 1000);
 
-        // console.log("update", formattedData);
-
         sendEmails(
           data,
           empPIRecord,
@@ -533,14 +513,20 @@ export const ProbationForm = ({ userID, userType }) => {
           notifyMessageGM
         );
       } else {
-        const ProbValue = { ...data, ...formDataValues, probStatus: true };
+        const ProbValue = {
+          ...data,
+          ...formDataValues,
+          probStatus: true,
+          prevProbExDate: prevProbDate,
+          probExtendStatus: "In Probation",
+        };
 
         if (
           userType === "Supervisor" &&
           !formData.probData.supervisorApproved &&
           !formData.probData.supervisorDate
         ) {
-          alert("Supervisor approval or Rejection and date is is required!");
+          alert("Supervisor approval or Rejection and date is required!");
           setIsLoading(false);
           return;
         }
@@ -575,13 +561,13 @@ export const ProbationForm = ({ userID, userType }) => {
           HRMPosition !== "HR MANAGER" &&
           !formData.probData.managerDate
         ) {
-          alert("Manager date is is required!");
+          alert("Manager date is required!");
           setIsLoading(false);
           return;
         }
 
         await ProbFormsData({ ProbValue });
-        // console.log("CR");
+        // console.log("CR", ProbValue);
 
         setIsLoading(false);
 
@@ -590,7 +576,6 @@ export const ProbationForm = ({ userID, userType }) => {
           setShowTitle("Probation form created successfully");
         }, 1000);
 
-        // console.log("create");
         sendEmails(
           data,
           empPIRecord,
@@ -600,16 +585,12 @@ export const ProbationForm = ({ userID, userType }) => {
           notifyMessageManager,
           notifyMessageGM
         );
-
-        // console.log("Created", ProbValue);
       }
     } catch (err) {
       setIsLoading(false);
       console.error("Error submitting form:", err);
     }
   };
-
-  // console.log("EmailData", emailData)
 
   const sendEmails = async (
     data,
@@ -656,8 +637,6 @@ export const ProbationForm = ({ userID, userType }) => {
       }
 
       if (userType === "Manager" && gmPosition !== GM) {
-        // console.log("GM block");
-
         // Sending email to GM if applicable
         if (emailData.skilledAndUnskilled === null) {
           if (Array.isArray(emailData.gmOfficialMail)) {
@@ -727,8 +706,6 @@ export const ProbationForm = ({ userID, userType }) => {
           // alert(`Email sent successfully to HR's mail: ${emailData.hrOfficialmail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name || "Not mentioned"}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been reviewed and ${data?.managerApproved || PFDataRecord.managerApproved} by the Manager, ${emailData?.managerName || "Not Mentioned"}.\n\nPlease proceed with the necessary actions.`);
         }
       } else if (gmPosition === GM) {
-        // console.log("HR Block");
-
         // Sending email to HR if GM position is set
         await sendEmail(
           hrSubject,
@@ -778,7 +755,7 @@ export const ProbationForm = ({ userID, userType }) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDownloading(true);
-    // Hide buttons before download
+
     const editButton = document.getElementById("left-button");
     const downloadButton = document.getElementById("download-button");
     const printButton = document.getElementById("print-button");
@@ -789,7 +766,6 @@ export const ProbationForm = ({ userID, userType }) => {
     if (printButton) printButton.style.visibility = "hidden";
     if (saveButton) saveButton.style.visibility = "hidden";
 
-    // Wait for the PDF to be generated, then restore the buttons.
     ProbDownload("capture-section");
 
     setTimeout(() => {
@@ -809,7 +785,7 @@ export const ProbationForm = ({ userID, userType }) => {
             {`
       @media print {
         @page {
-          size: A4 portrait;
+          // size: A4 portrait;
           margin: 0.2cm;
         }
         
@@ -892,8 +868,6 @@ export const ProbationForm = ({ userID, userType }) => {
                 name="deadline"
                 {...register("deadline")}
                 value={formData.probData.deadline || employeeData?.deadline}
-                // {...register("deadline")}
-                // value={formData.probData.deadline}
                 onChange={handleInputChange}
                 className="border-b border-black outline-none px-1"
               />
@@ -923,7 +897,6 @@ export const ProbationForm = ({ userID, userType }) => {
                     Employee ID
                   </td>
                   <td className="p-2 border-b">
-                    {/* Displaying employee name and registering the input */}
                     <input
                       {...register("empID")}
                       defaultValue={employeeData?.empID || ""}
@@ -936,7 +909,6 @@ export const ProbationForm = ({ userID, userType }) => {
                     Badge Number
                   </td>
                   <td className="p-2 border-b">
-                    {/* Displaying employee name and registering the input */}
                     <input
                       {...register("empBadgeNo")}
                       defaultValue={employeeData?.empBadgeNo || ""}
@@ -1007,16 +979,6 @@ export const ProbationForm = ({ userID, userType }) => {
                     />
                   </td>
                 </tr>
-                {/* <tr className="border">
-              <td className="p-2 border-r font-semibold">Extended Probation End Date</td>
-              <td className="p-2 border-b">
-              <input
-                {...register("extendedProbationEndDate")}
-                defaultValue={employeeData?.extendedPED || "-"}
-                className="w-full outline-none"
-              />
-            </td>
-            </tr> */}
               </tbody>
             </table>
           </div>
@@ -1036,17 +998,12 @@ export const ProbationForm = ({ userID, userType }) => {
             errors={errors}
             userType={userType}
             gmPosition={gmPosition}
+            HRMPosition={HRMPosition}
+            probData={ProbFData}
+            handleCheckboxChange={handleCheckboxChange}
+            isExtended={isExtended}
           />
 
-          {/* Save Button */}
-          {/* <div className="flex items-center justify-center mt-8">
-        {userType !== "SuperAdmin" && (
-          <button disabled={isLoading} type="submit" className="primary_btn">
-            {isLoading ? "Loading..." : "Save"}{" "}
-        
-          </button>
-        )}
-      </div> */}
           {userType !== "SuperAdmin" && (
             <div className="flex justify-center gap-4 py-8 no-print-parent text-center">
               {isDownloading ? (
@@ -1073,8 +1030,6 @@ export const ProbationForm = ({ userID, userType }) => {
                       </>
                     )}
                   </button>
-
-                  {/* Print & Download only if genManager is not set */}
 
                   <>
                     {/* Download Button */}
