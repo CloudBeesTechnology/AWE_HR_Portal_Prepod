@@ -43,10 +43,6 @@ export const Reports = () => {
 
   const reportPermissions = usePermission("userID", "Report");
 
-  IVSSDetails.forEach((employee) => {
-    if (employee.tempID === "TEMP015") {
-    }
-  });
   const [mergedData, setMergeData] = useState([]);
   const { mergedProbData } = useProbData();
   const navigate = useNavigate();
@@ -86,8 +82,6 @@ export const Reports = () => {
     { title: "Leave Passage", icon: leavePass, path: "/leavePass" },
     { title: "Promotion", icon: promotion, path: "/promotion" },
   ];
-
-  const filteredReportTiles = reportTiles.filter((tile) => tile.show !== false);
 
   useEffect(() => {
     if (!empPIData || empPIData.length === 0) return;
