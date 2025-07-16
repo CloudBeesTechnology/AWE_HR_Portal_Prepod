@@ -294,7 +294,7 @@ export const FilterTable = ({
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <label
                   htmlFor="test-date"
                   className="block text-[16px] font-medium"
@@ -308,7 +308,7 @@ export const FilterTable = ({
                   onChange={(e) => setTestDate(e.target.value)}
                   className="outline-none text-grey border rounded-md p-2"
                 />
-              </div>
+              </div> */}
             </div>
           )}
 
