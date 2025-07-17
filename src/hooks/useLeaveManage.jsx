@@ -100,8 +100,6 @@ export const useLeaveManage = () => {
           ...response.data.listEmpLeaveDetails.items,
         ];
 
-        // console.log("LeaveDetails", allEmpLeaveDetails);
-
         nextTokenEmpLeaveDetails = response.data.listEmpLeaveDetails.nextToken;
       } while (nextTokenEmpLeaveDetails);
 
@@ -141,10 +139,13 @@ export const useLeaveManage = () => {
       const mergedLeaveData = allLeaveStatuses.map((leaveStatus) => {
         const empInfo = empInfoMap[leaveStatus.empID] || {};
         const workInfo = workInfoMap[leaveStatus.empID] || {};
+
         const leaveDetails = leaveDetailsMap[leaveStatus.empID] || {};
-        // console.log(leaveDetails,"sdfghjk");
-        
+
         return {
+          ...leaveStatus,
+          ...leaveDetails,
+          // ...workInfo,
           id: leaveStatus.id,
           empID: leaveStatus.empID,
           empName: empInfo.name,
@@ -172,6 +173,9 @@ export const useLeaveManage = () => {
           empLeaveType: leaveStatus.leaveType,
           position: workInfo.position || "",
           department: workInfo.department || "",
+          workHrs: workInfo?.workHrs || [],
+          workMonth: workInfo?.workMonth || [],
+          workWeek: workInfo?.workWeek || [],
 
           empLeaveStartDate: leaveStatus?.fromDate,
           empLeaveEndDate: leaveStatus?.toDate,
@@ -192,6 +196,7 @@ export const useLeaveManage = () => {
           leaveDetailsUpdatedAt: leaveDetails.updatedAt,
           empsickLeaveTaken: leaveDetails.sickLeaveTaken,
           empSickLeaveDate: leaveDetails.sickLeaveDate,
+          empAnnualLeaveDate: leaveDetails?.annualLeaveDate,
         };
       });
 

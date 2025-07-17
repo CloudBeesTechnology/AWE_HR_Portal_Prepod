@@ -91,7 +91,7 @@ export const UploadBLNGnewFormat = (
 
         function convertExcelDateToBruneiTime(serial) {
           // Excel base: 1899-12-30. Convert serial to UTC
-          const utcMilliseconds = (serial - 25569) * 86400 * 1000;
+          const utcMilliseconds = Math.round((serial - 25569) * 86400 * 1000);
           const bruneiDate = new Date(utcMilliseconds); // Already Brunei time
 
           // Format helper

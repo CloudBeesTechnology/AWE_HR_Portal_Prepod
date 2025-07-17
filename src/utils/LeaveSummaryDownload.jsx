@@ -1,9 +1,9 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import tableLogo from "../assets/logo/aweLogo.png"
+import tableLogo from "../assets/logo/aweLogo.png";
 
 export const LeaveSummaryDownload = () => {
-  const DownloadExcelPDF = (elementID, selectedDate) => {
+  const DownloadExcelPDF = (elementID, selectedDate, leaveSummary) => {
     const input = document.getElementById(elementID);
 
     if (!input) {
@@ -46,14 +46,14 @@ export const LeaveSummaryDownload = () => {
 
         const logoWidth = 30;
         const logoHeight = 0;
-  const logoUrl = tableLogo;
+        const logoUrl = tableLogo;
         // 1. Add Logo
         pdf.addImage(logoUrl, "SVG", margin, margin, logoWidth, logoHeight);
 
         // 2. Add Header Text
         pdf.setFontSize(8);
         pdf.text(
-          `Leave Summary for (${selectedDate})`,
+          `Leave Summary for ${leaveSummary?.employeeName} (${selectedDate})`,
           margin,
           margin + 5 + 5
         );
