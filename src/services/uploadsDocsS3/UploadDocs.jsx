@@ -69,32 +69,6 @@ export const uploadDocString = async (
     // console.log(Error uploading ${fileType}:, error);
   }
 };
-// export const uploadReqString = async (file, fileType, tempID) => {
-//   try {
-//     if (!file) return null; // Skip if no file is provided
-
-//     // Encode file name for URL safety
-//     const encodedFileName = encodeURIComponent(file.name).replace(/%20/g, ' ');
-
-//     // Construct the upload URL for API Gateway
-//     const uploadUrl = `https://gnth2qx5cf.execute-api.ap-southeast-1.amazonaws.com/fileupload/aweadininprod2024954b8-prod/public%2F${fileType}%2F${tempID}%2F${encodedFileName}`;
-
-//     // Upload the file using axios
-//     await axios.put(uploadUrl, file)
-//       .then((res) => {
-//         console.log(res.data.message);
-//       })
-//       .catch((err) => {
-//         console.error("Error uploading file:", err);
-//       });
-
-//     // Generate the uploaded file URL
-//     return `https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/public/${fileType}/${tempID}/${encodedFileName}`;
-//   } catch (error) {
-//     console.error(`Error uploading ${fileType}:`, error);
-//     throw error;
-//   }
-// };
 
 export const uploadReqString = async (file, fileType, tempID) => {
   try {
@@ -102,42 +76,40 @@ export const uploadReqString = async (file, fileType, tempID) => {
       return null;
     }
 
-    // Encode file name for URL safety using encodeURIComponent (handles all special characters)
+    // Encode file name for URL safety
     const encodedFileName = encodeURIComponent(file.name);
 
     // Construct the upload URL for API Gateway
     const uploadUrl = `https://gnth2qx5cf.execute-api.ap-southeast-1.amazonaws.com/fileupload/aweadininprod2024954b8-prod/public%2F${fileType}%2F${tempID}%2F${encodedFileName}`;
 
-    // Upload the file using axios
     await axios
       .put(uploadUrl, file)
       .then((res) => {
-        console.log("Response from API after uploading:", res.data.message);
-        // alert("File uploaded successfully!");
+        console.log("Full response from API:", res);
       })
       .catch((err) => {
-        console.error("Network error uploading file:", err);
+        console.error("Error details:", err);
+
         if (err.response) {
-          alert("The server is having issues. Please try again later.");
+          console.error("Server responded with error status:", err.response?.status);
+          console.error("Server error data:", err.response?.data);
         } else if (err.request) {
-          alert(
-            "Unable to connect to the server. Please check your internet connection."
-          );
+          console.error("No response received from server");
         } else {
-          alert("Something went wrong during the upload. Please try again.");
+          console.error("Error setting up the request");
         }
         throw err;
       });
 
-    // Decode the file name using decodeURIComponent (reverts encoding)
+    // Decode the file name
     const decodedFileName = decodeURIComponent(encodedFileName);
 
-    // Generate the uploaded file URL with the decoded file name
+    // Generate the uploaded file URL
     const uploadedFileUrl = `https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/public/${fileType}/${tempID}/${decodedFileName}`;
-
     return uploadedFileUrl;
   } catch (error) {
-    console.error("Network error uploading file, try again later:", error);
+    console.error("Caught error in uploadReqString:", error);
+    console.error("Error stack:", error.stack);
     throw error;
   }
 };
@@ -220,12 +192,11 @@ export const insClaim = async (
   file,
   fileType,
   setUploadedDocs,
-
   empID,
   index
 ) => {
   try {
-    console.log("Starting upload process...");
+    // console.log("Starting upload process...");
     const currentUser = await getCurrentUser();
 
     if (currentUser) {
@@ -236,16 +207,16 @@ export const insClaim = async (
       const fileUrl = result.path;
       const uploadDate = new Date().toISOString().split("T")[0];
 
-      console.log("File URL:", fileUrl);
-      console.log("Upload Date:", uploadDate);
+      // console.log("File URL:", fileUrl);
+      // console.log("Upload Date:", uploadDate);
 
       // Handling when index is provided
       if (typeof index === "number") {
-        console.log("Updating state at index:", index);
+        // console.log("Updating state at index:", index);
 
         setUploadedDocs((prev) => {
           const updatedUploads = { ...prev };
-          console.log("Previous uploadedDocs:", prev);
+          // console.log("Previous uploadedDocs:", prev);
 
           if (!updatedUploads[fileType]) {
             updatedUploads[fileType] = [];
@@ -258,7 +229,7 @@ export const insClaim = async (
           const existingUpload = updatedUploads[fileType][index].find(
             (item) => item.upload === fileUrl
           );
-          console.log("Existing upload check:", existingUpload);
+          // console.log("Existing upload check:", existingUpload);
 
           if (!existingUpload) {
             updatedUploads[fileType][index].push({
@@ -267,7 +238,7 @@ export const insClaim = async (
             });
           }
 
-          console.log("Updated uploads:", updatedUploads);
+          // console.log("Updated uploads:", updatedUploads);
           return updatedUploads;
         });
       } else {
@@ -287,11 +258,11 @@ export const insClaim = async (
     console.log(`Error uploading ${fileType}:`, error);
   }
 };
+
 export const trainingUp = async (
   file,
   fileType,
   setUploadedDocs,
-
   empID,
   index
 ) => {

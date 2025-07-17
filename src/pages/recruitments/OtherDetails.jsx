@@ -210,6 +210,13 @@ export const OtherDetails = ({ fetchedData }) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    const MAX_FILE_SIZE = 3.5 * 1024 * 1024;
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert("File size must be less than 3.5 MB.");
+      return;
+    }
+
     setValue(type, file);
 
     const fileTypeMapping = {
@@ -470,7 +477,7 @@ export const OtherDetails = ({ fetchedData }) => {
         await candyDetails({ reqValue: updateReqValue })
           .then(() => {
             // setNotification(true);
-            setShowTitle("Your Application Submitted Successfully")
+            setShowTitle("Your Application Submitted Successfully");
             setIsLoading(false);
           })
           .catch((err) => {
@@ -482,7 +489,7 @@ export const OtherDetails = ({ fetchedData }) => {
         await submitODFunc({ reqValue, latestTempIDData })
           .then(() => {
             // setNotification(true);
-            setShowTitle("Your Application Submitted Successfully")
+            setShowTitle("Your Application Submitted Successfully");
             setIsLoading(false);
           })
           .catch((err) => {
@@ -497,6 +504,10 @@ export const OtherDetails = ({ fetchedData }) => {
 
   const requiredPermissions = ["Candidate"];
   const access = "Recruitment";
+
+
+  console.log("tempID:", tempID);
+  console.log("Navigating Education Data:", navigatingEducationData);
 
   return (
     <>
