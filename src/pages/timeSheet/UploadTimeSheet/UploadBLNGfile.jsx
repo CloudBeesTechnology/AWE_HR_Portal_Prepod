@@ -103,7 +103,6 @@ export const UploadBLNGfile = (
           const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
             .toString()
             .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-
           return formattedTime;
         } else if (type === "Avg. Daily Total By Day") {
           const totalMinutes = Math.round(serial * 24 * 60);

@@ -5,6 +5,7 @@ import { FaRegSquareMinus } from "react-icons/fa6";
 import "../../../src/index.css";
 import img from "../../assets/logo/logo-with-name.svg";
 import { SearchDisplayForTimeSheet } from "./timeSheetSearch/SearchDisplayForTS";
+import { JOBCODES, LocationData } from "./customTimeSheet/JobcodeAndLocation";
 
 export const EditTimeSheet = ({
   editObject,
@@ -30,56 +31,6 @@ export const EditTimeSheet = ({
   const [formData, setFormData] = useState({
     fieldObj,
   });
-
-  const JOBCODES = [
-    { id: 1, JOBCODE: "J9001" },
-    { id: 2, JOBCODE: "J9002" },
-    { id: 3, JOBCODE: "J9009M433" },
-    { id: 4, JOBCODE: "J9010M432" },
-    { id: 5, JOBCODE: "J9013M432" },
-    { id: 6, JOBCODE: "J9014" },
-    { id: 7, JOBCODE: "J9026M433" },
-    { id: 8, JOBCODE: "J9027M433" },
-    { id: 9, JOBCODE: "J9028M432" },
-    { id: 10, JOBCODE: "J9032M431" },
-    { id: 11, JOBCODE: "J9036M433" },
-    { id: 12, JOBCODE: "J9037M433" },
-    { id: 13, JOBCODE: "J9038M433" },
-    { id: 14, JOBCODE: "J9040M433" },
-    { id: 15, JOBCODE: "J9041M433" },
-    { id: 16, JOBCODE: "J9043M432" },
-    { id: 17, JOBCODE: "J9057M431" },
-    { id: 18, JOBCODE: "J9063M431" },
-    { id: 19, JOBCODE: "J9064M431" },
-    { id: 20, JOBCODE: "J9068M431" },
-    { id: 21, JOBCODE: "J9069M433" },
-    { id: 22, JOBCODE: "J9070M431" },
-    { id: 23, JOBCODE: "J9071M433" },
-    { id: 24, JOBCODE: "J9072M431" },
-    { id: 25, JOBCODE: "J9073M431" },
-    { id: 26, JOBCODE: "J9074M433" },
-    { id: 27, JOBCODE: "J9075M433" },
-  ];
-
-  const LocationData = [
-    { id: 1, location: "OFFSHORE" },
-    { id: 2, location: "HEAD OFFICE" },
-    { id: 3, location: "ORMC" },
-    { id: 4, location: "SBW" },
-    { id: 5, location: "BLNG" },
-    { id: 6, location: "CREST CENTURION 2" },
-    { id: 7, location: "DAY TRIPPING" },
-    { id: 8, location: "ICON ALIZA" },
-    { id: 9, location: "ICON VALIANT" },
-    { id: 10, location: "KHALIFA" },
-    { id: 11, location: "MASSHOR PRINCESS" },
-    { id: 12, location: "MV FALGOUT" },
-    { id: 13, location: "ACCOUNTS" },
-    { id: 14, location: "HR" },
-    { id: 15, location: "PURCHASING" },
-    { id: 16, location: "CORPORATE" },
-    { id: 17, location: "CPD" },
-  ];
 
   useEffect(() => {
     if (editObject) {
@@ -318,7 +269,6 @@ export const EditTimeSheet = ({
               .padStart(2, "0")}`;
           };
 
-          
           let totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
 
           setFormData((prevFormData) => {
@@ -363,7 +313,6 @@ export const EditTimeSheet = ({
       };
       // End
 
-      
       if (titleName === "HO") {
         updateFormData("TOTALACTUALHOURS", "TOTALACTUALHOURS");
       } else if (titleName === "BLNG") {
@@ -463,6 +412,9 @@ export const EditTimeSheet = ({
       if (!section.LOCATION) {
         newErrors[`LOCATION-${index}`] = "Location is required.";
       }
+      if (!section.WORKINGHRS) {
+        newErrors[`WORKINGHRS-${index}`] = "Working Hrs is required.";
+      }
       // Switch-case style logic using Object.keys
       if (editObject && typeof editObject === "object") {
         Object.keys(editObject).forEach((key) => {
@@ -500,7 +452,7 @@ export const EditTimeSheet = ({
         });
       }
     });
-   
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -624,11 +576,11 @@ export const EditTimeSheet = ({
           empAndWorkInfo,
           editObject?.fileType
         );
-        
+
         let rawDate =
           editObject?.DATE?.trim() || editObject?.ENTRANCEDATEUSED?.trim();
         let formattedDate = convertToYYYYMMDD(rawDate, editObject.fileType);
-        
+
         const currentDay = new Date(formattedDate);
         const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
           weekday: "long",
@@ -655,7 +607,6 @@ export const EditTimeSheet = ({
           const normalizedWorkHrs = convertHHMMtoHH100(formattedWorkHrs);
           const normalizedNormalHrs = normalizeHH100(formattedNWHPD);
 
-         
           if (normalizedWorkHrs > normalizedNormalHrs) {
             alertShown = false;
             if (dayOfWeek === "Saturday" && NWHPD == 8 && NWHPM == 24) {
@@ -908,6 +859,11 @@ export const EditTimeSheet = ({
                         className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto bg-white"
                         readOnly={!section.LOCATION}
                       />
+                      {errors[`WORKINGHRS-${index}`] && (
+                        <span className="text-red text_size_9">
+                          {errors[`WORKINGHRS-${index}`]}
+                        </span>
+                      )}
                     </div>
                     <div className="w-fit">
                       <input

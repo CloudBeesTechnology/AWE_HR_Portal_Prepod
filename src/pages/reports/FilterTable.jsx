@@ -15,6 +15,8 @@ export const FilterTable = ({
   handleDate,
   startDate,
   endDate,
+  testDate,
+  setTestDate,
 }) => {
   const { dropDownVal } = useContext(DataSupply);
   const [searchQuery, setSearchQuery] = useState("");
@@ -119,14 +121,29 @@ export const FilterTable = ({
         .replace(/_/g, " ")
         .toUpperCase();
     };
-
-    const processedData = filteredTableBody.map((row) => {
+    const excludeKeys = [
+      "headStatus",
+      "hrmStatus",
+      "gmStatus",
+      "matchedID",
+      "oldCED","probID", "probCreatedAt", "probExtendStatus" , "prevProbExDate"
+    ];
+   const processedData = filteredTableBody.map((row) => {
       const processedRow = {};
       for (const [key, value] of Object.entries(row)) {
+        if (excludeKeys.includes(key)) continue;
         const formattedKey = formatKey(key);
-        processedRow[formattedKey] = Array.isArray(value)
-          ? value.join(", ")
-          : value;
+        if (key === "contractEndDate") {
+          processedRow[formattedKey] = row.oldCED || "N/A"; // ✅ Use oldCED here
+        } else {
+          processedRow[formattedKey] = Array.isArray(value)
+            ? value.length > 0
+              ? value.join(", ")
+              : "N/A"
+            : (value ?? "") !== ""
+            ? value
+            : "N/A";
+        }
       }
       return processedRow;
     });
@@ -207,7 +224,7 @@ export const FilterTable = ({
       saveAs(blob, `${title}.xlsx`);
     });
   };
-
+  
   const isClickableRow = [
     "Probation Review",
     "Probation Form Update",
@@ -217,7 +234,7 @@ export const FilterTable = ({
   ].includes(title);
 
   return (
-    <div className="w-full px-7 bg-[#F5F6F1CC]">
+   <div className="w-full px-7 bg-[#F5F6F1CC]">
       <div className="w-full flex items-center justify-between gap-5 ">
         <Link to="/reports" className="text-xl flex-1 text-grey ">
           <FaArrowLeft />
@@ -276,6 +293,22 @@ export const FilterTable = ({
                   className="outline-none text-grey border rounded-md p-2"
                 />
               </div>
+
+              {/* <div>
+                <label
+                  htmlFor="test-date"
+                  className="block text-[16px] font-medium"
+                >
+                  Today
+                </label>
+                <input
+                  id="test-date"
+                  type="date"
+                  value={testDate}
+                  onChange={(e) => setTestDate(e.target.value)}
+                  className="outline-none text-grey border rounded-md p-2"
+                />
+              </div> */}
             </div>
           )}
 
@@ -372,9 +405,9 @@ export const FilterTable = ({
                                   : col?.toLowerCase() === "extended"
                                   ? "text-[#339933]"
                                   : col?.toLowerCase() === "not extended"
-                                  ? "text-[#E8A317]" 
+                                  ? "text-[#E8A317]"
                                   : ""
-                                  : ""
+                                : ""
                             }`}
                           >
                             {displayValue}

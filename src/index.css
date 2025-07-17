@@ -284,19 +284,39 @@ input[type="number"] {
   /* width: 100px; */
   /* background-color: #f7f1f1;  */
 }
+
 @media print {
   /* Remove margins to ensure content fills the entire page */
   body {
     margin: 0;
   }
-
   /* Force page breaks for the PDF content */
   .invoice-content {
-    page-break-before: always;  /* Ensures each new page starts with a fresh break */
-    page-break-after: always;   /* Forces a break after each PDF page */
-    break-inside: avoid;        /* Prevents breaking content between pages */
+    page-break-before: always; /* Ensures each new page starts with a fresh break */
+    page-break-after: always; /* Forces a break after each PDF page */
+    break-inside: avoid; /* Prevents breaking content between pages */
   }
 
+  .print-contract-form {
+    page-break-inside: avoid;
+    margin-inline: auto;
+    padding: 0px !important;
+  }
+
+  .print-width {
+    width: 160px;
+  }
+  .print-box {
+    margin: 0 !important;
+    padding: 0px !important;
+    width: 100%;
+  }
+  .print-remark{
+    margin-block: 100px !important;
+  }
+  .print-renewalContract {
+    overflow: hidden;
+  }
   /* Ensure the PDF content doesn't overflow the page */
   .pdfViewer {
     max-width: 100%;
@@ -313,4 +333,10 @@ input[type="number"] {
 
 .custom-shadow {
   box-shadow: 0px 0px 1px 0px ;
+}
+
+@media (min-width: 1300px) {
+  .custom-gap {
+    row-gap: 2rem; /* 40px equivalent to gap-y-10 */
+  }
 }

@@ -554,8 +554,11 @@ export const UseFetchDataForSummary = (
                 const parsedWorkInfo = JSON.parse(
                   entry.empWorkInfo?.[0] || "[]"
                 );
+
                 const filteredWorkInfo = parsedWorkInfo.filter(
-                  (info) => info.LOCATION === location
+                  (info) =>
+                    String(info?.LOCATION).toUpperCase() ===
+                    String(location).toUpperCase()
                 );
                 if (filteredWorkInfo.length === 0) return [];
                 return [
@@ -566,7 +569,8 @@ export const UseFetchDataForSummary = (
                   },
                 ];
               } else {
-                return entry.companyName === location
+                return String(entry?.companyName).toUpperCase() ===
+                  String(location).toUpperCase()
                   ? [{ ...entry }] // 🟢 clone to avoid reference issues
                   : [];
               }

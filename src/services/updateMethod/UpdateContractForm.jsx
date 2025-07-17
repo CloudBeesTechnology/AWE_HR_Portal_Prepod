@@ -11,10 +11,15 @@ export const UpdateContractData = () => {
     }
 
     try {
-      const { conAttn, depHead,contStatus, hrManager, genManager, remarks,
-        remarkHr, remarkGm, renewalContract, id } = ContractValue;
+   const { conAttn, depHead,contStatus, hrManager, genManager, remarks, oldCED,
+        gmDate,
+        extendedStatus,
+        hrmDate,
+        managerDate,
+        remarkHr, remarkGm, renewalContract, id,hrSign,
+        hrDate, } = ContractValue;
 
-      const updatedData = {
+  const updatedData = {
         conAttn,
         depHead,
         hrManager,
@@ -23,7 +28,14 @@ export const UpdateContractData = () => {
         remarkHr,
         remarkGm,
         contStatus,
+        oldCED,
+        gmDate,
+        extendedStatus,
+        hrmDate,
+        managerDate,
         renewalContract,
+        hrSign,
+        hrDate,
         id,
       };
 
