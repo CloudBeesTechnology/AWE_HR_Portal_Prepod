@@ -43,6 +43,8 @@ export const Status = () => {
   const [mergeData, setMergeData] = useState([]);
   const [urlValue, setURLValue] = useState("");
   const [dropOption, setDropOption] = useState();
+  const [searchTerm, setSearchTerm] = useState("");
+  
   const { empPDData, educDetailsData, IVSSDetails } = useContext(DataSupply);
 
   const mergeContextData = (empPDData, educDetailsData) => {
@@ -202,7 +204,7 @@ export const Status = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [cvTypeDropdownOpen, isFilterBoxOpen]); 
+  }, [cvTypeDropdownOpen, isFilterBoxOpen]);
 
   // Toggle Filter Box
   const toggleFilterBox = (event) => {
@@ -217,6 +219,22 @@ export const Status = () => {
     setFilterBoxTitle(selectedValue);
   };
 
+  const filterBySearchTerm = (data) => {
+    if (!searchTerm) return data;
+
+    const term = searchTerm.toLowerCase();
+
+    return data.filter((item) => {
+      return (
+        (item.tempID && item.tempID.toLowerCase().includes(term)) ||
+        (item.firstName && item.firstName.toLowerCase().includes(term)) ||
+        (item.lastName && item.lastName.toLowerCase().includes(term)) ||
+        (item.email && item.email.toLowerCase().includes(term)) ||
+        (item.phoneNumber && item.phoneNumber.includes(term))
+      );
+    });
+  };
+
   useEffect(() => {
     if (!mergeData) {
       setFilteredData([]);
@@ -224,6 +242,7 @@ export const Status = () => {
     }
 
     let result = [...mergeData];
+    result = filterBySearchTerm(result);
 
     // Apply status filter if selected
     if (selectedFilters) {
@@ -245,7 +264,7 @@ export const Status = () => {
             );
           case "PAAF_OnShore":
             return (
-              val?.interviewDetails_status?.toUpperCase() === "PAAF" 
+              val?.interviewDetails_status?.toUpperCase() === "PAAF"
               // val?.empType === "Onshore"
             );
           case "Mobilization":
@@ -284,7 +303,7 @@ export const Status = () => {
     }
 
     setFilteredData(result);
-  }, [selectedFilters, selectedOptions, mergeData]);
+  }, [selectedFilters, selectedOptions, mergeData, searchTerm]);
 
   const handleOptionSelect = (option) => {
     setSelectedOptions((prevSelectedOptions) => {
@@ -396,8 +415,8 @@ export const Status = () => {
 
     const date = new Date(dateToString);
 
-    const day = date.getDate().toString().padStart(2, "0"); 
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
 
     return `${day}-${month}-${year}`;
@@ -538,6 +557,16 @@ export const Status = () => {
             )}
           </div>
         )}
+
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search by tempID, name..."
+            className="w-full p-2 border rounded"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
         {/* Filter Button */}
         <button
