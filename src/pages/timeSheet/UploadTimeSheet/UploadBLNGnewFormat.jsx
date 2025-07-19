@@ -91,13 +91,14 @@ export const UploadBLNGnewFormat = (
 
         function convertExcelDateToBruneiTime(serial) {
           // Excel base: 1899-12-30. Convert serial to UTC
-          const utcMilliseconds = (serial - 25569) * 86400 * 1000;
+          const utcMilliseconds = Math.round((serial - 25569) * 86400 * 1000);
           const bruneiDate = new Date(utcMilliseconds); // Already Brunei time
 
           // Format helper
           const pad2 = (num) => String(num).padStart(2, "0");
 
           let hours = bruneiDate.getUTCHours();
+
           const minutes = pad2(bruneiDate.getUTCMinutes());
           const seconds = pad2(bruneiDate.getUTCSeconds());
 
@@ -197,22 +198,23 @@ export const UploadBLNGnewFormat = (
 
               item.ENTRANCEDATEUSED = convertToDMY(localDateObject);
             }
-            if (typeof item.AVGDAILYTOTALBYDAY === "number") {
-              const entranceDate = excelSerialToDate(
-                item.AVGDAILYTOTALBYDAY,
-                "Avg. Daily Total By Day"
-              );
 
-              item.AVGDAILYTOTALBYDAY = entranceDate;
-            }
-            if (typeof item.AVGDAILYTOTALBYDAY === "number") {
-              const entranceDate = excelSerialToDate(
-                item.AVGDAILYTOTALBYDAY,
-                "Avg. Daily Total By Day"
-              );
+            // if (typeof item.AVGDAILYTOTALBYDAY === "number") {
+            //   const entranceDate = excelSerialToDate(
+            //     item.AVGDAILYTOTALBYDAY,
+            //     "Avg. Daily Total By Day"
+            //   );
 
-              item.ADININWORKSENGINEERINGSDNBHD = entranceDate;
-            }
+            //   item.AVGDAILYTOTALBYDAY = entranceDate;
+            // }
+            // if (typeof item.AVGDAILYTOTALBYDAY === "number") {
+            //   const entranceDate = excelSerialToDate(
+            //     item.AVGDAILYTOTALBYDAY,
+            //     "Avg. Daily Total By Day"
+            //   );
+
+            //   item.ADININWORKSENGINEERINGSDNBHD = entranceDate;
+            // }
 
             return item;
           });
@@ -250,8 +252,8 @@ export const UploadBLNGnewFormat = (
               // Assign AVGDAILYTOTALBYDAY for AHIGHLIGHTDAILYTOTALBYGROUP and ADININWORKSENGINEERINGSDNBHD
               groupedData[key].AHIGHLIGHTDAILYTOTALBYGROUP =
                 entry.AVGDAILYTOTALBYDAY;
-              groupedData[key].ADININWORKSENGINEERINGSDNBHD =
-                entry.AVGDAILYTOTALBYDAY;
+              // groupedData[key].ADININWORKSENGINEERINGSDNBHD =
+              //   entry.AVGDAILYTOTALBYDAY;
             });
 
             return Object.values(groupedData);

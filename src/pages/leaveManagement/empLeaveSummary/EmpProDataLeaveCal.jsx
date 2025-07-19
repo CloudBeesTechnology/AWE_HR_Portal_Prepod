@@ -118,17 +118,15 @@ export const EmpProDataLeaveCal = ({
     //   parseFloat(updateStatusSection?.annualLeave?.totalLeave) -
     //   parseFloat(updateStatusSection?.annualLeaveBal);
 
-    const currentYearALBalance =
-      updateStatusSection?.annualLeaveEntitlement ?? 0;
+    const currentYearALEntitle =
+      parseFloat(updateStatusSection?.annualLeaveEntitlement) ?? 0;
+
+    const calCurrentYearALEntitle = parseFloat(
+      (currentYearALEntitle / 365) * noOfDaysWorkedMinusUAL
+    ).toFixed(1);
 
     const currentYearALEntitleBal =
-      parseFloat((currentYearALBalance / 365) * noOfDaysWorkedMinusUAL).toFixed(
-        1
-      ) > 0
-        ? parseFloat(
-            (currentYearALBalance / 365) * noOfDaysWorkedMinusUAL
-          ).toFixed(1)
-        : "0";
+      calCurrentYearALEntitle > 0 ? calCurrentYearALEntitle : "0";
 
     let totalLeaveForAL =
       parseFloat(updateStatusSection?.annualLeaveBal) +
@@ -361,7 +359,7 @@ export const EmpProDataLeaveCal = ({
         <button
           className="px-3 py-2 flex center gap-3 bg-primary text_size_5 text-dark_grey rounded"
           onClick={() => {
-            DownloadExcelPDF("downloadTable", selectedDate);
+            DownloadExcelPDF("downloadTable", selectedDate, leaveSummary);
           }}
         >
           <i>

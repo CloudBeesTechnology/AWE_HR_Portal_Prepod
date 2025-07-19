@@ -101,7 +101,7 @@ export const EmpLeaveBalance = () => {
         const leaveTakenCount = dayCount > item?.days ? dayCount : item?.days;
         const totalLeave = parseFloat(dayCount);
         // const isHalfDay = totalLeave % 1 !== 0;
-       
+
         for (let i = 0; i < dayCount; i++) {
           const leaveDate = new Date(currentDate);
           const formattedDate = formatLocalDate(leaveDate);
@@ -150,11 +150,11 @@ export const EmpLeaveBalance = () => {
     }
 
     // const filteredData = mergedData?.filter((fil) => {
-    //   if (fil.empID === "7510" && fil?.leaveType === "Annual Leave") {
+    //   if (fil.empID === "1705" && fil?.leaveType === "Compensate Leave") {
     //     return fil;
     //   }
     // });
-    // // console.log("empLeaveBalance filteredData : ", filteredData);
+    // console.log("empLeaveBalance filteredData : ", filteredData);
 
     // const splittedLeaveData = seperateLeaves(filteredData);
     // console.log("splittedLeaveData : ",splittedLeaveData);

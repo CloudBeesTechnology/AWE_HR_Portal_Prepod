@@ -1,6 +1,6 @@
 import logo from "../assets/logo/logo-with-name.svg";
 export const LeaveSummaryPrint = () => {
-  const PrintExcelSheet = (downloadTable, selectedDate) => {
+  const PrintExcelSheet = (downloadTable, selectedDate, leaveSummary) => {
     const table = document.getElementById(downloadTable);
 
     if (!table) return;
@@ -79,7 +79,7 @@ export const LeaveSummaryPrint = () => {
     <div class="print-header">
       <img src="${logo}" class="logo" alt="Logo" />
       <div class="header-text">
-      <h2>Leave Summary for (${selectedDate})</h2>
+      <h2>Leave Summary for ${leaveSummary?.employeeName} (${selectedDate})</h2>
       </div>
     </div>
   `);

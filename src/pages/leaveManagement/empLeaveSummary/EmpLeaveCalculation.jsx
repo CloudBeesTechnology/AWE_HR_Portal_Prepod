@@ -41,30 +41,6 @@ export const EmpLeaveCalculation = () => {
     remainingLeave: isSpecialLeave ? null : total,
   });
 
-  //   useEffect(() => {
-  //     const filteredData = mergedData.filter((val) => {
-  //       let effectiveDateOfAL = Array.isArray(val.empAnnualLeaveDate)
-  //         ? val.empAnnualLeaveDate[val.empAnnualLeaveDate.length - 1]
-  //         : null;
-
-  //       let effDate = new Date(effectiveDateOfAL);
-  //       let selectedFrom = new Date(val.empLeaveSelectedFrom);
-  //       if (
-  //         val.empLeaveType === "Annual Leave"
-  //         // selectedFrom >= effDate &&
-  //         // val.empBadgeNo === "022A" &&
-  //         // val?.managerStatus === "Approved" &&
-  //         // val?.empStatus !== "Cancelled"
-  //       ) {
-  //         console.log("effectiveDateOfAL : ", effectiveDateOfAL);
-  //         console.log("val.empLeaveSelectedFrom : ", val.empLeaveSelectedFrom);
-  //         return val;
-  //       }
-  //     });
-
-  //     console.log("filteredData : ", filteredData);
-  //   }, [mergedData]);
-
   // Formatted date
   const formattedDate = (selectedDate) => {
     let leaveDateObj = null;
@@ -663,7 +639,6 @@ export const EmpLeaveCalculation = () => {
           : {};
 
       const getMatchedEmpLeaves = initialLeaveDetails[empDetails?.empID];
-      
 
       const { formattedPHList } = convertToFormattedHolidays({
         publicHoliday,
@@ -679,7 +654,7 @@ export const EmpLeaveCalculation = () => {
         getUpdatedLeaveData,
         getMatchedEmpLeaves
       );
-     
+
       setLeaveSummary(allCurrentYearLeaves);
     } catch (err) {
       setLeaveSummary((prev) => {
@@ -710,7 +685,7 @@ export const EmpLeaveCalculation = () => {
 
         return updated;
       });
-      
+
       // nav("/leaveManagement/leaveBalance");
     }
   }, [primaryData, empDetails, publicHoliday]);
@@ -748,9 +723,6 @@ export const EmpLeaveCalculation = () => {
 
   return (
     <main className="w-full">
-     
-
-     
       <i
         className="text-2xl text-dark_grey cursor-pointer"
         onClick={() => nav("/leaveManagement/leaveBalance")}
@@ -800,7 +772,7 @@ export const EmpLeaveCalculation = () => {
           <button
             className="center gap-2 px-3 py-2 text-dark_grey text_size_5 bg-primary rounded"
             onClick={() => {
-              PrintExcelSheet("downloadTable", selectedDate);
+              PrintExcelSheet("downloadTable", selectedDate, leaveSummary);
             }}
           >
             <i>
@@ -833,63 +805,11 @@ export const EmpLeaveCalculation = () => {
         </h2>
       </div>
       <div>
-        {/* <table className="table-fixed text-sm font-semibold w-full my-7">
-          <thead>
-            <tr className="text-center">
-              <th className="border py-2">Leave Type</th>
-              <th className="border py-2">Total Leave</th>
-              <th className="border py-2">Days Taken</th>
-              <th className="border py-2">Waiting Approval</th>
-              <th className="border py-2">Remaining Leave</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.keys(leaveTypes).map((key) => {
-              // Skip Maternity Leave for MALE
-              if (leaveSummary.gender === "MALE" && key === "maternityLeave") {
-                return null;
-              }
-
-              // Skip Paternity Leave for FEMALE
-              if (
-                leaveSummary.gender === "FEMALE" &&
-                key === "paternityLeave"
-              ) {
-                return null;
-              }
-              // const label = leaveTypes?.[key].split(" ")[0];
-              const label = leaveTypes?.[key];
-
-              const data = leaveSummary?.[key] || {
-                totalLeave: "0",
-                daysTaken: "0",
-                waitingApproval: "0",
-                remainingLeave: "0",
-              };
-
-              return (
-                <tr key={key} className="text-center">
-                  <td className="text-start pl-8 py-2 border">{label}</td>
-                  <td className="border py-2">{data?.totalLeave || "0"}</td>
-                  <td className="border py-2">{data?.daysTaken || "0"}</td>
-                  <td className="border py-2">
-                    {data?.waitingApproval || "0"}
-                  </td>
-                  <td className="border py-2">{data?.remainingLeave || "0"}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table> */}
         <EmpProDataLeaveCal
           selectedDate={selectedDate}
           leaveTypes={leaveTypes}
           leaveSummary={leaveSummary}
         />
-        {/* <p className="text_size_6">
-          Previous Year Annual Leave Balance {new Date().getFullYear() - 1} :{" "}
-          {leaveSummary?.annualLeaveBal}
-        </p> */}
       </div>
     </main>
   );
