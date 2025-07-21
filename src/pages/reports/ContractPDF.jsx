@@ -39,6 +39,10 @@ export const ContractPDF = ({ userID, userType }) => {
   );
 
   const formatDate = (date) => {
+     const ddmmyyyyRegex = /^\d{2}-\d{2}-\d{4}$/;
+  if (typeof date === "string" && ddmmyyyyRegex.test(date)) {
+    return date;
+  }
     if (Array.isArray(date)) {
       if (date.length === 0) return "-";
       const lastDate = date[date.length - 1];
