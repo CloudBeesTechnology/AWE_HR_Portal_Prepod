@@ -123,6 +123,9 @@ import { TrainingCertifyMD } from "../components/migratingData/TrainingCertifyMD
 import { TriningReqMD } from "../components/migratingData/TrainingReqMD";
 import { useTempID } from "../utils/TempIDContext";
 import { usePersonalDetails } from "../hooks/usePersonalDetails";
+import { EmpLeaveCalculation } from "../pages/leaveManagement/empLeaveSummary/EmpLeaveCalculation";
+import { EmpProDataLeaveCal } from "../pages/leaveManagement/empLeaveSummary/EmpProDataLeaveCal";
+
 const client = generateClient();
 
 const NavigationLinks = () => {
@@ -386,6 +389,8 @@ const NavigationLinks = () => {
           <Route path="historyLeave" element={<HOLTable />} />
           <Route path="leaveBalance" element={<EmpLeaveBalance />} />
           <Route path="requestTickets" element={<TicketsTable />} />
+          <Route path="leaveDetails" element={<EmpLeaveCalculation />} />
+          <Route path="proDataCalculation" element={<EmpProDataLeaveCal />} />
         </Route>
       )}
       {allowedCategories.includes("Notification") && (

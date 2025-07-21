@@ -40,7 +40,7 @@ export const UploadOffshoreFile = (
 
     const tbodyHeader = [];
 
-    console.log("allSheets : ", allSheets);
+  
     const processedSheets =
       allSheets &&
       allSheets.map((sheet) => {

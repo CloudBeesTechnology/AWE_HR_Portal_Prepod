@@ -33,6 +33,7 @@ import { UnlockVerifiedCellVS } from "./customTimeSheet/UnlockVerifiedCellVS";
 import PopupForDuplicateFileAlert from "./ModelForSuccessMess/PopupForDuplicateFileAlert";
 import { useTableMergedData } from "./customTimeSheet/useTableMergedData";
 import PopupForCheckBadgeNo from "./ModelForSuccessMess/PopupForCheckBadgeNo";
+import LocationFilter from "./timeSheetSearch/locationFilter";
 
 export const ViewSBWsheet = ({
   excelData,
@@ -63,6 +64,10 @@ export const ViewSBWsheet = ({
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
   const [editFormTitle, setEditFormTitle] = useState("");
+  const [storeLocation, setStoreLocation] = useState(["All"]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isApprovedChecked, setIsApprovedChecked] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [userIdentification, setUserIdentification] = useState("");
@@ -249,6 +254,17 @@ export const ViewSBWsheet = ({
             const finalData = await SendDataToManager(fetchedData);
 
             pendingData(fetchedData);
+
+            const getLocation = Array.isArray(fetchedData) && [
+              ...new Set(
+                fetchedData.flatMap((val) => {
+                  let workHrsData = JSON.parse(val.empWorkInfo);
+                  return workHrsData.map((item) => item.LOCATION);
+                })
+              ),
+            ];
+
+            setStoreLocation([...storeLocation, ...getLocation]);
           }
         } catch (err) {
         } finally {
@@ -594,6 +610,8 @@ export const ViewSBWsheet = ({
         );
 
         storeApproveRej = [];
+        setIsApprovedChecked(false);
+        unCheckAllData();
         await handleManagerReload();
       }
     } else if (
@@ -973,9 +991,59 @@ export const ViewSBWsheet = ({
         });
       }
 
+      if (selectedOption) {
+        if (selectedOption === "All") {
+          filteredData = filteredData;
+        } else {
+          filteredData = filteredData.filter((val) => {
+            const jobLocaWhrs = val?.jobLocaWhrs;
+
+            return (
+              Array.isArray(jobLocaWhrs) &&
+              jobLocaWhrs.some((emp) => emp?.LOCATION === selectedOption)
+            );
+          });
+        }
+      }
       setData(filteredData);
     }
-  }, [startDate, endDate, secondaryData, searchQuery]);
+  }, [startDate, endDate, secondaryData, searchQuery, selectedOption]);
+
+  const autoApproveFunction = useCallback(() => {
+    if (!data || !Array.isArray(data)) return;
+
+    // Create approved data
+    const approveSelectedData = data.map((val) => ({
+      ...val,
+      status: "Approved",
+    }));
+
+    // Update approved data state
+    setAllApprovedData(approveSelectedData);
+
+    // Update checked items for all approved items
+    const updatedCheckedItems = data.reduce((acc, val) => {
+      acc[val.id] = true;
+      return acc;
+    }, {});
+    setCheckedItems((prev) => ({
+      ...prev,
+      ...updatedCheckedItems,
+    }));
+  }, [data, setAllApprovedData, setCheckedItems]);
+
+  const unCheckAllData = useCallback(() => {
+    if (!data || !Array.isArray(data)) return;
+    setAllApprovedData([]);
+    const updatedCheckedItems = data.reduce((acc, val) => {
+      acc[val.id] = false;
+      return acc;
+    }, {});
+    setCheckedItems((prev) => ({
+      ...prev,
+      ...updatedCheckedItems,
+    }));
+  }, [data, setAllApprovedData, setCheckedItems]);
 
   useEffect(() => {
     try {
@@ -1021,6 +1089,10 @@ export const ViewSBWsheet = ({
     }
   }, [empAndWorkInfo, data]);
 
+  const handleSelectItem = (option) => {
+    setSelectedOption(option);
+  };
+
   const itemsPerPage = 25;
   const safeData = finalData || [];
 
@@ -1035,7 +1107,7 @@ export const ViewSBWsheet = ({
   visibleData = currentData;
 
   return (
-    <div>
+    <div onClick={() => setIsOpen(false)}>
       <div>
         {currentStatus === true ? (
           <div>
@@ -1043,7 +1115,45 @@ export const ViewSBWsheet = ({
               <div>
                 <DateFilter />
               </div>
-              <div className="pt-5">
+              <div className="flex justify-between items-center gap-5 pt-5">
+                {Array.isArray(ManagerData) &&
+                ManagerData.length > 0 &&
+                Array.isArray(visibleData) &&
+                visibleData.length > 0 ? (
+                  <div className="flex justify-between items-center gap-3">
+                    <p className="text_size_5 text-dark_grey">Approve All</p>
+                    <input
+                      type="checkbox"
+                      id="exampleCheckbox"
+                      className="h-4 w-4 cursor-pointer"
+                      checked={isApprovedChecked}
+                      onChange={(e) => {
+                        const isChecked = e.target.checked;
+                        setIsApprovedChecked(isChecked);
+                        if (isChecked) {
+                          autoApproveFunction();
+                        } else {
+                          unCheckAllData();
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  ""
+                )}
+
+                {Array.isArray(storeLocation) &&
+                storeLocation?.length > 0 &&
+                Array.isArray(ManagerData) &&
+                ManagerData?.length > 0 ? (
+                  <LocationFilter
+                    handleSelectItem={handleSelectItem}
+                    storeLocation={storeLocation}
+                    setIsOpen={setIsOpen}
+                    isOpen={isOpen}
+                  />
+                ) : null}
+
                 <SearchBoxForTimeSheet
                   allEmpDetails={data}
                   searchResult={searchResult}
@@ -1341,66 +1451,6 @@ export const ViewSBWsheet = ({
                       } else if (excelData && excelData) {
                         storeInitialData();
                       }
-
-                      // const fetchDataAndDelete = async () => {
-                      //   try {
-                      //     console.log("Fetching and Deleting SBW Data...");
-                      //     // setIsDeleting(true); // Set loading state
-                      //     let nextToken = null; // Initialize nextToken for pagination
-                      //     do {
-                      //       // Define the filter for fetching SBW data
-                      //       const filter = {
-                      //         and: [{ fileType: { eq: "SBW" } }],
-                      //       };
-                      //       // Fetch the BLNG data using GraphQL with pagination
-                      //       const response = await client.graphql({
-                      //         query: listTimeSheets,
-                      //         variables: {
-                      //           filter: filter,
-                      //           nextToken: nextToken,
-                      //         }, // Pass nextToken for pagination
-                      //       });
-                      //       // Extract data and nextToken
-                      //       const SBWdata =
-                      //         response?.data?.listTimeSheets?.items || [];
-                      //       nextToken =
-                      //         response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
-                      //       console.log("Fetched SBW Data:", SBWdata);
-                      //       // Delete each item in the current batch
-                      //       await Promise.all(
-                      //         SBWdata.map(async (item) => {
-                      //           try {
-                      //             const deleteResponse = await client.graphql({
-                      //               query: deleteTimeSheet,
-                      //               variables: { input: { id: item.id } },
-                      //             });
-                      //             console.log(
-                      //               "Deleted Item Response:",
-                      //               deleteResponse
-                      //             );
-                      //           } catch (deleteError) {
-                      //             console.error(
-                      //               `Error deleting item with ID ${item.id}:`,
-                      //               deleteError
-                      //             );
-                      //           }
-                      //         })
-                      //       );
-                      //       console.log("Batch deletion completed.");
-                      //     } while (nextToken); // Continue fetching until no more data
-                      //     console.log(
-                      //       "All SBW items deletion process completed."
-                      //     );
-                      //   } catch (fetchError) {
-                      //     console.error(
-                      //       "Error in fetchDataAndDelete:",
-                      //       fetchError
-                      //     );
-                      //   } finally {
-                      //     // setIsDeleting(false); // Reset loading state
-                      //   }
-                      // };
-                      // fetchDataAndDelete();
                     } else if (userIdentification === "Manager") {
                       removeCheckedItem();
                       renameKeysFunctionAndSubmit();
@@ -1533,6 +1583,69 @@ export const ViewSBWsheet = ({
           alertMessage={alertMessage}
         />
       )}
+
+      {/* <button
+        className="text_size_5 text-dark_grey px-3 py-2 rounded bg-yellow"
+        onClick={async () => {
+          try {
+            console.log("Fetching and Deleting BLNG Data...");
+            let nextToken = null;
+            let deleteCount = 0; // 🟢 Counter to track deletions
+
+            do {
+              const filter = {
+                and: [{ fileType: { eq: "SBW" } }],
+              };
+
+              const response = await client.graphql({
+                query: listTimeSheets,
+                variables: {
+                  filter: filter,
+                  nextToken: nextToken,
+                  limit: 1000, // optional: ensure limit is large enough
+                },
+              });
+
+              const SBWdata = response?.data?.listTimeSheets?.items || [];
+              nextToken = response?.data?.listTimeSheets?.nextToken;
+
+              console.log(
+                `Fetched ${SBWdata.length} BLNG items in this batch.`
+              );
+
+              await Promise.all(
+                SBWdata.map(async (item) => {
+                  try {
+                    const deleteResponse = await client.graphql({
+                      query: deleteTimeSheet,
+                      variables: { input: { id: item.id } },
+                    });
+                    deleteCount++; // ✅ Increment counter
+                    console.log(`Deleted item ID: ${item.id}`);
+                  } catch (deleteError) {
+                    console.error(
+                      `Error deleting item with ID ${item.id}:`,
+                      deleteError
+                    );
+                  }
+                })
+              );
+
+              console.log(
+                `Batch deletion completed. Total deleted so far: ${deleteCount}`
+              );
+            } while (nextToken);
+
+            console.log(
+              `✅ All BLNG items deletion process completed. Total deleted: ${deleteCount}`
+            );
+          } catch (fetchError) {
+            console.error("❌ Error in fetchDataAndDelete:", fetchError);
+          }
+        }}
+      >
+        Delete Offshore Data
+      </button> */}
     </div>
   );
 };

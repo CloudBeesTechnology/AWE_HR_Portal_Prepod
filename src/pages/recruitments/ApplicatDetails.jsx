@@ -55,7 +55,7 @@ export const ApplicantDetails = () => {
       path: pathUrl,
     });
     setImageUrl(result.url.toString());
-  }; 
+  };
 
   useEffect(() => {
     const savedData = JSON.parse(localStorage.getItem("profileStore"));
@@ -75,7 +75,6 @@ export const ApplicantDetails = () => {
         }
       });
     } else {
-    
     }
 
     const handleBeforeUnload = () => {
@@ -163,7 +162,6 @@ export const ApplicantDetails = () => {
             } else if (interviewData[key]) {
               setValue(key, interviewData[key]);
             } else {
-             
             }
           });
 
@@ -175,27 +173,49 @@ export const ApplicantDetails = () => {
             setValue("profilePhoto", interviewData.profilePhoto);
           }
         } else {
-          
         }
       }
     }
   }, [tempID, setValue, empPDData]);
 
- 
+  // const handleFileChange = async (e) => {
+  //   const selectedFile = e.target.files[0];
+
+  //   if (selectedFile) {
+  //     setProfilePhoto(selectedFile);
+  //     setValue("profilePhoto", selectedFile);
+  //     await uploadDocString(
+  //       selectedFile,
+  //       "profilePhoto",
+  //       setUploadedDocs,
+  //       "Employee"
+  //     );
+  //   }
+  // };
 
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
 
-    if (selectedFile) {
-      setProfilePhoto(selectedFile);
-      setValue("profilePhoto", selectedFile);
-      await uploadDocString(
-        selectedFile,
-        "profilePhoto",
-        setUploadedDocs,
-        "Employee"
+    if (!selectedFile) return;
+
+    const maxSizeInBytes = 1 * 1024 * 1024;
+
+    if (selectedFile.size > maxSizeInBytes) {
+      alert(
+        "File size exceeds the 1MB (1024KB) limit. Please upload a smaller file."
       );
+      return;
     }
+
+    setProfilePhoto(selectedFile);
+    setValue("profilePhoto", selectedFile);
+
+    await uploadDocString(
+      selectedFile,
+      "profilePhoto",
+      setUploadedDocs,
+      "Employee"
+    );
   };
 
   useEffect(() => {
@@ -204,13 +224,38 @@ export const ApplicantDetails = () => {
     }
   }, [uploadedDocs.profilePhoto]);
 
+  const toBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+    });
+
+  const isFile = (file) =>
+    file instanceof File ||
+    (file && typeof file === "object" && file.type && file.name);
+
   const onSubmit = async (data) => {
     try {
+      let base64Image = null;
+
+      // Only convert to base64 if it's truly a File object
+      if (isFile(profilePhoto)) {
+        base64Image = await toBase64(profilePhoto);
+      } else {
+        console.warn(
+          "Skipping base64: profilePhoto is not a File",
+          profilePhoto
+        );
+      }
+
       const applicationUpdate = {
         ...data,
-        profilePhoto: profilePhoto,
+        profilePhoto: base64Image ? base64Image : profilePhoto,
         uploadedFileNames: uploadedFileNames?.profilePhoto,
-        profilePhotoDoc: uploadedDocs?.profilePhoto
+        profilePhotoDoc: uploadedDocs?.profilePhoto,
+        profilePhotoName: profilePhoto?.name,
       };
 
       localStorage.setItem(
@@ -218,22 +263,20 @@ export const ApplicantDetails = () => {
         JSON.stringify(applicationUpdate)
       );
 
+      // console.log("Step 1", applicationUpdate);
+
       const profileStore = {
         ...data,
         profilePhoto: uploadedDocs.profilePhoto,
       };
 
-      localStorage.setItem(
-        "profileStore",
-        JSON.stringify(profileStore)
-      );
+      localStorage.setItem("profileStore", JSON.stringify(profileStore));
 
-    
       navigate("/addCandidates/personalDetails", {
         state: { FormData: applicationUpdate },
       });
     } catch (error) {
-     
+      console.log("Error in onSubmit:", error);
     }
   };
 
@@ -328,6 +371,10 @@ export const ApplicantDetails = () => {
                   </button>
                 </div>
               )}
+
+            <p className="text-[10px] text-medium_grey mt-1 text-center">
+              Upload a JPG/PNG image under 1MB (1024KB)
+            </p>
 
             {errors.profilePhoto && (
               <p className="text-[red] text-[13px] text-center">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CandidatesSchema } from "../../services/Validation";
@@ -6,7 +6,6 @@ import { generateClient } from "aws-amplify/api";
 import { useLocation } from "react-router-dom";
 import { listPersonalDetails } from "../../graphql/queries";
 import { RecODFunc } from "../../services/createMethod/RecODFunc";
-import { SpinLogo } from "../../utils/SpinLogo";
 import { FileUploadField } from "../employees/medicalDep/FileUploadField";
 import { uploadReqString } from "../../services/uploadsDocsS3/UploadDocs";
 import { DataSupply } from "../../utils/DataStoredContext";
@@ -29,7 +28,7 @@ export const OtherDetails = ({ fetchedData }) => {
   const [mergedData, setMergedData] = useState([]);
   const { candyDetails } = CandyDetails();
   const location = useLocation();
-  const navigatingEducationData = location.state?.FormData;
+  // const navigatingEducationData = location.state?.FormData;
   const { tempID } = useTempID();
   const { empPDData, educDetailsData } = useContext(DataSupply);
 
@@ -68,6 +67,12 @@ export const OtherDetails = ({ fetchedData }) => {
       perIDesc: "",
     },
   });
+
+  const navigatingEducationData = JSON.parse(
+    localStorage.getItem("educationFormData")
+  );
+
+  // console.log("Step 4", navigatingEducationData);
 
   useEffect(() => {
     if (fetchedData) {
@@ -210,6 +215,13 @@ export const OtherDetails = ({ fetchedData }) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    const MAX_FILE_SIZE = 3.5 * 1024 * 1024;
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert("File size must be less than 3.5 MB.");
+      return;
+    }
+
     setValue(type, file);
 
     const fileTypeMapping = {
@@ -323,12 +335,29 @@ export const OtherDetails = ({ fetchedData }) => {
 
   var latestTempIDData;
 
+  function base64ToFile(base64String, fileName) {
+    const arr = base64String.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new File([u8arr], fileName, { type: mime });
+  }
+
+  const originalName =
+    navigatingEducationData?.profilePhotoName || "profilePhoto.png";
+
   const onSubmit = async (data) => {
     // console.log("data", data);
     try {
       setIsLoading(true);
 
-      const isUpdate = data.tempID;
+      const isUpdate = data?.tempID;
 
       if (!isUpdate) {
         const nextTempID = await fetchNextTempID();
@@ -382,6 +411,19 @@ export const OtherDetails = ({ fetchedData }) => {
 
       let UpProfilePhoto;
 
+      const profilePhoto = navigatingEducationData?.profilePhoto;
+
+      // Check: If base64 string → convert to File
+      const isBase64Image =
+        typeof profilePhoto === "string" &&
+        profilePhoto.startsWith("data:image");
+
+      let preparedFile = profilePhoto;
+
+      if (isBase64Image) {
+        preparedFile = base64ToFile(profilePhoto, originalName);
+      }
+
       if (
         navigatingEducationData.profilePhotoDoc &&
         !navigatingEducationData.profilePhotoDoc.includes("Employee")
@@ -389,7 +431,7 @@ export const OtherDetails = ({ fetchedData }) => {
         UpProfilePhoto = navigatingEducationData.profilePhotoDoc;
       } else {
         UpProfilePhoto = await uploadReqString(
-          navigatingEducationData.profilePhoto,
+          preparedFile,
           "profilePhoto",
           personName
         );
@@ -470,7 +512,7 @@ export const OtherDetails = ({ fetchedData }) => {
         await candyDetails({ reqValue: updateReqValue })
           .then(() => {
             // setNotification(true);
-            setShowTitle("Your Application Submitted Successfully")
+            setShowTitle("Your Application Submitted Successfully");
             setIsLoading(false);
           })
           .catch((err) => {
@@ -482,7 +524,7 @@ export const OtherDetails = ({ fetchedData }) => {
         await submitODFunc({ reqValue, latestTempIDData })
           .then(() => {
             // setNotification(true);
-            setShowTitle("Your Application Submitted Successfully")
+            setShowTitle("Your Application Submitted Successfully");
             setIsLoading(false);
           })
           .catch((err) => {
@@ -497,6 +539,9 @@ export const OtherDetails = ({ fetchedData }) => {
 
   const requiredPermissions = ["Candidate"];
   const access = "Recruitment";
+
+  // console.log("tempID:", tempID);
+
 
   return (
     <>
@@ -713,6 +758,9 @@ export const OtherDetails = ({ fetchedData }) => {
                 />
               </div>
             </div>
+            <p className="text-xs text-medium_grey mt-1 text-center">
+              Please note: Upload a PDF document / Image under 3.5MB (3584KB) only.
+            </p>
           </div>
 
           <div className="flex items-start mb-4">
