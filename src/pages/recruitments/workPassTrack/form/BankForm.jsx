@@ -159,7 +159,7 @@ export const BankForm = ({ candidate }) => {
     setdeletePopup(!deletePopup);
   };
 
-  const deletedStringUpload = async (fileType, fileName) => {
+   const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = candidate.tempID;
 
@@ -169,10 +169,10 @@ export const BankForm = ({ candidate }) => {
       }
 
       const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+
       const isDeletedArrayUploaded = await DeleteUploadBankG(
         fileType,
         fileName,
-        tempID,
         setUploadedFileNames,
         setUploadedBank,
         setIsUploadingString,
@@ -180,19 +180,16 @@ export const BankForm = ({ candidate }) => {
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
-        console.error(
-          `Failed to delete file: ${fileName}, skipping UI update.`
-        );
         return;
       }
+
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
-      // console.log(`Deleted "${fileName}". Remaining files:`);
-      // console.error("Error deleting file:", error);
-      alert("Error processing the file deletion.");
+      console.log("error", error);
     }
   };
+
 
   const currentDate = new Date().toISOString().split("T")[0];
 

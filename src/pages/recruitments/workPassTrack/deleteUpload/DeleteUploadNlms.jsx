@@ -50,6 +50,7 @@ export const DeleteUploadNlms = (
       interview: {
         ...prev.interview,
         [fileType]: "",
+        nlmsfile: "",
       },
     }));
   } catch (error) {

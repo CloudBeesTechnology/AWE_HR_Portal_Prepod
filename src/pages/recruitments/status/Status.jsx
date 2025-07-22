@@ -16,6 +16,7 @@ import { CVEVRecru } from "./CVEVRecru";
 import { PAAFRecru } from "./PAAFRecru";
 import { MobilizationRecru } from "./MobilizationRecru";
 import { getUrl } from "@aws-amplify/storage";
+import { IoSearch } from "react-icons/io5";
 const client = generateClient();
 
 const filterOptions = [
@@ -44,7 +45,7 @@ export const Status = () => {
   const [urlValue, setURLValue] = useState("");
   const [dropOption, setDropOption] = useState();
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   const { empPDData, educDetailsData, IVSSDetails } = useContext(DataSupply);
 
   const mergeContextData = (empPDData, educDetailsData) => {
@@ -520,94 +521,117 @@ export const Status = () => {
 
   return (
     <section className="screen-size min-h-screen mb-4">
-      <div className="relative">
-        {/* CV Type Dropdown */}
-        <button
-          className={`font-semibold py-2 px-6 mb-6 rounded-lg flex items-center ${
-            selectedOptions.length > 0 ? "bg-[#faf362]" : "bg-[#8d8f9036]"
-          } cvTypeDropdown`}
-          onClick={() => setCvTypeDropdownOpen(!cvTypeDropdownOpen)}
-        >
-          {selectedOptions.length > 0 ? selectedOptions.join(" + ") : "CV TYPE"}
-          {cvTypeDropdownOpen ? (
-            <FaChevronUp className="ml-10" />
-          ) : (
-            <FaChevronDown className="ml-10" />
-          )}
-        </button>
+      <div className="flex justify-between items-start flex-wrap gap-4 py-4">
+        {/* LEFT SIDE: CV Type Dropdown + Filter Button */}
+        <div className="flex gap-4 items-start">
+          {/* CV Type Dropdown */}
+          <div className="relative">
+            <button
+              className={`font-semibold py-2 px-6 rounded-lg flex items-center ${
+                selectedOptions.length > 0 ? "bg-[#faf362]" : "bg-[#8d8f9036]"
+              }`}
+              onClick={() => setCvTypeDropdownOpen(!cvTypeDropdownOpen)}
+            >
+              {selectedOptions.length > 0
+                ? selectedOptions.join(" + ")
+                : "CV TYPE"}
+              {cvTypeDropdownOpen ? (
+                <FaChevronUp className="ml-2" />
+              ) : (
+                <FaChevronDown className="ml-2" />
+              )}
+            </button>
 
-        {cvTypeDropdownOpen && (
-          <div className="absolute bg-white border shadow-lg rounded-lg z-20 cvTypeDropdown">
-            {["LOCAL", "NON LOCAL", "LPA", "SAWP", "ONSHORE", "OFFSHORE"].map(
-              (option) => (
-                <label
-                  key={option}
-                  className="block w-full text-left px-4 py-2"
-                >
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    checked={selectedOptions.includes(option)}
-                    onChange={() => handleOptionSelect(option)}
-                    disabled={isOptionDisabled(option)}
-                  />
-                  {option}
-                </label>
-              )
+            {cvTypeDropdownOpen && (
+              <div className="absolute bg-white border shadow-lg rounded-lg z-20 mt-2">
+                {[
+                  "LOCAL",
+                  "NON LOCAL",
+                  "LPA",
+                  "SAWP",
+                  "ONSHORE",
+                  "OFFSHORE",
+                ].map((option) => (
+                  <label
+                    key={option}
+                    className="block w-full text-left px-4 py-2"
+                  >
+                    <input
+                      type="checkbox"
+                      className="mr-2"
+                      checked={selectedOptions.includes(option)}
+                      onChange={() => handleOptionSelect(option)}
+                      disabled={isOptionDisabled(option)}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
             )}
           </div>
-        )}
 
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search by tempID, name..."
-            className="w-full p-2 border rounded"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          {/* Filter Button + Dropdown */}
+          <div className="relative">
+            <button
+              onClick={toggleFilterBox}
+              className={`px-6 py-2 font-semibold rounded-lg flex items-center ${
+                selectedFilters.length ? "bg-[#faf362]" : "bg-[#8d8f9036]"
+              }`}
+            >
+              <LuFilter className="mr-2" />
+              <span>{filterBoxTitle}</span>
+            </button>
+
+            {isFilterBoxOpen && (
+              <div
+                ref={filterBoxRef}
+                className="absolute z-50 bg-white shadow-lg rounded-lg p-4 mt-2 w-48"
+              >
+                {filterOptions.map((status) => (
+                  <label
+                    key={status}
+                    className={`flex items-center font-semibold space-x-2 hover:font-bold hover:text-[#c7bd03] p-2 rounded-md ${
+                      selectedFilters === status
+                        ? "text-[#faf362]"
+                        : "text-lite_grey"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      className="w-5 h-6"
+                      name="status"
+                      value={status}
+                      checked={selectedFilters === status}
+                      onChange={handleFilterChange}
+                    />
+                    <span>{status}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Filter Button */}
-        <button
-          onClick={toggleFilterBox}
-          className={`absolute top-0 right-0 px-6 py-2 font-semibold rounded-lg flex items-center ${
-            selectedFilters.length ? "bg-[#faf362]" : "bg-[#8d8f9036]"
-          }`}
-        >
-          <LuFilter className="mr-5" />
-          <span>{filterBoxTitle}</span>
-        </button>
-
-        {isFilterBoxOpen && (
-          <div
-            ref={filterBoxRef}
-            className="absolute top-12 right-0 mt-2 bg-white shadow-lg rounded-lg p-4 z-50 flex flex-col space-y-2"
-          >
-            {filterOptions.map((status) => (
-              <label
-                key={status}
-                className={`flex items-center font-semibold  space-x-2 hover:font-bold hover:text-[#c7bd03] p-2 rounded-md ${
-                  selectedFilters === status
-                    ? "text-[#faf362]"
-                    : "text-lite_grey"
-                }`}
-              >
-                <input
-                  type="radio"
-                  className="w-5 h-6"
-                  name="status"
-                  value={status}
-                  checked={selectedFilters === status}
-                  onChange={handleFilterChange}
-                />
-                <span>{status}</span>
-              </label>
-            ))}
+        {/* RIGHT SIDE: Search Input */}
+        <div className="flex-1 flex justify-end">
+          <div className="relative w-full max-w-sm">
+            <div className="py-[9px] w-full text_size_5 bg-white border text-grey border-lite_grey rounded-lg flex items-center px-3 gap-2">
+              <input
+                type="text"
+                placeholder="Search"
+                className="outline-none w-full text-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <div className="text-dark_grey text-2xl cursor-pointer">
+                <IoSearch />
+              </div>
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
+      {/* Results Section */}
       {loading ? (
         <p>Loading...</p>
       ) : error ? (
@@ -615,7 +639,6 @@ export const Status = () => {
       ) : (
         <>
           {renderComponent()}
-
           {isFormVisible && (
             <StatusForm
               candidate={selectedInterviewCandidate}

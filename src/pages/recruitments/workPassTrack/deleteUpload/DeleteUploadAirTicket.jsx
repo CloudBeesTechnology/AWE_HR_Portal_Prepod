@@ -51,6 +51,7 @@ export const DeleteUploadAirTicket = (
       interview: {
         ...prev.interview,
         [fileType]: "",
+        airticketfile: "",
       },
     }));
   } catch (error) {

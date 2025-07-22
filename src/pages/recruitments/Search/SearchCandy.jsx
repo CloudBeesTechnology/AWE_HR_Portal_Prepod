@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 
-export const SearchLocalCandy = ({
+export const SearchCandy = ({
   allEmpDetails,
   searchUserList,
   searchIcon1,
@@ -36,7 +36,7 @@ export const SearchLocalCandy = ({
       alert("Employee not found.");
       searchUserList([]);
     }
-  }, [allEmpDetails, searchQuery, searchFields, searchUserList]);
+  }, [allEmpDetails, searchQuery, searchFields]);
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
@@ -79,7 +79,9 @@ export const SearchLocalCandy = ({
           placeholder={placeholder}
           className="outline-none w-full text-sm"
           value={searchQuery}
-          onChange={handleSearch}
+          onChange={(e)=>{
+            handleSearch(e)
+          }}
         />
         {searchIcon2 && (
           <div

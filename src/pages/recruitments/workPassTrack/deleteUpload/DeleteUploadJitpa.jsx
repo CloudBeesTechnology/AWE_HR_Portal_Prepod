@@ -50,6 +50,7 @@ export const DeleteUploadJitpa = (
       interview: {
         ...prev.interview,
         [fileType]: "",
+        jitpafile: "",
       },
     }));
   } catch (error) {

@@ -61,7 +61,7 @@ export const DoeForm = ({ candidate }) => {
 
   const DoeUpload = watch("doeFile", "");
 
-   useEffect(() => {
+  useEffect(() => {
     if (interviewSchedules.length > 0) {
       const interviewData = interviewSchedules.find(
         (data) => data.tempID === candidate.tempID
@@ -92,12 +92,11 @@ export const DoeForm = ({ candidate }) => {
           // console.log("Uploaded file name set:", fileName);
         }
       } else {
-         setFormData({
+        setFormData({
           interview: {
             status: interviewStatus.status,
           },
         });
-
       }
     }
   }, [interviewSchedules, candidate.tempID]);
@@ -171,7 +170,6 @@ export const DoeForm = ({ candidate }) => {
       const isDeletedArrayUploaded = await DeleteUploadDoe(
         fileType,
         fileName,
-        tempID,
         setUploadedFileNames,
         setUploadedDoe,
         setIsUploadingString,

@@ -578,7 +578,7 @@ export const ContractFormPDF = ({ contentRef }) => {
           </div>
 
           <div className="w-full print-box">
-            <table className="min-w-full table-fixed print-box text-xs text-center border-collapse border">
+            <table className="min-w-full table-fixed print:table-auto print:w-[95%] text-xs text-center border-collapse border">
               <thead>
                 <tr>
                   <th className="border p-1 py-4">No.</th>

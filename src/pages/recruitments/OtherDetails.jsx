@@ -542,7 +542,6 @@ export const OtherDetails = ({ fetchedData }) => {
 
   // console.log("tempID:", tempID);
 
-
   return (
     <>
       {showTitle && (
@@ -759,7 +758,7 @@ export const OtherDetails = ({ fetchedData }) => {
               </div>
             </div>
             <p className="text-xs text-medium_grey mt-1 text-center">
-              Please note: Upload a PDF document / Image under 3.5MB (3584KB) only.
+              Please note: Upload a PDF / JPG, PNG under 3.5MB (3584KB) only.
             </p>
           </div>
 

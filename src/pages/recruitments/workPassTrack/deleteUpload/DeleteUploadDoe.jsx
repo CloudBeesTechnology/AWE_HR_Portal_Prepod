@@ -3,7 +3,6 @@ import React from "react";
 export const DeleteUploadDoe = (
   fileType,
   fileName,
-  empID,
   setUploadedFileNames,
   setUploadedDoe,
   setIsUploadingString,
@@ -50,6 +49,7 @@ export const DeleteUploadDoe = (
       interview: {
         ...prev.interview,
         [fileType]: "",
+        doefile: ""
       },
     }));
   } catch (error) {
