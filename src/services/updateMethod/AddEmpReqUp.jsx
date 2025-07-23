@@ -8,13 +8,13 @@ export const AddEmpReqUp = () => {
     if (!TMRDataUp) {
       throw new Error("Missing required parameters");
     }
-     
-    
+
     const totalData = {
       id: TMRDataUp.id,
       empID: TMRDataUp.empID,
-      // traineeTrack:TMRDataUp.traineeTrack
+      // traineeTrack:TMRDataUp.traineeTrack,
       traineeTrack: JSON.stringify(TMRDataUp.trainingTrack),
+      updatedBy: TMRDataUp?.updatedBy,
     };
     // console.log(totalData, "update method");
 

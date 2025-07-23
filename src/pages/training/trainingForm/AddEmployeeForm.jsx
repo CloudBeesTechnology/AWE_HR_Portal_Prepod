@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useContext } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -71,7 +70,7 @@ export const AddEmployeeForm = () => {
   //----------------------------------------------------------------------------
   const [uploadedFileNames, setUploadedFileNames] = useState({});
   const [fileNames, setFileNames] = useState({});
-
+  const EMPID = localStorage.getItem("userID");
   const {
     register,
     handleSubmit,
@@ -122,7 +121,6 @@ export const AddEmployeeForm = () => {
   // console.log("medi", uploadMedicalReports);
   // console.log("flieNames", uploadedFileNames);
   // console.log("File 2", fileNames);
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -643,6 +641,7 @@ export const AddEmployeeForm = () => {
 
   const onSubmit = async (data) => {
     try {
+      const currentDate = new Date().toISOString().split("T")[0];
       // const EmpReqDataRecord = AddEmpReq
       //   ? AddEmpReq.find((match) => match.empID === data.empID)
       //   : {};
@@ -769,6 +768,21 @@ export const AddEmployeeForm = () => {
             status: "Unread",
           });
         }
+
+        let previousUpdates = EmpReqDataRecord?.updatedBy
+          ? JSON.parse(EmpReqDataRecord?.updatedBy)
+          : [];
+
+        const updateUpdatedByData = [
+          ...previousUpdates,
+          { userID: EMPID, date: currentDate },
+        ];
+
+        const orderedUpdatedBy = updateUpdatedByData?.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
+
         const TMRDataUp = {
           trainingTrack: data?.trainingreq?.map((trainee, index) => {
             return {
@@ -782,6 +796,7 @@ export const AddEmployeeForm = () => {
           empBadgeNo: data.empBadgeNo,
           empID: data.empID,
           id: EmpReqDataRecord.id,
+          updatedBy: JSON.stringify(orderedUpdatedBy),
         };
 
         await TrReqUp({ TMRDataUp });
@@ -801,6 +816,7 @@ export const AddEmployeeForm = () => {
           department: data.department,
           empBadgeNo: data.empBadgeNo,
           empID: data.empID,
+          createdBy: JSON.stringify([{ userID: EMPID, date: currentDate }]),
         };
         await AddEmpData({ AddEmpValue });
         // console.log(AddEmpValue, "Training details Saved successfully");
