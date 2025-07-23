@@ -12,6 +12,7 @@ export const UpdateDepInsDataFun = () => {
       empID: depValue.empID,
       depInsurance: JSON.stringify(depValue.depInsurance),
       id: depValue.id,
+      updatedBy: depValue.updatedBy,
     };
     // console.log(totalData,"updated");
 

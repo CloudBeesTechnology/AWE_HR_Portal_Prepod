@@ -19,7 +19,7 @@ export const UpdateEmpInsDataFun = () => {
         travelIns:[empInsValue.travelIns],
         accidentIns:[empInsValue.accidentIns],
         empInsUpload:[empInsValue.empInsUpload],
-
+        updatedBy:empInsValue.updatedBy,
     };
     // console.log(totalData);
 

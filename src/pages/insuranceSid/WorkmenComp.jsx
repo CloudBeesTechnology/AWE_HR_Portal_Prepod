@@ -68,7 +68,8 @@ export const WorkmenComp = () => {
   const { formattedPermissions } = useDeleteAccess();
   const { workMenDetails } = useContext(DataSupply);
   const { empID, requiredPermissions, access } = useOutletContext();
-
+  const userType = localStorage.getItem("userID");
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const workmenPrint = useRef();
 
   const {
@@ -254,6 +255,9 @@ export const WorkmenComp = () => {
 
   const searchResult = (result) => {
     setSearchResultData(result);
+    if (result) {
+      setTrackEmpID(true);
+    }
   };
 
   const getFileName = (input) => {
@@ -324,14 +328,18 @@ export const WorkmenComp = () => {
 
   const onSubmit = async (data) => {
     try {
+      const today = new Date().toISOString().split("T")[0];
       const checkingDITable = workMenDetails.find(
         (match) => match.id === searchResultData.id
       );
 
       if (checkingDITable) {
+        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         const WCUpValue = {
           ...data,
           workmenComUp: JSON.stringify(uploadWCU.workmenComUp),
+          updatedBy,
         };
         console.log("Up Value", WCUpValue);
 
@@ -341,6 +349,7 @@ export const WorkmenComp = () => {
           workmenComUp: WCUpValue.workmenComUp,
           workmenCompExp: WCUpValue.workmenCompExp,
           workmenCompNo: WCUpValue.workmenCompNo,
+          updatedBy: WCUpValue.updatedBy,
         };
 
         const response = await client.graphql({
@@ -354,6 +363,7 @@ export const WorkmenComp = () => {
         const WCCreValue = {
           ...data,
           workmenComUp: JSON.stringify(uploadWCU.workmenComUp),
+          createdBy: JSON.stringify([{ userID: userType, date: today }]),
         };
         // console.log(WCCreValue);
 
@@ -610,6 +620,7 @@ export const WorkmenComp = () => {
               placeholder="Enter Workmen Comp Policy No"
               register={register}
               errors={errors}
+              trackEmpID={trackEmpID}
             />
 
             {/* Workmen Comp Expiry Date */}

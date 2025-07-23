@@ -27,6 +27,7 @@ export const CreateSRData = () => {
       uploadLP,
       uploadAL,
       uploadDep,
+      createdBy,
     } = SRValue;
 
     console.log(SRValue);
@@ -98,6 +99,7 @@ export const CreateSRData = () => {
       uploadLP: JSON.stringify(uploadLP),
       uploadAL: JSON.stringify(uploadAL),
       uploadDep: JSON.stringify(uploadDep),
+      createdBy: createdBy,
     };
 
     console.log(totalData);

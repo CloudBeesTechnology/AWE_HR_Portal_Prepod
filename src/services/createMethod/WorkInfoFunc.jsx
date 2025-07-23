@@ -39,6 +39,7 @@ export const WorkInfoFunc = () => {
       salaryType,
       probDuration,
       sapNo,
+      createdBy,
     } = workInfoValue;
 
     const formatDate = (date) =>
@@ -148,6 +149,7 @@ export const WorkInfoFunc = () => {
       workMonth: updatedWorkMonth,
       salaryType: updatedSalaryType,
       sapNo,
+      createdBy,
     };
 
     try {

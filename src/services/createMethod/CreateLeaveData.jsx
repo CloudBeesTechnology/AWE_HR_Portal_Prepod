@@ -27,6 +27,7 @@ export const CreateLeaveData = () => {
       // compasLeave,
       pervAnnualLeaveBal,
       remainAnnualLeave,
+      createdBy,
     } = LeaveValue;
 
     const formatDate = (date) =>
@@ -81,7 +82,8 @@ export const CreateLeaveData = () => {
       sickLeave,
       sickLeaveDate,
       hospLeave,
-      remainAnnualLeave
+      remainAnnualLeave,
+      createdBy: createdBy,
     };
 
     try {

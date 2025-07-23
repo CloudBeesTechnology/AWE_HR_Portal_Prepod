@@ -81,6 +81,7 @@ export const UpdateWISRData = () => {
       uploadLP,
       uploadAL,
       uploadDep,
+      updatedBy
     } = SRUpValue;
 
     const upgradeDepEmpDate = formatDate(depEmpDate);
@@ -150,6 +151,7 @@ export const UpdateWISRData = () => {
           uploadLP,
           uploadAL,
           uploadDep,
+          updatedBy: updatedBy,
         };
   
         // console.log(totalData3, "ertdfghjkhbtxrfgh");

@@ -32,6 +32,8 @@ export const EmployeeInsurance = () => {
   const [empInsUpload, setEmpInsUpload] = useState([]);
   const [showTitle, setShowTitle] = useState("");
   const [isUploading, setIsUploading] = useState([]);
+  const userType = localStorage.getItem("userID");
+
   const {
     register,
     handleSubmit,
@@ -298,6 +300,8 @@ export const EmployeeInsurance = () => {
   const defaultOptions = ["OFFSHORE", "ONSHORE", "GENERAL"];
 
   const onSubmit = async (data) => {
+    const today = new Date().toISOString().split("T")[0];
+
     const filteredUploads = uploadedDocs.empInsUpload.filter(
       (upload) => upload.upload
     );
@@ -320,9 +324,16 @@ export const EmployeeInsurance = () => {
 
     if (existingEmpInsurance) {
       empInsValue.id = existingEmpInsurance.id;
+      const previous = existingEmpInsurance.updatedBy ? JSON.parse(existingEmpInsurance.updatedBy) : [];
+      const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+      empInsValue.updatedBy = updatedBy;
+      console.log(empInsValue,"empInsValue");
       await UpdateEIDataSubmit({ empInsValue });
+      
       setShowTitle("Employee Insurance Info updated successfully");
     } else {
+      empInsValue.createdBy = JSON.stringify([{ userID: userType, date: today }]);
+      console.log(empInsValue,"empInsValue");
       await SubmitMPData({ empInsValue });
       setShowTitle("Employee Insurance Info Saved successfully");
     }

@@ -12,6 +12,7 @@ export const InsClaimUp = () => {
       empID: ICValuse.empID,
       insuranceClaims: JSON.stringify(ICValuse.insuranceClaims),
       id: ICValuse.id,
+      updatedBy: ICValuse.updatedBy,
     };
     // console.log(totalData,"updated");
 
