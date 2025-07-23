@@ -205,8 +205,6 @@ export const ProbationPDF = ({ userID, userType }) => {
         if (userType !== "SuperAdmin") {
           if (item.probExtendStatus?.trim().toLowerCase() === "extended") {
             status = "Extended";
-          } else if (item.hrName && item.probExtendStatus !== "Extended") {
-            status = "Not extended";
           } else if (userType === "Supervisor") {
             status = item.supervisorApproved ? "Approved" : "Pending";
           } else if (HRMPosition === "HR MANAGER" || userType === "HR") {

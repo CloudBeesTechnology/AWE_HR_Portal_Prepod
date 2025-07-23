@@ -35,6 +35,8 @@ export declare type DNDetailsCreateFormInputValues = {
     nlmsRefNo?: string[];
     nlmsEmpValid?: string[];
     nlmsEmpUpload?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type DNDetailsCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -50,6 +52,8 @@ export declare type DNDetailsCreateFormValidationValues = {
     nlmsRefNo?: ValidationFunction<string>;
     nlmsEmpValid?: ValidationFunction<string>;
     nlmsEmpUpload?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type DNDetailsCreateFormOverridesProps = {
@@ -67,6 +71,8 @@ export declare type DNDetailsCreateFormOverridesProps = {
     nlmsRefNo?: PrimitiveOverrideProps<TextFieldProps>;
     nlmsEmpValid?: PrimitiveOverrideProps<TextFieldProps>;
     nlmsEmpUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type DNDetailsCreateFormProps = React.PropsWithChildren<{
     overrides?: DNDetailsCreateFormOverridesProps | undefined | null;

@@ -52,6 +52,8 @@ export declare type IDDetailsUpdateFormInputValues = {
     religion?: string;
     supportDocUpload?: string[];
     qcCertifyUpload?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type IDDetailsUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -84,6 +86,8 @@ export declare type IDDetailsUpdateFormValidationValues = {
     religion?: ValidationFunction<string>;
     supportDocUpload?: ValidationFunction<string>;
     qcCertifyUpload?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type IDDetailsUpdateFormOverridesProps = {
@@ -118,6 +122,8 @@ export declare type IDDetailsUpdateFormOverridesProps = {
     religion?: PrimitiveOverrideProps<TextFieldProps>;
     supportDocUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
     qcCertifyUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type IDDetailsUpdateFormProps = React.PropsWithChildren<{
     overrides?: IDDetailsUpdateFormOverridesProps | undefined | null;

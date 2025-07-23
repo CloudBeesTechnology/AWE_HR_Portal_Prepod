@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -39,6 +39,8 @@ export declare type EmpLeaveDetailsUpdateFormInputValues = {
     pervAnnualLeaveBal?: string;
     sickLeaveTaken?: string;
     remainAnnualLeave?: string;
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type EmpLeaveDetailsUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -58,6 +60,8 @@ export declare type EmpLeaveDetailsUpdateFormValidationValues = {
     pervAnnualLeaveBal?: ValidationFunction<string>;
     sickLeaveTaken?: ValidationFunction<string>;
     remainAnnualLeave?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type EmpLeaveDetailsUpdateFormOverridesProps = {
@@ -79,6 +83,8 @@ export declare type EmpLeaveDetailsUpdateFormOverridesProps = {
     pervAnnualLeaveBal?: PrimitiveOverrideProps<TextFieldProps>;
     sickLeaveTaken?: PrimitiveOverrideProps<TextFieldProps>;
     remainAnnualLeave?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type EmpLeaveDetailsUpdateFormProps = React.PropsWithChildren<{
     overrides?: EmpLeaveDetailsUpdateFormOverridesProps | undefined | null;

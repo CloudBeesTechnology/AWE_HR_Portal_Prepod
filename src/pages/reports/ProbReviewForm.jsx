@@ -45,7 +45,6 @@ export const ProbReviewForm = ({ userID, userType }) => {
     skilledAndUnskilled: null,
   });
 
-
   const [formData, setFormData] = useState({
     probData: {
       adaptability: "",
@@ -399,7 +398,7 @@ export const ProbReviewForm = ({ userID, userType }) => {
       };
 
       if (userType === "Supervisor" && !formData.probData.supervisorName) {
-        alert("Supervisor Name is required!");
+        alert("Supervisor name is required!");
         setIsLoading(false);
         return;
       }
@@ -408,13 +407,13 @@ export const ProbReviewForm = ({ userID, userType }) => {
         !formData.probData.supervisorApproved &&
         !formData.probData.supervisorDate
       ) {
-        alert("Supervisor approval or Rejection required!");
+        alert("Supervisor approval or rejection required!");
         setIsLoading(false);
         return;
       }
 
       if (userType === "Supervisor" && !formData.probData.supervisorDate) {
-        alert("Supervisor Date is required!");
+        alert("Supervisor date is required!");
         setIsLoading(false);
         return;
       }
@@ -423,11 +422,10 @@ export const ProbReviewForm = ({ userID, userType }) => {
         userType === "Manager" &&
         gmPosition !== GM &&
         HRMPosition !== "HR MANAGER" &&
-        formData.probData.supervisorApproved === null &&
+        !formData.probData.supervisorApproved &&
         supervisorCheck === true
       ) {
-        console.log("Supervisor approval block triggered");
-        alert("Supervisor Approval required!");
+        alert("Supervisor approval required!");
         setIsLoading(false);
         return;
       }
@@ -474,7 +472,7 @@ export const ProbReviewForm = ({ userID, userType }) => {
       }
 
       await ProbFormsData({ ProbValue });
-   
+
       setIsLoading(false);
 
       setTimeout(() => {
@@ -684,6 +682,19 @@ export const ProbReviewForm = ({ userID, userType }) => {
     }, 500);
   };
 
+  function formatDateIfNeeded(dateStr) {
+    if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) return dateStr;
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+      return dateStr.replace(/\//g, "-");
+    }
+    const date = new Date(dateStr);
+    if (isNaN(date)) return dateStr;
+    const dd = String(date.getDate()).padStart(2, "0");
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const yyyy = date.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
   return (
     <>
       <div id="capture-section" ref={probationFormRef}>
@@ -784,105 +795,87 @@ export const ProbReviewForm = ({ userID, userType }) => {
           {/* Employee Details */}
           <div className="w-full mx-auto mb-10">
             <h2 className="text-lg font-semibold mb-4">Employee Details:</h2>
-            <table className="w-full border border-black">
+            <table className="w-full border border-black table-fixed">
               <tbody>
                 <tr className="border">
-                  <td className="p-2 border-r border-b font-semibold">
+                  <td className="p-2 border-r border-b font-semibold w-1/2">
                     Employee Name
                   </td>
-                  <td className="p-2 border-b">
-                    <input
-                      {...register("name")}
-                      defaultValue={employeeData?.name || "-"}
-                      className="w-full outline-none"
-                    />
+                  <td className="p-2 border-b w-1/2">
+                    {employeeData?.name || "-"}
                   </td>
                 </tr>
 
                 <tr className="border">
-                  <td className="p-2 border-r border-b font-semibold">
+                  <td className="p-2 border-r border-b font-semibold w-1/2">
                     Employee ID
                   </td>
-                  <td className="p-2 border-b">
-                    <input
-                      {...register("empID")}
-                      defaultValue={employeeData?.empID || ""}
-                      className="w-full outline-none"
-                    />
+                  <td className="p-2 border-b w-1/2">
+                    {employeeData?.empID || "-"}
                   </td>
                 </tr>
+
                 <tr className="border">
-                  <td className="p-2 border-r border-b font-semibold">
+                  <td className="p-2 border-r border-b font-semibold w-1/2">
                     Badge Number
                   </td>
-                  <td className="p-2 border-b">
-                    <input
-                      {...register("empBadgeNo")}
-                      defaultValue={employeeData?.empBadgeNo || ""}
-                      className="w-full outline-none"
-                    />
+                  <td className="p-2 border-b w-1/2">
+                    {employeeData?.empBadgeNo || "-"}
                   </td>
                 </tr>
+
                 <tr className="border">
-                  <td className="p-2 border-r border-b font-semibold">
+                  <td className="p-2 border-r border-b font-semibold w-1/2">
                     Department
                   </td>
-                  <td className="p-2 border-b">
-                    <input
-                      {...register("department")}
-                      defaultValue={employeeData?.department || ""}
-                      className="w-full outline-none"
-                    />
+                  <td className="p-2 border-b w-1/2">
+                    {employeeData?.department || "-"}
                   </td>
                 </tr>
+
                 <tr className="border">
-                  <td className="p-2 border-r border-b font-semibold">
+                  <td className="p-2 border-r border-b font-semibold w-1/2">
                     Position
                   </td>
-                  <td className="p-2 border-b">
-                    <input
-                      {...register("position")}
-                      defaultValue={employeeData?.position || ""}
-                      className="w-full outline-none"
-                    />
+                  <td className="p-2 border-b w-1/2">
+                    {employeeData?.position || "-"}
                   </td>
                 </tr>
+
                 <tr className="border">
-                  <td className="p-2 border-r border-b font-semibold">
+                  <td className="p-2 border-r border-b font-semibold w-1/2">
                     Date Joined
                   </td>
-                  <td className="p-2 border-b">
-                    <input
-                      {...register("doj")}
-                      defaultValue={employeeData?.dateOfJoin || ""}
-                      className="w-full outline-none"
-                    />
+                  <td className="p-2 border-b w-1/2">
+                    {employeeData?.dateOfJoin
+                      ? employeeData?.dateOfJoin
+                      : employeeData?.doj || "-"}
                   </td>
                 </tr>
+
                 <tr className="border">
-                  <td className="p-2 border-r border-b font-semibold">
+                  <td className="p-2 border-r border-b font-semibold w-1/2">
                     Probation End Date
                   </td>
-                  <td className="p-2 border-b">
-                    <input
-                      {...register("probationEnd")}
-                      defaultValue={employeeData?.probationEndDate || "-"}
-                      className="w-full outline-none"
-                    />
+                  <td className="p-2 border-b w-1/2">
+                    {employeeData?.prevProbExDate
+                      ? formatDateIfNeeded(employeeData?.prevProbExDate)
+                      : employeeData?.probationEndDate || "-"}
                   </td>
                 </tr>
+
                 <tr className="border">
-                  <td className="p-2 border-r border-b font-semibold">
+                  <td className="p-2 border-r border-b font-semibold w-1/2">
                     Extended Probation End Date
                   </td>
-                  <td className="p-2 border-b">
+                  <td className="p-2 border-b w-1/2">
                     <input
                       type="date"
                       name="extendDate"
                       {...register("extendDate")}
                       value={formData.probData.extendDate}
                       onChange={handleInputChange}
-                      className=" px-1"
+                      className="w-full px-1"
                     />
                   </td>
                 </tr>

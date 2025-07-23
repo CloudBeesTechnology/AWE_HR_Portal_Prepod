@@ -13,6 +13,7 @@ import { LabourDepTable } from "./LabourDepTable";
 import { ImmigrationTable } from "./ImmigrationTable";
 import { AirTKtTable } from "./AirTKtTable";
 import { NonLocalMobTable } from "./NonLocalMobTable";
+import { IoSearch } from "react-icons/io5";
 
 export const WorkpassTracking = () => {
   const [data, setData] = useState([]);
@@ -24,12 +25,15 @@ export const WorkpassTracking = () => {
   const [filterBoxTitle, setFilterBoxTitle] = useState("SAWP");
   const [selectedFilters, setSelectedFilters] = useState("SAWP");
   const [selectedCandidateType, setSelectedCandidateType] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [candidateTypeDropdownOpen, setCandidateTypeDropdownOpen] =
     useState(false);
   const [urlValue, setURLValue] = useState("");
   const { WPTrackings, empPDData, IVSSDetails, educDetailsData, localMobiliz } =
     useContext(DataSupply);
 
+  // Process and merge data
   useEffect(() => {
     // Create a map of education details for easy lookup
     const educDetailsMap = educDetailsData.reduce((acc, item) => {
@@ -107,24 +111,11 @@ export const WorkpassTracking = () => {
     }
   }, [WPTrackings, empPDData, IVSSDetails, educDetailsData, localMobiliz]);
 
-  const toggleFilterBox = (event) => {
-    event?.stopPropagation();
-    setIsFilterBoxOpen((prevState) => !prevState);
-  };
+  // Apply filters whenever search term, selected filters, or candidate type changes
+  useEffect(() => {
+    if (!data || data.length === 0) return;
 
-  const handleRowClick = (candidate) => {
-    setSelectedCandidate(candidate);
-    setIsFormVisible(true);
-  };
-
-  const handleFilterChange = (event) => {
-    const selectedValue = event.target.value;
-    setSelectedFilters(selectedValue);
-    setFilterBoxTitle(selectedValue);
-
-    if (!data) return;
-
-    let filtered = applyFiltersBasedOnStatus(selectedValue, data);
+    let filtered = applyFiltersBasedOnStatus(selectedFilters, data);
 
     if (selectedCandidateType.length > 0) {
       filtered = filtered.filter((candidate) => {
@@ -135,21 +126,14 @@ export const WorkpassTracking = () => {
           if (opt === "LPA") {
             return (
               candidate.contractType === "LPA" &&
-              (candidate.empType === "OnShore" ||
-                candidate.empType === "OffShore")
+              (candidate.empType === "Onshore" || candidate.empType === "Offshore")
             );
           }
           if (opt === "OnShore") {
-            return (
-              candidate.empType === "OnShore" &&
-              candidate.contractType !== "SAWP"
-            ); // Exclude SAWP for OnShore
+            return candidate.empType === "Onshore" && candidate.contractType !== "SAWP";
           }
           if (opt === "OffShore") {
-            return (
-              candidate.empType === "OffShore" &&
-              candidate.contractType !== "SAWP"
-            ); // Exclude SAWP for OffShore
+            return candidate.empType === "Offshore" && candidate.contractType !== "SAWP";
           }
           return true;
         });
@@ -157,64 +141,94 @@ export const WorkpassTracking = () => {
     }
 
     setFilteredData(filtered);
-    setIsFilterBoxOpen(false);
+     setIsFilterBoxOpen(false);
+  }, [searchTerm, selectedFilters, selectedCandidateType, data]);
+
+  const toggleFilterBox = (event) => {
+    event?.stopPropagation();
+    setIsFilterBoxOpen((prevState) => !prevState);
+  };
+
+
+  const filterBySearchTerm = (data) => {
+    if (!searchTerm) return data;
+
+    const term = searchTerm.toLowerCase();
+
+    return data.filter((item) => {
+      return (
+        (item.tempID && item.tempID.toLowerCase().includes(term)) ||
+        (item.firstName && item.firstName.toLowerCase().includes(term)) ||
+        (item.lastName && item.lastName.toLowerCase().includes(term)) ||
+        (item.email && item.email.toLowerCase().includes(term)) ||
+        (item.phoneNumber && item.phoneNumber.includes(term))
+      );
+    });
   };
 
   const applyFiltersBasedOnStatus = (status, data) => {
-    let filtered = [];
-    // console.log("Data", data);
+    let filtered = data;
 
+    // First apply status filter
     switch (status) {
       case "SAWP":
-        filtered = data.filter(
+        filtered = filtered.filter(
           (val) => val?.interviewDetails_status?.toUpperCase() === "SAWP"
         );
         break;
       case "DOE":
-        filtered = data.filter(
+        filtered = filtered.filter(
           (val) => val?.interviewDetails_status?.toUpperCase() === "DOE"
         );
         break;
       case "NLMS":
-        filtered = data.filter(
+        filtered = filtered.filter(
           (val) => val?.interviewDetails_status?.toUpperCase() === "NLMS"
         );
         break;
       case "Bank Guarantee":
-        filtered = data.filter(
+        filtered = filtered.filter(
           (val) => val?.interviewDetails_status === "Bank Guarantee"
         );
         break;
       case "JITPA":
-        filtered = data.filter(
+        filtered = filtered.filter(
           (val) => val?.interviewDetails_status?.toUpperCase() === "JITPA"
         );
         break;
       case "Labour Deposit":
-        filtered = data.filter(
+        filtered = filtered.filter(
           (val) => val?.interviewDetails_status === "Labour Deposit"
         );
         break;
       case "Immigration":
-        filtered = data.filter(
+        filtered = filtered.filter(
           (val) => val?.interviewDetails_status?.toLowerCase() === "immigration"
         );
         break;
       case "Air Ticket":
-        filtered = data.filter(
+        filtered = filtered.filter(
           (val) => val?.interviewDetails_status === "Air Ticket"
         );
         break;
       case "NonLocal Mobilization":
-        filtered = data.filter(
+        filtered = filtered.filter(
           (val) => val?.interviewDetails_status === "NonLocal Mobilization"
         );
         break;
       default:
-        filtered = data;
         break;
     }
-    return filtered;
+
+    // Then apply search filter
+    return filterBySearchTerm(filtered);
+  };
+
+  const handleFilterChange = (event) => {
+    const selectedValue = event.target.value;
+    setSelectedFilters(selectedValue);
+    setFilterBoxTitle(selectedValue);
+    setIsFilterBoxOpen(false);
   };
 
   const handleCandidateTypeSelect = (option) => {
@@ -248,50 +262,17 @@ export const WorkpassTracking = () => {
     }
 
     setSelectedCandidateType(updatedOptions);
-
-    let filtered = data;
-
-    if (updatedOptions.length > 0) {
-      filtered = data.filter((d) => {
-        return updatedOptions.some((opt) => {
-          if (opt === "SAWP") {
-            return d.contractType === "SAWP";
-          }
-          if (opt === "LPA") {
-            return (
-              d.contractType === "LPA" &&
-              (d.empType === "Onshore" || d.empType === "Offshore") // Ensure empType is checked as Onshore/Offshore
-            );
-          }
-          if (opt === "OnShore") {
-            // Exclude SAWP when filtering OnShore
-            return d.empType === "Onshore" && d.contractType !== "SAWP";
-          }
-          if (opt === "OffShore") {
-            // Exclude SAWP when filtering OffShore
-            return d.empType === "Offshore" && d.contractType !== "SAWP";
-          }
-
-          return true;
-        });
-      });
-    }
-
-    if (selectedFilters) {
-      filtered = applyFiltersBasedOnStatus(selectedFilters, filtered);
-    }
-
-    setFilteredData(filtered);
   };
 
   const closeForm = () => setIsFormVisible(false);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         filterBoxRef.current &&
         !filterBoxRef.current.contains(event.target)
       ) {
-        setIsFilterBoxOpen(false); // Close the filter box when clicking outside
+        setIsFilterBoxOpen(false);
       }
       if (!event.target.closest(".candidateTypeDropdown")) {
         setCandidateTypeDropdownOpen(false);
@@ -322,23 +303,22 @@ export const WorkpassTracking = () => {
 
     const date = new Date(dateToString);
 
-    const day = date.getDate().toString().padStart(2, "0"); // Local day
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Local month
-    const year = date.getFullYear(); // Local year
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
 
-    return `${day}-${month}-${year}`; // Format as DD/MM/YYYY
+    return `${day}-${month}-${year}`;
   };
 
   const fileUpload = async (files) => {
     try {
-      // Check if input is a string
       if (typeof files === "string") {
         let validJsonString = files
-          .replace(/=/g, ":") // Replace `=` with `:`
-          .replace(/([{,])(\s*[a-zA-Z0-9_]+)(?=\s*:)/g, '$1"$2"') // Wrap keys in quotes
-          .replace(/:\s*([^",}\]]+)/g, ': "$1"') // Wrap unquoted values in quotes
-          .replace(/"\s*[^"]+"\s*$/g, (match) => match.trim()) // Trim unnecessary spaces
-          .replace(/(\w)(,|})/g, "$1$2"); // Ensure commas and closing brackets are in place
+          .replace(/=/g, ":")
+          .replace(/([{,])(\s*[a-zA-Z0-9_]+)(?=\s*:)/g, '$1"$2"')
+          .replace(/:\s*([^",}\]]+)/g, ': "$1"')
+          .replace(/"\s*[^"]+"\s*$/g, (match) => match.trim())
+          .replace(/(\w)(,|})/g, "$1$2");
 
         const parsedArray = JSON.parse(validJsonString);
 
@@ -453,93 +433,131 @@ export const WorkpassTracking = () => {
   };
 
   return (
-    <section className="screen-size min-h-screen mb-4 ">
-      <div className="relative">
-        {/* Candidate Type Dropdown */}
-        <button
-          className={`font-semibold py-2 px-6 mb-6 rounded-lg flex items-center ${
-            selectedCandidateType.length > 0 ? "bg-[#faf362]" : "bg-[#8d8f9036]"
-          } candidateTypeDropdown`}
-          onClick={() =>
-            setCandidateTypeDropdownOpen(!candidateTypeDropdownOpen)
-          }
-        >
-          {selectedCandidateType.length > 0
-            ? selectedCandidateType.join(" + ")
-            : "CANDIDATE TYPE"}
-          {candidateTypeDropdownOpen ? (
-            <FaChevronUp className="ml-10" />
-          ) : (
-            <FaChevronDown className="ml-10" />
-          )}
-        </button>
+    <section className="screen-size min-h-screen mb-4">
+      <div className="py-4">
+        {/* Top Control Bar */}
+        <div className="flex justify-between items-start gap-4 flex-wrap">
+          {/* LEFT SIDE: Dropdowns */}
+          <div className="flex gap-4">
+            {/* Candidate Type Dropdown */}
+            <div className="relative">
+              <button
+                className={`font-semibold py-2 px-6 rounded-lg flex items-center ${
+                  selectedCandidateType.length > 0
+                    ? "bg-[#faf362]"
+                    : "bg-[#8d8f9036]"
+                }`}
+                onClick={() =>
+                  setCandidateTypeDropdownOpen(!candidateTypeDropdownOpen)
+                }
+              >
+                {selectedCandidateType.length > 0
+                  ? selectedCandidateType.join(" + ")
+                  : "CANDIDATE TYPE"}
+                {candidateTypeDropdownOpen ? (
+                  <FaChevronUp className="ml-10" />
+                ) : (
+                  <FaChevronDown className="ml-10" />
+                )}
+              </button>
 
-        {candidateTypeDropdownOpen && (
-          <div className="absolute bg-white border shadow-lg rounded-lg z-20 candidateTypeDropdown">
-            {["SAWP", "LPA", "OnShore", "OffShore"].map((option) => (
-              <label key={option} className="block w-full text-left px-4 py-2">
-                <input
-                  type="checkbox"
-                  className="mr-2"
-                  checked={selectedCandidateType.includes(option)}
-                  onChange={() => handleCandidateTypeSelect(option)}
-                />
-                {option}
-              </label>
-            ))}
-          </div>
-        )}
+              {/* Candidate Type Dropdown Menu */}
+              {candidateTypeDropdownOpen && (
+                <div className="absolute mt-2 bg-white border shadow-lg rounded-lg z-20 w-48">
+                  {["SAWP", "LPA", "OnShore", "OffShore"].map((option) => (
+                    <label
+                      key={option}
+                      className="block w-full text-left px-4 py-2"
+                    >
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        checked={selectedCandidateType.includes(option)}
+                        onChange={() => handleCandidateTypeSelect(option)}
+                      />
+                      {option}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
 
-        <button
-          onClick={toggleFilterBox}
-          className={`absolute top-0 right-10 px-6 py-2 font-semibold rounded-lg flex items-center ${
-            selectedFilters.length ? "bg-[#faf362]" : "bg-[#8d8f9036]"
-          }`}
-        >
-          <LuFilter className="mr-5" />
-          <span>{filterBoxTitle}</span>
-        </button>
-
-        {isFilterBoxOpen && (
-          <div
-            ref={filterBoxRef}
-            className="absolute top-12 right-0 mt-2 bg-white shadow-lg rounded-lg p-4 z-50 flex flex-col space-y-2"
-          >
-            {[
-              "SAWP",
-              "DOE",
-              "NLMS",
-              "Bank Guarantee",
-              "JITPA",
-              "Labour Deposit",
-              "Immigration",
-              "Air Ticket",
-              "NonLocal Mobilization",
-            ].map((workpasstracking) => (
-              <label
-                key={workpasstracking}
-                className={`flex items-center font-semibold space-x-2 hover:font-bold hover:text-[#c7bd03] p-2 rounded-md ${
-                  selectedFilters === workpasstracking
-                    ? "text-[#faf362]"
-                    : "text-lite_grey"
+            {/* Filter Button + Dropdown */}
+            <div className="relative">
+              <button
+                onClick={toggleFilterBox}
+                className={`px-6 py-2 font-semibold rounded-lg flex items-center ${
+                  selectedFilters.length ? "bg-[#faf362]" : "bg-[#8d8f9036]"
                 }`}
               >
-                <input
-                  type="radio"
-                  className="w-5 h-6"
-                  name="workpasstracking"
-                  value={workpasstracking}
-                  checked={selectedFilters === workpasstracking}
-                  onChange={handleFilterChange}
-                />
-                <span>{workpasstracking}</span>
-              </label>
-            ))}
+                <LuFilter className="mr-2" />
+                <span>{filterBoxTitle}</span>
+              </button>
+
+              {/* Filter Box Dropdown */}
+              {isFilterBoxOpen && (
+                <div
+                  ref={filterBoxRef}
+                  className="absolute mt-2 w-60 bg-white shadow-lg rounded-lg p-4 z-50 flex flex-col space-y-2"
+                >
+                  {[
+                    "SAWP",
+                    "DOE",
+                    "NLMS",
+                    "Bank Guarantee",
+                    "JITPA",
+                    "Labour Deposit",
+                    "Immigration",
+                    "Air Ticket",
+                    "NonLocal Mobilization",
+                  ].map((workpasstracking) => (
+                    <label
+                      key={workpasstracking}
+                      className={`flex items-center font-semibold space-x-2 hover:font-bold hover:text-[#c7bd03] p-2 rounded-md ${
+                        selectedFilters === workpasstracking
+                          ? "text-[#faf362]"
+                          : "text-lite_grey"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        className="w-5 h-6"
+                        name="workpasstracking"
+                        value={workpasstracking}
+                        checked={selectedFilters === workpasstracking}
+                        onChange={handleFilterChange}
+                      />
+                      <span>{workpasstracking}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        )}
 
-        {renderComponent()}
+          {/* RIGHT SIDE: Search Input */}
+          <div className="flex-1 flex justify-end">
+            <div className="relative w-full max-w-sm">
+              <div className="py-[9px] w-full text_size_5 bg-white border text-grey border-lite_grey rounded-lg flex items-center px-3 gap-2">
+                <input
+                  type="text"
+                  placeholder="Search"
+                  className="outline-none w-full text-sm"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <div className="text-dark_grey text-2xl cursor-pointer">
+                  <IoSearch />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
+        {/* Component Display Area */}
+        <div className="mt-6">{renderComponent()}</div>
+
+        {/* Form Drawer */}
         {isFormVisible && selectedCandidate && (
           <WorkpassForm
             candidate={selectedCandidate}

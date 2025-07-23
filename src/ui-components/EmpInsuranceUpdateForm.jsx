@@ -201,6 +201,8 @@ export default function EmpInsuranceUpdateForm(props) {
     travelIns: [],
     accidentIns: [],
     empInsUpload: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [groupIns, setGroupIns] = React.useState(initialValues.groupIns);
@@ -223,6 +225,8 @@ export default function EmpInsuranceUpdateForm(props) {
   const [empInsUpload, setEmpInsUpload] = React.useState(
     initialValues.empInsUpload
   );
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = empInsuranceRecord
@@ -243,6 +247,10 @@ export default function EmpInsuranceUpdateForm(props) {
     setCurrentAccidentInsValue("");
     setEmpInsUpload(cleanValues.empInsUpload ?? []);
     setCurrentEmpInsUploadValue("");
+    setCreatedBy(cleanValues.createdBy ?? []);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(cleanValues.updatedBy ?? []);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [empInsuranceRecord, setEmpInsuranceRecord] = React.useState(
@@ -279,6 +287,10 @@ export default function EmpInsuranceUpdateForm(props) {
   const [currentEmpInsUploadValue, setCurrentEmpInsUploadValue] =
     React.useState("");
   const empInsUploadRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     groupIns: [],
@@ -289,6 +301,8 @@ export default function EmpInsuranceUpdateForm(props) {
     travelIns: [],
     accidentIns: [],
     empInsUpload: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -325,6 +339,8 @@ export default function EmpInsuranceUpdateForm(props) {
           travelIns: travelIns ?? null,
           accidentIns: accidentIns ?? null,
           empInsUpload: empInsUpload ?? null,
+          createdBy: createdBy ?? null,
+          updatedBy: updatedBy ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -394,6 +410,8 @@ export default function EmpInsuranceUpdateForm(props) {
               travelIns,
               accidentIns,
               empInsUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -422,6 +440,8 @@ export default function EmpInsuranceUpdateForm(props) {
               travelIns,
               accidentIns,
               empInsUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.groupIns ?? values;
@@ -475,6 +495,8 @@ export default function EmpInsuranceUpdateForm(props) {
               travelIns,
               accidentIns,
               empInsUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.groupInsEffectDate ?? values;
@@ -536,6 +558,8 @@ export default function EmpInsuranceUpdateForm(props) {
               travelIns,
               accidentIns,
               empInsUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.groupInsEndDate ?? values;
@@ -598,6 +622,8 @@ export default function EmpInsuranceUpdateForm(props) {
               travelIns,
               accidentIns,
               empInsUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empStatusType ?? value;
@@ -630,6 +656,8 @@ export default function EmpInsuranceUpdateForm(props) {
               travelIns,
               accidentIns,
               empInsUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.workmenCompNo ?? value;
@@ -658,6 +686,8 @@ export default function EmpInsuranceUpdateForm(props) {
               travelIns: values,
               accidentIns,
               empInsUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.travelIns ?? values;
@@ -711,6 +741,8 @@ export default function EmpInsuranceUpdateForm(props) {
               travelIns,
               accidentIns: values,
               empInsUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.accidentIns ?? values;
@@ -766,6 +798,8 @@ export default function EmpInsuranceUpdateForm(props) {
               travelIns,
               accidentIns,
               empInsUpload: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.empInsUpload ?? values;
@@ -805,6 +839,116 @@ export default function EmpInsuranceUpdateForm(props) {
           ref={empInsUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "empInsUpload")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              groupIns,
+              groupInsEffectDate,
+              groupInsEndDate,
+              empStatusType,
+              workmenCompNo,
+              travelIns,
+              accidentIns,
+              empInsUpload,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              groupIns,
+              groupInsEffectDate,
+              groupInsEndDate,
+              empStatusType,
+              workmenCompNo,
+              travelIns,
+              accidentIns,
+              empInsUpload,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex

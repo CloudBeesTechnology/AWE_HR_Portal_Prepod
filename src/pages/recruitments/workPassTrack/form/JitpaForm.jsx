@@ -260,12 +260,12 @@ export const JitpaForm = ({ candidate }) => {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
-      setNotification(true);
-
+      
       // console.log("Submitting interview details with status:", interStatus);
-
+      
       await interviewDetails({ InterviewValue: interStatus });
-
+      
+      setNotification(true);
       // console.log("Interview status updated:", interStatus);
 
       // console.log("Response from WPTrackingDetails:", response);

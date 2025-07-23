@@ -26,12 +26,16 @@ export declare type SawpDetailsUpdateFormInputValues = {
     sawpEmpLtrReq?: string[];
     sawpEmpLtrReci?: string[];
     sawpEmpUpload?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type SawpDetailsUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
     sawpEmpLtrReq?: ValidationFunction<string>;
     sawpEmpLtrReci?: ValidationFunction<string>;
     sawpEmpUpload?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type SawpDetailsUpdateFormOverridesProps = {
@@ -40,6 +44,8 @@ export declare type SawpDetailsUpdateFormOverridesProps = {
     sawpEmpLtrReq?: PrimitiveOverrideProps<TextFieldProps>;
     sawpEmpLtrReci?: PrimitiveOverrideProps<TextFieldProps>;
     sawpEmpUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type SawpDetailsUpdateFormProps = React.PropsWithChildren<{
     overrides?: SawpDetailsUpdateFormOverridesProps | undefined | null;

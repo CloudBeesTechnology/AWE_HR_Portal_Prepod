@@ -206,6 +206,8 @@ export default function TrainingReqCreateForm(props) {
     company: [],
     mediRequired: false,
     traineeTrack: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [MRNo, setMRNo] = React.useState(initialValues.MRNo);
@@ -238,6 +240,8 @@ export default function TrainingReqCreateForm(props) {
   const [traineeTrack, setTraineeTrack] = React.useState(
     initialValues.traineeTrack
   );
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -260,6 +264,10 @@ export default function TrainingReqCreateForm(props) {
     setMediRequired(initialValues.mediRequired);
     setTraineeTrack(initialValues.traineeTrack);
     setCurrentTraineeTrackValue("");
+    setCreatedBy(initialValues.createdBy);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(initialValues.updatedBy);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [currentMedicalReportValue, setCurrentMedicalReportValue] =
@@ -276,6 +284,10 @@ export default function TrainingReqCreateForm(props) {
   const [currentTraineeTrackValue, setCurrentTraineeTrackValue] =
     React.useState("");
   const traineeTrackRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     MRNo: [],
@@ -292,6 +304,8 @@ export default function TrainingReqCreateForm(props) {
     company: [],
     mediRequired: [],
     traineeTrack: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -334,6 +348,8 @@ export default function TrainingReqCreateForm(props) {
           company,
           mediRequired,
           traineeTrack,
+          createdBy,
+          updatedBy,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -411,6 +427,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -449,6 +467,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.MRNo ?? value;
@@ -487,6 +507,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.medicalName ?? value;
@@ -525,6 +547,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.medicalExpiry ?? value;
@@ -563,6 +587,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.medicalAppointDate ?? value;
@@ -599,6 +625,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.medicalReport ?? values;
@@ -664,6 +692,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.traineeSD ?? value;
@@ -702,6 +732,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.traineeED ?? value;
@@ -740,6 +772,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.traineeStatus ?? value;
@@ -778,6 +812,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.traineeCourseFee ?? value;
@@ -812,6 +848,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.courseCode ?? values;
@@ -873,6 +911,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.courseName ?? values;
@@ -934,6 +974,8 @@ export default function TrainingReqCreateForm(props) {
               company: values,
               mediRequired,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.company ?? values;
@@ -997,6 +1039,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired: value,
               traineeTrack,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.mediRequired ?? value;
@@ -1031,6 +1075,8 @@ export default function TrainingReqCreateForm(props) {
               company,
               mediRequired,
               traineeTrack: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.traineeTrack ?? values;
@@ -1070,6 +1116,128 @@ export default function TrainingReqCreateForm(props) {
           ref={traineeTrackRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "traineeTrack")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              MRNo,
+              medicalName,
+              medicalExpiry,
+              medicalAppointDate,
+              medicalReport,
+              traineeSD,
+              traineeED,
+              traineeStatus,
+              traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
+              traineeTrack,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              MRNo,
+              medicalName,
+              medicalExpiry,
+              medicalAppointDate,
+              medicalReport,
+              traineeSD,
+              traineeED,
+              traineeStatus,
+              traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
+              traineeTrack,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex

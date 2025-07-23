@@ -30,7 +30,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
   const [formData, setFormData] = useState({
     interview: {
       id: "",
-      mobSignDate: "", 
+      mobSignDate: "",
       agentname: "",
       remarkNLMob: "",
       mobFile: "",
@@ -263,9 +263,10 @@ export const NonLocalMobilizForm = ({ candidate }) => {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
-      setNotification(true);
 
       await interviewDetails({ InterviewValue: interStatus });
+
+      setNotification(true);
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

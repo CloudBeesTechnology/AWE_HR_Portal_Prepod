@@ -25,11 +25,15 @@ export declare type PersonalAccidentUpdateFormInputValues = {
     perAccExp?: string;
     perAccNo?: string;
     perAccUp?: string[];
+    updatedBy?: string[];
+    createdBy?: string[];
 };
 export declare type PersonalAccidentUpdateFormValidationValues = {
     perAccExp?: ValidationFunction<string>;
     perAccNo?: ValidationFunction<string>;
     perAccUp?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PersonalAccidentUpdateFormOverridesProps = {
@@ -37,6 +41,8 @@ export declare type PersonalAccidentUpdateFormOverridesProps = {
     perAccExp?: PrimitiveOverrideProps<TextFieldProps>;
     perAccNo?: PrimitiveOverrideProps<TextFieldProps>;
     perAccUp?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type PersonalAccidentUpdateFormProps = React.PropsWithChildren<{
     overrides?: PersonalAccidentUpdateFormOverridesProps | undefined | null;

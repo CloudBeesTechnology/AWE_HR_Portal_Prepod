@@ -778,7 +778,7 @@ export const AddEmployeeForm = () => {
           { userID: EMPID, date: currentDate },
         ];
 
-        const orderedUpdatedBy = updateUpdatedByData.map((entry) => ({
+        const orderedUpdatedBy = updateUpdatedByData?.map((entry) => ({
           userID: entry.userID,
           date: entry.date,
         }));

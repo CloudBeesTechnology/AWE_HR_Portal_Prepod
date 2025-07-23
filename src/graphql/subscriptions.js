@@ -462,6 +462,8 @@ export const onCreateInsuranceType = /* GraphQL */ `
       id
       typeIns
       insDetails
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -476,6 +478,8 @@ export const onUpdateInsuranceType = /* GraphQL */ `
       id
       typeIns
       insDetails
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -490,6 +494,8 @@ export const onDeleteInsuranceType = /* GraphQL */ `
       id
       typeIns
       insDetails
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -505,6 +511,8 @@ export const onCreateGroupHandS = /* GraphQL */ `
       groupHSExp
       groupHSNo
       groupHSUpload
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -520,6 +528,8 @@ export const onUpdateGroupHandS = /* GraphQL */ `
       groupHSExp
       groupHSNo
       groupHSUpload
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -535,6 +545,8 @@ export const onDeleteGroupHandS = /* GraphQL */ `
       groupHSExp
       groupHSNo
       groupHSUpload
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -549,6 +561,8 @@ export const onCreateWorkMen = /* GraphQL */ `
       workmenCompExp
       workmenCompNo
       workmenComUp
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -563,6 +577,8 @@ export const onUpdateWorkMen = /* GraphQL */ `
       workmenCompExp
       workmenCompNo
       workmenComUp
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -577,6 +593,8 @@ export const onDeleteWorkMen = /* GraphQL */ `
       workmenCompExp
       workmenCompNo
       workmenComUp
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -592,6 +610,8 @@ export const onCreateTravelIns = /* GraphQL */ `
       travelExp
       travelNo
       travelUp
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -607,6 +627,8 @@ export const onUpdateTravelIns = /* GraphQL */ `
       travelExp
       travelNo
       travelUp
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -622,6 +644,8 @@ export const onDeleteTravelIns = /* GraphQL */ `
       travelExp
       travelNo
       travelUp
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -637,6 +661,8 @@ export const onCreatePersonalAccident = /* GraphQL */ `
       perAccExp
       perAccNo
       perAccUp
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -652,6 +678,8 @@ export const onUpdatePersonalAccident = /* GraphQL */ `
       perAccExp
       perAccNo
       perAccUp
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -667,6 +695,8 @@ export const onDeletePersonalAccident = /* GraphQL */ `
       perAccExp
       perAccNo
       perAccUp
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -679,6 +709,8 @@ export const onCreateInsClaim = /* GraphQL */ `
       id
       empID
       insuranceClaims
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -691,6 +723,8 @@ export const onUpdateInsClaim = /* GraphQL */ `
       id
       empID
       insuranceClaims
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -703,6 +737,8 @@ export const onDeleteInsClaim = /* GraphQL */ `
       id
       empID
       insuranceClaims
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1099,6 +1135,8 @@ export const onCreateTrainingReq = /* GraphQL */ `
       company
       mediRequired
       traineeTrack
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1126,6 +1164,8 @@ export const onUpdateTrainingReq = /* GraphQL */ `
       company
       mediRequired
       traineeTrack
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1153,6 +1193,8 @@ export const onDeleteTrainingReq = /* GraphQL */ `
       company
       mediRequired
       traineeTrack
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1174,6 +1216,8 @@ export const onCreateTrainingCertificates = /* GraphQL */ `
       addDescretion
       tcRemarks
       trainingProof
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1195,6 +1239,8 @@ export const onUpdateTrainingCertificates = /* GraphQL */ `
       addDescretion
       tcRemarks
       trainingProof
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1216,6 +1262,8 @@ export const onDeleteTrainingCertificates = /* GraphQL */ `
       addDescretion
       tcRemarks
       trainingProof
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1275,6 +1323,8 @@ export const onCreateEmpDepInsurance = /* GraphQL */ `
       id
       empID
       depInsurance
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1289,6 +1339,8 @@ export const onUpdateEmpDepInsurance = /* GraphQL */ `
       id
       empID
       depInsurance
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1303,6 +1355,8 @@ export const onDeleteEmpDepInsurance = /* GraphQL */ `
       id
       empID
       depInsurance
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1324,6 +1378,8 @@ export const onCreateEmpInsurance = /* GraphQL */ `
       travelIns
       accidentIns
       empInsUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1345,6 +1401,8 @@ export const onUpdateEmpInsurance = /* GraphQL */ `
       travelIns
       accidentIns
       empInsUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1366,6 +1424,8 @@ export const onDeleteEmpInsurance = /* GraphQL */ `
       travelIns
       accidentIns
       empInsUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1382,6 +1442,8 @@ export const onCreateSawpDetails = /* GraphQL */ `
       sawpEmpLtrReq
       sawpEmpLtrReci
       sawpEmpUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1398,6 +1460,8 @@ export const onUpdateSawpDetails = /* GraphQL */ `
       sawpEmpLtrReq
       sawpEmpLtrReci
       sawpEmpUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1414,6 +1478,8 @@ export const onDeleteSawpDetails = /* GraphQL */ `
       sawpEmpLtrReq
       sawpEmpLtrReci
       sawpEmpUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1439,6 +1505,8 @@ export const onCreateDNDetails = /* GraphQL */ `
       nlmsRefNo
       nlmsEmpValid
       nlmsEmpUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1464,6 +1532,8 @@ export const onUpdateDNDetails = /* GraphQL */ `
       nlmsRefNo
       nlmsEmpValid
       nlmsEmpUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1489,6 +1559,8 @@ export const onDeleteDNDetails = /* GraphQL */ `
       nlmsRefNo
       nlmsEmpValid
       nlmsEmpUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1518,6 +1590,8 @@ export const onCreateBJLDetails = /* GraphQL */ `
       lbrDepoAmt
       lbrDepoSubmit
       lbrDepoUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1547,6 +1621,8 @@ export const onUpdateBJLDetails = /* GraphQL */ `
       lbrDepoAmt
       lbrDepoSubmit
       lbrDepoUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1576,6 +1652,8 @@ export const onDeleteBJLDetails = /* GraphQL */ `
       lbrDepoAmt
       lbrDepoSubmit
       lbrDepoUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1603,6 +1681,8 @@ export const onCreatePassportValid = /* GraphQL */ `
       immigApproval
       reEntryVisaExp
       remarkImmig
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1630,6 +1710,8 @@ export const onUpdatePassportValid = /* GraphQL */ `
       immigApproval
       reEntryVisaExp
       remarkImmig
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1657,6 +1739,8 @@ export const onDeletePassportValid = /* GraphQL */ `
       immigApproval
       reEntryVisaExp
       remarkImmig
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1855,6 +1939,8 @@ export const onCreateEmployeeNonLocalAcco = /* GraphQL */ `
       empID
       accommodation
       accommodationAddress
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1870,6 +1956,8 @@ export const onUpdateEmployeeNonLocalAcco = /* GraphQL */ `
       empID
       accommodation
       accommodationAddress
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1885,6 +1973,8 @@ export const onDeleteEmployeeNonLocalAcco = /* GraphQL */ `
       empID
       accommodation
       accommodationAddress
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1983,6 +2073,8 @@ export const onCreateServiceRecord = /* GraphQL */ `
       uploadLP
       uploadAL
       uploadDep
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2012,6 +2104,8 @@ export const onUpdateServiceRecord = /* GraphQL */ `
       uploadLP
       uploadAL
       uploadDep
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2041,6 +2135,8 @@ export const onDeleteServiceRecord = /* GraphQL */ `
       uploadLP
       uploadAL
       uploadDep
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2070,6 +2166,8 @@ export const onCreateEmpLeaveDetails = /* GraphQL */ `
       pervAnnualLeaveBal
       sickLeaveTaken
       remainAnnualLeave
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2099,6 +2197,8 @@ export const onUpdateEmpLeaveDetails = /* GraphQL */ `
       pervAnnualLeaveBal
       sickLeaveTaken
       remainAnnualLeave
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2128,6 +2228,8 @@ export const onDeleteEmpLeaveDetails = /* GraphQL */ `
       pervAnnualLeaveBal
       sickLeaveTaken
       remainAnnualLeave
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2158,6 +2260,8 @@ export const onCreateTerminationInfo = /* GraphQL */ `
       WIResignation
       WITermination
       WILeaveEntitle
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2188,6 +2292,8 @@ export const onUpdateTerminationInfo = /* GraphQL */ `
       WIResignation
       WITermination
       WILeaveEntitle
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2218,6 +2324,8 @@ export const onDeleteTerminationInfo = /* GraphQL */ `
       WIResignation
       WITermination
       WILeaveEntitle
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2258,6 +2366,8 @@ export const onCreateEmpWorkInfo = /* GraphQL */ `
       workHrs
       workWeek
       workMonth
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2298,6 +2408,8 @@ export const onUpdateEmpWorkInfo = /* GraphQL */ `
       workHrs
       workWeek
       workMonth
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2338,6 +2450,8 @@ export const onDeleteEmpWorkInfo = /* GraphQL */ `
       workHrs
       workWeek
       workMonth
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2380,6 +2494,8 @@ export const onCreateEmpPersonalInfo = /* GraphQL */ `
       position
       sapNo
       otherLang
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2422,6 +2538,8 @@ export const onUpdateEmpPersonalInfo = /* GraphQL */ `
       position
       sapNo
       otherLang
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2464,6 +2582,8 @@ export const onDeleteEmpPersonalInfo = /* GraphQL */ `
       position
       sapNo
       otherLang
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2506,6 +2626,8 @@ export const onCreateIDDetails = /* GraphQL */ `
       religion
       supportDocUpload
       qcCertifyUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2548,6 +2670,8 @@ export const onUpdateIDDetails = /* GraphQL */ `
       religion
       supportDocUpload
       qcCertifyUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2590,6 +2714,8 @@ export const onDeleteIDDetails = /* GraphQL */ `
       religion
       supportDocUpload
       qcCertifyUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -3151,6 +3277,8 @@ export const onCreateUser = /* GraphQL */ `
       setPermissions
       password
       status
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -3166,6 +3294,8 @@ export const onUpdateUser = /* GraphQL */ `
       setPermissions
       password
       status
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -3181,6 +3311,8 @@ export const onDeleteUser = /* GraphQL */ `
       setPermissions
       password
       status
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename

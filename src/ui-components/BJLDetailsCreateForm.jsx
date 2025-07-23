@@ -207,6 +207,8 @@ export default function BJLDetailsCreateForm(props) {
     lbrDepoAmt: [],
     lbrDepoSubmit: [],
     lbrDepoUpload: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [bankSubmit, setBankSubmit] = React.useState(initialValues.bankSubmit);
@@ -239,6 +241,8 @@ export default function BJLDetailsCreateForm(props) {
   const [lbrDepoUpload, setLbrDepoUpload] = React.useState(
     initialValues.lbrDepoUpload
   );
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -274,6 +278,10 @@ export default function BJLDetailsCreateForm(props) {
     setCurrentLbrDepoSubmitValue("");
     setLbrDepoUpload(initialValues.lbrDepoUpload);
     setCurrentLbrDepoUploadValue("");
+    setCreatedBy(initialValues.createdBy);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(initialValues.updatedBy);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [currentBankSubmitValue, setCurrentBankSubmitValue] =
@@ -317,6 +325,10 @@ export default function BJLDetailsCreateForm(props) {
   const [currentLbrDepoUploadValue, setCurrentLbrDepoUploadValue] =
     React.useState("");
   const lbrDepoUploadRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     bankSubmit: [],
@@ -335,6 +347,8 @@ export default function BJLDetailsCreateForm(props) {
     lbrDepoAmt: [],
     lbrDepoSubmit: [],
     lbrDepoUpload: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -379,6 +393,8 @@ export default function BJLDetailsCreateForm(props) {
           lbrDepoAmt,
           lbrDepoSubmit,
           lbrDepoUpload,
+          createdBy,
+          updatedBy,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -458,6 +474,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -494,6 +512,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bankSubmit ?? values;
@@ -557,6 +577,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bankRece ?? values;
@@ -618,6 +640,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bankRefNo ?? values;
@@ -679,6 +703,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bankAmt ?? values;
@@ -740,6 +766,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bankValid ?? values;
@@ -801,6 +829,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bankEndorse ?? values;
@@ -864,6 +894,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bankEmpUpload ?? values;
@@ -927,6 +959,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.tbaPurchase ?? values;
@@ -990,6 +1024,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.jitpaAmt ?? values;
@@ -1051,6 +1087,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.jpValid ?? values;
@@ -1112,6 +1150,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.jpEndorse ?? values;
@@ -1173,6 +1213,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.jpEmpUpload ?? values;
@@ -1236,6 +1278,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.lbrReceiptNo ?? values;
@@ -1299,6 +1343,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt: values,
               lbrDepoSubmit,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.lbrDepoAmt ?? values;
@@ -1362,6 +1408,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit: values,
               lbrDepoUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.lbrDepoSubmit ?? values;
@@ -1425,6 +1473,8 @@ export default function BJLDetailsCreateForm(props) {
               lbrDepoAmt,
               lbrDepoSubmit,
               lbrDepoUpload: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.lbrDepoUpload ?? values;
@@ -1464,6 +1514,132 @@ export default function BJLDetailsCreateForm(props) {
           ref={lbrDepoUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "lbrDepoUpload")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              bankSubmit,
+              bankRece,
+              bankRefNo,
+              bankAmt,
+              bankValid,
+              bankEndorse,
+              bankEmpUpload,
+              tbaPurchase,
+              jitpaAmt,
+              jpValid,
+              jpEndorse,
+              jpEmpUpload,
+              lbrReceiptNo,
+              lbrDepoAmt,
+              lbrDepoSubmit,
+              lbrDepoUpload,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              bankSubmit,
+              bankRece,
+              bankRefNo,
+              bankAmt,
+              bankValid,
+              bankEndorse,
+              bankEmpUpload,
+              tbaPurchase,
+              jitpaAmt,
+              jpValid,
+              jpEndorse,
+              jpEmpUpload,
+              lbrReceiptNo,
+              lbrDepoAmt,
+              lbrDepoSubmit,
+              lbrDepoUpload,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex

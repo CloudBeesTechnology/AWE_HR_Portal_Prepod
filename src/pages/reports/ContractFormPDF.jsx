@@ -19,14 +19,14 @@ export const ContractFormPDF = ({ contentRef }) => {
   const { contractDetails } = UpdateContractData();
   const { contractForms, workInfoData, empPIData } = useContext(DataSupply);
   const location = useLocation();
-  const { employeeData,matchedID } = location.state || {};
+  const { employeeData, matchedID } = location.state || {};
   const { createNotification } = useCreateNotification();
   const [userType, setUserType] = useState("");
   const [showTitle, setShowTitle] = useState("");
   const [notification, setNotification] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-    const [isExtended, setIsExtended] = useState(false);
+  const [isExtended, setIsExtended] = useState(false);
 
   const contractEndDateStr = employeeData?.contractEndDate;
 
@@ -56,7 +56,7 @@ export const ContractFormPDF = ({ contentRef }) => {
       status: "",
       createdAt: "",
       hrSign: "",
-      hrDate: ""
+      hrDate: "",
     },
   });
 
@@ -70,7 +70,7 @@ export const ContractFormPDF = ({ contentRef }) => {
       },
     }));
   };
- const handleCheckboxChange = (e) => {
+  const handleCheckboxChange = (e) => {
     const { checked } = e.target;
     setIsExtended(checked);
     setFormData((prevState) => ({
@@ -151,7 +151,7 @@ export const ContractFormPDF = ({ contentRef }) => {
 
   // console.log(managerData);
 
-   useEffect(() => {
+  useEffect(() => {
     if (contractForms.length > 0) {
       const contractValue = contractForms.filter((val) => val.id === matchedID);
       const contractData = contractValue.find(
@@ -181,7 +181,6 @@ export const ContractFormPDF = ({ contentRef }) => {
       }
     }
   }, [contractForms, employeeData?.empID]);
-
 
   const sendHRNotification = async (
     empName,
@@ -380,11 +379,11 @@ export const ContractFormPDF = ({ contentRef }) => {
 
       const contractEndFormatted =
         Array.isArray(WorkInfoRecord?.contractEnd) &&
-          WorkInfoRecord?.contractEnd?.length > 0
+        WorkInfoRecord?.contractEnd?.length > 0
           ? WorkInfoRecord.contractEnd[WorkInfoRecord.contractEnd.length - 1]
-            .split("-")
-            .reverse()
-            .join("/")
+              .split("-")
+              .reverse()
+              .join("/")
           : "Not mentioned";
 
       let renewalStatus = "";
@@ -423,20 +422,20 @@ export const ContractFormPDF = ({ contentRef }) => {
         extendedStatus: renewalStatus,
         renewalContract: formData.contract.renewalContract,
         contStatus: true,
-        oldCED: contractEndDateStr,
+        ...(renewalStatus === "hrmView" && { oldCED: contractEndDateStr }),
         // status:"Approved"
       };
-        
+
       if (matchedID) {
         const formattedData = { ...formPayload, id: matchedID };
         await contractDetails({ ContractValue: formattedData });
         // console.log(formattedData, "update");
-      } else { 
+      } else {
         // console.log(formPayload, "create");
         await contractForm(formPayload);
       }
 
-      if (HRMPosition === "HR MANAGER" || userType === "HR") {
+      if (HRMPosition === "HR MANAGER") {
         HRResult = await sendHRNotification(
           empName,
           contractEndFormatted,
@@ -453,15 +452,13 @@ export const ContractFormPDF = ({ contentRef }) => {
           PDInfo,
           managerData
         );
-      }
-       else if (gmPosition === "GENERAL MANAGER") {
+      } else if (gmPosition === "GENERAL MANAGER") {
         GMResult = await sendGMNotification(
           empName,
           contractEndFormatted,
           managerData
         );
       }
-
 
       const notificationRes =
         managerResult === "success" ||
@@ -533,7 +530,7 @@ export const ContractFormPDF = ({ contentRef }) => {
   };
 
   return (
-   <>
+    <>
       <div
         id="capture-section"
         className="container mx-auto px-8 print-contract-form"
@@ -578,7 +575,7 @@ export const ContractFormPDF = ({ contentRef }) => {
           </div>
 
           <div className="w-full print-box">
-            <table className="min-w-full table-fixed print-box text-xs text-center border-collapse border">
+            <table className="min-w-full table-fixed print:table-auto print:w-[95%] text-xs text-center border-collapse border">
               <thead>
                 <tr>
                   <th className="border p-1 py-4">No.</th>
@@ -627,8 +624,8 @@ export const ContractFormPDF = ({ contentRef }) => {
                       {employeeData?.oldCED?.trim()
                         ? employeeData.oldCED
                         : employeeData?.contractEndDate
-                          ? employeeData.contractEndDate
-                          : "N/A"}
+                        ? employeeData.contractEndDate
+                        : "N/A"}
                     </td>
                     <td className="border p-1 py-4">
                       {employeeData?.nlmsEmpApproval || "N/A"}
@@ -703,7 +700,6 @@ export const ContractFormPDF = ({ contentRef }) => {
                 id="extendedStatus"
                 checked={isExtended}
                 onChange={handleCheckboxChange}
-           
                 className="mr-2"
               />
               <label htmlFor="extendedStatus" className="text-sm">

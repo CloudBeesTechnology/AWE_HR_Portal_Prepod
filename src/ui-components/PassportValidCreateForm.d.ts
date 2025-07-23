@@ -37,6 +37,8 @@ export declare type PassportValidCreateFormInputValues = {
     immigApproval?: string[];
     reEntryVisaExp?: string[];
     remarkImmig?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type PassportValidCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -54,6 +56,8 @@ export declare type PassportValidCreateFormValidationValues = {
     immigApproval?: ValidationFunction<string>;
     reEntryVisaExp?: ValidationFunction<string>;
     remarkImmig?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PassportValidCreateFormOverridesProps = {
@@ -73,6 +77,8 @@ export declare type PassportValidCreateFormOverridesProps = {
     immigApproval?: PrimitiveOverrideProps<TextFieldProps>;
     reEntryVisaExp?: PrimitiveOverrideProps<TextFieldProps>;
     remarkImmig?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type PassportValidCreateFormProps = React.PropsWithChildren<{
     overrides?: PassportValidCreateFormOverridesProps | undefined | null;

@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -24,16 +24,22 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type InsuranceTypeCreateFormInputValues = {
     typeIns?: string;
     insDetails?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type InsuranceTypeCreateFormValidationValues = {
     typeIns?: ValidationFunction<string>;
     insDetails?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type InsuranceTypeCreateFormOverridesProps = {
     InsuranceTypeCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     typeIns?: PrimitiveOverrideProps<TextFieldProps>;
     insDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type InsuranceTypeCreateFormProps = React.PropsWithChildren<{
     overrides?: InsuranceTypeCreateFormOverridesProps | undefined | null;

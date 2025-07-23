@@ -195,10 +195,14 @@ export default function PersonalAccidentUpdateForm(props) {
     perAccExp: "",
     perAccNo: "",
     perAccUp: [],
+    updatedBy: [],
+    createdBy: [],
   };
   const [perAccExp, setPerAccExp] = React.useState(initialValues.perAccExp);
   const [perAccNo, setPerAccNo] = React.useState(initialValues.perAccNo);
   const [perAccUp, setPerAccUp] = React.useState(initialValues.perAccUp);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = personalAccidentRecord
@@ -208,6 +212,10 @@ export default function PersonalAccidentUpdateForm(props) {
     setPerAccNo(cleanValues.perAccNo);
     setPerAccUp(cleanValues.perAccUp ?? []);
     setCurrentPerAccUpValue("");
+    setUpdatedBy(cleanValues.updatedBy ?? []);
+    setCurrentUpdatedByValue("");
+    setCreatedBy(cleanValues.createdBy ?? []);
+    setCurrentCreatedByValue("");
     setErrors({});
   };
   const [personalAccidentRecord, setPersonalAccidentRecord] = React.useState(
@@ -230,10 +238,16 @@ export default function PersonalAccidentUpdateForm(props) {
   React.useEffect(resetStateValues, [personalAccidentRecord]);
   const [currentPerAccUpValue, setCurrentPerAccUpValue] = React.useState("");
   const perAccUpRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
   const validations = {
     perAccExp: [],
     perAccNo: [],
     perAccUp: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -264,6 +278,8 @@ export default function PersonalAccidentUpdateForm(props) {
           perAccExp: perAccExp ?? null,
           perAccNo: perAccNo ?? null,
           perAccUp: perAccUp ?? null,
+          updatedBy: updatedBy ?? null,
+          createdBy: createdBy ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -327,6 +343,8 @@ export default function PersonalAccidentUpdateForm(props) {
               perAccExp: value,
               perAccNo,
               perAccUp,
+              updatedBy,
+              createdBy,
             };
             const result = onChange(modelFields);
             value = result?.perAccExp ?? value;
@@ -353,6 +371,8 @@ export default function PersonalAccidentUpdateForm(props) {
               perAccExp,
               perAccNo: value,
               perAccUp,
+              updatedBy,
+              createdBy,
             };
             const result = onChange(modelFields);
             value = result?.perAccNo ?? value;
@@ -375,6 +395,8 @@ export default function PersonalAccidentUpdateForm(props) {
               perAccExp,
               perAccNo,
               perAccUp: values,
+              updatedBy,
+              createdBy,
             };
             const result = onChange(modelFields);
             values = result?.perAccUp ?? values;
@@ -412,6 +434,104 @@ export default function PersonalAccidentUpdateForm(props) {
           ref={perAccUpRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "perAccUp")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              perAccExp,
+              perAccNo,
+              perAccUp,
+              updatedBy: values,
+              createdBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              perAccExp,
+              perAccNo,
+              perAccUp,
+              updatedBy,
+              createdBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex

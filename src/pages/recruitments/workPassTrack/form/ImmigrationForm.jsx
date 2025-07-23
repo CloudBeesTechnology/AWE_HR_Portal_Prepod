@@ -260,12 +260,12 @@ export const ImmigrationForm = ({ candidate }) => {
         status: formData.interview.status,
       };
 
-      setNotification(true);
-
+      
       // console.log("Submitting interview details with status:", interStatus);
-
+      
       await interviewDetails({ InterviewValue: interStatus });
-
+      
+      setNotification(true);
       // console.log("Interview status updated:", interStatus);
 
       // if (response.errors && response.errors.length > 0) {

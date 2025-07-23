@@ -193,24 +193,38 @@ export default function TravelInsCreateForm(props) {
     travelExp: "",
     travelNo: "",
     travelUp: [],
+    updatedBy: [],
+    createdBy: [],
   };
   const [travelExp, setTravelExp] = React.useState(initialValues.travelExp);
   const [travelNo, setTravelNo] = React.useState(initialValues.travelNo);
   const [travelUp, setTravelUp] = React.useState(initialValues.travelUp);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setTravelExp(initialValues.travelExp);
     setTravelNo(initialValues.travelNo);
     setTravelUp(initialValues.travelUp);
     setCurrentTravelUpValue("");
+    setUpdatedBy(initialValues.updatedBy);
+    setCurrentUpdatedByValue("");
+    setCreatedBy(initialValues.createdBy);
+    setCurrentCreatedByValue("");
     setErrors({});
   };
   const [currentTravelUpValue, setCurrentTravelUpValue] = React.useState("");
   const travelUpRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
   const validations = {
     travelExp: [],
     travelNo: [],
     travelUp: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -241,6 +255,8 @@ export default function TravelInsCreateForm(props) {
           travelExp,
           travelNo,
           travelUp,
+          updatedBy,
+          createdBy,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -306,6 +322,8 @@ export default function TravelInsCreateForm(props) {
               travelExp: value,
               travelNo,
               travelUp,
+              updatedBy,
+              createdBy,
             };
             const result = onChange(modelFields);
             value = result?.travelExp ?? value;
@@ -332,6 +350,8 @@ export default function TravelInsCreateForm(props) {
               travelExp,
               travelNo: value,
               travelUp,
+              updatedBy,
+              createdBy,
             };
             const result = onChange(modelFields);
             value = result?.travelNo ?? value;
@@ -354,6 +374,8 @@ export default function TravelInsCreateForm(props) {
               travelExp,
               travelNo,
               travelUp: values,
+              updatedBy,
+              createdBy,
             };
             const result = onChange(modelFields);
             values = result?.travelUp ?? values;
@@ -391,6 +413,104 @@ export default function TravelInsCreateForm(props) {
           ref={travelUpRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "travelUp")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              travelExp,
+              travelNo,
+              travelUp,
+              updatedBy: values,
+              createdBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              travelExp,
+              travelNo,
+              travelUp,
+              updatedBy,
+              createdBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex

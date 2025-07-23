@@ -15,6 +15,7 @@ import {
   Icon,
   ScrollView,
   Text,
+  TextAreaField,
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
@@ -217,6 +218,8 @@ export default function EmpWorkInfoCreateForm(props) {
     workHrs: [],
     workWeek: [],
     workMonth: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [contractStart, setContractStart] = React.useState(
@@ -270,6 +273,8 @@ export default function EmpWorkInfoCreateForm(props) {
   const [workHrs, setWorkHrs] = React.useState(initialValues.workHrs);
   const [workWeek, setWorkWeek] = React.useState(initialValues.workWeek);
   const [workMonth, setWorkMonth] = React.useState(initialValues.workMonth);
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -324,6 +329,10 @@ export default function EmpWorkInfoCreateForm(props) {
     setCurrentWorkWeekValue("");
     setWorkMonth(initialValues.workMonth);
     setCurrentWorkMonthValue("");
+    setCreatedBy(initialValues.createdBy);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(initialValues.updatedBy);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [currentContractStartValue, setCurrentContractStartValue] =
@@ -390,6 +399,10 @@ export default function EmpWorkInfoCreateForm(props) {
   const workWeekRef = React.createRef();
   const [currentWorkMonthValue, setCurrentWorkMonthValue] = React.useState("");
   const workMonthRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     contractStart: [],
@@ -419,6 +432,8 @@ export default function EmpWorkInfoCreateForm(props) {
     workHrs: [],
     workWeek: [],
     workMonth: [],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -474,6 +489,8 @@ export default function EmpWorkInfoCreateForm(props) {
           workHrs,
           workWeek,
           workMonth,
+          createdBy,
+          updatedBy,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -564,6 +581,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -611,6 +630,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.contractStart ?? values;
@@ -685,6 +706,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.contractEnd ?? values;
@@ -759,6 +782,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.contractPeriod ?? values;
@@ -837,6 +862,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.doj ?? value;
@@ -884,6 +911,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.department ?? values;
@@ -958,6 +987,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.hr ?? values;
@@ -1030,6 +1061,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.jobCat ?? values;
@@ -1102,6 +1135,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.jobDesc ?? values;
@@ -1174,6 +1209,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.manager ?? values;
@@ -1246,6 +1283,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.otherJobCat ?? values;
@@ -1320,6 +1359,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.otherDepartment ?? values;
@@ -1397,6 +1438,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.otherPosition ?? values;
@@ -1471,6 +1514,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.probationStart ?? values;
@@ -1545,6 +1590,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.probationEnd ?? values;
@@ -1619,6 +1666,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.probDuration ?? values;
@@ -1693,6 +1742,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.position ?? values;
@@ -1765,6 +1816,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.relationship ?? values;
@@ -1839,6 +1892,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.supervisor ?? values;
@@ -1917,6 +1972,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.skillPool ?? value;
@@ -1964,6 +2021,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.salaryType ?? values;
@@ -2042,6 +2101,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.sapNo ?? value;
@@ -2089,6 +2150,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.upgradeDate ?? values;
@@ -2163,6 +2226,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.upgradePosition ?? values;
@@ -2240,6 +2305,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.workStatus ?? values;
@@ -2314,6 +2381,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs: values,
               workWeek,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.workHrs ?? values;
@@ -2386,6 +2455,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek: values,
               workMonth,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.workWeek ?? values;
@@ -2458,6 +2529,8 @@ export default function EmpWorkInfoCreateForm(props) {
               workHrs,
               workWeek,
               workMonth: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.workMonth ?? values;
@@ -2496,6 +2569,154 @@ export default function EmpWorkInfoCreateForm(props) {
           labelHidden={true}
           {...getOverrideProps(overrides, "workMonth")}
         ></TextField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              contractStart,
+              contractEnd,
+              contractPeriod,
+              doj,
+              department,
+              hr,
+              jobCat,
+              jobDesc,
+              manager,
+              otherJobCat,
+              otherDepartment,
+              otherPosition,
+              probationStart,
+              probationEnd,
+              probDuration,
+              position,
+              relationship,
+              supervisor,
+              skillPool,
+              salaryType,
+              sapNo,
+              upgradeDate,
+              upgradePosition,
+              workStatus,
+              workHrs,
+              workWeek,
+              workMonth,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              contractStart,
+              contractEnd,
+              contractPeriod,
+              doj,
+              department,
+              hr,
+              jobCat,
+              jobDesc,
+              manager,
+              otherJobCat,
+              otherDepartment,
+              otherPosition,
+              probationStart,
+              probationEnd,
+              probDuration,
+              position,
+              relationship,
+              supervisor,
+              skillPool,
+              salaryType,
+              sapNo,
+              upgradeDate,
+              upgradePosition,
+              workStatus,
+              workHrs,
+              workWeek,
+              workMonth,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
+        ></TextAreaField>
       </ArrayField>
       <Flex
         justifyContent="space-between"
