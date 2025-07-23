@@ -195,12 +195,16 @@ export default function GroupHandSUpdateForm(props) {
     groupHSExp: "",
     groupHSNo: "",
     groupHSUpload: [],
+    updatedBy: [],
+    createdBy: [],
   };
   const [groupHSExp, setGroupHSExp] = React.useState(initialValues.groupHSExp);
   const [groupHSNo, setGroupHSNo] = React.useState(initialValues.groupHSNo);
   const [groupHSUpload, setGroupHSUpload] = React.useState(
     initialValues.groupHSUpload
   );
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = groupHandSRecord
@@ -210,6 +214,10 @@ export default function GroupHandSUpdateForm(props) {
     setGroupHSNo(cleanValues.groupHSNo);
     setGroupHSUpload(cleanValues.groupHSUpload ?? []);
     setCurrentGroupHSUploadValue("");
+    setUpdatedBy(cleanValues.updatedBy ?? []);
+    setCurrentUpdatedByValue("");
+    setCreatedBy(cleanValues.createdBy ?? []);
+    setCurrentCreatedByValue("");
     setErrors({});
   };
   const [groupHandSRecord, setGroupHandSRecord] =
@@ -232,10 +240,16 @@ export default function GroupHandSUpdateForm(props) {
   const [currentGroupHSUploadValue, setCurrentGroupHSUploadValue] =
     React.useState("");
   const groupHSUploadRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
   const validations = {
     groupHSExp: [],
     groupHSNo: [],
     groupHSUpload: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -266,6 +280,8 @@ export default function GroupHandSUpdateForm(props) {
           groupHSExp: groupHSExp ?? null,
           groupHSNo: groupHSNo ?? null,
           groupHSUpload: groupHSUpload ?? null,
+          updatedBy: updatedBy ?? null,
+          createdBy: createdBy ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -329,6 +345,8 @@ export default function GroupHandSUpdateForm(props) {
               groupHSExp: value,
               groupHSNo,
               groupHSUpload,
+              updatedBy,
+              createdBy,
             };
             const result = onChange(modelFields);
             value = result?.groupHSExp ?? value;
@@ -355,6 +373,8 @@ export default function GroupHandSUpdateForm(props) {
               groupHSExp,
               groupHSNo: value,
               groupHSUpload,
+              updatedBy,
+              createdBy,
             };
             const result = onChange(modelFields);
             value = result?.groupHSNo ?? value;
@@ -377,6 +397,8 @@ export default function GroupHandSUpdateForm(props) {
               groupHSExp,
               groupHSNo,
               groupHSUpload: values,
+              updatedBy,
+              createdBy,
             };
             const result = onChange(modelFields);
             values = result?.groupHSUpload ?? values;
@@ -416,6 +438,104 @@ export default function GroupHandSUpdateForm(props) {
           ref={groupHSUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "groupHSUpload")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              groupHSExp,
+              groupHSNo,
+              groupHSUpload,
+              updatedBy: values,
+              createdBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              groupHSExp,
+              groupHSNo,
+              groupHSUpload,
+              updatedBy,
+              createdBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex

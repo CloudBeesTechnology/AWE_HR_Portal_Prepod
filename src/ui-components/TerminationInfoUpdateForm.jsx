@@ -210,6 +210,8 @@ export default function TerminationInfoUpdateForm(props) {
     WIResignation: [],
     WITermination: [],
     WILeaveEntitle: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [resignDate, setResignDate] = React.useState(initialValues.resignDate);
@@ -257,6 +259,8 @@ export default function TerminationInfoUpdateForm(props) {
   const [WILeaveEntitle, setWILeaveEntitle] = React.useState(
     initialValues.WILeaveEntitle
   );
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = terminationInfoRecord
@@ -285,6 +289,10 @@ export default function TerminationInfoUpdateForm(props) {
     setCurrentWITerminationValue("");
     setWILeaveEntitle(cleanValues.WILeaveEntitle ?? []);
     setCurrentWILeaveEntitleValue("");
+    setCreatedBy(cleanValues.createdBy ?? []);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(cleanValues.updatedBy ?? []);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [terminationInfoRecord, setTerminationInfoRecord] = React.useState(
@@ -320,6 +328,10 @@ export default function TerminationInfoUpdateForm(props) {
   const [currentWILeaveEntitleValue, setCurrentWILeaveEntitleValue] =
     React.useState("");
   const WILeaveEntitleRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     resignDate: [],
@@ -339,6 +351,8 @@ export default function TerminationInfoUpdateForm(props) {
     WIResignation: [{ type: "JSON" }],
     WITermination: [{ type: "JSON" }],
     WILeaveEntitle: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -384,6 +398,8 @@ export default function TerminationInfoUpdateForm(props) {
           WIResignation: WIResignation ?? null,
           WITermination: WITermination ?? null,
           WILeaveEntitle: WILeaveEntitle ?? null,
+          createdBy: createdBy ?? null,
+          updatedBy: updatedBy ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -462,6 +478,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -503,6 +521,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.resignDate ?? value;
@@ -544,6 +564,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.resignNotProb ?? value;
@@ -585,6 +607,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.otherResignNotProb ?? value;
@@ -628,6 +652,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.resignNotConf ?? value;
@@ -669,6 +695,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.otherResignNotConf ?? value;
@@ -712,6 +740,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.reasonResign ?? value;
@@ -753,6 +783,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.reasonTerminate ?? value;
@@ -794,6 +826,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.termiDate ?? value;
@@ -835,6 +869,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.termiNotProb ?? value;
@@ -876,6 +912,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.otherTermiNotProb ?? value;
@@ -919,6 +957,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.termiNotConf ?? value;
@@ -960,6 +1000,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.otherTermiNotConf ?? value;
@@ -999,6 +1041,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.WIContract ?? values;
@@ -1063,6 +1107,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.WIProbation ?? values;
@@ -1127,6 +1173,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation: values,
               WITermination,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.WIResignation ?? values;
@@ -1191,6 +1239,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination: values,
               WILeaveEntitle,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.WITermination ?? values;
@@ -1255,6 +1305,8 @@ export default function TerminationInfoUpdateForm(props) {
               WIResignation,
               WITermination,
               WILeaveEntitle: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.WILeaveEntitle ?? values;
@@ -1294,6 +1346,134 @@ export default function TerminationInfoUpdateForm(props) {
           ref={WILeaveEntitleRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "WILeaveEntitle")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              resignDate,
+              resignNotProb,
+              otherResignNotProb,
+              resignNotConf,
+              otherResignNotConf,
+              reasonResign,
+              reasonTerminate,
+              termiDate,
+              termiNotProb,
+              otherTermiNotProb,
+              termiNotConf,
+              otherTermiNotConf,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              resignDate,
+              resignNotProb,
+              otherResignNotProb,
+              resignNotConf,
+              otherResignNotConf,
+              reasonResign,
+              reasonTerminate,
+              termiDate,
+              termiNotProb,
+              otherTermiNotProb,
+              termiNotConf,
+              otherTermiNotConf,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex

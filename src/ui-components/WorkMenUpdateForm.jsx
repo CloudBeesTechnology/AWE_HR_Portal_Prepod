@@ -196,6 +196,8 @@ export default function WorkMenUpdateForm(props) {
     workmenCompExp: "",
     workmenCompNo: "",
     workmenComUp: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empStatusType, setEmpStatusType] = React.useState(
     initialValues.empStatusType
@@ -209,6 +211,8 @@ export default function WorkMenUpdateForm(props) {
   const [workmenComUp, setWorkmenComUp] = React.useState(
     initialValues.workmenComUp
   );
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = workMenRecord
@@ -219,6 +223,10 @@ export default function WorkMenUpdateForm(props) {
     setWorkmenCompNo(cleanValues.workmenCompNo);
     setWorkmenComUp(cleanValues.workmenComUp ?? []);
     setCurrentWorkmenComUpValue("");
+    setCreatedBy(cleanValues.createdBy ?? []);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(cleanValues.updatedBy ?? []);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [workMenRecord, setWorkMenRecord] = React.useState(workMenModelProp);
@@ -240,11 +248,17 @@ export default function WorkMenUpdateForm(props) {
   const [currentWorkmenComUpValue, setCurrentWorkmenComUpValue] =
     React.useState("");
   const workmenComUpRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empStatusType: [],
     workmenCompExp: [],
     workmenCompNo: [],
     workmenComUp: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -276,6 +290,8 @@ export default function WorkMenUpdateForm(props) {
           workmenCompExp: workmenCompExp ?? null,
           workmenCompNo: workmenCompNo ?? null,
           workmenComUp: workmenComUp ?? null,
+          createdBy: createdBy ?? null,
+          updatedBy: updatedBy ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -340,6 +356,8 @@ export default function WorkMenUpdateForm(props) {
               workmenCompExp,
               workmenCompNo,
               workmenComUp,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empStatusType ?? value;
@@ -367,6 +385,8 @@ export default function WorkMenUpdateForm(props) {
               workmenCompExp: value,
               workmenCompNo,
               workmenComUp,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.workmenCompExp ?? value;
@@ -394,6 +414,8 @@ export default function WorkMenUpdateForm(props) {
               workmenCompExp,
               workmenCompNo: value,
               workmenComUp,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.workmenCompNo ?? value;
@@ -417,6 +439,8 @@ export default function WorkMenUpdateForm(props) {
               workmenCompExp,
               workmenCompNo,
               workmenComUp: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.workmenComUp ?? values;
@@ -456,6 +480,106 @@ export default function WorkMenUpdateForm(props) {
           ref={workmenComUpRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "workmenComUp")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empStatusType,
+              workmenCompExp,
+              workmenCompNo,
+              workmenComUp,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empStatusType,
+              workmenCompExp,
+              workmenCompNo,
+              workmenComUp,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex

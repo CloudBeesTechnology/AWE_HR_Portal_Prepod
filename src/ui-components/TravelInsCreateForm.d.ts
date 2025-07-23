@@ -25,11 +25,15 @@ export declare type TravelInsCreateFormInputValues = {
     travelExp?: string;
     travelNo?: string;
     travelUp?: string[];
+    updatedBy?: string[];
+    createdBy?: string[];
 };
 export declare type TravelInsCreateFormValidationValues = {
     travelExp?: ValidationFunction<string>;
     travelNo?: ValidationFunction<string>;
     travelUp?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TravelInsCreateFormOverridesProps = {
@@ -37,6 +41,8 @@ export declare type TravelInsCreateFormOverridesProps = {
     travelExp?: PrimitiveOverrideProps<TextFieldProps>;
     travelNo?: PrimitiveOverrideProps<TextFieldProps>;
     travelUp?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type TravelInsCreateFormProps = React.PropsWithChildren<{
     overrides?: TravelInsCreateFormOverridesProps | undefined | null;

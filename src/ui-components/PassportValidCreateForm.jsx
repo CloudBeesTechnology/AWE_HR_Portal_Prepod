@@ -205,6 +205,8 @@ export default function PassportValidCreateForm(props) {
     immigApproval: [],
     reEntryVisaExp: [],
     remarkImmig: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [ppLocation, setPpLocation] = React.useState(initialValues.ppLocation);
@@ -241,6 +243,8 @@ export default function PassportValidCreateForm(props) {
   const [remarkImmig, setRemarkImmig] = React.useState(
     initialValues.remarkImmig
   );
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -271,6 +275,10 @@ export default function PassportValidCreateForm(props) {
     setCurrentReEntryVisaExpValue("");
     setRemarkImmig(initialValues.remarkImmig);
     setCurrentRemarkImmigValue("");
+    setCreatedBy(initialValues.createdBy);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(initialValues.updatedBy);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [currentPpLocationValue, setCurrentPpLocationValue] =
@@ -311,6 +319,10 @@ export default function PassportValidCreateForm(props) {
   const [currentRemarkImmigValue, setCurrentRemarkImmigValue] =
     React.useState("");
   const remarkImmigRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     ppLocation: [],
@@ -327,6 +339,8 @@ export default function PassportValidCreateForm(props) {
     immigApproval: [],
     reEntryVisaExp: [],
     remarkImmig: [],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -369,6 +383,8 @@ export default function PassportValidCreateForm(props) {
           immigApproval,
           reEntryVisaExp,
           remarkImmig,
+          createdBy,
+          updatedBy,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -446,6 +462,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -480,6 +498,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.ppLocation ?? values;
@@ -541,6 +561,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.arrivStampUpload ?? values;
@@ -605,6 +627,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.immigEmpUpload ?? values;
@@ -666,6 +690,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.reEntryUpload ?? values;
@@ -727,6 +753,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.arrivStampExp ?? values;
@@ -792,6 +820,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.immigRefNo ?? value;
@@ -826,6 +856,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.ppSubmit ?? values;
@@ -885,6 +917,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.empPassExp ?? values;
@@ -946,6 +980,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.empPassStatus ?? values;
@@ -1007,6 +1043,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.airTktStatus ?? values;
@@ -1068,6 +1106,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.reEntryVisa ?? values;
@@ -1129,6 +1169,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval: values,
               reEntryVisaExp,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.immigApproval ?? values;
@@ -1190,6 +1232,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp: values,
               remarkImmig,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.reEntryVisaExp ?? values;
@@ -1251,6 +1295,8 @@ export default function PassportValidCreateForm(props) {
               immigApproval,
               reEntryVisaExp,
               remarkImmig: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.remarkImmig ?? values;
@@ -1291,6 +1337,128 @@ export default function PassportValidCreateForm(props) {
           labelHidden={true}
           {...getOverrideProps(overrides, "remarkImmig")}
         ></TextField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              ppLocation,
+              arrivStampUpload,
+              immigEmpUpload,
+              reEntryUpload,
+              arrivStampExp,
+              immigRefNo,
+              ppSubmit,
+              empPassExp,
+              empPassStatus,
+              airTktStatus,
+              reEntryVisa,
+              immigApproval,
+              reEntryVisaExp,
+              remarkImmig,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              ppLocation,
+              arrivStampUpload,
+              immigEmpUpload,
+              reEntryUpload,
+              arrivStampExp,
+              immigRefNo,
+              ppSubmit,
+              empPassExp,
+              empPassStatus,
+              airTktStatus,
+              reEntryVisa,
+              immigApproval,
+              reEntryVisaExp,
+              remarkImmig,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
+        ></TextAreaField>
       </ArrayField>
       <Flex
         justifyContent="space-between"

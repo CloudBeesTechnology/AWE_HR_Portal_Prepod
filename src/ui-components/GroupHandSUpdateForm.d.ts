@@ -25,11 +25,15 @@ export declare type GroupHandSUpdateFormInputValues = {
     groupHSExp?: string;
     groupHSNo?: string;
     groupHSUpload?: string[];
+    updatedBy?: string[];
+    createdBy?: string[];
 };
 export declare type GroupHandSUpdateFormValidationValues = {
     groupHSExp?: ValidationFunction<string>;
     groupHSNo?: ValidationFunction<string>;
     groupHSUpload?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type GroupHandSUpdateFormOverridesProps = {
@@ -37,6 +41,8 @@ export declare type GroupHandSUpdateFormOverridesProps = {
     groupHSExp?: PrimitiveOverrideProps<TextFieldProps>;
     groupHSNo?: PrimitiveOverrideProps<TextFieldProps>;
     groupHSUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type GroupHandSUpdateFormProps = React.PropsWithChildren<{
     overrides?: GroupHandSUpdateFormOverridesProps | undefined | null;

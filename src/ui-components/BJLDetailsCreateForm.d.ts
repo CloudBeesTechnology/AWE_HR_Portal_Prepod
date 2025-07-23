@@ -39,6 +39,8 @@ export declare type BJLDetailsCreateFormInputValues = {
     lbrDepoAmt?: string[];
     lbrDepoSubmit?: string[];
     lbrDepoUpload?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type BJLDetailsCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -58,6 +60,8 @@ export declare type BJLDetailsCreateFormValidationValues = {
     lbrDepoAmt?: ValidationFunction<string>;
     lbrDepoSubmit?: ValidationFunction<string>;
     lbrDepoUpload?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type BJLDetailsCreateFormOverridesProps = {
@@ -79,6 +83,8 @@ export declare type BJLDetailsCreateFormOverridesProps = {
     lbrDepoAmt?: PrimitiveOverrideProps<TextFieldProps>;
     lbrDepoSubmit?: PrimitiveOverrideProps<TextFieldProps>;
     lbrDepoUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type BJLDetailsCreateFormProps = React.PropsWithChildren<{
     overrides?: BJLDetailsCreateFormOverridesProps | undefined | null;

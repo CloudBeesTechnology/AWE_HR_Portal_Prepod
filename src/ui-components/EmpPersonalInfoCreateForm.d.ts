@@ -52,6 +52,8 @@ export declare type EmpPersonalInfoCreateFormInputValues = {
     position?: string[];
     sapNo?: string;
     otherLang?: string;
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type EmpPersonalInfoCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -84,6 +86,8 @@ export declare type EmpPersonalInfoCreateFormValidationValues = {
     position?: ValidationFunction<string>;
     sapNo?: ValidationFunction<string>;
     otherLang?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type EmpPersonalInfoCreateFormOverridesProps = {
@@ -118,6 +122,8 @@ export declare type EmpPersonalInfoCreateFormOverridesProps = {
     position?: PrimitiveOverrideProps<TextFieldProps>;
     sapNo?: PrimitiveOverrideProps<TextFieldProps>;
     otherLang?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type EmpPersonalInfoCreateFormProps = React.PropsWithChildren<{
     overrides?: EmpPersonalInfoCreateFormOverridesProps | undefined | null;

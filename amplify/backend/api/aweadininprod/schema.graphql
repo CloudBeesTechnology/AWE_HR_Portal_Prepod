@@ -113,6 +113,8 @@ type InsuranceType @model @auth(rules: [{allow: public}]) {
   id: ID!
   typeIns: String
   insDetails: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type GroupHandS @model @auth(rules: [{allow: public}]) {
@@ -120,6 +122,8 @@ type GroupHandS @model @auth(rules: [{allow: public}]) {
   groupHSExp: String
   groupHSNo: String
   groupHSUpload: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
 }
 
 type WorkMen @model @auth(rules: [{allow: public}]) {
@@ -128,6 +132,8 @@ type WorkMen @model @auth(rules: [{allow: public}]) {
   workmenCompExp: String
   workmenCompNo: String
   workmenComUp: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type TravelIns @model @auth(rules: [{allow: public}]) {
@@ -135,6 +141,8 @@ type TravelIns @model @auth(rules: [{allow: public}]) {
   travelExp: String
   travelNo: String
   travelUp: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
 }
 
 type PersonalAccident @model @auth(rules: [{allow: public}]) {
@@ -142,12 +150,16 @@ type PersonalAccident @model @auth(rules: [{allow: public}]) {
   perAccExp: String
   perAccNo: String
   perAccUp: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
 }
 
 type InsClaim @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String
   insuranceClaims: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type ProbForm @model @auth(rules: [{allow: public}]) {
@@ -260,6 +272,8 @@ type TrainingReq @model @auth(rules: [{allow: public}]) {
   company: [String]
   mediRequired: Boolean
   traineeTrack: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type TrainingCertificates @model @auth(rules: [{allow: public}]) {
@@ -273,6 +287,8 @@ type TrainingCertificates @model @auth(rules: [{allow: public}]) {
   addDescretion: [String]
   tcRemarks: String
   trainingProof: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type AddCourse @model @auth(rules: [{allow: public}]) {
@@ -286,6 +302,8 @@ type EmpDepInsurance @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String
   depInsurance: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type EmpInsurance @model @auth(rules: [{allow: public}]) {
@@ -299,6 +317,8 @@ type EmpInsurance @model @auth(rules: [{allow: public}]) {
   travelIns: [String]
   accidentIns: [String]
   empInsUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type SawpDetails @model @auth(rules: [{allow: public}]) {
@@ -307,6 +327,8 @@ type SawpDetails @model @auth(rules: [{allow: public}]) {
   sawpEmpLtrReq: [String]
   sawpEmpLtrReci: [String]
   sawpEmpUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type DNDetails @model @auth(rules: [{allow: public}]) {
@@ -324,6 +346,8 @@ type DNDetails @model @auth(rules: [{allow: public}]) {
   nlmsRefNo: [String]
   nlmsEmpValid: [String]
   nlmsEmpUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type BJLDetails @model @auth(rules: [{allow: public}]) {
@@ -345,6 +369,8 @@ type BJLDetails @model @auth(rules: [{allow: public}]) {
   lbrDepoAmt: [String]
   lbrDepoSubmit: [String]
   lbrDepoUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type PassportValid @model @auth(rules: [{allow: public}]) {
@@ -364,6 +390,8 @@ type PassportValid @model @auth(rules: [{allow: public}]) {
   immigApproval: [String]
   reEntryVisaExp: [String]
   remarkImmig: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type WPTracking @model @auth(rules: [{allow: public}]) {
@@ -424,6 +452,8 @@ type EmployeeNonLocalAcco @model @auth(rules: [{allow: public}]) {
   empID: String!
   accommodation: [String]
   accommodationAddress: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type LabourMedicalInfo @model @auth(rules: [{allow: public}]) {
@@ -460,6 +490,8 @@ type ServiceRecord @model @auth(rules: [{allow: public}]) {
   uploadLP: [AWSJSON]
   uploadAL: [AWSJSON]
   uploadDep: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type EmpLeaveDetails @model @auth(rules: [{allow: public}]) {
@@ -481,6 +513,8 @@ type EmpLeaveDetails @model @auth(rules: [{allow: public}]) {
   pervAnnualLeaveBal: String
   sickLeaveTaken: String
   remainAnnualLeave: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type TerminationInfo @model @auth(rules: [{allow: public}]) {
@@ -503,6 +537,8 @@ type TerminationInfo @model @auth(rules: [{allow: public}]) {
   WIResignation: [AWSJSON]
   WITermination: [AWSJSON]
   WILeaveEntitle: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type EmpWorkInfo @model @auth(rules: [{allow: public}]) {
@@ -535,6 +571,8 @@ type EmpWorkInfo @model @auth(rules: [{allow: public}]) {
   workHrs: [String]
   workWeek: [String]
   workMonth: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type EmpPersonalInfo @model @auth(rules: [{allow: public}]) {
@@ -569,6 +607,8 @@ type EmpPersonalInfo @model @auth(rules: [{allow: public}]) {
   position: [String]
   sapNo: String
   otherLang: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type IDDetails @model @auth(rules: [{allow: public}]) {
@@ -603,6 +643,8 @@ type IDDetails @model @auth(rules: [{allow: public}]) {
   religion: String
   supportDocUpload: [AWSJSON]
   qcCertifyUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type CandIToEMP @model @auth(rules: [{allow: public}]) {
@@ -754,6 +796,8 @@ type User @model @auth(rules: [{allow: public}]) {
   setPermissions: [String]
   password: String
   status: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type TicketRequest @model @auth(rules: [{allow: public}]) {

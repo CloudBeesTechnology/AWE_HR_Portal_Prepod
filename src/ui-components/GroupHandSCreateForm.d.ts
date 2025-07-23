@@ -25,11 +25,15 @@ export declare type GroupHandSCreateFormInputValues = {
     groupHSExp?: string;
     groupHSNo?: string;
     groupHSUpload?: string[];
+    updatedBy?: string[];
+    createdBy?: string[];
 };
 export declare type GroupHandSCreateFormValidationValues = {
     groupHSExp?: ValidationFunction<string>;
     groupHSNo?: ValidationFunction<string>;
     groupHSUpload?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type GroupHandSCreateFormOverridesProps = {
@@ -37,6 +41,8 @@ export declare type GroupHandSCreateFormOverridesProps = {
     groupHSExp?: PrimitiveOverrideProps<TextFieldProps>;
     groupHSNo?: PrimitiveOverrideProps<TextFieldProps>;
     groupHSUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type GroupHandSCreateFormProps = React.PropsWithChildren<{
     overrides?: GroupHandSCreateFormOverridesProps | undefined | null;

@@ -203,6 +203,8 @@ export default function DNDetailsCreateForm(props) {
     nlmsRefNo: [],
     nlmsEmpValid: [],
     nlmsEmpUpload: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [doeEmpSubmit, setDoeEmpSubmit] = React.useState(
@@ -237,6 +239,8 @@ export default function DNDetailsCreateForm(props) {
   const [nlmsEmpUpload, setNlmsEmpUpload] = React.useState(
     initialValues.nlmsEmpUpload
   );
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -264,6 +268,10 @@ export default function DNDetailsCreateForm(props) {
     setCurrentNlmsEmpValidValue("");
     setNlmsEmpUpload(initialValues.nlmsEmpUpload);
     setCurrentNlmsEmpUploadValue("");
+    setCreatedBy(initialValues.createdBy);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(initialValues.updatedBy);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [currentDoeEmpSubmitValue, setCurrentDoeEmpSubmitValue] =
@@ -301,6 +309,10 @@ export default function DNDetailsCreateForm(props) {
   const [currentNlmsEmpUploadValue, setCurrentNlmsEmpUploadValue] =
     React.useState("");
   const nlmsEmpUploadRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     doeEmpSubmit: [],
@@ -315,6 +327,8 @@ export default function DNDetailsCreateForm(props) {
     nlmsRefNo: [],
     nlmsEmpValid: [],
     nlmsEmpUpload: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -355,6 +369,8 @@ export default function DNDetailsCreateForm(props) {
           nlmsRefNo,
           nlmsEmpValid,
           nlmsEmpUpload,
+          createdBy,
+          updatedBy,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -430,6 +446,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -462,6 +480,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.doeEmpSubmit ?? values;
@@ -521,6 +541,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.doeEmpApproval ?? values;
@@ -580,6 +602,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.doeEmpValid ?? values;
@@ -639,6 +663,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.doeEmpRefNo ?? values;
@@ -698,6 +724,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.doeEmpUpload ?? values;
@@ -757,6 +785,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.permitType ?? values;
@@ -816,6 +846,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.nlmsEmpSubmit ?? values;
@@ -875,6 +907,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.nlmsEmpSubmitRefNo ?? values;
@@ -940,6 +974,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.nlmsEmpApproval ?? values;
@@ -1002,6 +1038,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo: values,
               nlmsEmpValid,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.nlmsRefNo ?? values;
@@ -1059,6 +1097,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid: values,
               nlmsEmpUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.nlmsEmpValid ?? values;
@@ -1118,6 +1158,8 @@ export default function DNDetailsCreateForm(props) {
               nlmsRefNo,
               nlmsEmpValid,
               nlmsEmpUpload: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.nlmsEmpUpload ?? values;
@@ -1157,6 +1199,124 @@ export default function DNDetailsCreateForm(props) {
           ref={nlmsEmpUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "nlmsEmpUpload")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              doeEmpSubmit,
+              doeEmpApproval,
+              doeEmpValid,
+              doeEmpRefNo,
+              doeEmpUpload,
+              permitType,
+              nlmsEmpSubmit,
+              nlmsEmpSubmitRefNo,
+              nlmsEmpApproval,
+              nlmsRefNo,
+              nlmsEmpValid,
+              nlmsEmpUpload,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              doeEmpSubmit,
+              doeEmpApproval,
+              doeEmpValid,
+              doeEmpRefNo,
+              doeEmpUpload,
+              permitType,
+              nlmsEmpSubmit,
+              nlmsEmpSubmitRefNo,
+              nlmsEmpApproval,
+              nlmsRefNo,
+              nlmsEmpValid,
+              nlmsEmpUpload,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex
