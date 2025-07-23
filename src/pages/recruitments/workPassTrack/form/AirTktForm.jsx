@@ -260,10 +260,10 @@ export const AirTktForm = ({ candidate }) => {
         status: formData.interview.status,
       };
 
-      setNotification(true);
-
+      
       await interviewDetails({ InterviewValue: interStatus });
-
+      
+      setNotification(true);
       // if (response.errors && response.errors.length > 0) {
       //   console.error("Response errors:", response.errors);
       // }

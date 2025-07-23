@@ -256,10 +256,10 @@ export const LabourDepForm = ({ candidate }) => {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
-      setNotification(true);
-
+      
       await interviewDetails({ InterviewValue: interStatus });
-
+      
+      setNotification(true);
   
     } catch (err) {
       console.error("Error submitting interview details:", err);

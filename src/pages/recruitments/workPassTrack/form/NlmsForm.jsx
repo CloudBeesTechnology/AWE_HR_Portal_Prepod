@@ -265,10 +265,11 @@ export const NlmsForm = ({ candidate }) => {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
-
+      
+      await interviewDetails({ InterviewValue: interStatus });
+      
       setNotification(true);
 
-      await interviewDetails({ InterviewValue: interStatus });
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

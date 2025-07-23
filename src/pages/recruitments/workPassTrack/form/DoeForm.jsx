@@ -259,10 +259,10 @@ export const DoeForm = ({ candidate }) => {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
-      setNotification(true);
       // console.log("Submitting interview details with status:", interStatus);
       await interviewDetails({ InterviewValue: interStatus });
-
+      
+      setNotification(true);
       // console.log("Interview status updated:", interStatus);
     } catch (err) {
       if (err?.response?.data?.errors) {
