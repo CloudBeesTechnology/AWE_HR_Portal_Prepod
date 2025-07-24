@@ -5,36 +5,34 @@ import { updateSawpDetails } from "../../graphql/mutations";
 export const SawpUpdate = () => {
   const client = generateClient();
   const SawpUpdateFun = useCallback(async ({ SawpUpValue }) => {
-    if (!SawpUpValue ) {
+    if (!SawpUpValue) {
       throw new Error("Missing required parameters");
     }
     const totalData = {
-        id:SawpUpValue.id,
-        empID:SawpUpValue.empID,
-        sawpEmpLtrReq:SawpUpValue.sawpEmpLtrReq,
-        sawpEmpLtrReci:SawpUpValue.sawpEmpLtrReci,
-        sawpEmpUpload:SawpUpValue.sawpEmpUpload,
-
+      id: SawpUpValue.id,
+      empID: SawpUpValue.empID,
+      sawpEmpLtrReq: SawpUpValue.sawpEmpLtrReq,
+      sawpEmpLtrReci: SawpUpValue.sawpEmpLtrReci,
+      sawpEmpUpload: SawpUpValue.sawpEmpUpload,
+      updatedBy: SawpUpValue.updatedBy,
     };
-    // console.log(totalData);
 
     try {
-      const storedData=   await Promise.all([
-           client.graphql({
-             query: updateSawpDetails,
-             variables: {
-               input: totalData, 
-             },
-           })
-         ])
-        //  console.log(storedData,"successfully Updated data");
+      const storedData = await Promise.all([
+        client.graphql({
+          query: updateSawpDetails,
+          variables: {
+            input: totalData,
+          },
+        }),
+      ]);
+      console.log(storedData, "successfully Updated data");
+    } catch (error) {
+      console.log(error);
 
-       } catch (error) {
-        console.log(error);
-        
-         console.error("Error executing GraphQL requests:", error);
-         throw error; // Rethrow error if needed
-       }
+      console.error("Error executing GraphQL requests:", error);
+      throw error;
+    }
   }, []);
   return { SawpUpdateFun };
 };

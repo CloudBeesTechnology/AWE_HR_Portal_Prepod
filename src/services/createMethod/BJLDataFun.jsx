@@ -17,9 +17,8 @@ export const BJLDataFun = () => {
       bankValid: [BJLValue.bankValid],
       bankEndorse: [BJLValue.bankEndorse],
       bankEmpUpload: [BJLValue.bankEmpUpload],
-      
+      createdBy: BJLValue.createdBy
     };
-    console.log(totalData);
 
     try {
       const storedData = await Promise.all([
@@ -34,7 +33,7 @@ export const BJLDataFun = () => {
       
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
-      throw error; // Rethrow error if needed
+      throw error; 
     }
   }, []);
   return { BGData };

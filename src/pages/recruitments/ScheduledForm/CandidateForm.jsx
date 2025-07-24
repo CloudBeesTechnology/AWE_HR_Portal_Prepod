@@ -42,6 +42,9 @@ export const CandidateForm = ({ candidate }) => {
     },
   });
 
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     if (mergedInterviewData.length > 0 && candidate?.tempID) {
       const interviewData = mergedInterviewData.find(
@@ -58,7 +61,6 @@ export const CandidateForm = ({ candidate }) => {
       }
     }
   }, [mergedInterviewData, candidate?.tempID]);
-
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -90,12 +92,26 @@ export const CandidateForm = ({ candidate }) => {
       return;
     }
 
+    const updatedByData = selectedInterviewData?.interviewSchedules;
+
+    const previousUpdates = updatedByData?.updatedBy
+      ? JSON.parse(updatedByData?.updatedBy)
+      : [];
+
+    const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
+
+    const orderedUpdatedBy = updatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     try {
       await interviewDetails({
         InterviewValue: {
           id: interviewScheduleId,
           department: formData.interview.department,
           otherDepartment: formData.interview.otherDepartment,
+          updatedBy: JSON.stringify(orderedUpdatedBy),
         },
       });
 

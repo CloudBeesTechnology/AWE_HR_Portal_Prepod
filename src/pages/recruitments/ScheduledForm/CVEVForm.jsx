@@ -59,6 +59,9 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
     resolver: yupResolver(CVEVFormSchema),
   });
 
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     if (mergedInterviewData.length > 0 && candidate?.tempID) {
       const interviewData = mergedInterviewData.find(
@@ -151,7 +154,7 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
         );
         return;
       }
-
+ 
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
@@ -180,12 +183,44 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
     const localMobilizationId = selectedInterviewData?.localMobilization?.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
+    const localUpdatedByData = selectedInterviewData?.localMobilization;
+    const intUpdatedByData = selectedInterviewData?.interviewSchedules;
+
+    const loiPreviousUpdates = localUpdatedByData?.updatedBy
+      ? JSON.parse(localUpdatedByData?.updatedBy)
+      : [];
+
+    const loiUpdatedBy = [
+      ...loiPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const loiOrderedUpdatedBy = loiUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     const createData = {
       cvecApproveDate: formData.interview.cvecApproveDate,
       cvecFile: isUploadingString.cvecFile
         ? JSON.stringify(wrapUpload(uploadedCVEC.cvecFile))
         : formData.interview.cvecFile,
       tempID: candidate.tempID,
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     try {
@@ -197,6 +232,7 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
             cvecFile: isUploadingString.cvecFile
               ? JSON.stringify(wrapUpload(uploadedCVEC.cvecFile))
               : formData.interview.cvecFile,
+            updatedBy: JSON.stringify(loiOrderedUpdatedBy),
           },
         });
       } else {
@@ -207,6 +243,7 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
         InterviewValue: {
           id: interviewScheduleStatusId,
           status: formData.interview.status,
+          updatedBy: JSON.stringify(intOrderedUpdatedBy),
         },
       });
 

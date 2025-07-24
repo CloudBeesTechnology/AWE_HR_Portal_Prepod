@@ -49,6 +49,9 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
     },
   });
 
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
+
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
       const decodedUrl = decodeURIComponent(url);
@@ -125,7 +128,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
         );
         return;
       }
-    
+
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
@@ -154,6 +157,37 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
     const localMobilizationId = selectedInterviewData.localMobilization.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
+    const localUpdatedByData = selectedInterviewData?.localMobilization;
+    const intUpdatedByData = selectedInterviewData?.interviewSchedules;
+
+    const loiPreviousUpdates = localUpdatedByData?.updatedBy
+      ? JSON.parse(localUpdatedByData?.updatedBy)
+      : [];
+
+    const loiUpdatedBy = [
+      ...loiPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const loiOrderedUpdatedBy = loiUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     const formattedData = {
       id: localMobilizationId,
       loiIssueDate: formData.interview.loiIssueDate,
@@ -164,6 +198,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
         ? JSON.stringify(wrapUpload(uploadedLOI.loiFile))
         : formData.interview.loiFile,
       tempID: candidate.tempID,
+      updatedBy: JSON.stringify(loiOrderedUpdatedBy),
     };
 
     const interStatus = {
@@ -171,6 +206,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       department: formData.interview.department,
       otherDepartment: formData.interview.otherDepartment,
       status: formData.interview.status,
+      updatedBy: JSON.stringify(intOrderedUpdatedBy),
     };
 
     const createData = {
@@ -182,6 +218,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
         ? JSON.stringify(wrapUpload(uploadedLOI.loiFile))
         : formData.interview.loiFile,
       tempID: candidate.tempID,
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     try {
@@ -208,7 +245,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
     if (mergedInterviewData.length > 0) {
       const interviewData = mergedInterviewData.find(
         (data) => data.tempID === candidate.tempID
-      ); 
+      );
       if (interviewData) {
         setFormData({
           interview: {
@@ -244,7 +281,6 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
   const requiredPermissions = ["Status"];
 
   const access = "Recruitment";
-
 
   return (
     <form>

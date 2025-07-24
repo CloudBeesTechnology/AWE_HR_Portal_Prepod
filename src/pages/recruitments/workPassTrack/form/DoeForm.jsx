@@ -59,7 +59,8 @@ export const DoeForm = ({ candidate }) => {
     resolver: yupResolver(DoeFormSchema),
   });
 
-  const DoeUpload = watch("doeFile", "");
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
@@ -210,7 +211,34 @@ export const DoeForm = ({ candidate }) => {
 
     const interviewScheduleId = selectedInterviewData?.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
-    console.log(selectedInterviewDataStatus);
+
+    const wpUpdatedByData = selectedInterviewData;
+    const intUpdatedByData = selectedInterviewDataStatus;
+
+    const wpPreviousUpdates = wpUpdatedByData?.updatedBy
+      ? JSON.parse(wpUpdatedByData?.updatedBy)
+      : [];
+
+    const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
+
+    const wpOrderedUpdatedBy = wpUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -231,6 +259,7 @@ export const DoeForm = ({ candidate }) => {
       doefile: isUploadingString.doeFile
         ? JSON.stringify(wrapUpload(uploadedDoe.doeFile))
         : formData.interview.doefile,
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     try {
@@ -245,6 +274,7 @@ export const DoeForm = ({ candidate }) => {
             doefile: isUploadingString.doeFile
               ? JSON.stringify(wrapUpload(uploadedDoe.doeFile))
               : formData.interview.doefile,
+            updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
       } else {
@@ -258,10 +288,11 @@ export const DoeForm = ({ candidate }) => {
       const interStatus = {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
+        updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
       // console.log("Submitting interview details with status:", interStatus);
       await interviewDetails({ InterviewValue: interStatus });
-      
+
       setNotification(true);
       // console.log("Interview status updated:", interStatus);
     } catch (err) {

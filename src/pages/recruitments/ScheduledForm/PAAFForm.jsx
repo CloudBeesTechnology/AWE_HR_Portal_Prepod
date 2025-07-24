@@ -59,6 +59,9 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
     resolver: yupResolver(PAAFFormSchema),
   });
 
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     if (mergedInterviewData.length > 0) {
       const interviewData = mergedInterviewData.find(
@@ -190,12 +193,44 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
     const localMobilizationId = selectedInterviewData?.localMobilization.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
+    const localUpdatedByData = selectedInterviewData?.localMobilization;
+    const intUpdatedByData = selectedInterviewData?.interviewSchedules;
+
+    const loiPreviousUpdates = localUpdatedByData?.updatedBy
+      ? JSON.parse(localUpdatedByData?.updatedBy)
+      : [];
+
+    const loiUpdatedBy = [
+      ...loiPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const loiOrderedUpdatedBy = loiUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     const createData = {
       paafApproveDate: formData.interview.paafApproveDate,
       paafFile: isUploadingString.paafFile
         ? JSON.stringify(wrapUpload(uploadedPAAF.paafFile))
         : formData.interview.paafFile,
       tempID: candidate.tempID,
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     try {
@@ -207,6 +242,7 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
             paafFile: isUploadingString.paafFile
               ? JSON.stringify(wrapUpload(uploadedPAAF.paafFile))
               : formData.interview.paafFile,
+            updatedBy: JSON.stringify(loiOrderedUpdatedBy),
           },
         });
       } else {
@@ -217,8 +253,7 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
         InterviewValue: {
           id: interviewScheduleStatusId,
           status: formData.interview.status,
-          // status: selectedInterviewData.empType === "Offshore" ? "CVEV" : "PAAF",
-          // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
+          updatedBy: JSON.stringify(intOrderedUpdatedBy),
         },
       });
 

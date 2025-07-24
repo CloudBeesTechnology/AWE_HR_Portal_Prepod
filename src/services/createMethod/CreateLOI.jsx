@@ -1,4 +1,3 @@
-// useCreateInterviewSchedule.js
 import { useState } from 'react';
 import { generateClient } from '@aws-amplify/api';
 import { createLocalMobilization } from '../../graphql/mutations';
@@ -21,10 +20,10 @@ export const LocalMobilization = () => {
         variables: { input: formattedData },
       });
       console.log("API Response:", res);
-      setNotification(true); // Assume success
+      setNotification(true); 
     } catch (err) {
       console.error("Error during API call:", err);
-      setError(err); // Set error state
+      setError(err); 
     } finally {
       setIsLoading(false);
     }

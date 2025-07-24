@@ -58,7 +58,8 @@ export const JitpaForm = ({ candidate }) => {
     resolver: yupResolver(JitpaFormSchema),
   });
 
-  const JitpaUpload = watch("jitpaFile", "");
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
@@ -213,6 +214,34 @@ export const JitpaForm = ({ candidate }) => {
     const interviewScheduleId = selectedInterviewData?.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
+    const wpUpdatedByData = selectedInterviewData;
+    const intUpdatedByData = selectedInterviewDataStatus;
+
+    const wpPreviousUpdates = wpUpdatedByData?.updatedBy
+      ? JSON.parse(wpUpdatedByData?.updatedBy)
+      : [];
+
+    const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
+
+    const wpOrderedUpdatedBy = wpUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
@@ -232,6 +261,7 @@ export const JitpaForm = ({ candidate }) => {
       jitpafile: isUploadingString.jitpaFile
         ? JSON.stringify(wrapUpload(uploadedJitpa.jitpaFile))
         : formData.interview.jitpafile,
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     let response;
@@ -248,6 +278,7 @@ export const JitpaForm = ({ candidate }) => {
             jitpafile: isUploadingString.jitpaFile
               ? JSON.stringify(wrapUpload(uploadedJitpa.jitpaFile))
               : formData.interview.jitpafile,
+            updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
       } else {
@@ -259,17 +290,17 @@ export const JitpaForm = ({ candidate }) => {
       const interStatus = {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
+        updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
-      
+
       // console.log("Submitting interview details with status:", interStatus);
-      
+
       await interviewDetails({ InterviewValue: interStatus });
-      
+
       setNotification(true);
       // console.log("Interview status updated:", interStatus);
 
       // console.log("Response from WPTrackingDetails:", response);
-
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

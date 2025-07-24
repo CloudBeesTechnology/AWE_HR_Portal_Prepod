@@ -52,15 +52,8 @@ export const Doe = () => {
     doeEmpUpload: [],
   });
 
-  // const [fieldTitle, setFieldTitle] = useState("doeEmpUpload");
-  const empID = watch("empID");
-
-  const extractFileName = (url) => {
-    if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
-    }
-    return "";
-  };
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   const getFileName = (input) => {
     if (typeof input === "object" && input.upload) {
@@ -112,8 +105,8 @@ export const Doe = () => {
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
 
     // Ensure no duplicate files are added
@@ -243,33 +236,39 @@ export const Doe = () => {
       if (checkingEIDTable) {
         // If entry exists, update the dates, removing duplicates
         const updatedSubmissionDate = [
-          ...new Set([
-            ...(checkingEIDTable.doeEmpSubmit || []), // ensure it's an array before spreading
-            doeEmpSubmit,
-          ]),
+          ...new Set([...(checkingEIDTable.doeEmpSubmit || []), doeEmpSubmit]),
         ];
 
         const updatedApprovalDate = [
           ...new Set([
-            ...(checkingEIDTable.doeEmpApproval || []), // ensure it's an array before spreading
+            ...(checkingEIDTable.doeEmpApproval || []),
             doeEmpApproval,
           ]),
         ];
 
         const updatedValidDate = [
-          ...new Set([
-            ...(checkingEIDTable.doeEmpValid || []), // ensure it's an array before spreading
-            doeEmpValid,
-          ]),
+          ...new Set([...(checkingEIDTable.doeEmpValid || []), doeEmpValid]),
         ];
+
+        const previousUpdates = checkingEIDTable.updatedBy
+          ? JSON.parse(checkingEIDTable.updatedBy)
+          : [];
+
+        const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
+
+        const orderedUpdatedBy = updatedBy.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
 
         const DoeUpValue = {
           ...data,
-          doeEmpSubmit: updatedSubmissionDate.map(formatDate),
-          doeEmpApproval: updatedApprovalDate.map(formatDate), // Apply formatDate to each item
-          doeEmpValid: updatedValidDate.map(formatDate), // Apply formatDate to each item
-          doeEmpUpload: JSON.stringify(uploadDoe.doeEmpUpload), // Ensure this is properly set
           id: checkingEIDTable.id,
+          doeEmpSubmit: updatedSubmissionDate.map(formatDate),
+          doeEmpApproval: updatedApprovalDate.map(formatDate),
+          doeEmpValid: updatedValidDate.map(formatDate),
+          doeEmpUpload: JSON.stringify(uploadDoe.doeEmpUpload),
+          updatedBy: JSON.stringify(orderedUpdatedBy),
         };
 
         await UpdateMPData({ DoeUpValue });
@@ -283,6 +282,7 @@ export const Doe = () => {
           doeEmpApproval,
           doeEmpValid,
           doeEmpUpload: JSON.stringify(uploadDoe.doeEmpUpload),
+          createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
         };
 
         await CrerDoeFunData({ DoeValue });

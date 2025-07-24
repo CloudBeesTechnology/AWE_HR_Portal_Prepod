@@ -53,24 +53,13 @@ export const BankGuarantee = () => {
     bankEmpUpload: [],
   });
 
-  const [id, setID] = useState({
-    bankID: "",
-  });
-
-  const watchInducBgUpload = watch("bankEmpUpload", ""); // Watch the bankEmpUpload field
-  const empID = watch("empID");
-
-  const extractFileName = (url) => {
-    if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
-    }
-    return "";
-  };
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
     if (typeof input === "object" && input.upload) {
-      const filePath = input.upload; // Extract the 'upload' path
+      const filePath = input.upload;
 
       // Decode the URL path
       const decodedUrl = decodeURIComponent(filePath);
@@ -85,8 +74,8 @@ export const BankGuarantee = () => {
 
     // If input is a string (URL), use the URL constructor
     try {
-      const urlObj = new URL(input); // Attempt to create a URL object
-      const filePath = urlObj.pathname; // Extract path from URL
+      const urlObj = new URL(input);
+      const filePath = urlObj.pathname;
 
       // Decode the URL path
       const decodedUrl = decodeURIComponent(filePath);
@@ -140,8 +129,8 @@ export const BankGuarantee = () => {
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
 
     // Ensure no duplicate files are added
@@ -260,7 +249,7 @@ export const BankGuarantee = () => {
       );
 
       const formatDate = (date) =>
-        date ? new Date(date).toLocaleDateString("en-CA") : null; // 'en-CA' gives yyyy-mm-dd format
+        date ? new Date(date).toLocaleDateString("en-CA") : null;
       const bankEndorse = formatDate(data.bankEndorse);
       const bankSubmit = formatDate(data.bankSubmit);
       const bankRece = formatDate(data.bankRece);
@@ -268,41 +257,41 @@ export const BankGuarantee = () => {
 
       if (checkingEIDTable) {
         const updatedBankEnDate = [
-          ...new Set([
-            ...(checkingEIDTable.bankEndorse || []), // ensure it's an array before spreading
-            bankEndorse,
-          ]),
+          ...new Set([...(checkingEIDTable.bankEndorse || []), bankEndorse]),
         ];
 
         const updatedReciDate = [
-          ...new Set([
-            ...checkingEIDTable.bankRece, // ensure it's an array before spreading
-            bankRece,
-          ]),
+          ...new Set([...checkingEIDTable.bankRece, bankRece]),
         ];
 
         const updatedValidDate = [
-          ...new Set([
-            ...checkingEIDTable.bankValid, // ensure it's an array before spreading
-            bankValid,
-          ]),
+          ...new Set([...checkingEIDTable.bankValid, bankValid]),
         ];
 
         const updatedSubmitDate = [
-          ...new Set([
-            ...checkingEIDTable.bankSubmit, // ensure it's an array before spreading
-            bankSubmit,
-          ]),
+          ...new Set([...checkingEIDTable.bankSubmit, bankSubmit]),
         ];
+
+        const previousUpdates = checkingEIDTable.updatedBy
+          ? JSON.parse(checkingEIDTable.updatedBy)
+          : [];
+
+        const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
+
+        const orderedUpdatedBy = updatedBy.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
 
         const BJLUpValue = {
           ...data,
+          id: checkingEIDTable.id,
           bankEndorse: updatedBankEnDate.map(formatDate),
           bankRece: updatedReciDate.map(formatDate),
           bankSubmit: updatedSubmitDate.map(formatDate),
           bankValid: updatedValidDate.map(formatDate),
           bankEmpUpload: JSON.stringify(uploadBG.bankEmpUpload),
-          id: checkingEIDTable.id,
+          updatedBy: JSON.stringify(orderedUpdatedBy),
         };
         // console.log("Updated bank Data:", BJLUpValue);
         await UpdateBJLFun({ BJLUpValue });
@@ -316,6 +305,7 @@ export const BankGuarantee = () => {
           bankSubmit,
           bankValid,
           bankEmpUpload: JSON.stringify(uploadBG.bankEmpUpload),
+          createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
         };
         // console.log(BJLValue);
 
