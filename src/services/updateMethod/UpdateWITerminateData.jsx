@@ -33,6 +33,7 @@ export const UpdateWITerminateData = () => {
       WIResignation,
       WITermination,
       WILeaveEntitle,
+      updatedBy
     } = TerminateUpValue;
 
     // console.log(contractEndValue);
@@ -58,6 +59,7 @@ export const UpdateWITerminateData = () => {
         WIResignation,
         WITermination,
         WILeaveEntitle,
+        updatedBy: updatedBy,
       };
 
       // console.log(totalData2, "ertdfghjkhbtxrfgh");

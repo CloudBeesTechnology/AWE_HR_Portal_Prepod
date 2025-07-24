@@ -73,7 +73,9 @@ export const PersonalAcci = () => {
   const { formattedPermissions } = useDeleteAccess();
   const { personalAcciData } = useContext(DataSupply);
   const { empID, requiredPermissions, access } = useOutletContext();
-
+  const userType = localStorage.getItem("userID");
+  const [trackEmpID, setTrackEmpID] = useState(false);
+  
   const {
     register,
     handleSubmit,
@@ -253,8 +255,11 @@ export const PersonalAcci = () => {
   }, []);
 
   const searchResult = (result) => {
-    console.log("RW", result);
+    // console.log("RW", result);
     setSearchResultData(result);
+    if (result) {
+      setTrackEmpID(true);
+    }
   };
 
   const getFileName = (input) => {
@@ -315,14 +320,19 @@ export const PersonalAcci = () => {
 
   const onSubmit = async (data) => {
     try {
+      const today = new Date().toISOString().split("T")[0];
+
       const checkingDITable = personalAcciData.find(
         (match) => match.id === searchResultData.id
       );
 
       if (checkingDITable) {
+        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         const PAUpValue = {
           ...data,
           perAccUp: JSON.stringify(uploadPAU.perAccUp),
+          updatedBy,
         };
         // console.log(PACreValue);
 
@@ -331,6 +341,7 @@ export const PersonalAcci = () => {
           perAccUp: PAUpValue.perAccUp,
           perAccExp: PAUpValue.perAccExp,
           perAccNo: PAUpValue.perAccNo,
+          updatedBy: PAUpValue.updatedBy,
         };
 
         const response = await client.graphql({
@@ -344,6 +355,7 @@ export const PersonalAcci = () => {
         const PACreValue = {
           ...data,
           perAccUp: JSON.stringify(uploadPAU.perAccUp),
+          createdBy: JSON.stringify([{ userID: userType, date: today }]),
         };
         // console.log(PACreValue);
         const response = await client.graphql({
@@ -584,6 +596,7 @@ export const PersonalAcci = () => {
               label="Policy Number"
               register={register}
               errors={errors}
+              trackEmpID={trackEmpID}
             />
 
             {/* Personal Accident Expiry Date */}

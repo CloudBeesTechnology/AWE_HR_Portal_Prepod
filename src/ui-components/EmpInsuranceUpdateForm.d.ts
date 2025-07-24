@@ -31,6 +31,8 @@ export declare type EmpInsuranceUpdateFormInputValues = {
     travelIns?: string[];
     accidentIns?: string[];
     empInsUpload?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type EmpInsuranceUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -42,6 +44,8 @@ export declare type EmpInsuranceUpdateFormValidationValues = {
     travelIns?: ValidationFunction<string>;
     accidentIns?: ValidationFunction<string>;
     empInsUpload?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type EmpInsuranceUpdateFormOverridesProps = {
@@ -55,6 +59,8 @@ export declare type EmpInsuranceUpdateFormOverridesProps = {
     travelIns?: PrimitiveOverrideProps<TextFieldProps>;
     accidentIns?: PrimitiveOverrideProps<TextFieldProps>;
     empInsUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type EmpInsuranceUpdateFormProps = React.PropsWithChildren<{
     overrides?: EmpInsuranceUpdateFormOverridesProps | undefined | null;

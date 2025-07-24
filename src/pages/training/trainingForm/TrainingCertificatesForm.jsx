@@ -40,6 +40,8 @@ export const TrainingCertificatesForm = () => {
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [showTitle, setShowTitle] = useState("");
+  const userType = localStorage.getItem("userID");
+  const [trackEmpID, setTrackEmpID] = useState(false);
 
   const {
     register,
@@ -273,6 +275,9 @@ export const TrainingCertificatesForm = () => {
 
   const searchResult = (result) => {
     // console.log("Res", result.trainingProof[0]);
+  if (result) {
+      setTrackEmpID(true);
+    }
 
     if (!result) {
       console.warn("Search result is undefined or null");
@@ -562,6 +567,7 @@ export const TrainingCertificatesForm = () => {
 
   const onSubmit = async (data) => {
     try {
+      const today = new Date().toISOString().split("T")[0];
       const TCDataRecord = trainingCertifi
         ? trainingCertifi.find((match) => match.empID === data.empID)
         : {};
@@ -577,7 +583,7 @@ export const TrainingCertificatesForm = () => {
             addDescretion,
             trainingUpCertifi,
             traineeSD,
-            traineeED,
+            traineeED
           }) => ({
             certifiExpiry,
             eCertifiDate,
@@ -587,12 +593,14 @@ export const TrainingCertificatesForm = () => {
             addDescretion,
             trainingUpCertifi,
             traineeSD,
-            traineeED,
+            traineeED
           })
         );
       };
 
       if (TCDataRecord) {
+        const previous = TCDataRecord.updatedBy ? JSON.parse(TCDataRecord.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         const TCDataUp = {
           ...data,
           trainingProof: extractValues(data?.trainingProof)?.map(
@@ -606,6 +614,7 @@ export const TrainingCertificatesForm = () => {
             }
           ),
           id: TCDataRecord.id,
+          updatedBy,
         };
 
         await TCDataFunUp({ TCDataUp });
@@ -625,6 +634,7 @@ export const TrainingCertificatesForm = () => {
               };
             }
           ),
+          createdBy: JSON.stringify([{ userID: userType, date: today }]),
         };
 
         await TCData({ TCValue });
@@ -678,6 +688,7 @@ export const TrainingCertificatesForm = () => {
                 placeholder="Employee ID"
                 className="outline-none w-full"
                 {...register("empID")}
+                disabled={trackEmpID}
               />
             </div>
             {errors.empID && (

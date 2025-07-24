@@ -24,16 +24,22 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type InsClaimCreateFormInputValues = {
     empID?: string;
     insuranceClaims?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type InsClaimCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
     insuranceClaims?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type InsClaimCreateFormOverridesProps = {
     InsClaimCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     empID?: PrimitiveOverrideProps<TextFieldProps>;
     insuranceClaims?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type InsClaimCreateFormProps = React.PropsWithChildren<{
     overrides?: InsClaimCreateFormOverridesProps | undefined | null;

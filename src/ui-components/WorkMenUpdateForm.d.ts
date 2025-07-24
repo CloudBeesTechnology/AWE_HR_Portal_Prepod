@@ -26,12 +26,16 @@ export declare type WorkMenUpdateFormInputValues = {
     workmenCompExp?: string;
     workmenCompNo?: string;
     workmenComUp?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type WorkMenUpdateFormValidationValues = {
     empStatusType?: ValidationFunction<string>;
     workmenCompExp?: ValidationFunction<string>;
     workmenCompNo?: ValidationFunction<string>;
     workmenComUp?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type WorkMenUpdateFormOverridesProps = {
@@ -40,6 +44,8 @@ export declare type WorkMenUpdateFormOverridesProps = {
     workmenCompExp?: PrimitiveOverrideProps<TextFieldProps>;
     workmenCompNo?: PrimitiveOverrideProps<TextFieldProps>;
     workmenComUp?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type WorkMenUpdateFormProps = React.PropsWithChildren<{
     overrides?: WorkMenUpdateFormOverridesProps | undefined | null;

@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -50,6 +50,8 @@ export declare type EmpWorkInfoCreateFormInputValues = {
     workHrs?: string[];
     workWeek?: string[];
     workMonth?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type EmpWorkInfoCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -80,6 +82,8 @@ export declare type EmpWorkInfoCreateFormValidationValues = {
     workHrs?: ValidationFunction<string>;
     workWeek?: ValidationFunction<string>;
     workMonth?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type EmpWorkInfoCreateFormOverridesProps = {
@@ -112,6 +116,8 @@ export declare type EmpWorkInfoCreateFormOverridesProps = {
     workHrs?: PrimitiveOverrideProps<TextFieldProps>;
     workWeek?: PrimitiveOverrideProps<TextFieldProps>;
     workMonth?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type EmpWorkInfoCreateFormProps = React.PropsWithChildren<{
     overrides?: EmpWorkInfoCreateFormOverridesProps | undefined | null;

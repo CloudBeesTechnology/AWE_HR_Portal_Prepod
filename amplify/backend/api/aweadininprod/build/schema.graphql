@@ -123,6 +123,8 @@ type InsuranceType @aws_iam @aws_api_key {
   id: ID!
   typeIns: String
   insDetails: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -132,6 +134,8 @@ type GroupHandS @aws_iam @aws_api_key {
   groupHSExp: String
   groupHSNo: String
   groupHSUpload: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -142,6 +146,8 @@ type WorkMen @aws_iam @aws_api_key {
   workmenCompExp: String
   workmenCompNo: String
   workmenComUp: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -151,6 +157,8 @@ type TravelIns @aws_iam @aws_api_key {
   travelExp: String
   travelNo: String
   travelUp: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -160,6 +168,8 @@ type PersonalAccident @aws_iam @aws_api_key {
   perAccExp: String
   perAccNo: String
   perAccUp: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -168,6 +178,8 @@ type InsClaim @aws_iam @aws_api_key {
   id: ID!
   empID: String
   insuranceClaims: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -290,6 +302,8 @@ type TrainingReq @aws_iam @aws_api_key {
   company: [String]
   mediRequired: Boolean
   traineeTrack: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -305,6 +319,8 @@ type TrainingCertificates @aws_iam @aws_api_key {
   addDescretion: [String]
   tcRemarks: String
   trainingProof: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -322,6 +338,8 @@ type EmpDepInsurance @aws_iam @aws_api_key {
   id: ID!
   empID: String
   depInsurance: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -337,6 +355,8 @@ type EmpInsurance @aws_iam @aws_api_key {
   travelIns: [String]
   accidentIns: [String]
   empInsUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -347,6 +367,8 @@ type SawpDetails @aws_iam @aws_api_key {
   sawpEmpLtrReq: [String]
   sawpEmpLtrReci: [String]
   sawpEmpUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -366,6 +388,8 @@ type DNDetails @aws_iam @aws_api_key {
   nlmsRefNo: [String]
   nlmsEmpValid: [String]
   nlmsEmpUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -389,6 +413,8 @@ type BJLDetails @aws_iam @aws_api_key {
   lbrDepoAmt: [String]
   lbrDepoSubmit: [String]
   lbrDepoUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -410,6 +436,8 @@ type PassportValid @aws_iam @aws_api_key {
   immigApproval: [String]
   reEntryVisaExp: [String]
   remarkImmig: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -474,6 +502,8 @@ type EmployeeNonLocalAcco @aws_iam @aws_api_key {
   empID: String!
   accommodation: [String]
   accommodationAddress: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -514,6 +544,8 @@ type ServiceRecord @aws_iam @aws_api_key {
   uploadLP: [AWSJSON]
   uploadAL: [AWSJSON]
   uploadDep: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -537,6 +569,8 @@ type EmpLeaveDetails @aws_iam @aws_api_key {
   pervAnnualLeaveBal: String
   sickLeaveTaken: String
   remainAnnualLeave: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -561,6 +595,8 @@ type TerminationInfo @aws_iam @aws_api_key {
   WIResignation: [AWSJSON]
   WITermination: [AWSJSON]
   WILeaveEntitle: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -595,6 +631,8 @@ type EmpWorkInfo @aws_iam @aws_api_key {
   workHrs: [String]
   workWeek: [String]
   workMonth: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -631,6 +669,8 @@ type EmpPersonalInfo @aws_iam @aws_api_key {
   position: [String]
   sapNo: String
   otherLang: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -667,6 +707,8 @@ type IDDetails @aws_iam @aws_api_key {
   religion: String
   supportDocUpload: [AWSJSON]
   qcCertifyUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -830,6 +872,8 @@ type User @aws_iam @aws_api_key {
   setPermissions: [String]
   password: String
   status: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -2054,6 +2098,8 @@ input ModelInsuranceTypeFilterInput {
   id: ModelIDInput
   typeIns: ModelStringInput
   insDetails: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelInsuranceTypeFilterInput]
@@ -2064,6 +2110,8 @@ input ModelInsuranceTypeFilterInput {
 input ModelInsuranceTypeConditionInput {
   typeIns: ModelStringInput
   insDetails: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelInsuranceTypeConditionInput]
   or: [ModelInsuranceTypeConditionInput]
   not: ModelInsuranceTypeConditionInput
@@ -2075,12 +2123,16 @@ input CreateInsuranceTypeInput {
   id: ID
   typeIns: String
   insDetails: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateInsuranceTypeInput {
   id: ID!
   typeIns: String
   insDetails: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteInsuranceTypeInput {
@@ -2091,6 +2143,8 @@ input ModelSubscriptionInsuranceTypeFilterInput {
   id: ModelSubscriptionIDInput
   typeIns: ModelSubscriptionStringInput
   insDetails: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionInsuranceTypeFilterInput]
@@ -2107,6 +2161,8 @@ input ModelGroupHandSFilterInput {
   groupHSExp: ModelStringInput
   groupHSNo: ModelStringInput
   groupHSUpload: ModelStringInput
+  updatedBy: ModelStringInput
+  createdBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelGroupHandSFilterInput]
@@ -2118,6 +2174,8 @@ input ModelGroupHandSConditionInput {
   groupHSExp: ModelStringInput
   groupHSNo: ModelStringInput
   groupHSUpload: ModelStringInput
+  updatedBy: ModelStringInput
+  createdBy: ModelStringInput
   and: [ModelGroupHandSConditionInput]
   or: [ModelGroupHandSConditionInput]
   not: ModelGroupHandSConditionInput
@@ -2130,6 +2188,8 @@ input CreateGroupHandSInput {
   groupHSExp: String
   groupHSNo: String
   groupHSUpload: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
 }
 
 input UpdateGroupHandSInput {
@@ -2137,6 +2197,8 @@ input UpdateGroupHandSInput {
   groupHSExp: String
   groupHSNo: String
   groupHSUpload: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
 }
 
 input DeleteGroupHandSInput {
@@ -2148,6 +2210,8 @@ input ModelSubscriptionGroupHandSFilterInput {
   groupHSExp: ModelSubscriptionStringInput
   groupHSNo: ModelSubscriptionStringInput
   groupHSUpload: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionGroupHandSFilterInput]
@@ -2165,6 +2229,8 @@ input ModelWorkMenFilterInput {
   workmenCompExp: ModelStringInput
   workmenCompNo: ModelStringInput
   workmenComUp: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelWorkMenFilterInput]
@@ -2177,6 +2243,8 @@ input ModelWorkMenConditionInput {
   workmenCompExp: ModelStringInput
   workmenCompNo: ModelStringInput
   workmenComUp: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelWorkMenConditionInput]
   or: [ModelWorkMenConditionInput]
   not: ModelWorkMenConditionInput
@@ -2190,6 +2258,8 @@ input CreateWorkMenInput {
   workmenCompExp: String
   workmenCompNo: String
   workmenComUp: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateWorkMenInput {
@@ -2198,6 +2268,8 @@ input UpdateWorkMenInput {
   workmenCompExp: String
   workmenCompNo: String
   workmenComUp: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteWorkMenInput {
@@ -2210,6 +2282,8 @@ input ModelSubscriptionWorkMenFilterInput {
   workmenCompExp: ModelSubscriptionStringInput
   workmenCompNo: ModelSubscriptionStringInput
   workmenComUp: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionWorkMenFilterInput]
@@ -2226,6 +2300,8 @@ input ModelTravelInsFilterInput {
   travelExp: ModelStringInput
   travelNo: ModelStringInput
   travelUp: ModelStringInput
+  updatedBy: ModelStringInput
+  createdBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTravelInsFilterInput]
@@ -2237,6 +2313,8 @@ input ModelTravelInsConditionInput {
   travelExp: ModelStringInput
   travelNo: ModelStringInput
   travelUp: ModelStringInput
+  updatedBy: ModelStringInput
+  createdBy: ModelStringInput
   and: [ModelTravelInsConditionInput]
   or: [ModelTravelInsConditionInput]
   not: ModelTravelInsConditionInput
@@ -2249,6 +2327,8 @@ input CreateTravelInsInput {
   travelExp: String
   travelNo: String
   travelUp: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
 }
 
 input UpdateTravelInsInput {
@@ -2256,6 +2336,8 @@ input UpdateTravelInsInput {
   travelExp: String
   travelNo: String
   travelUp: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
 }
 
 input DeleteTravelInsInput {
@@ -2267,6 +2349,8 @@ input ModelSubscriptionTravelInsFilterInput {
   travelExp: ModelSubscriptionStringInput
   travelNo: ModelSubscriptionStringInput
   travelUp: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTravelInsFilterInput]
@@ -2283,6 +2367,8 @@ input ModelPersonalAccidentFilterInput {
   perAccExp: ModelStringInput
   perAccNo: ModelStringInput
   perAccUp: ModelStringInput
+  updatedBy: ModelStringInput
+  createdBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelPersonalAccidentFilterInput]
@@ -2294,6 +2380,8 @@ input ModelPersonalAccidentConditionInput {
   perAccExp: ModelStringInput
   perAccNo: ModelStringInput
   perAccUp: ModelStringInput
+  updatedBy: ModelStringInput
+  createdBy: ModelStringInput
   and: [ModelPersonalAccidentConditionInput]
   or: [ModelPersonalAccidentConditionInput]
   not: ModelPersonalAccidentConditionInput
@@ -2306,6 +2394,8 @@ input CreatePersonalAccidentInput {
   perAccExp: String
   perAccNo: String
   perAccUp: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
 }
 
 input UpdatePersonalAccidentInput {
@@ -2313,6 +2403,8 @@ input UpdatePersonalAccidentInput {
   perAccExp: String
   perAccNo: String
   perAccUp: [AWSJSON]
+  updatedBy: [AWSJSON]
+  createdBy: [AWSJSON]
 }
 
 input DeletePersonalAccidentInput {
@@ -2324,6 +2416,8 @@ input ModelSubscriptionPersonalAccidentFilterInput {
   perAccExp: ModelSubscriptionStringInput
   perAccNo: ModelSubscriptionStringInput
   perAccUp: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionPersonalAccidentFilterInput]
@@ -2339,6 +2433,8 @@ input ModelInsClaimFilterInput {
   id: ModelIDInput
   empID: ModelStringInput
   insuranceClaims: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelInsClaimFilterInput]
@@ -2349,6 +2445,8 @@ input ModelInsClaimFilterInput {
 input ModelInsClaimConditionInput {
   empID: ModelStringInput
   insuranceClaims: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelInsClaimConditionInput]
   or: [ModelInsClaimConditionInput]
   not: ModelInsClaimConditionInput
@@ -2360,12 +2458,16 @@ input CreateInsClaimInput {
   id: ID
   empID: String
   insuranceClaims: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateInsClaimInput {
   id: ID!
   empID: String
   insuranceClaims: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteInsClaimInput {
@@ -2376,6 +2478,8 @@ input ModelSubscriptionInsClaimFilterInput {
   id: ModelSubscriptionIDInput
   empID: ModelSubscriptionStringInput
   insuranceClaims: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionInsClaimFilterInput]
@@ -2957,6 +3061,8 @@ input ModelTrainingReqFilterInput {
   company: ModelStringInput
   mediRequired: ModelBooleanInput
   traineeTrack: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTrainingReqFilterInput]
@@ -2980,6 +3086,8 @@ input ModelTrainingReqConditionInput {
   company: ModelStringInput
   mediRequired: ModelBooleanInput
   traineeTrack: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelTrainingReqConditionInput]
   or: [ModelTrainingReqConditionInput]
   not: ModelTrainingReqConditionInput
@@ -3004,6 +3112,8 @@ input CreateTrainingReqInput {
   company: [String]
   mediRequired: Boolean
   traineeTrack: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateTrainingReqInput {
@@ -3023,6 +3133,8 @@ input UpdateTrainingReqInput {
   company: [String]
   mediRequired: Boolean
   traineeTrack: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteTrainingReqInput {
@@ -3046,6 +3158,8 @@ input ModelSubscriptionTrainingReqFilterInput {
   company: ModelSubscriptionStringInput
   mediRequired: ModelSubscriptionBooleanInput
   traineeTrack: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTrainingReqFilterInput]
@@ -3068,6 +3182,8 @@ input ModelTrainingCertificatesFilterInput {
   addDescretion: ModelStringInput
   tcRemarks: ModelStringInput
   trainingProof: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTrainingCertificatesFilterInput]
@@ -3085,6 +3201,8 @@ input ModelTrainingCertificatesConditionInput {
   addDescretion: ModelStringInput
   tcRemarks: ModelStringInput
   trainingProof: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelTrainingCertificatesConditionInput]
   or: [ModelTrainingCertificatesConditionInput]
   not: ModelTrainingCertificatesConditionInput
@@ -3103,6 +3221,8 @@ input CreateTrainingCertificatesInput {
   addDescretion: [String]
   tcRemarks: String
   trainingProof: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateTrainingCertificatesInput {
@@ -3116,6 +3236,8 @@ input UpdateTrainingCertificatesInput {
   addDescretion: [String]
   tcRemarks: String
   trainingProof: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteTrainingCertificatesInput {
@@ -3133,6 +3255,8 @@ input ModelSubscriptionTrainingCertificatesFilterInput {
   addDescretion: ModelSubscriptionStringInput
   tcRemarks: ModelSubscriptionStringInput
   trainingProof: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTrainingCertificatesFilterInput]
@@ -3205,6 +3329,8 @@ input ModelEmpDepInsuranceFilterInput {
   id: ModelIDInput
   empID: ModelStringInput
   depInsurance: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpDepInsuranceFilterInput]
@@ -3215,6 +3341,8 @@ input ModelEmpDepInsuranceFilterInput {
 input ModelEmpDepInsuranceConditionInput {
   empID: ModelStringInput
   depInsurance: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelEmpDepInsuranceConditionInput]
   or: [ModelEmpDepInsuranceConditionInput]
   not: ModelEmpDepInsuranceConditionInput
@@ -3226,12 +3354,16 @@ input CreateEmpDepInsuranceInput {
   id: ID
   empID: String
   depInsurance: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateEmpDepInsuranceInput {
   id: ID!
   empID: String
   depInsurance: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteEmpDepInsuranceInput {
@@ -3242,6 +3374,8 @@ input ModelSubscriptionEmpDepInsuranceFilterInput {
   id: ModelSubscriptionIDInput
   empID: ModelSubscriptionStringInput
   depInsurance: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpDepInsuranceFilterInput]
@@ -3264,6 +3398,8 @@ input ModelEmpInsuranceFilterInput {
   travelIns: ModelStringInput
   accidentIns: ModelStringInput
   empInsUpload: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpInsuranceFilterInput]
@@ -3281,6 +3417,8 @@ input ModelEmpInsuranceConditionInput {
   travelIns: ModelStringInput
   accidentIns: ModelStringInput
   empInsUpload: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelEmpInsuranceConditionInput]
   or: [ModelEmpInsuranceConditionInput]
   not: ModelEmpInsuranceConditionInput
@@ -3299,6 +3437,8 @@ input CreateEmpInsuranceInput {
   travelIns: [String]
   accidentIns: [String]
   empInsUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateEmpInsuranceInput {
@@ -3312,6 +3452,8 @@ input UpdateEmpInsuranceInput {
   travelIns: [String]
   accidentIns: [String]
   empInsUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteEmpInsuranceInput {
@@ -3329,6 +3471,8 @@ input ModelSubscriptionEmpInsuranceFilterInput {
   travelIns: ModelSubscriptionStringInput
   accidentIns: ModelSubscriptionStringInput
   empInsUpload: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpInsuranceFilterInput]
@@ -3346,6 +3490,8 @@ input ModelSawpDetailsFilterInput {
   sawpEmpLtrReq: ModelStringInput
   sawpEmpLtrReci: ModelStringInput
   sawpEmpUpload: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelSawpDetailsFilterInput]
@@ -3358,6 +3504,8 @@ input ModelSawpDetailsConditionInput {
   sawpEmpLtrReq: ModelStringInput
   sawpEmpLtrReci: ModelStringInput
   sawpEmpUpload: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelSawpDetailsConditionInput]
   or: [ModelSawpDetailsConditionInput]
   not: ModelSawpDetailsConditionInput
@@ -3371,6 +3519,8 @@ input CreateSawpDetailsInput {
   sawpEmpLtrReq: [String]
   sawpEmpLtrReci: [String]
   sawpEmpUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateSawpDetailsInput {
@@ -3379,6 +3529,8 @@ input UpdateSawpDetailsInput {
   sawpEmpLtrReq: [String]
   sawpEmpLtrReci: [String]
   sawpEmpUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteSawpDetailsInput {
@@ -3391,6 +3543,8 @@ input ModelSubscriptionSawpDetailsFilterInput {
   sawpEmpLtrReq: ModelSubscriptionStringInput
   sawpEmpLtrReci: ModelSubscriptionStringInput
   sawpEmpUpload: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionSawpDetailsFilterInput]
@@ -3417,6 +3571,8 @@ input ModelDNDetailsFilterInput {
   nlmsRefNo: ModelStringInput
   nlmsEmpValid: ModelStringInput
   nlmsEmpUpload: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelDNDetailsFilterInput]
@@ -3438,6 +3594,8 @@ input ModelDNDetailsConditionInput {
   nlmsRefNo: ModelStringInput
   nlmsEmpValid: ModelStringInput
   nlmsEmpUpload: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelDNDetailsConditionInput]
   or: [ModelDNDetailsConditionInput]
   not: ModelDNDetailsConditionInput
@@ -3460,6 +3618,8 @@ input CreateDNDetailsInput {
   nlmsRefNo: [String]
   nlmsEmpValid: [String]
   nlmsEmpUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateDNDetailsInput {
@@ -3477,6 +3637,8 @@ input UpdateDNDetailsInput {
   nlmsRefNo: [String]
   nlmsEmpValid: [String]
   nlmsEmpUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteDNDetailsInput {
@@ -3498,6 +3660,8 @@ input ModelSubscriptionDNDetailsFilterInput {
   nlmsRefNo: ModelSubscriptionStringInput
   nlmsEmpValid: ModelSubscriptionStringInput
   nlmsEmpUpload: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionDNDetailsFilterInput]
@@ -3528,6 +3692,8 @@ input ModelBJLDetailsFilterInput {
   lbrDepoAmt: ModelStringInput
   lbrDepoSubmit: ModelStringInput
   lbrDepoUpload: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelBJLDetailsFilterInput]
@@ -3553,6 +3719,8 @@ input ModelBJLDetailsConditionInput {
   lbrDepoAmt: ModelStringInput
   lbrDepoSubmit: ModelStringInput
   lbrDepoUpload: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelBJLDetailsConditionInput]
   or: [ModelBJLDetailsConditionInput]
   not: ModelBJLDetailsConditionInput
@@ -3579,6 +3747,8 @@ input CreateBJLDetailsInput {
   lbrDepoAmt: [String]
   lbrDepoSubmit: [String]
   lbrDepoUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateBJLDetailsInput {
@@ -3600,6 +3770,8 @@ input UpdateBJLDetailsInput {
   lbrDepoAmt: [String]
   lbrDepoSubmit: [String]
   lbrDepoUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteBJLDetailsInput {
@@ -3625,6 +3797,8 @@ input ModelSubscriptionBJLDetailsFilterInput {
   lbrDepoAmt: ModelSubscriptionStringInput
   lbrDepoSubmit: ModelSubscriptionStringInput
   lbrDepoUpload: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionBJLDetailsFilterInput]
@@ -3653,6 +3827,8 @@ input ModelPassportValidFilterInput {
   immigApproval: ModelStringInput
   reEntryVisaExp: ModelStringInput
   remarkImmig: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelPassportValidFilterInput]
@@ -3676,6 +3852,8 @@ input ModelPassportValidConditionInput {
   immigApproval: ModelStringInput
   reEntryVisaExp: ModelStringInput
   remarkImmig: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelPassportValidConditionInput]
   or: [ModelPassportValidConditionInput]
   not: ModelPassportValidConditionInput
@@ -3700,6 +3878,8 @@ input CreatePassportValidInput {
   immigApproval: [String]
   reEntryVisaExp: [String]
   remarkImmig: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdatePassportValidInput {
@@ -3719,6 +3899,8 @@ input UpdatePassportValidInput {
   immigApproval: [String]
   reEntryVisaExp: [String]
   remarkImmig: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeletePassportValidInput {
@@ -3742,6 +3924,8 @@ input ModelSubscriptionPassportValidFilterInput {
   immigApproval: ModelSubscriptionStringInput
   reEntryVisaExp: ModelSubscriptionStringInput
   remarkImmig: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionPassportValidFilterInput]
@@ -4045,6 +4229,8 @@ input ModelEmployeeNonLocalAccoFilterInput {
   empID: ModelStringInput
   accommodation: ModelStringInput
   accommodationAddress: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmployeeNonLocalAccoFilterInput]
@@ -4056,6 +4242,8 @@ input ModelEmployeeNonLocalAccoConditionInput {
   empID: ModelStringInput
   accommodation: ModelStringInput
   accommodationAddress: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelEmployeeNonLocalAccoConditionInput]
   or: [ModelEmployeeNonLocalAccoConditionInput]
   not: ModelEmployeeNonLocalAccoConditionInput
@@ -4068,6 +4256,8 @@ input CreateEmployeeNonLocalAccoInput {
   empID: String!
   accommodation: [String]
   accommodationAddress: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateEmployeeNonLocalAccoInput {
@@ -4075,6 +4265,8 @@ input UpdateEmployeeNonLocalAccoInput {
   empID: String
   accommodation: [String]
   accommodationAddress: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteEmployeeNonLocalAccoInput {
@@ -4086,6 +4278,8 @@ input ModelSubscriptionEmployeeNonLocalAccoFilterInput {
   empID: ModelSubscriptionStringInput
   accommodation: ModelSubscriptionStringInput
   accommodationAddress: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmployeeNonLocalAccoFilterInput]
@@ -4213,6 +4407,8 @@ input ModelServiceRecordFilterInput {
   uploadLP: ModelStringInput
   uploadAL: ModelStringInput
   uploadDep: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelServiceRecordFilterInput]
@@ -4238,6 +4434,8 @@ input ModelServiceRecordConditionInput {
   uploadLP: ModelStringInput
   uploadAL: ModelStringInput
   uploadDep: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelServiceRecordConditionInput]
   or: [ModelServiceRecordConditionInput]
   not: ModelServiceRecordConditionInput
@@ -4264,6 +4462,8 @@ input CreateServiceRecordInput {
   uploadLP: [AWSJSON]
   uploadAL: [AWSJSON]
   uploadDep: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateServiceRecordInput {
@@ -4285,6 +4485,8 @@ input UpdateServiceRecordInput {
   uploadLP: [AWSJSON]
   uploadAL: [AWSJSON]
   uploadDep: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteServiceRecordInput {
@@ -4310,6 +4512,8 @@ input ModelSubscriptionServiceRecordFilterInput {
   uploadLP: ModelSubscriptionStringInput
   uploadAL: ModelSubscriptionStringInput
   uploadDep: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionServiceRecordFilterInput]
@@ -4340,6 +4544,8 @@ input ModelEmpLeaveDetailsFilterInput {
   pervAnnualLeaveBal: ModelStringInput
   sickLeaveTaken: ModelStringInput
   remainAnnualLeave: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpLeaveDetailsFilterInput]
@@ -4365,6 +4571,8 @@ input ModelEmpLeaveDetailsConditionInput {
   pervAnnualLeaveBal: ModelStringInput
   sickLeaveTaken: ModelStringInput
   remainAnnualLeave: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelEmpLeaveDetailsConditionInput]
   or: [ModelEmpLeaveDetailsConditionInput]
   not: ModelEmpLeaveDetailsConditionInput
@@ -4391,6 +4599,8 @@ input CreateEmpLeaveDetailsInput {
   pervAnnualLeaveBal: String
   sickLeaveTaken: String
   remainAnnualLeave: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateEmpLeaveDetailsInput {
@@ -4412,6 +4622,8 @@ input UpdateEmpLeaveDetailsInput {
   pervAnnualLeaveBal: String
   sickLeaveTaken: String
   remainAnnualLeave: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteEmpLeaveDetailsInput {
@@ -4437,6 +4649,8 @@ input ModelSubscriptionEmpLeaveDetailsFilterInput {
   pervAnnualLeaveBal: ModelSubscriptionStringInput
   sickLeaveTaken: ModelSubscriptionStringInput
   remainAnnualLeave: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpLeaveDetailsFilterInput]
@@ -4468,6 +4682,8 @@ input ModelTerminationInfoFilterInput {
   WIResignation: ModelStringInput
   WITermination: ModelStringInput
   WILeaveEntitle: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTerminationInfoFilterInput]
@@ -4494,6 +4710,8 @@ input ModelTerminationInfoConditionInput {
   WIResignation: ModelStringInput
   WITermination: ModelStringInput
   WILeaveEntitle: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelTerminationInfoConditionInput]
   or: [ModelTerminationInfoConditionInput]
   not: ModelTerminationInfoConditionInput
@@ -4521,6 +4739,8 @@ input CreateTerminationInfoInput {
   WIResignation: [AWSJSON]
   WITermination: [AWSJSON]
   WILeaveEntitle: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateTerminationInfoInput {
@@ -4543,6 +4763,8 @@ input UpdateTerminationInfoInput {
   WIResignation: [AWSJSON]
   WITermination: [AWSJSON]
   WILeaveEntitle: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteTerminationInfoInput {
@@ -4569,6 +4791,8 @@ input ModelSubscriptionTerminationInfoFilterInput {
   WIResignation: ModelSubscriptionStringInput
   WITermination: ModelSubscriptionStringInput
   WILeaveEntitle: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTerminationInfoFilterInput]
@@ -4610,6 +4834,8 @@ input ModelEmpWorkInfoFilterInput {
   workHrs: ModelStringInput
   workWeek: ModelStringInput
   workMonth: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpWorkInfoFilterInput]
@@ -4646,6 +4872,8 @@ input ModelEmpWorkInfoConditionInput {
   workHrs: ModelStringInput
   workWeek: ModelStringInput
   workMonth: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelEmpWorkInfoConditionInput]
   or: [ModelEmpWorkInfoConditionInput]
   not: ModelEmpWorkInfoConditionInput
@@ -4683,6 +4911,8 @@ input CreateEmpWorkInfoInput {
   workHrs: [String]
   workWeek: [String]
   workMonth: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateEmpWorkInfoInput {
@@ -4715,6 +4945,8 @@ input UpdateEmpWorkInfoInput {
   workHrs: [String]
   workWeek: [String]
   workMonth: [String]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteEmpWorkInfoInput {
@@ -4751,6 +4983,8 @@ input ModelSubscriptionEmpWorkInfoFilterInput {
   workHrs: ModelSubscriptionStringInput
   workWeek: ModelSubscriptionStringInput
   workMonth: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpWorkInfoFilterInput]
@@ -4794,6 +5028,8 @@ input ModelEmpPersonalInfoFilterInput {
   position: ModelStringInput
   sapNo: ModelStringInput
   otherLang: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpPersonalInfoFilterInput]
@@ -4832,6 +5068,8 @@ input ModelEmpPersonalInfoConditionInput {
   position: ModelStringInput
   sapNo: ModelStringInput
   otherLang: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelEmpPersonalInfoConditionInput]
   or: [ModelEmpPersonalInfoConditionInput]
   not: ModelEmpPersonalInfoConditionInput
@@ -4871,6 +5109,8 @@ input CreateEmpPersonalInfoInput {
   position: [String]
   sapNo: String
   otherLang: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateEmpPersonalInfoInput {
@@ -4905,6 +5145,8 @@ input UpdateEmpPersonalInfoInput {
   position: [String]
   sapNo: String
   otherLang: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteEmpPersonalInfoInput {
@@ -4943,6 +5185,8 @@ input ModelSubscriptionEmpPersonalInfoFilterInput {
   position: ModelSubscriptionStringInput
   sapNo: ModelSubscriptionStringInput
   otherLang: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpPersonalInfoFilterInput]
@@ -4986,6 +5230,8 @@ input ModelIDDetailsFilterInput {
   religion: ModelStringInput
   supportDocUpload: ModelStringInput
   qcCertifyUpload: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelIDDetailsFilterInput]
@@ -5024,6 +5270,8 @@ input ModelIDDetailsConditionInput {
   religion: ModelStringInput
   supportDocUpload: ModelStringInput
   qcCertifyUpload: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelIDDetailsConditionInput]
   or: [ModelIDDetailsConditionInput]
   not: ModelIDDetailsConditionInput
@@ -5063,6 +5311,8 @@ input CreateIDDetailsInput {
   religion: String
   supportDocUpload: [AWSJSON]
   qcCertifyUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateIDDetailsInput {
@@ -5097,6 +5347,8 @@ input UpdateIDDetailsInput {
   religion: String
   supportDocUpload: [AWSJSON]
   qcCertifyUpload: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteIDDetailsInput {
@@ -5135,6 +5387,8 @@ input ModelSubscriptionIDDetailsFilterInput {
   religion: ModelSubscriptionStringInput
   supportDocUpload: ModelSubscriptionStringInput
   qcCertifyUpload: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionIDDetailsFilterInput]
@@ -5973,6 +6227,8 @@ input ModelUserFilterInput {
   setPermissions: ModelStringInput
   password: ModelStringInput
   status: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelUserFilterInput]
@@ -5986,6 +6242,8 @@ input ModelUserConditionInput {
   setPermissions: ModelStringInput
   password: ModelStringInput
   status: ModelStringInput
+  createdBy: ModelStringInput
+  updatedBy: ModelStringInput
   and: [ModelUserConditionInput]
   or: [ModelUserConditionInput]
   not: ModelUserConditionInput
@@ -6000,6 +6258,8 @@ input CreateUserInput {
   setPermissions: [String]
   password: String
   status: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input UpdateUserInput {
@@ -6009,6 +6269,8 @@ input UpdateUserInput {
   setPermissions: [String]
   password: String
   status: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 input DeleteUserInput {
@@ -6022,6 +6284,8 @@ input ModelSubscriptionUserFilterInput {
   setPermissions: ModelSubscriptionStringInput
   password: ModelSubscriptionStringInput
   status: ModelSubscriptionStringInput
+  createdBy: ModelSubscriptionStringInput
+  updatedBy: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionUserFilterInput]

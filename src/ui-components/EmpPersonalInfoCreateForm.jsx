@@ -220,6 +220,8 @@ export default function EmpPersonalInfoCreateForm(props) {
     position: [],
     sapNo: "",
     otherLang: "",
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [age, setAge] = React.useState(initialValues.age);
@@ -265,6 +267,8 @@ export default function EmpPersonalInfoCreateForm(props) {
   const [position, setPosition] = React.useState(initialValues.position);
   const [sapNo, setSapNo] = React.useState(initialValues.sapNo);
   const [otherLang, setOtherLang] = React.useState(initialValues.otherLang);
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -305,6 +309,10 @@ export default function EmpPersonalInfoCreateForm(props) {
     setCurrentPositionValue("");
     setSapNo(initialValues.sapNo);
     setOtherLang(initialValues.otherLang);
+    setCreatedBy(initialValues.createdBy);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(initialValues.updatedBy);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [currentAgentValue, setCurrentAgentValue] = React.useState("");
@@ -327,6 +335,10 @@ export default function EmpPersonalInfoCreateForm(props) {
   const permanentAddressRef = React.createRef();
   const [currentPositionValue, setCurrentPositionValue] = React.useState("");
   const positionRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     age: [],
@@ -358,6 +370,8 @@ export default function EmpPersonalInfoCreateForm(props) {
     position: [],
     sapNo: [],
     otherLang: [],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -415,6 +429,8 @@ export default function EmpPersonalInfoCreateForm(props) {
           position,
           sapNo,
           otherLang,
+          createdBy,
+          updatedBy,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -507,6 +523,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -564,6 +582,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.age ?? value;
@@ -617,6 +637,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.aTQualify ?? value;
@@ -670,6 +692,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.alternateNo ?? value;
@@ -719,6 +743,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.agent ?? values;
@@ -797,6 +823,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.bankName ?? value;
@@ -850,6 +878,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.bankAccNo ?? value;
@@ -899,6 +929,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.contactNo ?? values;
@@ -977,6 +1009,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.cob ?? value;
@@ -1026,6 +1060,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.contractType ?? values;
@@ -1106,6 +1142,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.ctryOfOrigin ?? value;
@@ -1159,6 +1197,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.chinese ?? value;
@@ -1212,6 +1252,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.dob ?? value;
@@ -1265,6 +1307,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.educLevel ?? value;
@@ -1318,6 +1362,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -1367,6 +1413,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.eduDetails ?? values;
@@ -1447,6 +1495,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empBadgeNo ?? value;
@@ -1496,6 +1546,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.empType ?? values;
@@ -1570,6 +1622,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.familyDetails ?? values;
@@ -1650,6 +1704,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.gender ?? value;
@@ -1703,6 +1759,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.lang ?? value;
@@ -1756,6 +1814,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.marital ?? value;
@@ -1809,6 +1869,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -1862,6 +1924,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.officialEmail ?? value;
@@ -1915,6 +1979,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.oCOfOrigin ?? value;
@@ -1968,6 +2034,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.profilePhoto ?? value;
@@ -2017,6 +2085,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.permanentAddress ?? values;
@@ -2096,6 +2166,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position: values,
               sapNo,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.position ?? values;
@@ -2174,6 +2246,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo: value,
               otherLang,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.sapNo ?? value;
@@ -2227,6 +2301,8 @@ export default function EmpPersonalInfoCreateForm(props) {
               position,
               sapNo,
               otherLang: value,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.otherLang ?? value;
@@ -2241,6 +2317,158 @@ export default function EmpPersonalInfoCreateForm(props) {
         hasError={errors.otherLang?.hasError}
         {...getOverrideProps(overrides, "otherLang")}
       ></TextField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              age,
+              aTQualify,
+              alternateNo,
+              agent,
+              bankName,
+              bankAccNo,
+              contactNo,
+              cob,
+              contractType,
+              ctryOfOrigin,
+              chinese,
+              dob,
+              educLevel,
+              email,
+              eduDetails,
+              empBadgeNo,
+              empType,
+              familyDetails,
+              gender,
+              lang,
+              marital,
+              name,
+              officialEmail,
+              oCOfOrigin,
+              profilePhoto,
+              permanentAddress,
+              position,
+              sapNo,
+              otherLang,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              age,
+              aTQualify,
+              alternateNo,
+              agent,
+              bankName,
+              bankAccNo,
+              contactNo,
+              cob,
+              contractType,
+              ctryOfOrigin,
+              chinese,
+              dob,
+              educLevel,
+              email,
+              eduDetails,
+              empBadgeNo,
+              empType,
+              familyDetails,
+              gender,
+              lang,
+              marital,
+              name,
+              officialEmail,
+              oCOfOrigin,
+              profilePhoto,
+              permanentAddress,
+              position,
+              sapNo,
+              otherLang,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
+        ></TextAreaField>
+      </ArrayField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

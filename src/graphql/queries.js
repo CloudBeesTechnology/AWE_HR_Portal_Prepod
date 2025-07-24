@@ -329,6 +329,8 @@ export const getInsuranceType = /* GraphQL */ `
       id
       typeIns
       insDetails
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -346,6 +348,8 @@ export const listInsuranceTypes = /* GraphQL */ `
         id
         typeIns
         insDetails
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -362,6 +366,8 @@ export const getGroupHandS = /* GraphQL */ `
       groupHSExp
       groupHSNo
       groupHSUpload
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -380,6 +386,8 @@ export const listGroupHandS = /* GraphQL */ `
         groupHSExp
         groupHSNo
         groupHSUpload
+        updatedBy
+        createdBy
         createdAt
         updatedAt
         __typename
@@ -397,6 +405,8 @@ export const getWorkMen = /* GraphQL */ `
       workmenCompExp
       workmenCompNo
       workmenComUp
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -416,6 +426,8 @@ export const listWorkMen = /* GraphQL */ `
         workmenCompExp
         workmenCompNo
         workmenComUp
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -432,6 +444,8 @@ export const getTravelIns = /* GraphQL */ `
       travelExp
       travelNo
       travelUp
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -450,6 +464,8 @@ export const listTravelIns = /* GraphQL */ `
         travelExp
         travelNo
         travelUp
+        updatedBy
+        createdBy
         createdAt
         updatedAt
         __typename
@@ -466,6 +482,8 @@ export const getPersonalAccident = /* GraphQL */ `
       perAccExp
       perAccNo
       perAccUp
+      updatedBy
+      createdBy
       createdAt
       updatedAt
       __typename
@@ -488,6 +506,8 @@ export const listPersonalAccidents = /* GraphQL */ `
         perAccExp
         perAccNo
         perAccUp
+        updatedBy
+        createdBy
         createdAt
         updatedAt
         __typename
@@ -503,6 +523,8 @@ export const getInsClaim = /* GraphQL */ `
       id
       empID
       insuranceClaims
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -520,6 +542,8 @@ export const listInsClaims = /* GraphQL */ `
         id
         empID
         insuranceClaims
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -814,6 +838,8 @@ export const getTrainingReq = /* GraphQL */ `
       company
       mediRequired
       traineeTrack
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -844,6 +870,8 @@ export const listTrainingReqs = /* GraphQL */ `
         company
         mediRequired
         traineeTrack
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -866,6 +894,8 @@ export const getTrainingCertificates = /* GraphQL */ `
       addDescretion
       tcRemarks
       trainingProof
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -894,6 +924,8 @@ export const listTrainingCertificates = /* GraphQL */ `
         addDescretion
         tcRemarks
         trainingProof
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -943,6 +975,8 @@ export const getEmpDepInsurance = /* GraphQL */ `
       id
       empID
       depInsurance
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -964,6 +998,8 @@ export const listEmpDepInsurances = /* GraphQL */ `
         id
         empID
         depInsurance
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -986,6 +1022,8 @@ export const getEmpInsurance = /* GraphQL */ `
       travelIns
       accidentIns
       empInsUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1010,6 +1048,8 @@ export const listEmpInsurances = /* GraphQL */ `
         travelIns
         accidentIns
         empInsUpload
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1027,6 +1067,8 @@ export const getSawpDetails = /* GraphQL */ `
       sawpEmpLtrReq
       sawpEmpLtrReci
       sawpEmpUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1046,6 +1088,8 @@ export const listSawpDetails = /* GraphQL */ `
         sawpEmpLtrReq
         sawpEmpLtrReci
         sawpEmpUpload
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1072,6 +1116,8 @@ export const getDNDetails = /* GraphQL */ `
       nlmsRefNo
       nlmsEmpValid
       nlmsEmpUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1100,6 +1146,8 @@ export const listDNDetails = /* GraphQL */ `
         nlmsRefNo
         nlmsEmpValid
         nlmsEmpUpload
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1130,6 +1178,8 @@ export const getBJLDetails = /* GraphQL */ `
       lbrDepoAmt
       lbrDepoSubmit
       lbrDepoUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1162,6 +1212,8 @@ export const listBJLDetails = /* GraphQL */ `
         lbrDepoAmt
         lbrDepoSubmit
         lbrDepoUpload
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1190,6 +1242,8 @@ export const getPassportValid = /* GraphQL */ `
       immigApproval
       reEntryVisaExp
       remarkImmig
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1220,6 +1274,8 @@ export const listPassportValids = /* GraphQL */ `
         immigApproval
         reEntryVisaExp
         remarkImmig
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1362,6 +1418,8 @@ export const getEmployeeNonLocalAcco = /* GraphQL */ `
       empID
       accommodation
       accommodationAddress
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1384,6 +1442,8 @@ export const listEmployeeNonLocalAccos = /* GraphQL */ `
         empID
         accommodation
         accommodationAddress
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1468,6 +1528,8 @@ export const getServiceRecord = /* GraphQL */ `
       uploadLP
       uploadAL
       uploadDep
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1500,6 +1562,8 @@ export const listServiceRecords = /* GraphQL */ `
         uploadLP
         uploadAL
         uploadDep
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1530,6 +1594,8 @@ export const getEmpLeaveDetails = /* GraphQL */ `
       pervAnnualLeaveBal
       sickLeaveTaken
       remainAnnualLeave
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1562,6 +1628,8 @@ export const listEmpLeaveDetails = /* GraphQL */ `
         pervAnnualLeaveBal
         sickLeaveTaken
         remainAnnualLeave
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1593,6 +1661,8 @@ export const getTerminationInfo = /* GraphQL */ `
       WIResignation
       WITermination
       WILeaveEntitle
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1630,6 +1700,8 @@ export const listTerminationInfos = /* GraphQL */ `
         WIResignation
         WITermination
         WILeaveEntitle
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1671,6 +1743,8 @@ export const getEmpWorkInfo = /* GraphQL */ `
       workHrs
       workWeek
       workMonth
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1714,6 +1788,8 @@ export const listEmpWorkInfos = /* GraphQL */ `
         workHrs
         workWeek
         workMonth
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1757,6 +1833,8 @@ export const getEmpPersonalInfo = /* GraphQL */ `
       position
       sapNo
       otherLang
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1806,6 +1884,8 @@ export const listEmpPersonalInfos = /* GraphQL */ `
         position
         sapNo
         otherLang
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1849,6 +1929,8 @@ export const getIDDetails = /* GraphQL */ `
       religion
       supportDocUpload
       qcCertifyUpload
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1894,6 +1976,8 @@ export const listIDDetails = /* GraphQL */ `
         religion
         supportDocUpload
         qcCertifyUpload
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -2308,6 +2392,8 @@ export const getUser = /* GraphQL */ `
       setPermissions
       password
       status
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2328,6 +2414,8 @@ export const listUsers = /* GraphQL */ `
         setPermissions
         password
         status
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename

@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -25,11 +25,15 @@ export declare type EmployeeNonLocalAccoUpdateFormInputValues = {
     empID?: string;
     accommodation?: string[];
     accommodationAddress?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type EmployeeNonLocalAccoUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
     accommodation?: ValidationFunction<string>;
     accommodationAddress?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type EmployeeNonLocalAccoUpdateFormOverridesProps = {
@@ -37,6 +41,8 @@ export declare type EmployeeNonLocalAccoUpdateFormOverridesProps = {
     empID?: PrimitiveOverrideProps<TextFieldProps>;
     accommodation?: PrimitiveOverrideProps<TextFieldProps>;
     accommodationAddress?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type EmployeeNonLocalAccoUpdateFormProps = React.PropsWithChildren<{
     overrides?: EmployeeNonLocalAccoUpdateFormOverridesProps | undefined | null;

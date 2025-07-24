@@ -222,6 +222,8 @@ export default function IDDetailsUpdateForm(props) {
     religion: "",
     supportDocUpload: [],
     qcCertifyUpload: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [applicationUpload, setApplicationUpload] = React.useState(
@@ -281,6 +283,8 @@ export default function IDDetailsUpdateForm(props) {
   const [qcCertifyUpload, setQcCertifyUpload] = React.useState(
     initialValues.qcCertifyUpload
   );
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = iDDetailsRecord
@@ -330,6 +334,10 @@ export default function IDDetailsUpdateForm(props) {
     setCurrentSupportDocUploadValue("");
     setQcCertifyUpload(cleanValues.qcCertifyUpload ?? []);
     setCurrentQcCertifyUploadValue("");
+    setCreatedBy(cleanValues.createdBy ?? []);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(cleanValues.updatedBy ?? []);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [iDDetailsRecord, setIDDetailsRecord] =
@@ -385,6 +393,10 @@ export default function IDDetailsUpdateForm(props) {
   const [currentQcCertifyUploadValue, setCurrentQcCertifyUploadValue] =
     React.useState("");
   const qcCertifyUploadRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     applicationUpload: [{ type: "JSON" }],
@@ -416,6 +428,8 @@ export default function IDDetailsUpdateForm(props) {
     religion: [],
     supportDocUpload: [{ type: "JSON" }],
     qcCertifyUpload: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -473,6 +487,8 @@ export default function IDDetailsUpdateForm(props) {
           religion: religion ?? null,
           supportDocUpload: supportDocUpload ?? null,
           qcCertifyUpload: qcCertifyUpload ?? null,
+          createdBy: createdBy ?? null,
+          updatedBy: updatedBy ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -563,6 +579,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -612,6 +630,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.applicationUpload ?? values;
@@ -698,6 +718,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.bwnIcNo ?? value;
@@ -751,6 +773,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.bwnIcColour ?? value;
@@ -800,6 +824,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bwnIcExpiry ?? values;
@@ -876,6 +902,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bwnUpload ?? values;
@@ -950,6 +978,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.cvCertifyUpload ?? values;
@@ -1033,6 +1063,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.driveLic ?? value;
@@ -1086,6 +1118,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.inducBrief ?? value;
@@ -1139,6 +1173,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.inducBriefUp ?? value;
@@ -1188,6 +1224,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.loiUpload ?? values;
@@ -1266,6 +1304,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.myIcNo ?? value;
@@ -1315,6 +1355,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.myIcUpload ?? values;
@@ -1395,6 +1437,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.nationality ?? value;
@@ -1448,6 +1492,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.nationalCat ?? value;
@@ -1501,6 +1547,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.otherNation ?? value;
@@ -1554,6 +1602,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.otherRace ?? value;
@@ -1607,6 +1657,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.otherReligion ?? value;
@@ -1656,6 +1708,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.ppNo ?? values;
@@ -1730,6 +1784,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.paafCvevUpload ?? values;
@@ -1806,6 +1862,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.ppIssued ?? values;
@@ -1880,6 +1938,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.ppExpiry ?? values;
@@ -1954,6 +2014,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.ppUpload ?? values;
@@ -2028,6 +2090,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.ppDestinate ?? values;
@@ -2108,6 +2172,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.preEmp ?? value;
@@ -2161,6 +2227,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.preEmpPeriod ?? value;
@@ -2214,6 +2282,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.race ?? value;
@@ -2267,6 +2337,8 @@ export default function IDDetailsUpdateForm(props) {
               religion: value,
               supportDocUpload,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.religion ?? value;
@@ -2316,6 +2388,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload: values,
               qcCertifyUpload,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.supportDocUpload ?? values;
@@ -2395,6 +2469,8 @@ export default function IDDetailsUpdateForm(props) {
               religion,
               supportDocUpload,
               qcCertifyUpload: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.qcCertifyUpload ?? values;
@@ -2437,6 +2513,158 @@ export default function IDDetailsUpdateForm(props) {
           ref={qcCertifyUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "qcCertifyUpload")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              applicationUpload,
+              bwnIcNo,
+              bwnIcColour,
+              bwnIcExpiry,
+              bwnUpload,
+              cvCertifyUpload,
+              driveLic,
+              inducBrief,
+              inducBriefUp,
+              loiUpload,
+              myIcNo,
+              myIcUpload,
+              nationality,
+              nationalCat,
+              otherNation,
+              otherRace,
+              otherReligion,
+              ppNo,
+              paafCvevUpload,
+              ppIssued,
+              ppExpiry,
+              ppUpload,
+              ppDestinate,
+              preEmp,
+              preEmpPeriod,
+              race,
+              religion,
+              supportDocUpload,
+              qcCertifyUpload,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              applicationUpload,
+              bwnIcNo,
+              bwnIcColour,
+              bwnIcExpiry,
+              bwnUpload,
+              cvCertifyUpload,
+              driveLic,
+              inducBrief,
+              inducBriefUp,
+              loiUpload,
+              myIcNo,
+              myIcUpload,
+              nationality,
+              nationalCat,
+              otherNation,
+              otherRace,
+              otherReligion,
+              ppNo,
+              paafCvevUpload,
+              ppIssued,
+              ppExpiry,
+              ppUpload,
+              ppDestinate,
+              preEmp,
+              preEmpPeriod,
+              race,
+              religion,
+              supportDocUpload,
+              qcCertifyUpload,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex

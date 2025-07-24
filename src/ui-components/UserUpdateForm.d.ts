@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -27,6 +27,8 @@ export declare type UserUpdateFormInputValues = {
     setPermissions?: string[];
     password?: string;
     status?: string;
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type UserUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -34,6 +36,8 @@ export declare type UserUpdateFormValidationValues = {
     setPermissions?: ValidationFunction<string>;
     password?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type UserUpdateFormOverridesProps = {
@@ -43,6 +47,8 @@ export declare type UserUpdateFormOverridesProps = {
     setPermissions?: PrimitiveOverrideProps<TextFieldProps>;
     password?: PrimitiveOverrideProps<TextFieldProps>;
     status?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type UserUpdateFormProps = React.PropsWithChildren<{
     overrides?: UserUpdateFormOverridesProps | undefined | null;

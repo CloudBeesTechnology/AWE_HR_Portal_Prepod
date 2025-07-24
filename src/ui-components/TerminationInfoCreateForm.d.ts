@@ -40,6 +40,8 @@ export declare type TerminationInfoCreateFormInputValues = {
     WIResignation?: string[];
     WITermination?: string[];
     WILeaveEntitle?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type TerminationInfoCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -60,6 +62,8 @@ export declare type TerminationInfoCreateFormValidationValues = {
     WIResignation?: ValidationFunction<string>;
     WITermination?: ValidationFunction<string>;
     WILeaveEntitle?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TerminationInfoCreateFormOverridesProps = {
@@ -82,6 +86,8 @@ export declare type TerminationInfoCreateFormOverridesProps = {
     WIResignation?: PrimitiveOverrideProps<TextAreaFieldProps>;
     WITermination?: PrimitiveOverrideProps<TextAreaFieldProps>;
     WILeaveEntitle?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type TerminationInfoCreateFormProps = React.PropsWithChildren<{
     overrides?: TerminationInfoCreateFormOverridesProps | undefined | null;

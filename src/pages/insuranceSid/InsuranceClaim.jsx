@@ -35,6 +35,8 @@ export const InsuranceClaim = () => {
   const { InsClaimUpData } = InsClaimUp();
   const [notification, setNotification] = useState(false);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
+  const userType = localStorage.getItem("userID");
+  const [trackEmpID, setTrackEmpID] = useState(false);
 
   const {
     register,
@@ -181,6 +183,9 @@ export const InsuranceClaim = () => {
   const claimUp = "insuranceClaims";
   // console.log(isUploading);
   const searchResult = (result) => {
+    if (result) {
+      setTrackEmpID(true);
+    }
     // Reset the state before setting new data
     setValue("empID", result?.empID);
     const insuranceClaimsData = result?.insuranceClaims;
@@ -341,11 +346,15 @@ export const InsuranceClaim = () => {
   const onSubmit = async (data) => {
     // console.log(data);
     try {
+      const today = new Date().toISOString().split("T")[0];
+
       const checkingDITable = insuranceClaimsData.find(
         (match) => match.empID === data.empID
       );
 
       if (checkingDITable) {
+        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         const ICValuse = {
           ...data,
           insuranceClaims: data?.insuranceClaims?.map((insurance, index) => {
@@ -356,6 +365,7 @@ export const InsuranceClaim = () => {
             };
           }),
           id: checkingDITable.id,
+          updatedBy,
         };
         // console.log(ICValuse, "update");
         await InsClaimUpData({ ICValuse });
@@ -364,13 +374,14 @@ export const InsuranceClaim = () => {
       } else {
         const ICValuse = {
           ...data,
-          insuranceClaims: data.insuranceClaims.map((insurance, index) => {
+          insuranceClaims: data?.insuranceClaims.map((insurance, index) => {
             return {
               ...insurance,
               claimUpload:
                 JSON.stringify(uploadedDocs.insuranceClaims[index]) || [],
             };
           }),
+          createdBy: JSON.stringify([{ userID: userType, date: today }]),
         };
         // console.log(ICValuse, "create");
         await SubmitICData({ ICValuse });
@@ -386,31 +397,7 @@ export const InsuranceClaim = () => {
 
   const access = "Insurance";
 
-  // console.log("Unames", uploadedFileDep);
-  // console.log("Fnames", fileNames);
-  // console.log("upDoc", uploadedDocs);
-  // console.log("isUp",isUploading);
-  // const parsedClaims = insuranceClaims
-  //   ?.filter((item) => item !== null && item !== undefined) // Remove null/undefined
-  //   ?.flatMap((item) => {
-  //     try {
-  //       return typeof item === "string" ? JSON.parse(item) : item; // Parse JSON if string
-  //     } catch (error) {
-  //       console.error("Error parsing JSON:", error);
-  //       return []; // Return empty array if JSON parsing fails
-  //     }
-  //   })
-  //   ?.filter(
-  //     (field) =>
-  //       field &&
-  //       Object.values(field).some(
-  //         (value) =>
-  //           value !== "" &&
-  //           value !== null &&
-  //           value !== undefined &&
-  //           !(Array.isArray(value) && value?.length === 0)
-  //       )
-  //   );
+
   const parsedClaims = insuranceClaims
     ?.map((entry) => {
       try {
@@ -461,6 +448,7 @@ export const InsuranceClaim = () => {
                 className="w-full h-[45px] bg-lite_skyBlue pl-3 mt-2 border outline-none border-[#dedddd] rounded pr-10"
                 placeholder="Enter Employee ID"
                 {...register("empID")}
+                disabled={trackEmpID}
               />
               {errors.empID && (
                 <p className="text-[red] text-[12px]">{errors.empID.message}</p>

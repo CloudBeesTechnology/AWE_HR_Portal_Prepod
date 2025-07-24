@@ -79,6 +79,7 @@ export const UpdateWILeaveData = () => {
       sickLeaveDate,
       hospLeave,
       pervAnnualLeaveBal,
+      updatedBy,
     } = LeaveUpValue;
 
   
@@ -130,6 +131,8 @@ export const UpdateWILeaveData = () => {
           pervAnnualLeaveBal,
           // compasLeave,
           hospLeave,
+          updatedBy: updatedBy,
+
         };
   
         //   // console.log(totalData1, "ertdfghjkhbtxrfgh");

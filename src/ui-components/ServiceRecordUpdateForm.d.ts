@@ -39,6 +39,8 @@ export declare type ServiceRecordUpdateFormInputValues = {
     uploadLP?: string[];
     uploadAL?: string[];
     uploadDep?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type ServiceRecordUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -58,6 +60,8 @@ export declare type ServiceRecordUpdateFormValidationValues = {
     uploadLP?: ValidationFunction<string>;
     uploadAL?: ValidationFunction<string>;
     uploadDep?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ServiceRecordUpdateFormOverridesProps = {
@@ -79,6 +83,8 @@ export declare type ServiceRecordUpdateFormOverridesProps = {
     uploadLP?: PrimitiveOverrideProps<TextAreaFieldProps>;
     uploadAL?: PrimitiveOverrideProps<TextAreaFieldProps>;
     uploadDep?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type ServiceRecordUpdateFormProps = React.PropsWithChildren<{
     overrides?: ServiceRecordUpdateFormOverridesProps | undefined | null;

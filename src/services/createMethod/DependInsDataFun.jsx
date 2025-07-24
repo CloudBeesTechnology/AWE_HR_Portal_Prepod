@@ -11,6 +11,7 @@ export const DependInsDataFun = () => {
     const totalData = {
         empID:depValue.empID,
         depInsurance: JSON.stringify(depValue.depInsurance),
+        createdBy: depValue.createdBy,
 
     };
     console.log(totalData);

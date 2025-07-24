@@ -192,24 +192,38 @@ export default function InsClaimCreateForm(props) {
   const initialValues = {
     empID: "",
     insuranceClaims: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [insuranceClaims, setInsuranceClaims] = React.useState(
     initialValues.insuranceClaims
   );
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
     setInsuranceClaims(initialValues.insuranceClaims);
     setCurrentInsuranceClaimsValue("");
+    setCreatedBy(initialValues.createdBy);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(initialValues.updatedBy);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [currentInsuranceClaimsValue, setCurrentInsuranceClaimsValue] =
     React.useState("");
   const insuranceClaimsRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [],
     insuranceClaims: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -239,6 +253,8 @@ export default function InsClaimCreateForm(props) {
         let modelFields = {
           empID,
           insuranceClaims,
+          createdBy,
+          updatedBy,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -303,6 +319,8 @@ export default function InsClaimCreateForm(props) {
             const modelFields = {
               empID: value,
               insuranceClaims,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -324,6 +342,8 @@ export default function InsClaimCreateForm(props) {
             const modelFields = {
               empID,
               insuranceClaims: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.insuranceClaims ?? values;
@@ -366,6 +386,102 @@ export default function InsClaimCreateForm(props) {
           ref={insuranceClaimsRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "insuranceClaims")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              insuranceClaims,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              insuranceClaims,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex

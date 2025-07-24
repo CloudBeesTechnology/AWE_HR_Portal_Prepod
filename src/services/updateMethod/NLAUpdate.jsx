@@ -10,12 +10,12 @@ export const NLAUpdate = () => {
   const NLAUpdateFun = useCallback(async ({ NLAValue }) => {
     if (!NLAValue ) {
       // Ensure all required parameters are provided
-      setErrorEmpID("All fields (empID, accommodation, accommodationAddress, IDTable) are required.");
+      setErrorEmpID("All fields (empID, accommodation, accommodationAddress, IDTable, updatedBy) are required.");
       throw new Error("Missing required parameters");
     }
 
     try {
-      const { empID, accommodation, accommodationAddress, IDTable } = NLAValue;
+      const { empID, accommodation, accommodationAddress, updatedBy, IDTable } = NLAValue;
 
       // Prepare data for the update
       const updatedData = {
@@ -23,6 +23,7 @@ export const NLAUpdate = () => {
         empID,
         accommodation,
         accommodationAddress,
+        updatedBy
       };
 
       // Call the AWS Amplify GraphQL client to update the record

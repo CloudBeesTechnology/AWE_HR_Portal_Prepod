@@ -15,6 +15,7 @@ import {
   Icon,
   ScrollView,
   Text,
+  TextAreaField,
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
@@ -206,6 +207,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
     pervAnnualLeaveBal: "",
     sickLeaveTaken: "",
     remainAnnualLeave: "",
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [annualLeave, setAnnualLeave] = React.useState(
@@ -244,6 +247,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
   const [remainAnnualLeave, setRemainAnnualLeave] = React.useState(
     initialValues.remainAnnualLeave
   );
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -269,6 +274,10 @@ export default function EmpLeaveDetailsCreateForm(props) {
     setPervAnnualLeaveBal(initialValues.pervAnnualLeaveBal);
     setSickLeaveTaken(initialValues.sickLeaveTaken);
     setRemainAnnualLeave(initialValues.remainAnnualLeave);
+    setCreatedBy(initialValues.createdBy);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(initialValues.updatedBy);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [currentAnnualLeaveValue, setCurrentAnnualLeaveValue] =
@@ -288,6 +297,10 @@ export default function EmpLeaveDetailsCreateForm(props) {
   const dateLeavePassRef = React.createRef();
   const [currentLeavePassValue, setCurrentLeavePassValue] = React.useState("");
   const leavePassRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     annualLeave: [],
@@ -306,6 +319,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
     pervAnnualLeaveBal: [],
     sickLeaveTaken: [],
     remainAnnualLeave: [],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -350,6 +365,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
           pervAnnualLeaveBal,
           sickLeaveTaken,
           remainAnnualLeave,
+          createdBy,
+          updatedBy,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -429,6 +446,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -465,6 +484,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.annualLeave ?? values;
@@ -528,6 +549,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.annualLeaveDate ?? values;
@@ -598,6 +621,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.compasLeave ?? value;
@@ -634,6 +659,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.destinateLeavePass ?? values;
@@ -703,6 +730,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.durLeavePass ?? values;
@@ -766,6 +795,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.dateLeavePass ?? values;
@@ -829,6 +860,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.leavePass ?? values;
@@ -894,6 +927,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.materLeave ?? value;
@@ -934,6 +969,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.mrageLeave ?? value;
@@ -974,6 +1011,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.paterLeave ?? value;
@@ -1014,6 +1053,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.sickLeave ?? value;
@@ -1054,6 +1095,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.sickLeaveDate ?? value;
@@ -1094,6 +1137,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.hospLeave ?? value;
@@ -1134,6 +1179,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal: value,
               sickLeaveTaken,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.pervAnnualLeaveBal ?? value;
@@ -1176,6 +1223,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken: value,
               remainAnnualLeave,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.sickLeaveTaken ?? value;
@@ -1216,6 +1265,8 @@ export default function EmpLeaveDetailsCreateForm(props) {
               pervAnnualLeaveBal,
               sickLeaveTaken,
               remainAnnualLeave: value,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.remainAnnualLeave ?? value;
@@ -1232,6 +1283,132 @@ export default function EmpLeaveDetailsCreateForm(props) {
         hasError={errors.remainAnnualLeave?.hasError}
         {...getOverrideProps(overrides, "remainAnnualLeave")}
       ></TextField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              annualLeave,
+              annualLeaveDate,
+              compasLeave,
+              destinateLeavePass,
+              durLeavePass,
+              dateLeavePass,
+              leavePass,
+              materLeave,
+              mrageLeave,
+              paterLeave,
+              sickLeave,
+              sickLeaveDate,
+              hospLeave,
+              pervAnnualLeaveBal,
+              sickLeaveTaken,
+              remainAnnualLeave,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              annualLeave,
+              annualLeaveDate,
+              compasLeave,
+              destinateLeavePass,
+              durLeavePass,
+              dateLeavePass,
+              leavePass,
+              materLeave,
+              mrageLeave,
+              paterLeave,
+              sickLeave,
+              sickLeaveDate,
+              hospLeave,
+              pervAnnualLeaveBal,
+              sickLeaveTaken,
+              remainAnnualLeave,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
+        ></TextAreaField>
+      </ArrayField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
