@@ -54,6 +54,8 @@ export const GroupHS = () => {
   const [searchResultData, setSearchResultData] = useState([]);
   const [empID, setEmpID] = useState("");
   const { formattedPermissions } = useDeleteAccess();
+  const userType = localStorage.getItem("userID");
+  const [trackEmpID, setTrackEmpID] = useState(false);
 
   const {
     register,
@@ -205,20 +207,24 @@ export const GroupHS = () => {
 
   const onSubmit = async (data) => {
     // console.log("data121", data);
-
     try {
+      
+      const today = new Date().toISOString().split("T")[0];
       const checkingDITable = groupHSData?.find(
         (match) => match?.id === searchResultData?.id
       );
 
-      console.log(checkingDITable);
+      // console.log(checkingDITable);
 
       if (checkingDITable) {
+        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         // Update case: Prepare the update data and perform the update
         const updatedGHSValue = {
           ...data,
           id: checkingDITable.id,
           groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
+          updatedBy,
         };
         // console.log("update value logs:", updatedGHSValue);
 
@@ -227,6 +233,7 @@ export const GroupHS = () => {
           groupHSExp: updatedGHSValue.groupHSExp,
           groupHSNo: updatedGHSValue.groupHSNo,
           groupHSUpload: updatedGHSValue.groupHSUpload,
+          updatedBy: updatedGHSValue.updatedBy,
         };
         const response = await client.graphql({
           query: updateGroupHandS,
@@ -240,6 +247,7 @@ export const GroupHS = () => {
           groupHSNo: data.groupHSNo,
           groupHSExp: data.groupHSExp,
           groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
+          createdBy: JSON.stringify([{ userID: userType, date: today }]),
         };
 
         const response = await client.graphql({
@@ -319,6 +327,9 @@ export const GroupHS = () => {
 
   const searchResult = (result) => {
     setSearchResultData(result);
+    if (result) {
+      setTrackEmpID(true);
+    }
   };
 
   const getFileName = (input) => {
@@ -614,6 +625,7 @@ export const GroupHS = () => {
               label="Policy Number"
               register={register}
               errors={errors}
+              trackEmpID={trackEmpID}
             />
             <FormField
               name="groupHSExp"

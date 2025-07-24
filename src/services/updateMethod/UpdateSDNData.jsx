@@ -11,28 +11,27 @@ export const UpdateDataFun = () => {
     }
     try {
       const updatedData = {
-        id:DoeUpValue.id,
-        empID:DoeUpValue.empID, // Use the existing ID
-        doeEmpSubmit:DoeUpValue.doeEmpSubmit,
-        doeEmpApproval:DoeUpValue.doeEmpApproval,
-        doeEmpValid:DoeUpValue.doeEmpValid,
-        doeEmpRefNo:DoeUpValue.doeEmpRefNo,
-        doeEmpUpload:DoeUpValue.doeEmpUpload,
+        id: DoeUpValue.id,
+        empID: DoeUpValue.empID,
+        doeEmpSubmit: DoeUpValue.doeEmpSubmit,
+        doeEmpApproval: DoeUpValue.doeEmpApproval,
+        doeEmpValid: DoeUpValue.doeEmpValid,
+        doeEmpRefNo: DoeUpValue.doeEmpRefNo,
+        doeEmpUpload: DoeUpValue.doeEmpUpload,
+        updatedBy: DoeUpValue.updatedBy
       };
 
       const response = await client.graphql({
         query: updateDNDetails,
-        variables: { input: updatedData, },
+        variables: { input: updatedData },
       });
 
-      // // Log the response to confirm the update
-      // console.log("Data successfully updated:", response);
+      console.log("Data successfully updated:", response);
     } catch (error) {
       console.error("Error updating data:", error);
-      throw error; // Re-throw the error after logging
+      throw error;
     }
   }, []);
 
   return { UpdateMPData };
 };
-

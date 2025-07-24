@@ -22,7 +22,8 @@ export const NonLocalAcco = () => {
   const [notification, setNotification] = useState(false);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [showTitle, setShowTitle] = useState("");
-
+  const [trackEmpID, setTrackEmpID] = useState(false);
+  const userType = localStorage.getItem("userID");
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -74,6 +75,10 @@ const getArrayDateValue = (value) => {
 // Function to handle search results and set form values
 const searchResult = (result) => {
 
+  if (result) {
+    setTrackEmpID(true);
+  }
+
   const fieldValue = ["empID","empBadgeNo"];
 
   fieldValue.forEach((val) => {
@@ -101,47 +106,56 @@ const searchResult = (result) => {
 };
 
 
-  const onSubmit = async (data) => {
-    // console.log("Submitted Data:", data);  // Check if empID is part of the data
+const onSubmit = async (data) => {
+  // console.log("Submitted Data:", data);  // Check if empID is part of the data
 
-    if (!data.empID) {
-      console.error("empID is missing");
-      return;
+  if (!data.empID) {
+    console.error("empID is missing");
+    return;
+  }
+
+  try {
+    const checkingPITable = empPIData.find(
+      (match) => match.empID === data.empID
+    );
+    const checkingIDTable = NLAData.find(
+      (match) => match.empID === data.empID
+    );
+
+
+  const today = new Date().toISOString().split("T")[0];
+    if (checkingIDTable && checkingPITable) {
+      const previous = checkingIDTable.updatedBy ? JSON.parse(checkingIDTable.updatedBy) : [];
+      const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+      const NLAValue = {
+        ...data,
+        PITableID: checkingPITable.id,
+        IDTable: checkingIDTable.id,
+        updatedBy,
+      };
+      // console.log("Updating data with empID:", data.empID);  // Log before calling the update function
+
+      console.log("update",NLAValue);
+      await NLAUpdateFun({ NLAValue });
+      setShowTitle("Details updated successfully");
+      setNotification(true);
+    } else {
+      const NLACreValue = {
+        ...data,
+        createdBy: JSON.stringify([{ userID: userType, date: today }]),
+      };
+      console.log("NLACreValue",NLACreValue);
+      // console.log("Creating new data for empID:", data.empID);  // Log before calling the create function
+      await NLADatas({ NLACreValue });
+      setShowTitle("Details saved successfully");
+      setNotification(true);
     }
 
-    try {
-      const checkingPITable = empPIData.find(
-        (match) => match.empID === data.empID
-      );
-      const checkingIDTable = NLAData.find(
-        (match) => match.empID === data.empID
-      );
-
-      if (checkingIDTable && checkingPITable) {
-        const NLAValue = {
-          ...data,
-          PITableID: checkingPITable.id,
-          IDTable: checkingIDTable.id,
-        };
-        // console.log("Updating data with empID:", data.empID);  // Log before calling the update function
-        await NLAUpdateFun({ NLAValue });
-        setShowTitle("Details updated successfully");
-        setNotification(true);
-      } else {
-        const NLACreValue = {
-          ...data,
-        };
-        // console.log("Creating new data for empID:", data.empID);  // Log before calling the create function
-        await NLADatas({ NLACreValue });
-        setShowTitle("Details saved successfully");
-        setNotification(true);
-      }
-  
-    } catch (error) {
-      console.log(error);
-      console.error("Error submitting data to AWS:", JSON.stringify(error, null, 2));
-    }
-  };
+  } catch (error) {
+    console.log(error);
+    console.error("Error submitting data to AWS:", JSON.stringify(error, null, 2));
+  }
+};
 
   return (
     <div className="flex flex-col items-center justify-center  p-10 bg-[#F5F6F1]"  onClick={() => {
@@ -179,6 +193,7 @@ const searchResult = (result) => {
                  type="text"
                  placeholder="Enter Employee ID"
                  errors={errors}
+                 trackEmpID={trackEmpID}
                />
              </div>
            </div>

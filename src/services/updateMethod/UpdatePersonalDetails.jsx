@@ -8,8 +8,8 @@ import { generateClient } from "@aws-amplify/api";
 export const CandyDetails = () => {
   const client = generateClient();
 
-  const candyDetails  = useCallback(async ({ reqValue }) => {
-    if (!reqValue ) {
+  const candyDetails = useCallback(async ({ reqValue }) => {
+    if (!reqValue) {
       throw new Error("Missing required parameters");
     }
 
@@ -75,12 +75,12 @@ export const CandyDetails = () => {
       uploadIc,
       status,
       PDTableID,
-      EDTableID
+      EDTableID,
+      updatedBy,
     } = reqValue;
- 
 
     const totalData = {
-      id:PDTableID,
+      id: PDTableID,
       tempID,
       age,
       alternateNo,
@@ -119,10 +119,11 @@ export const CandyDetails = () => {
       religion,
       status,
       workExperience,
+      updatedBy,
     };
 
     const totalDataTwo = {
-      id:EDTableID,
+      id: EDTableID,
       tempID,
       crime,
       crimeDesc,
@@ -144,32 +145,28 @@ export const CandyDetails = () => {
       uploadResume,
       uploadCertificate,
       uploadPp,
-      uploadIc
+      uploadIc,
+      updatedBy,
     };
 
-  
-    
-
-    // console.log("Total Data",totalData);
-    // console.log("Total DataT",totalDataTwo);
-
     try {
-      const [personaldetails,educationDetails] = await Promise.all([
+      const [personaldetails, educationDetails] = await Promise.all([
         client.graphql({
           query: updatePersonalDetails,
           variables: { input: totalData },
         }),
         client.graphql({
           query: updateEducationDetails,
-          variables: { input: totalDataTwo,  },
+          variables: { input: totalDataTwo },
         }),
       ]);
-      // console.log("update", personaldetails,educationDetails);
+      console.log("update Personal", personaldetails);
+      console.log("Update Education", educationDetails);
       // localStorage.removeItem("applicantFormData");
       // localStorage.removeItem("personalFormData");
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
-      throw error; // Rethrow error if needed
+      throw error;
     }
   }, []);
   return { candyDetails };

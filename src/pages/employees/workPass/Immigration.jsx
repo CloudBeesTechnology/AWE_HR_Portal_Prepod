@@ -61,10 +61,13 @@ export const Immigration = () => {
     reEntryUpload: [],
   });
 
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
+
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
     if (typeof input === "object" && input.upload) {
-      const filePath = input.upload; // Extract the 'upload' path
+      const filePath = input.upload;
 
       // Decode the URL path
       const decodedUrl = decodeURIComponent(filePath);
@@ -79,8 +82,8 @@ export const Immigration = () => {
 
     // If input is a string (URL), use the URL constructor
     try {
-      const urlObj = new URL(input); // Attempt to create a URL object
-      const filePath = urlObj.pathname; // Extract path from URL
+      const urlObj = new URL(input);
+      const filePath = urlObj.pathname;
 
       // Decode the URL path
       const decodedUrl = decodeURIComponent(filePath);
@@ -189,8 +192,8 @@ export const Immigration = () => {
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
     // Ensure no duplicate files are added
     const currentFiles = watch(label) || [];
@@ -261,7 +264,7 @@ export const Immigration = () => {
       );
 
       const formatDate = (date) =>
-        date ? new Date(date).toLocaleDateString("en-CA") : null; // 'en-CA' gives yyyy-mm-dd format
+        date ? new Date(date).toLocaleDateString("en-CA") : null;
 
       const arrivStampExp = formatDate(data.arrivStampExp);
       const ppSubmit = formatDate(data.ppSubmit);
@@ -272,7 +275,7 @@ export const Immigration = () => {
       if (checkingEIDTable) {
         const updatedArrivedDate = [
           ...new Set([
-            ...(checkingEIDTable.arrivStampExp || []), // ensure it's an array before spreading
+            ...(checkingEIDTable.arrivStampExp || []),
             arrivStampExp,
           ]),
         ];
@@ -299,18 +302,30 @@ export const Immigration = () => {
           ]),
         ];
 
+        const previousUpdates = checkingEIDTable.updatedBy
+          ? JSON.parse(checkingEIDTable.updatedBy)
+          : [];
+
+        const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
+
+        const orderedUpdatedBy = updatedBy.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
+
         const UpImmiValue = {
           ...data,
+          id: checkingEIDTable.id,
           immigRefNo: "IMMBD/1382",
           arrivStampExp: updatedArrivedDate.map(formatDate),
           ppSubmit: updatedPassportSubmit.map(formatDate),
           empPassExp: updatedPassportExpiry.map(formatDate),
           immigApproval: updatedImmigration.map(formatDate),
           reEntryVisaExp: updatedReEntry.map(formatDate),
-          arrivStampUpload: JSON.stringify(uploadedImmigrate.arrivStampUpload), // Use the uploaded URL
+          arrivStampUpload: JSON.stringify(uploadedImmigrate.arrivStampUpload),
           immigEmpUpload: JSON.stringify(uploadedImmigrate.immigEmpUpload),
           reEntryUpload: JSON.stringify(uploadedImmigrate.reEntryUpload),
-          id: checkingEIDTable.id,
+          updatedBy: JSON.stringify(orderedUpdatedBy),
         };
 
         await UpdateImmigraData({ UpImmiValue });
@@ -328,6 +343,7 @@ export const Immigration = () => {
           arrivStampUpload: JSON.stringify(uploadedImmigrate.arrivStampUpload), // Use the uploaded URL
           immigEmpUpload: JSON.stringify(uploadedImmigrate.immigEmpUpload),
           reEntryUpload: JSON.stringify(uploadedImmigrate.reEntryUpload),
+          createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
         };
 
         await ImmigrationData({ ImmiValue });

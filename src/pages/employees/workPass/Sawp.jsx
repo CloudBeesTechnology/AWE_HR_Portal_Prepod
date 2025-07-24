@@ -37,8 +37,6 @@ export const Sawp = () => {
     sawpEmpUpload: [],
   });
 
-  const [fieldTitle, setFieldTitle] = useState("sawpEmpUpload");
-
   const {
     register,
     handleSubmit,
@@ -57,14 +55,9 @@ export const Sawp = () => {
   const contractTypes = watch("sawpEmpLtrReq");
   const contractTypes1 = watch("sawpEmpLtrReci");
   const empID = watch("empID");
-  const watchInducSwapUpload = watch("sawpEmpUpload", "");
 
-  const extractFileName = (url) => {
-    if (typeof url === "string" && url) {
-      return url.split("/").pop();
-    }
-    return "";
-  };
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   const getFileName = (input) => {
     if (typeof input === "object" && input.upload) {
@@ -202,7 +195,7 @@ export const Sawp = () => {
           typeof item === "string" ? JSON.parse(item) : item
         );
 
-        setValue("sawpEmpUpload", parsedFiles); // Set parsed files to the form
+        setValue("sawpEmpUpload", parsedFiles);
 
         setEmpID(searchResultData.empID);
         setUploadSawp((prev) => ({
@@ -213,7 +206,7 @@ export const Sawp = () => {
         // Set all file names, not just the last one
         setUploadedFileNames((prev) => ({
           ...prev,
-          sawpEmpUpload: parsedFiles.map((file) => getFileName(file.upload)), // Get names of all files
+          sawpEmpUpload: parsedFiles.map((file) => getFileName(file.upload)),
         }));
       } catch (error) {
         console.error(
@@ -252,12 +245,24 @@ export const Sawp = () => {
           ]),
         ];
 
+        const previousUpdates = checkingEIDTable.updatedBy
+          ? JSON.parse(checkingEIDTable.updatedBy)
+          : [];
+
+        const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
+
+        const orderedUpdatedBy = updatedBy.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
+
         const SawpUpValue = {
           ...data,
+          id: checkingEIDTable.id,
           sawpEmpLtrReq: updatedReqDate.map(formatDate),
           sawpEmpLtrReci: updatedReciDate.map(formatDate),
           sawpEmpUpload: JSON.stringify(uploadSawp.sawpEmpUpload),
-          id: checkingEIDTable.id,
+          updatedBy: JSON.stringify(orderedUpdatedBy),
         };
 
         await SawpUpdateFun({ SawpUpValue });
@@ -269,6 +274,7 @@ export const Sawp = () => {
           sawpEmpLtrReq,
           sawpEmpLtrReci,
           sawpEmpUpload: JSON.stringify(uploadSawp.sawpEmpUpload),
+          createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
         };
 
         await SubmitMPData({ SawpValue });

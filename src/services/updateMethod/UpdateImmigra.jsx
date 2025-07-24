@@ -4,12 +4,12 @@ import { updatePassportValid } from "../../graphql/mutations";
 
 export const UpdateImmigra = () => {
   const client = generateClient();
-  const UpdateImmigraData = useCallback(async ({ UpImmiValue  }) => {
-    if (!UpImmiValue ) {
+  const UpdateImmigraData = useCallback(async ({ UpImmiValue }) => {
+    if (!UpImmiValue) {
       throw new Error("Missing required parameters");
     }
     const totalData = {
-      id:UpImmiValue.id,
+      id: UpImmiValue.id,
       empID: UpImmiValue.empID,
       ppLocation: UpImmiValue.ppLocation,
       arrivStampUpload: UpImmiValue.arrivStampUpload,
@@ -25,25 +25,24 @@ export const UpdateImmigra = () => {
       immigApproval: UpImmiValue.immigApproval,
       reEntryVisaExp: UpImmiValue.reEntryVisaExp,
       remarkImmig: UpImmiValue.remarkImmig,
+      updatedBy: UpImmiValue.updatedBy,
     };
     // console.log(totalData);
 
     try {
-      const storedData=   await Promise.all([
-           client.graphql({
-             query: updatePassportValid,
-             variables: {
-               input: totalData,
-             },
-           })
-         ])
-        //  console.log(storedData,"successfully stored data");
-
-       } catch (error) {
-         console.error("Error executing GraphQL requests:", error);
-         throw error; // Rethrow error if needed
-       }
+      const storedData = await Promise.all([
+        client.graphql({
+          query: updatePassportValid,
+          variables: {
+            input: totalData,
+          },
+        }),
+      ]);
+      console.log(storedData, "successfully stored data");
+    } catch (error) {
+      console.error("Error executing GraphQL requests:", error);
+      throw error;
+    }
   }, []);
   return { UpdateImmigraData };
 };
-

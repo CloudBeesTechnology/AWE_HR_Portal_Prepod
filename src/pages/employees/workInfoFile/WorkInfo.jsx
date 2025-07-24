@@ -81,6 +81,8 @@ export const WorkInfo = () => {
   const [showTitle, setShowTitle] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const watchedEmpID = watch("empID");
+  const [trackEmpID, setTrackEmpID] = useState(false);
+  const userType = localStorage.getItem("userID");
   const [updateFlag, setUpdateFlag] = useState(false);
   const {
     terminationFields,
@@ -315,7 +317,9 @@ export const WorkInfo = () => {
  
 
   const searchResult = (result) => {
-   
+    if (result){
+      setTrackEmpID(true)
+    }
 
     const fieldValue = ["empID"];
 
@@ -493,34 +497,32 @@ fieldValue.forEach((val) => {
   };
 
   const onSubmit = async (data) => {
-    // console.log(data);
-    
     try {
-      const checkingPITable =
-        empPIData?.find((match) => match.empID === data.empID) || null;
-      const terminateDataRecord =
-        terminateData?.find((match) => match.empID === data.empID) || null;
-      const workInfoDataRecord =
-        workInfoData?.find((match) => match.empID === data.empID) || null;
-      const leaveDetailsDataRecord =
-        leaveDetailsData?.find((match) => match.empID === data.empID) || null;
-      const SRDataRecord =
-        SRData?.find((match) => match.empID === data.empID) || null;
-
-      // Check each record and handle accordingly
+      const checkingPITable = empPIData?.find((match) => match.empID === data.empID) || null;
+      const terminateDataRecord = terminateData?.find((match) => match.empID === data.empID) || null;
+      const workInfoDataRecord = workInfoData?.find((match) => match.empID === data.empID) || null;
+      const leaveDetailsDataRecord = leaveDetailsData?.find((match) => match.empID === data.empID) || null;
+      const SRDataRecord = SRData?.find((match) => match.empID === data.empID) || null;
+  
+      const today = new Date().toISOString().split("T")[0];
+  
+      // ===== SR Data =====
       if (SRDataRecord) {
+        const previous = SRDataRecord.updatedBy ? JSON.parse(SRDataRecord.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         const SRUpValue = {
           ...data,
-          SRDataRecord: SRDataRecord,
+          SRDataRecord:SRDataRecord,
           uploadPR: JSON.stringify(nameServiceUp.uploadPR),
           uploadSP: JSON.stringify(nameServiceUp.uploadSP),
           uploadLP: JSON.stringify(nameServiceUp.uploadLP),
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
+          updatedBy,
         };
-        // console.log("SR Data Update Value:", SRUpValue);
         await WIUpdateSRData({ SRUpValue });
       } else {
+        const createdBy = JSON.stringify([{ userID: userType, date: today }]);
         const SRValue = {
           ...data,
           empID: data.empID,
@@ -529,59 +531,70 @@ fieldValue.forEach((val) => {
           uploadLP: JSON.stringify(nameServiceUp.uploadLP),
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
+          createdBy,
         };
-        // console.log("Create SR Data Value:", SRValue);
         await SRDataValue({ SRValue });
       }
-
+  
+      // ===== Leave Details =====
       if (leaveDetailsDataRecord) {
-        // If leaveDetailsDataRecord exists, update leave details data
+        const previous = leaveDetailsDataRecord.updatedBy ? JSON.parse(leaveDetailsDataRecord.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         const LeaveUpValue = {
           ...data,
           leaveDetailsDataRecord: leaveDetailsDataRecord,
+          updatedBy,
         };
-        // console.log("Leave Details Update Value:", LeaveUpValue);
         await WIUpdateLeaveData({ LeaveUpValue });
       } else {
+        const createdBy = JSON.stringify([{ userID: userType, date: today }]);
         const LeaveValue = {
           ...data,
           remainAnnualLeave: "0",
           empID: data.empID,
+          createdBy,
         };
-        console.log("Create Leave Details Value:", LeaveValue);
         await LeaveDataValue({ LeaveValue });
       }
-
+  
+      // ===== Work Info =====
       if (workInfoDataRecord) {
+        const previous = workInfoDataRecord.updatedBy ? JSON.parse(workInfoDataRecord.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         const workInfoUpValue = {
           ...data,
           sapNo: checkingPITable?.sapNo,
-          workInfoDataRecord: workInfoDataRecord,
+          workInfoDataRecord:workInfoDataRecord,
+          updatedBy,
         };
-        // console.log("Work Info Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
       } else {
+        const createdBy = JSON.stringify([{ userID: userType, date: today }]);
         const workInfoValue = {
           ...data,
           sapNo: checkingPITable?.sapNo,
+          createdBy,
         };
-        // console.log("Create Work Info Value:", workInfoValue);
         await SubmitWIData({ workInfoValue });
       }
-
+  
+      // ===== Terminate Data =====
       if (terminateDataRecord) {
+        const previous = terminateDataRecord.updatedBy ? JSON.parse(terminateDataRecord.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         const TerminateUpValue = {
           ...data,
-          terminateDataRecord: terminateDataRecord,
+          terminateDataRecord:terminateDataRecord,
           WIContract: JSON.stringify(nameServiceUp.WIContract),
           WIProbation: JSON.stringify(nameServiceUp.WIProbation),
           WIResignation: JSON.stringify(nameServiceUp.WIResignation),
           WITermination: JSON.stringify(nameServiceUp.WITermination),
           WILeaveEntitle: JSON.stringify(nameServiceUp.WILeaveEntitle),
+          updatedBy,
         };
-        // console.log("Terminate Update Value:", TerminateUpValue);
         await WIUpdateTerminateData({ TerminateUpValue });
       } else {
+        const createdBy = JSON.stringify([{ userID: userType, date: today }]);
         const TerminateValue = {
           ...data,
           empID: data.empID,
@@ -590,11 +603,10 @@ fieldValue.forEach((val) => {
           WIResignation: JSON.stringify(nameServiceUp.WIResignation),
           WITermination: JSON.stringify(nameServiceUp.WITermination),
           WILeaveEntitle: JSON.stringify(nameServiceUp.WILeaveEntitle),
+          createdBy,
         };
-        // console.log("Create Terminate Data Value:", TerminateValue);
         await TerminateDataValue({ TerminateValue });
       }
-
       setShowTitle("Employee Work Info Stored successfully");
       setNotification(true);
     } catch (err) {
@@ -644,6 +656,7 @@ fieldValue.forEach((val) => {
               placeholder="Enter Employee ID"
               errors={errors}
               register={register}
+              trackEmpID={trackEmpID}
             />
           </div>
         </div>

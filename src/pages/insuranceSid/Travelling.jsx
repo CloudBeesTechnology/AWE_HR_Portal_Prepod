@@ -68,7 +68,8 @@ export const Travelling = () => {
   const { formattedPermissions } = useDeleteAccess();
   const { travelInsData } = useContext(DataSupply);
   const { empID, requiredPermissions, access } = useOutletContext();
-
+  const userType = localStorage.getItem("userID");
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const {
     register,
     handleSubmit,
@@ -244,8 +245,11 @@ export const Travelling = () => {
   }, []);
 
   const searchResult = (result) => {
-    console.log("RW", result);
+    // console.log("RW", result);
     setSearchResultData(result);
+    if (result) {
+      setTrackEmpID(true);
+    }
   };
 
   const getFileName = (input) => {
@@ -306,14 +310,19 @@ export const Travelling = () => {
 
   const onSubmit = async (data) => {
     try {
+      const today = new Date().toISOString().split("T")[0];
+
       const checkingDITable = travelInsData.find(
         (match) => match.id === searchResultData.id
       );
 
       if (checkingDITable) {
+        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         const TravelUpValue = {
           ...data,
           travelUp: JSON.stringify(uploadTU.travelUp),
+          updatedBy,
         };
         // console.log(TravellCreValue);
 
@@ -322,6 +331,7 @@ export const Travelling = () => {
           travelUp: TravelUpValue.travelUp,
           travelExp: TravelUpValue.travelExp,
           travelNo: TravelUpValue.travelNo,
+          updatedBy: TravelUpValue.updatedBy,
         };
 
         const response = await client.graphql({
@@ -335,6 +345,7 @@ export const Travelling = () => {
         const TravellCreValue = {
           ...data,
           travelUp: JSON.stringify(uploadTU.travelUp),
+          createdBy: JSON.stringify([{ userID: userType, date: today }]),
         };
         // console.log(TravellCreValue);
 
@@ -576,6 +587,7 @@ export const Travelling = () => {
               label="Policy Number"
               register={register}
               errors={errors}
+              trackEmpID={trackEmpID}
               className="mt-2 p-[12px] bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
             />
 

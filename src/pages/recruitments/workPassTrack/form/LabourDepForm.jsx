@@ -57,8 +57,9 @@ export const LabourDepForm = ({ candidate }) => {
     resolver: yupResolver(LabourDepFormSchema),
   });
 
-  const DepositUpload = watch("lbrFile");
-  
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     if (interviewSchedules.length > 0) {
       const interviewData = interviewSchedules.find(
@@ -90,12 +91,11 @@ export const LabourDepForm = ({ candidate }) => {
           // console.log("Uploaded file name set:", fileName);
         }
       } else {
-          setFormData({
+        setFormData({
           interview: {
             status: interviewStatus.status,
           },
         });
-
       }
     }
   }, [interviewSchedules, candidate.tempID]);
@@ -211,6 +211,34 @@ export const LabourDepForm = ({ candidate }) => {
     const interviewScheduleId = selectedInterviewData?.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
+    const wpUpdatedByData = selectedInterviewData;
+    const intUpdatedByData = selectedInterviewDataStatus;
+
+    const wpPreviousUpdates = wpUpdatedByData?.updatedBy
+      ? JSON.parse(wpUpdatedByData?.updatedBy)
+      : [];
+
+    const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
+
+    const wpOrderedUpdatedBy = wpUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
@@ -229,6 +257,7 @@ export const LabourDepForm = ({ candidate }) => {
       lbrFile: isUploadingString.lbrFile
         ? JSON.stringify(wrapUpload(uploadedLabDep.lbrFile))
         : formData.interview.lbrFile,
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     let response;
@@ -244,6 +273,7 @@ export const LabourDepForm = ({ candidate }) => {
             lbrFile: isUploadingString.lbrFile
               ? JSON.stringify(wrapUpload(uploadedLabDep.lbrFile))
               : formData.interview.lbrFile,
+            updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
       } else {
@@ -255,12 +285,12 @@ export const LabourDepForm = ({ candidate }) => {
       const interStatus = {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
+        updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
-      
+
       await interviewDetails({ InterviewValue: interStatus });
-      
+
       setNotification(true);
-  
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

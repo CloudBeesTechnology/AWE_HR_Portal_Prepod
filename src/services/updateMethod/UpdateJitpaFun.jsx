@@ -17,15 +17,17 @@ export const UpdateJitpaFun = () => {
         jpEndorse,
         jpEmpUpload,
         id,
+        updatedBy
       } = JitpaValue;
 
       const updatedData = {
-        id, // Use the existing ID
+        id, 
         tbaPurchase,
         jitpaAmt,
         jpValid,
         jpEndorse,
         jpEmpUpload,
+        updatedBy
       };
 
       const response = await client.graphql({
@@ -33,11 +35,10 @@ export const UpdateJitpaFun = () => {
         variables: { input: updatedData, },
       });
 
-      // // Log the response to confirm the update
       // console.log("Data successfully updated:", response);
     } catch (error) {
       console.error("Error updating data:", error);
-      throw error; // Re-throw the error after logging
+      throw error; 
     }
   }, []);
 

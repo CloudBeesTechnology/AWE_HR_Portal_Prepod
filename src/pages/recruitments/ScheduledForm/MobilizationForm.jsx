@@ -61,11 +61,14 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
     resolver: yupResolver(MOBFormSchema),
   });
 
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     if (mergedInterviewData.length > 0) {
       const interviewData = mergedInterviewData.find(
         (data) => data.tempID === candidate.tempID
-      ); 
+      );
       if (interviewData) {
         setFormData({
           interview: {
@@ -98,7 +101,6 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
       ...prev,
       [type]: value,
     }));
-    
   };
 
   const handleFileUpload = async (e, type) => {
@@ -158,7 +160,7 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
         );
         return;
       }
-    
+
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
@@ -187,12 +189,44 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
     const localMobilizationId = selectedInterviewData.localMobilization.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
+    const localUpdatedByData = selectedInterviewData?.localMobilization;
+    const intUpdatedByData = selectedInterviewData?.interviewSchedules;
+
+    const loiPreviousUpdates = localUpdatedByData?.updatedBy
+      ? JSON.parse(localUpdatedByData?.updatedBy)
+      : [];
+
+    const loiUpdatedBy = [
+      ...loiPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const loiOrderedUpdatedBy = loiUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     const createData = {
       mobSignDate: formData.interview.mobSignDate,
       mobFile: isUploadingString.mobFile
         ? JSON.stringify(wrapUpload(uploadedMOB.mobFile))
         : formData.interview.mobFile,
       tempID: candidate.tempID,
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     try {
@@ -204,6 +238,7 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
             mobFile: isUploadingString.mobFile
               ? JSON.stringify(wrapUpload(uploadedMOB.mobFile))
               : formData.interview.mobFile,
+            updatedBy: JSON.stringify(loiOrderedUpdatedBy),
           },
         });
       } else {
@@ -214,6 +249,7 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
         InterviewValue: {
           id: interviewScheduleStatusId,
           status: formData.interview.status,
+          updatedBy: JSON.stringify(intOrderedUpdatedBy),
           // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
         },
       });
@@ -245,7 +281,7 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
       <div className="grid grid-cols-2 gap-5 mt-5">
         <div>
           <label htmlFor="mobSignDate">Date of Mobilize</label>
-          <input
+          <input 
             className="w-full border p-2 rounded mt-1"
             type="date"
             id="mobSignDate"

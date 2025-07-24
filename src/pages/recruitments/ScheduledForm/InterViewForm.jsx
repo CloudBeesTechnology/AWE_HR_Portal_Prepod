@@ -21,6 +21,9 @@ export const InterviewForm = ({ candidate }) => {
     },
   });
 
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
+
   const formatDate = (dateToString) => {
     if (!dateToString || isNaN(new Date(dateToString).getTime())) {
       return "";
@@ -28,8 +31,8 @@ export const InterviewForm = ({ candidate }) => {
 
     const date = new Date(dateToString);
 
-    const day = date.getDate().toString().padStart(2, "0"); // Local day
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Local month
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
 
     return `${year}-${month}-${day}`;
@@ -98,6 +101,19 @@ export const InterviewForm = ({ candidate }) => {
       return;
     }
 
+    const updatedByData = selectedInterviewData;
+
+    const previousUpdates = updatedByData?.updatedBy
+      ? JSON.parse(updatedByData?.updatedBy)
+      : [];
+
+    const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
+
+    const orderedUpdatedBy = updatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     try {
       // Use the interviewScheduleId to update the interview details
       await interviewDetails({
@@ -109,9 +125,10 @@ export const InterviewForm = ({ candidate }) => {
           interType: formData.interview.interviewType,
           message: formData.interview.message,
           manager: formData.interview.interviewer,
+          updatedBy: JSON.stringify(orderedUpdatedBy),
         },
       });
-   
+
       setNotification(true);
     } catch (error) {
       // console.error("Error submitting interview details:", error);

@@ -89,6 +89,7 @@ export const UpdateWIData = () => {
       workMonth,
       salaryType,
       sapNo,
+      updatedBy,
     } = workInfoUpValue;
 
     const contractEndValue = formatDate(contractEnd);
@@ -196,6 +197,7 @@ export const UpdateWIData = () => {
         id: workInfoDataRecord.id,
         empID,
         department: updateddepartment,
+        updatedBy: updatedBy,
         otherDepartment: updatedotherDepartment,
         position: updatedPosition,
         otherPosition: updatedotherPosition,

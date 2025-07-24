@@ -10,20 +10,16 @@ export const UpdateLDFun = () => {
       throw new Error("Missing required parameters or empID");
     }
     try {
-      const {
-        lbrReceiptNo,
-      lbrDepoAmt,
-      lbrDepoSubmit,
-      lbrDepoUpload,
-        id,
-      } = LDValue;
+      const { lbrReceiptNo, lbrDepoAmt, lbrDepoSubmit, lbrDepoUpload, id, updatedBy } =
+        LDValue;
 
       const updatedData = {
-        id, // Use the existing ID
+        id,
         lbrReceiptNo,
-      lbrDepoAmt,
-      lbrDepoSubmit,
-      lbrDepoUpload,
+        lbrDepoAmt,
+        lbrDepoSubmit,
+        lbrDepoUpload,
+        updatedBy,
       };
 
       const response = await client.graphql({
@@ -31,11 +27,10 @@ export const UpdateLDFun = () => {
         variables: { input: updatedData },
       });
 
-      // // Log the response to confirm the update
-      // console.log("Data successfully updated:", response);
+      console.log("Data successfully updated:", response);
     } catch (error) {
       console.error("Error updating data:", error);
-      throw error; // Re-throw the error after logging
+      throw error;
     }
   }, []);
 

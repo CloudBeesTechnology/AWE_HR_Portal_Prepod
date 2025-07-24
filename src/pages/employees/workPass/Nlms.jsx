@@ -13,11 +13,13 @@ import { DeleteDocsNlms } from "../../../services/uploadDocsDelete/DeleteDocsNlm
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../utils/DeletePopup";
+import { CreateDoe } from "../../../services/createMethod/CreateDoe";
 
 export const Nlms = () => {
   const { searchResultData } = useOutletContext();
   const { formattedPermissions } = useDeleteAccess();
   const { DNData, dropDownVal } = useContext(DataSupply);
+  const { CrerDoeFunData } = CreateDoe();
   const { uploadNlmsFun } = UpdateNlmsData();
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
@@ -48,8 +50,11 @@ export const Nlms = () => {
     nlmsEmpApproval: [],
     nlmsEmpValid: [],
   });
-  const watchInducNlmsUpload = watch("nlmsEmpUpload", "");
+
   const empID = watch("empID");
+
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -140,8 +145,8 @@ export const Nlms = () => {
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
 
     // Ensure no duplicate files are added
@@ -263,38 +268,60 @@ export const Nlms = () => {
 
       // If entry exists, update the dates, removing duplicates
       const updatedSubmissionDate = [
-        ...new Set([
-          ...(matchedEmployee.nlmsEmpSubmit || []), // ensure it's an array before spreading
+        ...new Set([...(matchedEmployee.nlmsEmpSubmit || []), nlmsEmpSubmit]),
+      ];
+
+      if (matchedEmployee) {
+        const updatedApprovalDate = [
+          ...new Set([
+            ...(matchedEmployee.nlmsEmpApproval || []),
+            nlmsEmpApproval,
+          ]),
+        ];
+
+        const updatedValidDate = [
+          ...new Set([...(matchedEmployee.nlmsEmpValid || []), nlmsEmpValid]),
+        ];
+
+        const previousUpdates = matchedEmployee.updatedBy
+          ? JSON.parse(matchedEmployee.updatedBy)
+          : [];
+
+        const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
+
+        const orderedUpdatedBy = updatedBy.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
+
+        const DoeValue = {
+          ...data,
+          id: matchedEmployee?.id,
+          nlmsEmpSubmit: updatedSubmissionDate.map(formatDate),
+          nlmsEmpApproval: updatedApprovalDate.map(formatDate),
+          nlmsEmpValid: updatedValidDate.map(formatDate),
+          nlmsEmpUpload: JSON.stringify(uploadNlms.nlmsEmpUpload),
+          updatedBy: JSON.stringify(orderedUpdatedBy),
+        };
+
+        await uploadNlmsFun({ DoeValue });
+        setShowTitle("NLMS Info Stored Successfully");
+        setNotification(true);
+      } else {
+        const DoeValue = {
+          ...data,
           nlmsEmpSubmit,
-        ]),
-      ];
-
-      const updatedApprovalDate = [
-        ...new Set([
-          ...(matchedEmployee.nlmsEmpApproval || []), // ensure it's an array before spreading
           nlmsEmpApproval,
-        ]),
-      ];
-
-      const updatedValidDate = [
-        ...new Set([
-          ...(matchedEmployee.nlmsEmpValid || []), // ensure it's an array before spreading
           nlmsEmpValid,
-        ]),
-      ];
+          nlmsEmpUpload: JSON.stringify(uploadNlms.nlmsEmpUpload),
+          createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
+        };
 
-      const DoeValue = {
-        ...data,
-        nlmsEmpSubmit: updatedSubmissionDate.map(formatDate),
-        nlmsEmpApproval: updatedApprovalDate.map(formatDate),
-        nlmsEmpValid: updatedValidDate.map(formatDate),
-        nlmsEmpUpload: JSON.stringify(uploadNlms.nlmsEmpUpload),
-        id: matchedEmployee?.id || null,
-      };
-
-      await uploadNlmsFun({ DoeValue });
-      setShowTitle("NLMS Info Stored Successfully");
-      setNotification(true);
+        // console.log("Create", DoeValue);
+        await CrerDoeFunData({ DoeValue });
+        setShowTitle("NLMS Info Stored Successfully");
+        setNotification(true);
+      }
     } catch (error) {
       console.error("Error submitting data:", error);
     }

@@ -9,15 +9,13 @@ export const LabCreFun = () => {
       throw new Error("Missing required parameters");
     }
     const totalData = {
-      
-        lbrReceiptNo:[creLabpaValue.lbrReceiptNo],
-        lbrDepoAmt:[creLabpaValue.lbrDepoAmt],
-        lbrDepoSubmit:[creLabpaValue.lbrDepoSubmit],
-        lbrDepoUpload:[creLabpaValue.lbrDepoUpload],
-        empID:creLabpaValue.empID,
-      
+      empID: creLabpaValue.empID,
+      lbrReceiptNo: [creLabpaValue.lbrReceiptNo],
+      lbrDepoAmt: [creLabpaValue.lbrDepoAmt],
+      lbrDepoSubmit: [creLabpaValue.lbrDepoSubmit],
+      lbrDepoUpload: [creLabpaValue.lbrDepoUpload],
+      createdBy: creLabpaValue.createdBy,
     };
-    console.log(totalData);
 
     try {
       const storedData = await Promise.all([
@@ -29,10 +27,9 @@ export const LabCreFun = () => {
         }),
       ]);
       console.log(storedData, "successfully Save data");
-      
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
-      throw error; // Rethrow error if needed
+      throw error; 
     }
   }, []);
   return { LabourCreData };

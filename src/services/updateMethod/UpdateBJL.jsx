@@ -18,7 +18,7 @@ export const UpdateBJL = () => {
       bankValid: BJLUpValue.bankValid,
       bankEndorse: BJLUpValue.bankEndorse,
       bankEmpUpload: [BJLUpValue.bankEmpUpload],
-
+      updatedBy: BJLUpValue.updatedBy
     };
     // console.log(totalData);
 
@@ -31,13 +31,13 @@ export const UpdateBJL = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully Updated data");
+         console.log(storedData,"successfully Updated data");
 
        } catch (error) {
         console.log(error);
         
          console.error("Error executing GraphQL requests:", error);
-         throw error; // Rethrow error if needed
+         throw error; 
        }
   }, []);
   return { UpdateBJLFun };

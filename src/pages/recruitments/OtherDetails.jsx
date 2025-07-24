@@ -72,7 +72,8 @@ export const OtherDetails = ({ fetchedData }) => {
     localStorage.getItem("educationFormData")
   );
 
-  // console.log("Step 4", navigatingEducationData);
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (fetchedData) {
@@ -457,6 +458,24 @@ export const OtherDetails = ({ fetchedData }) => {
         return safePath ? [{ upload: safePath, date: currentDate }] : null;
       };
 
+      const checkingPDTable = empPDData.find(
+        (match) => match.tempID === personName
+      );
+      const checkingEDTable = educDetailsData.find(
+        (match) => match.tempID === personName
+      );
+
+      const createdBy = JSON.stringify([{ userID: EMPID, date: TODAY }]);
+
+      const previousUpdates = checkingPDTable?.updatedBy
+        ? JSON.parse(checkingPDTable.updatedBy)
+        : [];
+
+      const updatedBy = JSON.stringify([
+        ...previousUpdates,
+        { userID: EMPID, date: TODAY },
+      ]);
+
       const reqValue = {
         ...data,
         ...navigatingEducationData,
@@ -490,15 +509,10 @@ export const OtherDetails = ({ fetchedData }) => {
         uploadIc: isUploadingString.uploadIc
           ? JSON.stringify(wrapUpload(uploadedIc))
           : uploadedDocs?.uploadIc,
+        createdBy: !isUpdate ? createdBy : null,
+        updatedBy: isUpdate ? updatedBy : null,
       };
       // console.log(reqValue);
-
-      const checkingPDTable = empPDData.find(
-        (match) => match.tempID === personName
-      );
-      const checkingEDTable = educDetailsData.find(
-        (match) => match.tempID === personName
-      );
 
       if (checkingPDTable && checkingEDTable) {
         const updateReqValue = {
