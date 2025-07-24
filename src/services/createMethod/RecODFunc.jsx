@@ -156,7 +156,7 @@ export const RecODFunc = () => {
           variables: { input: totalData },
         }),
       ]);
-      console.log("Server Response", responses);
+      // console.log("Server Response", res);
       // localStorage.removeItem("applicantFormData");
       // localStorage.removeItem("personalFormData");
     } catch (error) {

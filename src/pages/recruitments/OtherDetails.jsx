@@ -465,6 +465,8 @@ export const OtherDetails = ({ fetchedData }) => {
         (match) => match.tempID === personName
       );
 
+      const createdBy = JSON.stringify([{ userID: EMPID, date: TODAY }]);
+
       const previousUpdates = checkingPDTable?.updatedBy
         ? JSON.parse(checkingPDTable.updatedBy)
         : [];

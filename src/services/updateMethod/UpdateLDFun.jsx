@@ -10,7 +10,7 @@ export const UpdateLDFun = () => {
       throw new Error("Missing required parameters or empID");
     }
     try {
-      const { lbrReceiptNo, lbrDepoAmt, lbrDepoSubmit, lbrDepoUpload, id } =
+      const { lbrReceiptNo, lbrDepoAmt, lbrDepoSubmit, lbrDepoUpload, id, updatedBy } =
         LDValue;
 
       const updatedData = {
