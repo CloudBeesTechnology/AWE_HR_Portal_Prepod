@@ -37,7 +37,7 @@ export const UpdateEmpInfo = () => {
       position,
       sapNo,
       bankName,
-      bankAccNo,
+      bankAccNo,updatedBy
     } = collectValue;
 
     const totalData = {
@@ -68,7 +68,7 @@ export const UpdateEmpInfo = () => {
       position,
       sapNo,
       bankName,
-      bankAccNo,
+      bankAccNo,updatedBy
     };
 
     console.log("Update Call Recived TotalData EmpInfo", totalData);

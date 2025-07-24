@@ -103,6 +103,7 @@ export const EmployeeInfo = () => {
   const [familyData, setFamilyData] = useState([]);
   const [showTitle, setShowTitle] = useState("");
   const [deletedFiles, setDeletedFiles] = useState({});
+  const [disableEmpID, setDisableEmpID] = useState(false);
 
   const handleNationalityChange = (e) => {
     setSelectedNationality(e.target.value);
@@ -518,7 +519,9 @@ export const EmployeeInfo = () => {
       const data = result[val] || "";
       setValue(val, typeof data === "string" ? data : "");
     });
-
+  if (result.empID) {
+      setDisableEmpID(true);
+    }
     const keysToSet = [
       "driveLic",
       "inducBrief",
@@ -808,7 +811,8 @@ export const EmployeeInfo = () => {
         return [];
       }
     };
-
+    const today = new Date().toISOString().split("T")[0];
+    const userIDFind = localStorage.getItem("userID");
     try {
       const checkingPITable = empPIData.find(
         (match) => match.empID === data.empID
@@ -838,7 +842,32 @@ export const EmployeeInfo = () => {
         checkingIDTable?.ppIssued,
         ppIssued
       );
+      const previousUpdatesPI = checkingPITable.updatedBy
+        ? JSON.parse(checkingPITable.updatedBy)
+        : [];
 
+      const updatedByPI = [
+        ...previousUpdatesPI,
+        { userID: userIDFind, date: today },
+      ];
+
+      const orderedUpdatedByPI = updatedByPI.map((entry) => ({
+        userID: entry.userID,
+        date: entry.date,
+      }));
+      const previousUpdatesID = checkingIDTable.updatedBy
+        ? JSON.parse(checkingIDTable.updatedBy)
+        : [];
+
+      const updatedByID = [
+        ...previousUpdatesID,
+        { userID: userIDFind, date: today },
+      ];
+
+      const orderedUpdatedByID = updatedByID.map((entry) => ({
+        userID: entry.userID,
+        date: entry.date,
+      }));
       if (checkingPITable) {
 
         const collectValue = {
@@ -851,6 +880,7 @@ export const EmployeeInfo = () => {
           familyDetails: JSON.stringify(data.familyDetails),
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
+          updatedBy: JSON.stringify(orderedUpdatedByPI),
         };
 
         await UpdateEIValue({ collectValue });
@@ -865,6 +895,7 @@ export const EmployeeInfo = () => {
           familyDetails: JSON.stringify(data.familyDetails),
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
+             createdBy: JSON.stringify([{ userID: userIDFind, date: today }]),
         };
 
         await SubmitEIData({ empValue });
@@ -889,6 +920,7 @@ export const EmployeeInfo = () => {
           ppUpload: JSON.stringify(uploadedFiles.ppUpload),
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
           qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
+             updatedBy: JSON.stringify(orderedUpdatedByID),
         };
 
         await UpdateIDValue({ collectValue });
@@ -910,6 +942,7 @@ export const EmployeeInfo = () => {
           ppUpload: JSON.stringify(uploadedFiles.ppUpload),
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
           qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
+           createdBy: JSON.stringify([{ userID: userIDFind, date: today }]),
         };
 
         await SubmitIDData({ empValue });
@@ -1030,6 +1063,7 @@ export const EmployeeInfo = () => {
               value={watch("empID") || ""}
               placeholder="Enter Employee ID"
               errors={errors}
+               trackEmpID={disableEmpID}
             />
             {/* {errorEmpID && (
               <p className="text-[red] text-[13px] text-center">{errorEmpID}</p>

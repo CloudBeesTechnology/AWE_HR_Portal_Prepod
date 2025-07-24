@@ -19,6 +19,7 @@ export const FormField = ({
   control,
   errorValue,
   arrayString,
+  trackEmpID,
 }) => {
   const [selectedOption, setSelectedOption] = useState(
     value || (isArray ? [] : "")
@@ -63,10 +64,12 @@ export const FormField = ({
     ...option,
     value:
       typeof option?.value === "string"
-      ? option?.value.trim().toUpperCase()
-      : option?.value.trim().toUpperCase(), 
+        ? option?.value.trim().toUpperCase()
+        : option?.value.trim().toUpperCase(),
     label:
-    typeof option?.label === "string" ? option?.label.trim().toUpperCase() : option?.label,
+      typeof option?.label === "string"
+        ? option?.label.trim().toUpperCase()
+        : option?.label,
   }));
 
   return (
@@ -120,6 +123,7 @@ export const FormField = ({
                   const textValue = e.target.value;
                   field.onChange(isArray ? [textValue] : textValue);
                 }}
+                disabled={trackEmpID}
               />
             </div>
           )}
@@ -129,6 +133,7 @@ export const FormField = ({
           type={type}
           value={value}
           className="input-field border"
+          disabled={trackEmpID}
           {...register(name)} // Connect to React Hook Form
         />
       )}
@@ -139,6 +144,7 @@ export const FormField = ({
           className="input-field border mt-2"
           placeholder="Please specify"
           value={value}
+          disabled={trackEmpID}
           {...register(`${name}Details`)}
         />
       )}

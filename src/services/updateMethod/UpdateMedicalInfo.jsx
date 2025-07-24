@@ -24,6 +24,7 @@ export const UpdateMedical = () => {
       dependPass: JSON.stringify(LabUpValue.dependPass),
       uploadFitness: LabUpValue.uploadFitness,
       uploadRegis: LabUpValue.uploadRegis,
+       updatedBy: LabUpValue. updatedBy,
     };
 
     // console.log("Updating data in LabourMedicalInfo table:", updateData);

@@ -36,7 +36,7 @@ export const EmpInfoFunc = () => {
         sapNo,
         bankName,
         bankAccNo,
-        profilePhoto,
+        profilePhoto, createdBy
       } = empValue;
 
       // console.log(totalData1,"totalData1 Create");
@@ -68,7 +68,7 @@ export const EmpInfoFunc = () => {
         position,
         sapNo,
         bankName,
-        bankAccNo,
+        bankAccNo, createdBy
       };
 
       console.log("Create Call Recived TotalData EmpInfo", totalData);
