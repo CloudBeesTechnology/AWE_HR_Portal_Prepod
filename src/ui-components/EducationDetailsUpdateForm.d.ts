@@ -44,6 +44,8 @@ export declare type EducationDetailsUpdateFormInputValues = {
     uploadCertificate?: string;
     uploadPp?: string;
     uploadIc?: string;
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type EducationDetailsUpdateFormValidationValues = {
     tempID?: ValidationFunction<string>;
@@ -68,6 +70,8 @@ export declare type EducationDetailsUpdateFormValidationValues = {
     uploadCertificate?: ValidationFunction<string>;
     uploadPp?: ValidationFunction<string>;
     uploadIc?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type EducationDetailsUpdateFormOverridesProps = {
@@ -94,6 +98,8 @@ export declare type EducationDetailsUpdateFormOverridesProps = {
     uploadCertificate?: PrimitiveOverrideProps<TextFieldProps>;
     uploadPp?: PrimitiveOverrideProps<TextFieldProps>;
     uploadIc?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type EducationDetailsUpdateFormProps = React.PropsWithChildren<{
     overrides?: EducationDetailsUpdateFormOverridesProps | undefined | null;

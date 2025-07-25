@@ -214,6 +214,8 @@ export default function EducationDetailsUpdateForm(props) {
     uploadCertificate: "",
     uploadPp: "",
     uploadIc: "",
+    createdBy: [],
+    updatedBy: [],
   };
   const [tempID, setTempID] = React.useState(initialValues.tempID);
   const [crime, setCrime] = React.useState(initialValues.crime);
@@ -253,6 +255,8 @@ export default function EducationDetailsUpdateForm(props) {
   );
   const [uploadPp, setUploadPp] = React.useState(initialValues.uploadPp);
   const [uploadIc, setUploadIc] = React.useState(initialValues.uploadIc);
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = educationDetailsRecord
@@ -283,6 +287,10 @@ export default function EducationDetailsUpdateForm(props) {
     setUploadCertificate(cleanValues.uploadCertificate);
     setUploadPp(cleanValues.uploadPp);
     setUploadIc(cleanValues.uploadIc);
+    setCreatedBy(cleanValues.createdBy ?? []);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(cleanValues.updatedBy ?? []);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [educationDetailsRecord, setEducationDetailsRecord] = React.useState(
@@ -310,6 +318,10 @@ export default function EducationDetailsUpdateForm(props) {
   const refereesRef = React.createRef();
   const [currentRelativesValue, setCurrentRelativesValue] = React.useState("");
   const relativesRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     tempID: [{ type: "Required" }],
     crime: [],
@@ -333,6 +345,8 @@ export default function EducationDetailsUpdateForm(props) {
     uploadCertificate: [],
     uploadPp: [],
     uploadIc: [],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -382,6 +396,8 @@ export default function EducationDetailsUpdateForm(props) {
           uploadCertificate: uploadCertificate ?? null,
           uploadPp: uploadPp ?? null,
           uploadIc: uploadIc ?? null,
+          createdBy: createdBy ?? null,
+          updatedBy: updatedBy ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -464,6 +480,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.tempID ?? value;
@@ -509,6 +527,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.crime ?? value;
@@ -554,6 +574,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.crimeDesc ?? value;
@@ -595,6 +617,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.emgDetails ?? values;
@@ -667,6 +691,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.noExperience ?? value;
@@ -712,6 +738,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empStatement ?? value;
@@ -757,6 +785,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.desc ?? value;
@@ -802,6 +832,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.disease ?? value;
@@ -847,6 +879,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.diseaseDesc ?? value;
@@ -892,6 +926,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.liquor ?? value;
@@ -937,6 +973,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.liquorDesc ?? value;
@@ -982,6 +1020,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.noticePeriod ?? value;
@@ -1027,6 +1067,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.perIS ?? value;
@@ -1072,6 +1114,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.perIDesc ?? value;
@@ -1113,6 +1157,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.referees ?? values;
@@ -1179,6 +1225,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.relatives ?? values;
@@ -1249,6 +1297,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.salaryExpectation ?? value;
@@ -1296,6 +1346,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.supportInfo ?? value;
@@ -1341,6 +1393,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.uploadResume ?? value;
@@ -1386,6 +1440,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate: value,
               uploadPp,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.uploadCertificate ?? value;
@@ -1433,6 +1489,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp: value,
               uploadIc,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.uploadPp ?? value;
@@ -1478,6 +1536,8 @@ export default function EducationDetailsUpdateForm(props) {
               uploadCertificate,
               uploadPp,
               uploadIc: value,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.uploadIc ?? value;
@@ -1492,6 +1552,142 @@ export default function EducationDetailsUpdateForm(props) {
         hasError={errors.uploadIc?.hasError}
         {...getOverrideProps(overrides, "uploadIc")}
       ></TextField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              noticePeriod,
+              perIS,
+              perIDesc,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              uploadResume,
+              uploadCertificate,
+              uploadPp,
+              uploadIc,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              noticePeriod,
+              perIS,
+              perIDesc,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              uploadResume,
+              uploadCertificate,
+              uploadPp,
+              uploadIc,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
+        ></TextAreaField>
+      </ArrayField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

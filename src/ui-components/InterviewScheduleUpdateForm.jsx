@@ -6,12 +6,179 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Badge,
+  Button,
+  Divider,
+  Flex,
+  Grid,
+  Icon,
+  ScrollView,
+  Text,
+  TextAreaField,
+  TextField,
+  useTheme,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { getInterviewSchedule } from "../graphql/queries";
 import { updateInterviewSchedule } from "../graphql/mutations";
 const client = generateClient();
+function ArrayField({
+  items = [],
+  onChange,
+  label,
+  inputFieldRef,
+  children,
+  hasError,
+  setFieldValue,
+  currentFieldValue,
+  defaultFieldValue,
+  lengthLimit,
+  getBadgeText,
+  runValidationTasks,
+  errorMessage,
+}) {
+  const labelElement = <Text>{label}</Text>;
+  const {
+    tokens: {
+      components: {
+        fieldmessages: { error: errorStyles },
+      },
+    },
+  } = useTheme();
+  const [selectedBadgeIndex, setSelectedBadgeIndex] = React.useState();
+  const [isEditing, setIsEditing] = React.useState();
+  React.useEffect(() => {
+    if (isEditing) {
+      inputFieldRef?.current?.focus();
+    }
+  }, [isEditing]);
+  const removeItem = async (removeIndex) => {
+    const newItems = items.filter((value, index) => index !== removeIndex);
+    await onChange(newItems);
+    setSelectedBadgeIndex(undefined);
+  };
+  const addItem = async () => {
+    const { hasError } = runValidationTasks();
+    if (
+      currentFieldValue !== undefined &&
+      currentFieldValue !== null &&
+      currentFieldValue !== "" &&
+      !hasError
+    ) {
+      const newItems = [...items];
+      if (selectedBadgeIndex !== undefined) {
+        newItems[selectedBadgeIndex] = currentFieldValue;
+        setSelectedBadgeIndex(undefined);
+      } else {
+        newItems.push(currentFieldValue);
+      }
+      await onChange(newItems);
+      setIsEditing(false);
+    }
+  };
+  const arraySection = (
+    <React.Fragment>
+      {!!items?.length && (
+        <ScrollView height="inherit" width="inherit" maxHeight={"7rem"}>
+          {items.map((value, index) => {
+            return (
+              <Badge
+                key={index}
+                style={{
+                  cursor: "pointer",
+                  alignItems: "center",
+                  marginRight: 3,
+                  marginTop: 3,
+                  backgroundColor:
+                    index === selectedBadgeIndex ? "#B8CEF9" : "",
+                }}
+                onClick={() => {
+                  setSelectedBadgeIndex(index);
+                  setFieldValue(items[index]);
+                  setIsEditing(true);
+                }}
+              >
+                {getBadgeText ? getBadgeText(value) : value.toString()}
+                <Icon
+                  style={{
+                    cursor: "pointer",
+                    paddingLeft: 3,
+                    width: 20,
+                    height: 20,
+                  }}
+                  viewBox={{ width: 20, height: 20 }}
+                  paths={[
+                    {
+                      d: "M10 10l5.09-5.09L10 10l5.09 5.09L10 10zm0 0L4.91 4.91 10 10l-5.09 5.09L10 10z",
+                      stroke: "black",
+                    },
+                  ]}
+                  ariaLabel="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    removeItem(index);
+                  }}
+                />
+              </Badge>
+            );
+          })}
+        </ScrollView>
+      )}
+      <Divider orientation="horizontal" marginTop={5} />
+    </React.Fragment>
+  );
+  if (lengthLimit !== undefined && items.length >= lengthLimit && !isEditing) {
+    return (
+      <React.Fragment>
+        {labelElement}
+        {arraySection}
+      </React.Fragment>
+    );
+  }
+  return (
+    <React.Fragment>
+      {labelElement}
+      {isEditing && children}
+      {!isEditing ? (
+        <>
+          <Button
+            onClick={() => {
+              setIsEditing(true);
+            }}
+          >
+            Add item
+          </Button>
+          {errorMessage && hasError && (
+            <Text color={errorStyles.color} fontSize={errorStyles.fontSize}>
+              {errorMessage}
+            </Text>
+          )}
+        </>
+      ) : (
+        <Flex justifyContent="flex-end">
+          {(currentFieldValue || isEditing) && (
+            <Button
+              children="Cancel"
+              type="button"
+              size="small"
+              onClick={() => {
+                setFieldValue(defaultFieldValue);
+                setIsEditing(false);
+                setSelectedBadgeIndex(undefined);
+              }}
+            ></Button>
+          )}
+          <Button size="small" variation="link" onClick={addItem}>
+            {selectedBadgeIndex !== undefined ? "Save" : "Add"}
+          </Button>
+        </Flex>
+      )}
+      {arraySection}
+    </React.Fragment>
+  );
+}
 export default function InterviewScheduleUpdateForm(props) {
   const {
     id: idProp,
@@ -38,6 +205,8 @@ export default function InterviewScheduleUpdateForm(props) {
     otherDepartment: "",
     status: "",
     empID: "",
+    createdBy: [],
+    updatedBy: [],
   };
   const [interDate, setInterDate] = React.useState(initialValues.interDate);
   const [interTime, setInterTime] = React.useState(initialValues.interTime);
@@ -56,6 +225,8 @@ export default function InterviewScheduleUpdateForm(props) {
   );
   const [status, setStatus] = React.useState(initialValues.status);
   const [empID, setEmpID] = React.useState(initialValues.empID);
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = interviewScheduleRecord
@@ -74,6 +245,10 @@ export default function InterviewScheduleUpdateForm(props) {
     setOtherDepartment(cleanValues.otherDepartment);
     setStatus(cleanValues.status);
     setEmpID(cleanValues.empID);
+    setCreatedBy(cleanValues.createdBy ?? []);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(cleanValues.updatedBy ?? []);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [interviewScheduleRecord, setInterviewScheduleRecord] = React.useState(
@@ -94,6 +269,10 @@ export default function InterviewScheduleUpdateForm(props) {
     queryData();
   }, [idProp, interviewScheduleModelProp]);
   React.useEffect(resetStateValues, [interviewScheduleRecord]);
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     interDate: [],
     interTime: [],
@@ -108,6 +287,8 @@ export default function InterviewScheduleUpdateForm(props) {
     otherDepartment: [],
     status: [],
     empID: [],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -148,6 +329,8 @@ export default function InterviewScheduleUpdateForm(props) {
           otherDepartment: otherDepartment ?? null,
           status: status ?? null,
           empID: empID ?? null,
+          createdBy: createdBy ?? null,
+          updatedBy: updatedBy ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -221,6 +404,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.interDate ?? value;
@@ -257,6 +442,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.interTime ?? value;
@@ -293,6 +480,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.venue ?? value;
@@ -329,6 +518,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.interType ?? value;
@@ -365,6 +556,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.bagdeNo ?? value;
@@ -401,6 +594,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.message ?? value;
@@ -437,6 +632,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.tempID ?? value;
@@ -473,6 +670,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.manager ?? value;
@@ -509,6 +708,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.candidateStatus ?? value;
@@ -545,6 +746,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.department ?? value;
@@ -581,6 +784,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment: value,
               status,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.otherDepartment ?? value;
@@ -617,6 +822,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status: value,
               empID,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.status ?? value;
@@ -653,6 +860,8 @@ export default function InterviewScheduleUpdateForm(props) {
               otherDepartment,
               status,
               empID: value,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -667,6 +876,124 @@ export default function InterviewScheduleUpdateForm(props) {
         hasError={errors.empID?.hasError}
         {...getOverrideProps(overrides, "empID")}
       ></TextField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              interDate,
+              interTime,
+              venue,
+              interType,
+              bagdeNo,
+              message,
+              tempID,
+              manager,
+              candidateStatus,
+              department,
+              otherDepartment,
+              status,
+              empID,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              interDate,
+              interTime,
+              venue,
+              interType,
+              bagdeNo,
+              message,
+              tempID,
+              manager,
+              candidateStatus,
+              department,
+              otherDepartment,
+              status,
+              empID,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
+        ></TextAreaField>
+      </ArrayField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

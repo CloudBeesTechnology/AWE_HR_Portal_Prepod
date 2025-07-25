@@ -1338,6 +1338,8 @@ export const getWPTracking = /* GraphQL */ `
       lbrDepoAmount
       lbrFile
       remarkNLMob
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1402,6 +1404,8 @@ export const listWPTrackings = /* GraphQL */ `
         lbrDepoAmount
         lbrFile
         remarkNLMob
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -1468,6 +1472,8 @@ export const getLabourMedicalInfo = /* GraphQL */ `
       uploadRegis
       uploadBwn
       dependPass
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1498,6 +1504,8 @@ export const listLabourMedicalInfos = /* GraphQL */ `
         uploadRegis
         uploadBwn
         dependPass
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -2105,6 +2113,8 @@ export const getLocalMobilization = /* GraphQL */ `
       loiFile
       cvecApproveDate
       cvecFile
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2136,6 +2146,8 @@ export const listLocalMobilizations = /* GraphQL */ `
         loiFile
         cvecApproveDate
         cvecFile
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -2162,6 +2174,8 @@ export const getInterviewSchedule = /* GraphQL */ `
       otherDepartment
       status
       empID
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2194,6 +2208,8 @@ export const listInterviewSchedules = /* GraphQL */ `
         otherDepartment
         status
         empID
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -2229,6 +2245,8 @@ export const getEducationDetails = /* GraphQL */ `
       uploadCertificate
       uploadPp
       uploadIc
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2270,6 +2288,8 @@ export const listEducationDetails = /* GraphQL */ `
         uploadCertificate
         uploadPp
         uploadIc
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
@@ -2321,6 +2341,8 @@ export const getPersonalDetails = /* GraphQL */ `
       status
       workExperience
       otherLang
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2374,6 +2396,8 @@ export const listPersonalDetails = /* GraphQL */ `
         status
         workExperience
         otherLang
+        createdBy
+        updatedBy
         createdAt
         updatedAt
         __typename
