@@ -40,7 +40,7 @@ export const UpdateIDDetails = () => {
       paafCvevUpload,
       ppUpload,
       supportDocUpload,
-      qcCertifyUpload,
+      qcCertifyUpload, updatedBy
     } = collectValue;
 
     const totalData = {
@@ -74,7 +74,7 @@ export const UpdateIDDetails = () => {
       paafCvevUpload,
       ppUpload,
       supportDocUpload,
-      qcCertifyUpload,
+      qcCertifyUpload, updatedBy
     };
 
     // console.log("Update Call Recived TotalData IDDetails", totalData);

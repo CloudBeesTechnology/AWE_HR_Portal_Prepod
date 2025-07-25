@@ -29,6 +29,7 @@ export const CreateTerminate = () => {
       WIResignation,
       WITermination,
       WILeaveEntitle,
+      createdBy,
     } = TerminateValue;
 
     const totalData = {
@@ -50,6 +51,7 @@ export const CreateTerminate = () => {
       WIResignation: JSON.stringify(WIResignation),
       WITermination: JSON.stringify(WITermination),
       WILeaveEntitle: JSON.stringify(WILeaveEntitle),
+      createdBy: createdBy,
     };
 
     try {

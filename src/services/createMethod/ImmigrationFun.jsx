@@ -24,8 +24,8 @@ export const ImmigrationFun = () => {
       immigApproval: ImmiValue.immigApproval,
       reEntryVisaExp: ImmiValue.reEntryVisaExp,
       remarkImmig: ImmiValue.remarkImmig,
+      createdBy: ImmiValue.createdBy
     };
-    console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
@@ -40,7 +40,7 @@ export const ImmigrationFun = () => {
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);
-         throw error; // Rethrow error if needed
+         throw error; 
        }
   }, []);
   return { ImmigrationData };

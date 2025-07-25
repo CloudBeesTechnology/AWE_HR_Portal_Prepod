@@ -59,7 +59,8 @@ export const NlmsForm = ({ candidate }) => {
     resolver: yupResolver(NlmsFormSchema),
   });
 
-  const NlmsUpload = watch("nlmsFile");
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
@@ -223,21 +224,50 @@ export const NlmsForm = ({ candidate }) => {
     const interviewScheduleId = selectedInterviewData?.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
+    const wpUpdatedByData = selectedInterviewData;
+    const intUpdatedByData = selectedInterviewDataStatus;
+
+    const wpPreviousUpdates = wpUpdatedByData?.updatedBy
+      ? JSON.parse(wpUpdatedByData?.updatedBy)
+      : [];
+
+    const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
+
+    const wpOrderedUpdatedBy = wpUpdatedBy?.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
     }
 
     const wpTrackingData = {
-      tempID: candidate.tempID,
-      nlmssubmitdate: formData.interview.nlmssubmitdate,
-      submissionrefrenceno: formData.interview.submissionrefrenceno,
-      nlmsapprovedate: formData.interview.nlmsapprovedate,
-      nlmsexpirydate: formData.interview.nlmsexpirydate,
-      ldreferenceno: formData.interview.ldreferenceno,
-      nlmsfile: isUploadingString.nlmsFile
-        ? JSON.stringify(wrapUpload(uploadedNlms.nlmsFile))
-        : formData.interview.nlmsfile,
+      tempID: candidate?.tempID,
+      nlmssubmitdate: formData.interview?.nlmssubmitdate,
+      submissionrefrenceno: formData.interview?.submissionrefrenceno,
+      nlmsapprovedate: formData.interview?.nlmsapprovedate,
+      nlmsexpirydate: formData.interview?.nlmsexpirydate,
+      ldreferenceno: formData.interview?.ldreferenceno,
+      nlmsfile: isUploadingString?.nlmsFile
+        ? JSON.stringify(wrapUpload(uploadedNlms?.nlmsFile))
+        : formData.interview?.nlmsfile,
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     try {
@@ -245,14 +275,15 @@ export const NlmsForm = ({ candidate }) => {
         const response = await wpTrackingDetails({
           WPTrackingValue: {
             id: interviewScheduleId,
-            nlmssubmitdate: formData.interview.nlmssubmitdate,
-            submissionrefrenceno: formData.interview.submissionrefrenceno,
-            nlmsapprovedate: formData.interview.nlmsapprovedate,
-            nlmsexpirydate: formData.interview.nlmsexpirydate,
-            ldreferenceno: formData.interview.ldreferenceno,
-            nlmsfile: isUploadingString.nlmsFile
-              ? JSON.stringify(wrapUpload(uploadedNlms.nlmsFile))
-              : formData.interview.nlmsfile,
+            nlmssubmitdate: formData.interview?.nlmssubmitdate,
+            submissionrefrenceno: formData.interview?.submissionrefrenceno,
+            nlmsapprovedate: formData.interview?.nlmsapprovedate,
+            nlmsexpirydate: formData.interview?.nlmsexpirydate,
+            ldreferenceno: formData.interview?.ldreferenceno,
+            nlmsfile: isUploadingString?.nlmsFile
+              ? JSON.stringify(wrapUpload(uploadedNlms?.nlmsFile))
+              : formData.interview?.nlmsfile,
+            updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
       } else {
@@ -263,13 +294,13 @@ export const NlmsForm = ({ candidate }) => {
 
       const interStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
+        updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
-      
-      await interviewDetails({ InterviewValue: interStatus });
-      
-      setNotification(true);
 
+      await interviewDetails({ InterviewValue: interStatus });
+
+      setNotification(true);
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

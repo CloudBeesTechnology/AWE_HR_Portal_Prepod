@@ -17,7 +17,7 @@ export const Insurance = () => {
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const userType = localStorage.getItem("userID");
   const {
     register,
     handleSubmit,
@@ -62,9 +62,11 @@ export const Insurance = () => {
 
   const onSubmit = async (data) => {
     try {
+      const today = new Date().toISOString().split("T")[0];
       const InsTypeData = {
         typeIns: data.typeIns,
         insDetails: data.insDetails.map((detail) => detail.company),
+        createdBy: JSON.stringify([{ userID: userType, date: today }]),
       };
 
       const response = await client.graphql({

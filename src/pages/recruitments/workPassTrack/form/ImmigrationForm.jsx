@@ -58,7 +58,8 @@ export const ImmigrationForm = ({ candidate }) => {
     resolver: yupResolver(ImmigrationFormSchema),
   });
 
-  const VisaUpload = watch("visaFile");
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
@@ -92,12 +93,11 @@ export const ImmigrationForm = ({ candidate }) => {
           // console.log("Uploaded file name set:", fileName);
         }
       } else {
-         setFormData({
+        setFormData({
           interview: {
             status: interviewStatus.status,
           },
         });
-
       }
     }
   }, [interviewSchedules, candidate.tempID]);
@@ -213,6 +213,34 @@ export const ImmigrationForm = ({ candidate }) => {
     const interviewScheduleId = selectedInterviewData?.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
+    const wpUpdatedByData = selectedInterviewData;
+    const intUpdatedByData = selectedInterviewDataStatus;
+
+    const wpPreviousUpdates = wpUpdatedByData?.updatedBy
+      ? JSON.parse(wpUpdatedByData?.updatedBy)
+      : [];
+
+    const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
+
+    const wpOrderedUpdatedBy = wpUpdatedBy?.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
@@ -225,13 +253,14 @@ export const ImmigrationForm = ({ candidate }) => {
 
     const wpTrackingData = {
       tempID: candidate.tempID,
-      immbdno: formData.interview.immbdno,
-      docsubmitdate: formData.interview.docsubmitdate,
-      visaapprovedate: formData.interview.visaapprovedate,
-      visareferenceno: formData.interview.visareferenceno,
-      visaFile: isUploadingString.visaFile
-        ? JSON.stringify(wrapUpload(uploadedVisa.visaFile))
-        : formData.interview.visaFile,
+      immbdno: formData.interview?.immbdno,
+      docsubmitdate: formData.interview?.docsubmitdate,
+      visaapprovedate: formData.interview?.visaapprovedate,
+      visareferenceno: formData.interview?.visareferenceno,
+      visaFile: isUploadingString?.visaFile
+        ? JSON.stringify(wrapUpload(uploadedVisa?.visaFile))
+        : formData.interview?.visaFile,
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     let response;
@@ -240,13 +269,14 @@ export const ImmigrationForm = ({ candidate }) => {
         response = await wpTrackingDetails({
           WPTrackingValue: {
             id: interviewScheduleId,
-            immbdno: formData.interview.immbdno,
-            docsubmitdate: formData.interview.docsubmitdate,
-            visaapprovedate: formData.interview.visaapprovedate,
-            visareferenceno: formData.interview.visareferenceno,
-            visaFile: isUploadingString.visaFile
-              ? JSON.stringify(wrapUpload(uploadedVisa.visaFile))
-              : formData.interview.visaFile,
+            immbdno: formData.interview?.immbdno,
+            docsubmitdate: formData.interview?.docsubmitdate,
+            visaapprovedate: formData.interview?.visaapprovedate,
+            visareferenceno: formData.interview?.visareferenceno,
+            visaFile: isUploadingString?.visaFile
+              ? JSON.stringify(wrapUpload(uploadedVisa?.visaFile))
+              : formData.interview?.visaFile,
+            updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
       } else {
@@ -257,14 +287,14 @@ export const ImmigrationForm = ({ candidate }) => {
 
       const interStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
+        updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
 
-      
       // console.log("Submitting interview details with status:", interStatus);
-      
+
       await interviewDetails({ InterviewValue: interStatus });
-      
+
       setNotification(true);
       // console.log("Interview status updated:", interStatus);
 

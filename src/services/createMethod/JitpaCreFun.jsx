@@ -9,15 +9,14 @@ export const JitpaCreFun = () => {
       throw new Error("Missing required parameters");
     }
     const totalData = {
-        tbaPurchase:[creJitpaValue.tbaPurchase],
-        jitpaAmt:[creJitpaValue.jitpaAmt],
-        jpValid:[creJitpaValue.jpValid],
-        jpEndorse:[creJitpaValue.jpEndorse],
-        jpEmpUpload:[creJitpaValue.jpEmpUpload],
-      empID:creJitpaValue.empID,
-      
+      empID: creJitpaValue.empID,
+      tbaPurchase: [creJitpaValue.tbaPurchase],
+      jitpaAmt: [creJitpaValue.jitpaAmt],
+      jpValid: [creJitpaValue.jpValid],
+      jpEndorse: [creJitpaValue.jpEndorse],
+      jpEmpUpload: [creJitpaValue.jpEmpUpload],
+      createdBy: creJitpaValue.createdBy
     };
-    console.log(totalData);
 
     try {
       const storedData = await Promise.all([
@@ -29,10 +28,9 @@ export const JitpaCreFun = () => {
         }),
       ]);
       console.log(storedData, "successfully stored data");
-      
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
-      throw error; // Rethrow error if needed
+      throw error; 
     }
   }, []);
   return { JitpaCreData };

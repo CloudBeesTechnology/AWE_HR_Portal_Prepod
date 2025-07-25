@@ -33,7 +33,7 @@ export const AddNewForm = () => {
   const [showTitle, setShowTitle] = useState("");
   const userDataDetails = data?.userValue || addData?.userValue;
   const workInfoDataDetails = data?.workValue || addData?.workValue;
-
+  const [disableEmpID, setDisableEmpID] = useState(false);
 
   useEffect(() => {
     window.scrollTo({
@@ -153,6 +153,9 @@ export const AddNewForm = () => {
   // console.log("add Data:", addData);
 
   const searchResult = (result) => {
+    if (result.empID) {
+      setDisableEmpID(true);
+    }
     setValue("name", result.name);
     setValue("officialEmail", result.officialEmail);
     setValue("empID", result.empID);
@@ -196,9 +199,10 @@ export const AddNewForm = () => {
   }
 
   const onSubmit = handleSubmit(async (data) => {
-//     console.log(data, "Data  checking");
-// console.log(dropDownVal,"setpermission");
-
+    //     console.log(data, "Data  checking");
+    // console.log(dropDownVal,"setpermission");
+    const today = new Date().toISOString().split("T")[0];
+    const userIDFind = localStorage.getItem("userID");
     try {
       const desideCreateOrUpdate = userDataDetails.some((m) => {
         return m.empID === data.empID;
@@ -208,13 +212,26 @@ export const AddNewForm = () => {
       const userIDs = await userDataDetails
         .filter((m) => m.empID === data.empID)
         .map((m) => m);
+      const previousUpdatesUser = userIDs[0]?.updatedBy
+        ? JSON.parse(userIDs[0]?.updatedBy)
+        : [];
 
+      const updatedByUser = [
+        ...previousUpdatesUser,
+        { userID: userIDFind, date: today },
+      ];
+
+      const orderedUpdatedByUser = updatedByUser.map((entry) => ({
+        userID: entry.userID,
+        date: entry.date,
+      }));
       if (desideCreateOrUpdate) {
         const updateUserObject = {
           id: userIDs[0].id,
           password: data.password,
           selectType: data.selectType,
           setPermissions: dropDownVal,
+          updatedBy: JSON.stringify(orderedUpdatedByUser),
           // status: "Active",
         };
         // console.log("updateUserObject : ", updateUserObject);
@@ -257,16 +274,17 @@ export const AddNewForm = () => {
               selectType: data.selectType,
               setPermissions: dropDownVal,
               status: "Active",
+              createdBy: JSON.stringify([{ userID: userIDFind, date: today }]),
             };
             await client
-            .graphql({
-              query: createUser,
-              variables: {
-                input: createNewUser,
-              },
-            })
-            .then(async(res) => {
-             await sendEmail(
+              .graphql({
+                query: createUser,
+                variables: {
+                  input: createNewUser,
+                },
+              })
+              .then(async (res) => {
+                await sendEmail(
                   `Verify Your Email to Activate Your Account`,
                   `
                   <html>

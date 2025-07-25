@@ -59,7 +59,8 @@ export const BankForm = ({ candidate }) => {
     resolver: yupResolver(BankFormSchema),
   });
 
-  const BankUpload = watch("bgFile", "");
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
@@ -159,7 +160,7 @@ export const BankForm = ({ candidate }) => {
     setdeletePopup(!deletePopup);
   };
 
-   const deletedStringUpload = async (fileType, fileName) => {
+  const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = candidate.tempID;
 
@@ -190,7 +191,6 @@ export const BankForm = ({ candidate }) => {
     }
   };
 
-
   const currentDate = new Date().toISOString().split("T")[0];
 
   const wrapUpload = (filePath) => {
@@ -211,6 +211,34 @@ export const BankForm = ({ candidate }) => {
     const interviewScheduleId = selectedInterviewData?.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
+    const wpUpdatedByData = selectedInterviewData;
+    const intUpdatedByData = selectedInterviewDataStatus;
+
+    const wpPreviousUpdates = wpUpdatedByData?.updatedBy
+      ? JSON.parse(wpUpdatedByData?.updatedBy)
+      : [];
+
+    const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
+
+    const wpOrderedUpdatedBy = wpUpdatedBy?.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
@@ -223,14 +251,15 @@ export const BankForm = ({ candidate }) => {
 
     const wpTrackingData = {
       tempID: candidate.tempID,
-      bgsubmitdate: formData.interview.bgsubmitdate,
-      bgreceivedate: formData.interview.bgreceivedate,
-      bgexpirydate: formData.interview.bgexpirydate,
-      referenceno: formData.interview.referenceno,
-      bgamount: formData.interview.bgamount,
-      bgfile: isUploadingString.bgFile
+      bgsubmitdate: formData.interview?.bgsubmitdate,
+      bgreceivedate: formData.interview?.bgreceivedate,
+      bgexpirydate: formData.interview?.bgexpirydate,
+      referenceno: formData.interview?.referenceno,
+      bgamount: formData.interview?.bgamount,
+      bgfile: isUploadingString?.bgFile
         ? JSON.stringify(wrapUpload(uploadedBank.bgFile))
         : formData.interview.bgfile,
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     let response;
@@ -239,14 +268,15 @@ export const BankForm = ({ candidate }) => {
         response = await wpTrackingDetails({
           WPTrackingValue: {
             id: interviewScheduleId,
-            bgsubmitdate: formData.interview.bgsubmitdate,
-            bgreceivedate: formData.interview.bgreceivedate,
-            bgexpirydate: formData.interview.bgexpirydate,
-            referenceno: formData.interview.referenceno,
-            bgamount: formData.interview.bgamount,
-            bgfile: isUploadingString.bgFile
-              ? JSON.stringify(wrapUpload(uploadedBank.bgFile))
-              : formData.interview.bgfile,
+            bgsubmitdate: formData.interview?.bgsubmitdate,
+            bgreceivedate: formData.interview?.bgreceivedate,
+            bgexpirydate: formData.interview?.bgexpirydate,
+            referenceno: formData.interview?.referenceno,
+            bgamount: formData.interview?.bgamount,
+            bgfile: isUploadingString?.bgFile
+              ? JSON.stringify(wrapUpload(uploadedBank?.bgFile))
+              : formData.interview?.bgfile,
+            updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
       } else {
@@ -257,13 +287,14 @@ export const BankForm = ({ candidate }) => {
 
       const interStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
+        updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
-      
+
       // console.log("Submitting interview details with status:", interStatus);
-      
+
       await interviewDetails({ InterviewValue: interStatus });
-      
+
       setNotification(true);
       // console.log("Interview status updated:", interStatus);
 

@@ -36,6 +36,7 @@ export const DependentInsurance = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const { depInsuData } = useOutletContext();
+  const userType = localStorage.getItem("userID");
 
   const [selectedNationality, setSelectedNationality] = useState("");
   const {
@@ -369,8 +370,10 @@ export const DependentInsurance = () => {
       const checkingDITable = depInsuranceData.find(
         (match) => match.empID === data.empID
       );
-      
+      const today = new Date().toISOString().split("T")[0];
       if (checkingDITable) {
+        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
+        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
         const depValue = {
           ...data,
           depInsurance: data?.depInsurance
@@ -392,6 +395,7 @@ export const DependentInsurance = () => {
               };
             }),
           id: checkingDITable.id,
+          updatedBy,
         };
         // console.log("depValue : ", depValue);
         await UpdateDIData({ depValue });
@@ -409,6 +413,7 @@ export const DependentInsurance = () => {
                 JSON.stringify(uploadedDocs?.depInsurance?.[index]) || [],
             };
           }),
+          createdBy: JSON.stringify([{ userID: userType, date: today }]),
         };
         // console.log(depValue, "create");
         await SubmitMPData({ depValue });

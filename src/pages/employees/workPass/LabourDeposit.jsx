@@ -41,7 +41,6 @@ export const LabourDeposit = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
-  const [labourDate, setLabourDate] = useState([]);
   const [isUploading, setIsUploading] = useState({
     lbrDepoUpload: false,
   });
@@ -54,9 +53,12 @@ export const LabourDeposit = () => {
 
   const watchInducLdUpload = watch("lbrDepoUpload", "");
 
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
+
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      return url.split("/").pop();
     }
     return "";
   };
@@ -64,7 +66,7 @@ export const LabourDeposit = () => {
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
     if (typeof input === "object" && input.upload) {
-      const filePath = input.upload; // Extract the 'upload' path
+      const filePath = input.upload;
 
       // Decode the URL path
       const decodedUrl = decodeURIComponent(filePath);
@@ -79,8 +81,8 @@ export const LabourDeposit = () => {
 
     // If input is a string (URL), use the URL constructor
     try {
-      const urlObj = new URL(input); // Attempt to create a URL object
-      const filePath = urlObj.pathname; // Extract path from URL
+      const urlObj = new URL(input);
+      const filePath = urlObj.pathname;
 
       // Decode the URL path
       const decodedUrl = decodeURIComponent(filePath);
@@ -135,8 +137,8 @@ export const LabourDeposit = () => {
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
 
     // Ensure no duplicate files are added
@@ -252,22 +254,31 @@ export const LabourDeposit = () => {
       );
 
       const formatDate = (date) =>
-        date ? new Date(date).toLocaleDateString("en-CA") : null; // 'en-CA' gives yyyy-mm-dd format
+        date ? new Date(date).toLocaleDateString("en-CA") : null;
       const lbrDepoSubmit = formatDate(data.lbrDepoSubmit);
 
       if (matchedEmployee) {
         const updatedlbrDate = [
-          ...new Set([
-            ...(matchedEmployee.lbrDepoSubmit || []), // ensure it's an array before spreading
-            lbrDepoSubmit,
-          ]),
+          ...new Set([...(matchedEmployee.lbrDepoSubmit || []), lbrDepoSubmit]),
         ];
+
+        const previousUpdates = matchedEmployee?.updatedBy
+          ? JSON.parse(matchedEmployee.updatedBy)
+          : [];
+
+        const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
+
+        const orderedUpdatedBy = updatedBy?.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
 
         const LDValue = {
           ...data,
+          id: matchedEmployee.id,
           lbrDepoSubmit: updatedlbrDate.map(formatDate),
           lbrDepoUpload: JSON.stringify(uploadLD.lbrDepoUpload),
-          id: matchedEmployee.id,
+          updatedBy: JSON.stringify(orderedUpdatedBy),
         };
 
         await UpdateLDData({ LDValue });
@@ -278,6 +289,7 @@ export const LabourDeposit = () => {
           ...data,
           lbrDepoSubmit,
           lbrDepoUpload: JSON.stringify(uploadLD.lbrDepoUpload),
+          createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
         };
         // console.log(creLabpaValue);
 

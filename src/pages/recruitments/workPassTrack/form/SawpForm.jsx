@@ -57,7 +57,8 @@ export const SawpForm = ({ candidate }) => {
     resolver: yupResolver(SawpFormSchema),
   });
 
-  const SawpUpload = watch("sawpFile");
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
@@ -209,16 +210,45 @@ export const SawpForm = ({ candidate }) => {
 
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
+    const wpUpdatedByData = existingInterviewData;
+    const intUpdatedByData = selectedInterviewDataStatus;
+
+    const wpPreviousUpdates = wpUpdatedByData?.updatedBy
+      ? JSON.parse(wpUpdatedByData?.updatedBy)
+      : [];
+
+    const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
+
+    const wpOrderedUpdatedBy = wpUpdatedBy.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
+    const intPreviousUpdates = intUpdatedByData?.updatedBy
+      ? JSON.parse(intUpdatedByData?.updatedBy)
+      : [];
+
+    const intUpdatedBy = [
+      ...intPreviousUpdates,
+      { userID: EMPID, date: TODAY },
+    ];
+
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
+      userID: entry.userID,
+      date: entry.date,
+    }));
+
     const requestData = {
       reqValue: {
         ...formData.interview,
-        sawpFile: isUploadingString.sawpFile
-          ? JSON.stringify(wrapUpload(uploadedSawp.sawpFile))
-          : formData.interview.sawpFile,
+        sawpFile: isUploadingString?.sawpFile
+          ? JSON.stringify(wrapUpload(uploadedSawp?.sawpFile))
+          : formData.interview?.sawpFile,
+        tempID: candidate?.tempID,
+        sawpDate: formData.interview?.sawpDate,
+        sawpRecivedDate: formData.interview?.sawpRecivedDate,
         tempID: candidate.tempID,
-        sawpDate: formData.interview.sawpDate,
-        sawpRecivedDate: formData.interview.sawpRecivedDate,
-        tempID: candidate.tempID,
+        createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
       },
     };
 
@@ -227,12 +257,13 @@ export const SawpForm = ({ candidate }) => {
         await wpTrackingDetails({
           WPTrackingValue: {
             id: existingInterviewData.id,
-            sawpDate: formData.interview.sawpDate,
-            sawpRecivedDate: formData.interview.sawpRecivedDate,
-            sawpFile: isUploadingString.sawpFile
-              ? JSON.stringify(wrapUpload(uploadedSawp.sawpFile))
-              : formData.interview.sawpFile,
-            tempID: candidate.tempID,
+            sawpDate: formData.interview?.sawpDate,
+            sawpRecivedDate: formData.interview?.sawpRecivedDate,
+            sawpFile: isUploadingString?.sawpFile
+              ? JSON.stringify(wrapUpload(uploadedSawp?.sawpFile))
+              : formData.interview?.sawpFile,
+            tempID: candidate?.tempID,
+            updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
 
@@ -244,7 +275,8 @@ export const SawpForm = ({ candidate }) => {
 
       const interviewStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
+        updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
 
       await interviewDetails({ InterviewValue: interviewStatus });

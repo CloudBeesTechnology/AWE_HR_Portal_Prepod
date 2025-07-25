@@ -12,12 +12,13 @@ export const CreateDoe = () => {
     }
     try {
       const updatedData = {
-        empID:DoeValue.empID, // Use the existing ID
+        empID:DoeValue.empID, 
         doeEmpSubmit:DoeValue.doeEmpSubmit,
         doeEmpApproval:DoeValue.doeEmpApproval,
         doeEmpValid:DoeValue.doeEmpValid,
         doeEmpRefNo:DoeValue.doeEmpRefNo,
         doeEmpUpload:DoeValue.doeEmpUpload,
+        createdBy: DoeValue.createdBy
       };
 
       const response = await client.graphql({
@@ -25,11 +26,10 @@ export const CreateDoe = () => {
         variables: { input: updatedData },
       });
 
-      // // Log the response to confirm the update
       console.log("Data successfully updated:", response);
     } catch (error) {
       console.error("Error updating data:", error);
-      throw error; // Re-throw the error after logging
+      throw error; 
     }
   }, [client]);
 

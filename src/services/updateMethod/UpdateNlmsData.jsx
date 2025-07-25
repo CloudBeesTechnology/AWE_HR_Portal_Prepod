@@ -1,4 +1,3 @@
-
 import { generateClient } from "@aws-amplify/api";
 import { useCallback, useEffect, useState } from "react";
 import { updateDNDetails } from "../../graphql/mutations";
@@ -20,10 +19,11 @@ export const UpdateNlmsData = () => {
         nlmsEmpValid,
         nlmsEmpUpload,
         id,
+        updatedBy,
       } = DoeValue;
 
       const updatedData = {
-        id, // Use the existing ID
+        id,
         nlmsEmpSubmit,
         nlmsEmpSubmitRefNo,
         nlmsEmpApproval,
@@ -31,18 +31,18 @@ export const UpdateNlmsData = () => {
         permitType,
         nlmsEmpValid,
         nlmsEmpUpload,
+        updatedBy,
       };
 
       const response = await client.graphql({
         query: updateDNDetails,
-        variables: { input: updatedData,  },
+        variables: { input: updatedData },
       });
 
-      // // Log the response to confirm the update
-      // console.log("Data successfully updated:", response);
+      console.log("Data successfully updated:", response);
     } catch (error) {
       console.error("Error updating data:", error);
-      throw error; // Re-throw the error after logging
+      throw error;
     }
   }, []);
 

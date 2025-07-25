@@ -53,6 +53,7 @@ const LabourImmigration = () => {
   const [notification, setNotification] = useState(false);
   const [dependPassData, setDependPassData] = useState(null);
   const [showTitle, setShowTitle] = useState("");
+  const [disableEmpID, setDisableEmpID] = useState(false);
 
   const {
     register,
@@ -138,7 +139,7 @@ const LabourImmigration = () => {
     }
 
     setValue(label, [...currentFiles, selectedFile]);
- 
+
     try {
       updateUploadingState(label, true);
       await uploadDocs(selectedFile, label, setDocsUploaded, watchedEmpID);
@@ -264,6 +265,9 @@ const LabourImmigration = () => {
         setValue(key, value);
       }
     });
+    if (result.empID) {
+      setDisableEmpID(true);
+    }
 
     const fields = ["bruneiMAD", "bruneiME"];
     // fields.forEach((field) => setValue(field, getLastValue(result[field])));
@@ -328,9 +332,23 @@ const LabourImmigration = () => {
       const checkingLMIDTable = LMIData.find(
         (match) => match.empID === data.empID
       );
+      const today = new Date().toISOString().split("T")[0];
+      const userIDFind = localStorage.getItem("userID");
       // const formatDate = (date) =>
       //   date ? new Date(date).toLocaleDateString("en-CA") : null;
+      const previousUpdatesLMI = checkingLMIDTable?.updatedBy
+        ? JSON.parse(checkingLMIDTable?.updatedBy)
+        : [];
 
+      const updatedByLMI = [
+        ...previousUpdatesLMI,
+        { userID: userIDFind, date: today },
+      ];
+
+      const orderedUpdatedByLMI = updatedByLMI?.map((entry) => ({
+        userID: entry.userID,
+        date: entry.date,
+      }));
       const formatDate = (dateString) => {
         if (!dateString || isNaN(new Date(dateString).getTime())) {
           return; // Return an empty string or a custom message if invalid
@@ -413,6 +431,7 @@ const LabourImmigration = () => {
             })
           ),
           LabTable: checkingLMIDTable.id,
+          updatedBy: JSON.stringify(orderedUpdatedByLMI),
         };
         // console.log("Update Method :", LabUpValue);
 
@@ -448,6 +467,7 @@ const LabourImmigration = () => {
               };
             })
           ),
+          createdBy: JSON.stringify([{ userID: userIDFind, date: today }]),
         };
         // console.log("Create Method :", labValue);
         await SubmitMPData({ labValue });
@@ -469,7 +489,7 @@ const LabourImmigration = () => {
   const access = "Employee";
 
   console.log("Up", isUploading);
-  
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}

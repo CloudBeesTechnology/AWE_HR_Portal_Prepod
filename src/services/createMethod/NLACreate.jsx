@@ -12,6 +12,7 @@ export const NLACreate = () => {
         empID: NLACreValue.empID,
       accommodation: [NLACreValue.accommodation],
       accommodationAddress: [NLACreValue.accommodationAddress],
+      createdBy: NLACreValue.createdBy,
     };
     console.log(totalData);
 

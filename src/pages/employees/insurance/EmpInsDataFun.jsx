@@ -30,6 +30,7 @@ export const EmpInsDataFun = () => {
         travelIns:[empInsValue.travelIns],
         accidentIns:[empInsValue.accidentIns],
         empInsUpload:[empInsValue.empInsUpload],
+        createdBy:empInsValue.createdBy,
 
     };
     // console.log(totalData);

@@ -35,17 +35,11 @@ export const Jitpa = () => {
     setValue,
   } = useForm({
     resolver: yupResolver(JitpaEmpSchema),
-    // tbaPurchase: [],
-    // jpValid: [],
-    // jpEndorse: [],
   });
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
-  // const [jpPurchaseDta,setJpPurchaseDta]=useState("")
-  // const [jpValidation,setJpValidation]=useState("")
-  // const [jpEndorsement,setJpEndorsement]=useState("")
   const [isUploading, setIsUploading] = useState({
     jpEmpUpload: false,
   });
@@ -58,9 +52,12 @@ export const Jitpa = () => {
 
   const watchInducJitpaUpload = watch("jpEmpUpload", "");
 
+  const EMPID = localStorage.getItem("userID");
+  const TODAY = new Date().toISOString().split("T")[0];
+
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      return url.split("/").pop();
     }
     return "";
   };
@@ -68,7 +65,7 @@ export const Jitpa = () => {
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
     if (typeof input === "object" && input.upload) {
-      const filePath = input.upload; // Extract the 'upload' path
+      const filePath = input.upload;
 
       // Decode the URL path
       const decodedUrl = decodeURIComponent(filePath);
@@ -83,8 +80,8 @@ export const Jitpa = () => {
 
     // If input is a string (URL), use the URL constructor
     try {
-      const urlObj = new URL(input); // Attempt to create a URL object
-      const filePath = urlObj.pathname; // Extract path from URL
+      const urlObj = new URL(input);
+      const filePath = urlObj.pathname;
 
       // Decode the URL path
       const decodedUrl = decodeURIComponent(filePath);
@@ -139,8 +136,8 @@ export const Jitpa = () => {
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
 
     // Ensure no duplicate files are added
@@ -289,13 +286,25 @@ export const Jitpa = () => {
           ]),
         ];
 
+        const previousUpdates = matchedEmployee?.updatedBy
+          ? JSON.parse(matchedEmployee.updatedBy)
+          : [];
+
+        const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
+
+        const orderedUpdatedBy = updatedBy?.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
+
         const JitpaValue = {
           ...data,
+          id: matchedEmployee.id,
           jpValid: updatedValidDate.map(formatDate),
           tbaPurchase: updatedSubmissionDate.map(formatDate),
           jpEndorse: updatedEndorseDate.map(formatDate),
           jpEmpUpload: JSON.stringify(uploadjitpa.jpEmpUpload),
-          id: matchedEmployee.id,
+          updatedBy: JSON.stringify(orderedUpdatedBy),
         };
 
         await UpdateJitpaData({ JitpaValue });
@@ -308,6 +317,7 @@ export const Jitpa = () => {
           tbaPurchase,
           jpEndorse,
           jpEmpUpload: JSON.stringify(uploadjitpa.jpEmpUpload),
+          createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
         };
         // console.log(creJitpaValue);
 

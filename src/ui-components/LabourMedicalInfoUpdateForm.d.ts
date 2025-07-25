@@ -33,6 +33,8 @@ export declare type LabourMedicalInfoUpdateFormInputValues = {
     uploadRegis?: string[];
     uploadBwn?: string[];
     dependPass?: string[];
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type LabourMedicalInfoUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -46,6 +48,8 @@ export declare type LabourMedicalInfoUpdateFormValidationValues = {
     uploadRegis?: ValidationFunction<string>;
     uploadBwn?: ValidationFunction<string>;
     dependPass?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type LabourMedicalInfoUpdateFormOverridesProps = {
@@ -61,6 +65,8 @@ export declare type LabourMedicalInfoUpdateFormOverridesProps = {
     uploadRegis?: PrimitiveOverrideProps<TextAreaFieldProps>;
     uploadBwn?: PrimitiveOverrideProps<TextAreaFieldProps>;
     dependPass?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type LabourMedicalInfoUpdateFormProps = React.PropsWithChildren<{
     overrides?: LabourMedicalInfoUpdateFormOverridesProps | undefined | null;

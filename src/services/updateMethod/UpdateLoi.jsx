@@ -12,18 +12,19 @@ export const UpdateLoiData = () => {
 
     try {
       const {
+        id,
         mobSignDate,
         mobFile,
         paafApproveDate,
         paafFile,
         loiIssueDate,
-        loiAcceptDate, 
+        loiAcceptDate,
         loiDeclineDate,
         declineReason,
         loiFile,
         cvecApproveDate,
         cvecFile,
-        id,
+        updatedBy,
       } = LoiValue;
 
       const updatedData = {
@@ -39,18 +40,18 @@ export const UpdateLoiData = () => {
         loiFile,
         cvecApproveDate,
         cvecFile,
+        updatedBy,
       };
 
       const response = await client.graphql({
         query: updateLocalMobilization,
-        variables: { input: updatedData,},
+        variables: { input: updatedData },
       });
 
-      // // Log the response to confirm the update
-      // console.log("Data successfully updated:", response);
+      console.log("Data successfully updated:", response);
     } catch (error) {
       console.error("Error updating data:", error);
-      throw error; // Re-throw the error after logging
+      throw error;
     }
   }, []);
 

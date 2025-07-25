@@ -39,7 +39,7 @@ export const IDDetailsFunc = () => {
         paafCvevUpload,
         ppUpload,
         supportDocUpload,
-        qcCertifyUpload,
+        qcCertifyUpload,createdBy
       } = empValue;
 
       const totalData = {
@@ -72,7 +72,7 @@ export const IDDetailsFunc = () => {
         paafCvevUpload,
         ppUpload,
         supportDocUpload,
-        qcCertifyUpload,
+        qcCertifyUpload,createdBy
       };
 
       // console.log("Create Call Recived TotalData IDDetails", totalData);

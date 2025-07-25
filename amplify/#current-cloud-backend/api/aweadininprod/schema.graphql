@@ -445,6 +445,8 @@ type WPTracking @model @auth(rules: [{allow: public}]) {
   lbrDepoAmount: String
   lbrFile: String
   remarkNLMob: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type EmployeeNonLocalAcco @model @auth(rules: [{allow: public}]) {
@@ -469,6 +471,8 @@ type LabourMedicalInfo @model @auth(rules: [{allow: public}]) {
   uploadRegis: [AWSJSON]
   uploadBwn: [AWSJSON]
   dependPass: [AWSJSON]
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type ServiceRecord @model @auth(rules: [{allow: public}]) {
@@ -702,6 +706,8 @@ type LocalMobilization @model @auth(rules: [{allow: public}]) {
   loiFile: String
   cvecApproveDate: String
   cvecFile: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type InterviewSchedule @model @auth(rules: [{allow: public}]) {
@@ -719,6 +725,8 @@ type InterviewSchedule @model @auth(rules: [{allow: public}]) {
   otherDepartment: String
   status: String
   empID: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type EducationDetails @model @auth(rules: [{allow: public}]) {
@@ -745,6 +753,8 @@ type EducationDetails @model @auth(rules: [{allow: public}]) {
   uploadCertificate: String
   uploadPp: String
   uploadIc: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type PersonalDetails @model @auth(rules: [{allow: public}]) {
@@ -787,6 +797,8 @@ type PersonalDetails @model @auth(rules: [{allow: public}]) {
   status: String
   workExperience: [AWSJSON]
   otherLang: String
+  createdBy: [AWSJSON]
+  updatedBy: [AWSJSON]
 }
 
 type User @model @auth(rules: [{allow: public}]) {

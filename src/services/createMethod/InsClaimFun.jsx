@@ -11,7 +11,8 @@ export const InsClaimFun = () => {
     const totalData = {
         empID:ICValuse.empID,
         insuranceClaims: JSON.stringify(ICValuse.insuranceClaims),
-    };
+        createdBy: ICValuse.createdBy,
+      };
     console.log(totalData);
 
     try {

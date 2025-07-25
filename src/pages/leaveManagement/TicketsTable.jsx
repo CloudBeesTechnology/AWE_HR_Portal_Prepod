@@ -11,29 +11,24 @@ import { FiLoader } from "react-icons/fi";
 import { useTempID } from "../../utils/TempIDContext";
 
 export const TicketsTable = () => {
-  const { handleViewClick, handleClickForToggle, userType } =
-    useOutletContext();
-
+  const { handleViewClick, handleClickForToggle, userType } = useOutletContext();
   const [searchResults, setSearchResults] = useState([]);
-  // const [loading, setLoading] = useState(false);
   const [secondartyData, setSecondartyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const { gmPosition, HRMPosition } = useTempID();
   const { ticketMerged, loading } = useLeaveManage();
 
-  // Add new state to track all filters
   const [filters, setFilters] = useState({
     date: "",
     search: [],
     status: "All",
   });
 
-  // Add this state at the top with other states
   const [errorState, setErrorState] = useState({
     noResults: false,
     searchError: false,
@@ -42,148 +37,113 @@ export const TicketsTable = () => {
 
   const GM = "GENERAL MANAGER";
   const HRM = "HR MANAGER";
+
+  // 🔁 Replaced filtering useEffect here:
   useEffect(() => {
-    // Step 1: Apply Filters (Status, Date, Search)
+    console.log("🔁 Filters triggered with ticketMerged and filters");
+
     let filteredResults = [...ticketMerged];
     let hasDateFilter = false;
     let hasSearchFilter = false;
     let dateMatches = false;
     let searchMatches = false;
 
-    // Apply status filter
+    // ✅ 1. Filter by status (HRM or GM logic)
     if (filters.status !== "All") {
-      filteredResults = filteredResults.filter(
-        (item) =>
+      filteredResults = filteredResults.filter((item) => {
+        return (
           (HRMPosition === HRM && item.hrStatus === filters.status) ||
           (gmPosition === GM && item.gmStatus === filters.status)
-      );
+        );
+      });
     }
 
-    // Apply date filter
+    // ✅ 2. Date filter
     if (filters.date) {
       hasDateFilter = true;
       const selectedDateLocal = new Date(filters.date);
       selectedDateLocal.setHours(0, 0, 0, 0);
 
       filteredResults = filteredResults.filter((item) => {
-        const departureDate = item?.departureDate
-          ? new Date(item.departureDate)
-          : null;
-        const arrivalDate = item?.arrivalDate
-          ? new Date(item.arrivalDate)
-          : null;
-        const createdDate = item?.createdAt ? new Date(item.createdAt) : null;
+        const datesToCheck = [
+          item?.departureDate && new Date(item.departureDate),
+          item?.arrivalDate && new Date(item.arrivalDate),
+          item?.createdAt && new Date(item.createdAt),
+        ].filter(Boolean);
 
-        if (departureDate) departureDate.setHours(0, 0, 0, 0);
-        if (arrivalDate) arrivalDate.setHours(0, 0, 0, 0);
-        if (createdDate) createdDate.setHours(0, 0, 0, 0);
+        datesToCheck.forEach((d) => d.setHours(0, 0, 0, 0));
 
-        const matches = [departureDate, arrivalDate, createdDate].some(
-          (date) => date && date.getTime() === selectedDateLocal.getTime()
+        const matches = datesToCheck.some(
+          (date) => date.getTime() === selectedDateLocal.getTime()
         );
         if (matches) dateMatches = true;
         return matches;
       });
     }
 
-    // Apply search filter
+    // ✅ 3. Search filter
     if (filters.search.length > 0) {
       hasSearchFilter = true;
       filteredResults = filteredResults.filter((item) => {
-        const matches = filters.search.some(
-          (searchItem) => searchItem.empID === item.empID
-        );
+        const matches = filters.search.some((s) => s.empID === item.empID);
         if (matches) searchMatches = true;
         return matches;
       });
     }
 
-    // Update error state
-    const noResults = filteredResults.length === 0;
-    const searchError = !searchMatches;
-    const dateError = hasDateFilter && !dateMatches;
+    // ✅ 4. GM-specific logic
+    if (gmPosition === GM) {
+      filteredResults = filteredResults.filter(
+        (item) => item.hrStatus === "Verified"
+      );
+    }
 
-    setErrorState({
-      noResults,
-      searchError,
-      dateError,
+    // ✅ 5. Final sort
+    filteredResults.sort((a, b) => {
+      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending") return -1;
+      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending") return 1;
+      if (a.gmStatus === "Pending" && b.gmStatus !== "Pending") return -1;
+      if (a.gmStatus !== "Pending" && b.gmStatus === "Pending") return 1;
+      return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-    // Step 2: After Filters are Applied, set filtered data
+    // ✅ 6. Update error state
+    setErrorState({
+      noResults: filteredResults.length === 0,
+      searchError: hasSearchFilter && !searchMatches,
+      dateError: hasDateFilter && !dateMatches,
+    });
+
+    // ✅ 7. Save filtered result for pagination
     setFilteredData(filteredResults);
+    setSecondartyData(filteredResults);
+    setCurrentPage(1); // reset page if filter changes
   }, [filters, ticketMerged]);
 
-  // Step 3: Apply pagination on the filtered data
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
 
     const filterPending = filteredData.sort((a, b) => {
-      // Step 1: Prioritize HR "Pending" status first
-      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending") {
-        return -1; // a (with Pending) should come first
-      }
-      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending") {
-        return 1; // b (with Pending) should come first
-      }
-
-      // Step 2: If both HR statuses are the same, prioritize GM "Pending"
-      if (a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
-        return -1; // a (with Pending GM) should come first
-      }
-      if (a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
-        return 1; // b (with Pending GM) should come first
-      }
-
-      // Step 3: If neither HR nor GM status is "Pending", fall back to createdAt (newest first)
+      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending") return -1;
+      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending") return 1;
+      if (a.gmStatus === "Pending" && b.gmStatus !== "Pending") return -1;
+      if (a.gmStatus !== "Pending" && b.gmStatus === "Pending") return 1;
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-    const paginatedData = filteredData.slice(
-      startIndex,
-      startIndex + rowsPerPage
-    );
-    setData(paginatedData); // Set the paginated data
+    const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+    setData(paginatedData);
   }, [currentPage, rowsPerPage, filteredData]);
-
-  // Calculate total pages based on filtered data
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const heading = [
-    "S.No",
-    "Emp ID",
-    "Name",
-    "Department",
-    "Position",
-    "Received Date",
-    "Departure date",
-    "Arrival date",
-    "Submitted form",
-    userType !== "SuperAdmin" && "Status",
-  ];
 
   useEffect(() => {
     const sortedData = data.sort((a, b) => {
-      // Step 1: Prioritize HR "Pending" status first
-      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending") {
-        return -1; // a (with Pending) should come first
-      }
-      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending") {
-        return 1; // b (with Pending) should come first
-      }
-
-      // Step 2: If both HR statuses are the same, prioritize GM "Pending"
-      if (a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
-        return -1; // a (with Pending GM) should come first
-      }
-      if (a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
-        return 1; // b (with Pending GM) should come first
-      }
-
-      // Step 3: If neither HR nor GM status is "Pending", fall back to createdAt (newest first)
+      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending") return -1;
+      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending") return 1;
+      if (a.gmStatus === "Pending" && b.gmStatus !== "Pending") return -1;
+      if (a.gmStatus !== "Pending" && b.gmStatus === "Pending") return 1;
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-    // Filter data based on GM position
     if (gmPosition === "GENERAL MANAGER") {
       const filterGMData = sortedData.filter(
         (item) => item.hrStatus === "Verified" && item.hrStatus !== "Pending"
@@ -196,7 +156,6 @@ export const TicketsTable = () => {
     }
   }, [ticketMerged, gmPosition]);
 
-  // Search functionality
   const searchUserList = async (searchData) => {
     try {
       const result = await searchData;
@@ -229,7 +188,6 @@ export const TicketsTable = () => {
     }
   };
 
-  // Update handlers for filters
   const handleDateChange = (event) => {
     const date = event.target.value;
     setSelectedDate(date);
@@ -254,23 +212,33 @@ export const TicketsTable = () => {
     );
   }
 
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const heading = [
+    "S.No",
+    "Emp ID",
+    "Name",
+    "Department",
+    "Position",
+    "Received Date",
+    "Departure date",
+    "Arrival date",
+    "Submitted form",
+    userType !== "SuperAdmin" && "Status",
+  ];
+
   return (
     <section className="w-full">
       <div className="flex justify-between flex-wrap mb-5">
-        <div>
-          <NavigateLM userType={userType} />
-        </div>
+        <div><NavigateLM userType={userType} /></div>
         <div className="flex  flex-wrap items-center gap-2">
-          <div>
-            <Searchbox
-              allEmpDetails={ticketMerged}
-              searchIcon2={<IoSearch />}
-              placeholder="Employee ID"
-              searchUserList={searchUserList}
-              border="rounded-md"
-            />
-          </div>
-
+          <Searchbox
+            allEmpDetails={secondartyData}
+            searchIcon2={<IoSearch />}
+            placeholder="Employee ID"
+            searchUserList={searchUserList}
+            border="rounded-md"
+          />
           <div className="text_size_5 bg-white border py-2 rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
             <input
               type="date"
@@ -281,17 +249,16 @@ export const TicketsTable = () => {
             />
           </div>
           {(gmPosition === "GENERAL MANAGER" || userType === "HR") && (
-            <div>
-              <Filter
-                name={filterStatus}
-                AfterFilter={handleFilterChange}
-                userType={userType}
-                gmPosition={gmPosition}
-              />
-            </div>
+            <Filter
+              name={filterStatus}
+              AfterFilter={handleFilterChange}
+              userType={userType}
+              gmPosition={gmPosition}
+            />
           )}
         </div>
       </div>
+
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
         {errorState.noResults ? (
           <div className="text-center mt-6 py-20">
@@ -302,9 +269,7 @@ export const TicketsTable = () => {
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
               <tr className="px-6">
                 {heading.map((header, index) => (
-                  <th key={index} className="py-5 text-[15px] text-white">
-                    {header}
-                  </th>
+                  <th key={index} className="py-5 text-[15px] text-white">{header}</th>
                 ))}
               </tr>
             </thead>
@@ -312,89 +277,50 @@ export const TicketsTable = () => {
               {data.map((item, index) => {
                 const displayIndex = startIndex + index + 1;
                 return (
-                  <tr
-                    key={index}
-                    className="text-center text-sm border-b-2 bg-white border-[#C7BCBC] text-[#303030] hover:bg-medium_blue"
-                  >
+                  <tr key={index} className="text-center text-sm border-b-2 bg-white border-[#C7BCBC] text-[#303030] hover:bg-medium_blue">
+                    <td className="border-b-2 border-[#CECECE] py-5">{displayIndex}</td>
+                    <td className="border-b-2 border-[#CECECE] py-5">{item?.empID}</td>
+                    <td className="border-b-2 border-[#CECECE] py-5">{capitalizedLetter(item?.empName) || "N/A"}</td>
                     <td className="border-b-2 border-[#CECECE] py-5">
-                      {displayIndex}
+                      {Array.isArray(item.department) ? capitalizedLetter(item.department[item.department.length - 1]) || "N/A" : "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
-                      {item?.empID}
+                      {Array.isArray(item.position) ? capitalizedLetter(item.position[item.position.length - 1]) || "N/A" : "N/A"}
                     </td>
-                    <td className="border-b-2 border-[#CECECE] py-5">
-                      {capitalizedLetter(item?.empName) || "N/A"}
-                    </td>
-                    <td className="border-b-2 border-[#CECECE] py-5">
-                      {Array.isArray(item.department)
-                        ? capitalizedLetter(
-                            item.department[item.department.length - 1]
-                          ) || "N/A"
-                        : "N/A"}
-                    </td>
-                    <td className="border-b-2 border-[#CECECE] py-5">
-                      {Array.isArray(item.position)
-                        ? capitalizedLetter(
-                            item.position[item.position.length - 1]
-                          ) || "N/A"
-                        : "N/A"}
-                    </td>
-                    <td className="border-b-2 border-[#CECECE] py-5">
-                      {DateFormat(item.createdAt)}
-                    </td>
-                    <td className="border-b-2 border-[#CECECE] py-5">
-                      {item.empDepartureDate ||
-                        DateFormat(item.departureDate) ||
-                        "N/A"}
-                    </td>
-                    <td className="border-b-2 border-[#CECECE] py-5">
-                      {item.empArrivalDate ||
-                        DateFormat(item.arrivalDate) ||
-                        "N/A"}
-                    </td>
+                    <td className="border-b-2 border-[#CECECE] py-5">{DateFormat(item.createdAt)}</td>
+                    <td className="border-b-2 border-[#CECECE] py-5">{item.empDepartureDate || DateFormat(item.departureDate) || "N/A"}</td>
+                    <td className="border-b-2 border-[#CECECE] py-5">{item.empArrivalDate || DateFormat(item.arrivalDate) || "N/A"}</td>
                     <td className="border-b-2 border-[#CECECE] cursor-pointer py-5">
-                      <span
-                        className="border-b-2 text-[blue] "
-                        onClick={() => {
-                          handleClickForToggle();
-                          handleViewClick(item, "Tickets");
-                          // console.log("Ticket", item);
-                        }}
-                      >
-                        {"View"}
+                      <span className="border-b-2 text-[blue]" onClick={() => { handleClickForToggle(); handleViewClick(item, "Tickets"); }}>
+                        View
                       </span>
                     </td>
                     {userType !== "SuperAdmin" && !gmPosition && (
-                      <td
-                        className={`border-b-2 border-[#CECECE] py-5 ${
-                          item.hrStatus === "Not Eligible"
-                            ? "text-[red]"
-                            : item.hrStatus === "Verified"
-                            ? "text-[#339933]"
-                            : item.hrStatus === "Pending"
-                            ? "text-[#E8A317]"
-                            : ""
-                        }`}
-                      >
+                      <td className={`border-b-2 border-[#CECECE] py-5 ${
+                        item.hrStatus === "Not Eligible"
+                          ? "text-[red]"
+                          : item.hrStatus === "Verified"
+                          ? "text-[#339933]"
+                          : item.hrStatus === "Pending"
+                          ? "text-[#E8A317]"
+                          : ""
+                      }`}>
                         {item.hrStatus}
                       </td>
                     )}
-                    {userType !== "SuperAdmin" &&
-                      gmPosition === "GENERAL MANAGER" && (
-                        <td
-                          className={`border-b-2 border-[#CECECE] py-5 ${
-                            item.gmStatus === "Rejected"
-                              ? "text-[red]"
-                              : item.gmStatus === "Approved"
-                              ? "text-[#339933]"
-                              : item.gmStatus === "Pending"
-                              ? "text-[#E8A317]"
-                              : ""
-                          }`}
-                        >
-                          {item.gmStatus || "Pending"}
-                        </td>
-                      )}
+                    {userType !== "SuperAdmin" && gmPosition === "GENERAL MANAGER" && (
+                      <td className={`border-b-2 border-[#CECECE] py-5 ${
+                        item.gmStatus === "Rejected"
+                          ? "text-[red]"
+                          : item.gmStatus === "Approved"
+                          ? "text-[#339933]"
+                          : item.gmStatus === "Pending"
+                          ? "text-[#E8A317]"
+                          : ""
+                      }`}>
+                        {item.gmStatus || "Pending"}
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -414,19 +340,15 @@ export const TicketsTable = () => {
       </div>
 
       <div className="center pt-10">
-        <div>
-          {data && data.length > 0 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(newPage) => {
-                if (newPage >= 1 && newPage <= totalPages) {
-                  setCurrentPage(newPage);
-                }
-              }}
-            />
-          )}
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(newPage) => {
+            if (newPage >= 1 && newPage <= totalPages) {
+              setCurrentPage(newPage);
+            }
+          }}
+        />
       </div>
     </section>
   );

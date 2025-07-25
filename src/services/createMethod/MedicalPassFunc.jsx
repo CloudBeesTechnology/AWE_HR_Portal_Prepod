@@ -20,6 +20,7 @@ export const MedicalPassFunc = () => {
       uploadFitness: labValue.uploadFitness,
       uploadRegis: labValue.uploadRegis,
       uploadBwn: labValue.uploadBwn,
+      createdBy: labValue.createdBy,
     };
     // console.log(totalData,"totalData");
 
