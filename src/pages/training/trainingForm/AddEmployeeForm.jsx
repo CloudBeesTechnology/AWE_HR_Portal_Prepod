@@ -71,6 +71,8 @@ export const AddEmployeeForm = () => {
   const [uploadedFileNames, setUploadedFileNames] = useState({});
   const [fileNames, setFileNames] = useState({});
   const EMPID = localStorage.getItem("userID");
+
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const {
     register,
     handleSubmit,
@@ -563,6 +565,7 @@ export const AddEmployeeForm = () => {
         // other fields to reset if needed
       });
 
+      setTrackEmpID(true);
       // setSelectedCourse([{ index: 0, courseName: "", company: "" }]);
       setShowMedicalFields({ 0: false });
       setUploadMedicalReports({ medicalReport: { 0: [] } });
@@ -960,6 +963,7 @@ ${trainingTable}
                 type="text"
                 className="input-field"
                 {...register("empID")}
+                disabled={trackEmpID}
               />
               {errors.empID && (
                 <p className="text-[red] text-[12px]">{errors.empID.message}</p>
