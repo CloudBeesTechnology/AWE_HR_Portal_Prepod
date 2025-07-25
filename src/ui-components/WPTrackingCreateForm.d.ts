@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -71,6 +71,8 @@ export declare type WPTrackingCreateFormInputValues = {
     lbrDepoAmount?: string;
     lbrFile?: string;
     remarkNLMob?: string;
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type WPTrackingCreateFormValidationValues = {
     tempID?: ValidationFunction<string>;
@@ -122,6 +124,8 @@ export declare type WPTrackingCreateFormValidationValues = {
     lbrDepoAmount?: ValidationFunction<string>;
     lbrFile?: ValidationFunction<string>;
     remarkNLMob?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type WPTrackingCreateFormOverridesProps = {
@@ -175,6 +179,8 @@ export declare type WPTrackingCreateFormOverridesProps = {
     lbrDepoAmount?: PrimitiveOverrideProps<TextFieldProps>;
     lbrFile?: PrimitiveOverrideProps<TextFieldProps>;
     remarkNLMob?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type WPTrackingCreateFormProps = React.PropsWithChildren<{
     overrides?: WPTrackingCreateFormOverridesProps | undefined | null;

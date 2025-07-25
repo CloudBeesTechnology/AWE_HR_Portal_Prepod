@@ -1802,6 +1802,8 @@ export const onCreateWPTracking = /* GraphQL */ `
       lbrDepoAmount
       lbrFile
       remarkNLMob
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1863,6 +1865,8 @@ export const onUpdateWPTracking = /* GraphQL */ `
       lbrDepoAmount
       lbrFile
       remarkNLMob
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1924,6 +1928,8 @@ export const onDeleteWPTracking = /* GraphQL */ `
       lbrDepoAmount
       lbrFile
       remarkNLMob
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -1998,6 +2004,8 @@ export const onCreateLabourMedicalInfo = /* GraphQL */ `
       uploadRegis
       uploadBwn
       dependPass
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2021,6 +2029,8 @@ export const onUpdateLabourMedicalInfo = /* GraphQL */ `
       uploadRegis
       uploadBwn
       dependPass
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2044,6 +2054,8 @@ export const onDeleteLabourMedicalInfo = /* GraphQL */ `
       uploadRegis
       uploadBwn
       dependPass
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2887,6 +2899,8 @@ export const onCreateLocalMobilization = /* GraphQL */ `
       loiFile
       cvecApproveDate
       cvecFile
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2911,6 +2925,8 @@ export const onUpdateLocalMobilization = /* GraphQL */ `
       loiFile
       cvecApproveDate
       cvecFile
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2935,6 +2951,8 @@ export const onDeleteLocalMobilization = /* GraphQL */ `
       loiFile
       cvecApproveDate
       cvecFile
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2960,6 +2978,8 @@ export const onCreateInterviewSchedule = /* GraphQL */ `
       otherDepartment
       status
       empID
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -2985,6 +3005,8 @@ export const onUpdateInterviewSchedule = /* GraphQL */ `
       otherDepartment
       status
       empID
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -3010,6 +3032,8 @@ export const onDeleteInterviewSchedule = /* GraphQL */ `
       otherDepartment
       status
       empID
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -3044,6 +3068,8 @@ export const onCreateEducationDetails = /* GraphQL */ `
       uploadCertificate
       uploadPp
       uploadIc
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -3078,6 +3104,8 @@ export const onUpdateEducationDetails = /* GraphQL */ `
       uploadCertificate
       uploadPp
       uploadIc
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -3112,6 +3140,8 @@ export const onDeleteEducationDetails = /* GraphQL */ `
       uploadCertificate
       uploadPp
       uploadIc
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -3162,6 +3192,8 @@ export const onCreatePersonalDetails = /* GraphQL */ `
       status
       workExperience
       otherLang
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -3212,6 +3244,8 @@ export const onUpdatePersonalDetails = /* GraphQL */ `
       status
       workExperience
       otherLang
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename
@@ -3262,6 +3296,8 @@ export const onDeletePersonalDetails = /* GraphQL */ `
       status
       workExperience
       otherLang
+      createdBy
+      updatedBy
       createdAt
       updatedAt
       __typename

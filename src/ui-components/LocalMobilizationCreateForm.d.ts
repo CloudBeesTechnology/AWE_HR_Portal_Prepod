@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -34,6 +34,8 @@ export declare type LocalMobilizationCreateFormInputValues = {
     loiFile?: string;
     cvecApproveDate?: string;
     cvecFile?: string;
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type LocalMobilizationCreateFormValidationValues = {
     tempID?: ValidationFunction<string>;
@@ -48,6 +50,8 @@ export declare type LocalMobilizationCreateFormValidationValues = {
     loiFile?: ValidationFunction<string>;
     cvecApproveDate?: ValidationFunction<string>;
     cvecFile?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type LocalMobilizationCreateFormOverridesProps = {
@@ -64,6 +68,8 @@ export declare type LocalMobilizationCreateFormOverridesProps = {
     loiFile?: PrimitiveOverrideProps<TextFieldProps>;
     cvecApproveDate?: PrimitiveOverrideProps<TextFieldProps>;
     cvecFile?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type LocalMobilizationCreateFormProps = React.PropsWithChildren<{
     overrides?: LocalMobilizationCreateFormOverridesProps | undefined | null;

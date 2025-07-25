@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -35,6 +35,8 @@ export declare type InterviewScheduleUpdateFormInputValues = {
     otherDepartment?: string;
     status?: string;
     empID?: string;
+    createdBy?: string[];
+    updatedBy?: string[];
 };
 export declare type InterviewScheduleUpdateFormValidationValues = {
     interDate?: ValidationFunction<string>;
@@ -50,6 +52,8 @@ export declare type InterviewScheduleUpdateFormValidationValues = {
     otherDepartment?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
     empID?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
+    updatedBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type InterviewScheduleUpdateFormOverridesProps = {
@@ -67,6 +71,8 @@ export declare type InterviewScheduleUpdateFormOverridesProps = {
     otherDepartment?: PrimitiveOverrideProps<TextFieldProps>;
     status?: PrimitiveOverrideProps<TextFieldProps>;
     empID?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    updatedBy?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type InterviewScheduleUpdateFormProps = React.PropsWithChildren<{
     overrides?: InterviewScheduleUpdateFormOverridesProps | undefined | null;

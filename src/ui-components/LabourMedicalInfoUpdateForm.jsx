@@ -203,6 +203,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
     uploadRegis: [],
     uploadBwn: [],
     dependPass: [],
+    createdBy: [],
+    updatedBy: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [overMD, setOverMD] = React.useState(initialValues.overMD);
@@ -219,6 +221,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
   );
   const [uploadBwn, setUploadBwn] = React.useState(initialValues.uploadBwn);
   const [dependPass, setDependPass] = React.useState(initialValues.dependPass);
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
+  const [updatedBy, setUpdatedBy] = React.useState(initialValues.updatedBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = labourMedicalInfoRecord
@@ -241,6 +245,10 @@ export default function LabourMedicalInfoUpdateForm(props) {
     setCurrentUploadBwnValue("");
     setDependPass(cleanValues.dependPass ?? []);
     setCurrentDependPassValue("");
+    setCreatedBy(cleanValues.createdBy ?? []);
+    setCurrentCreatedByValue("");
+    setUpdatedBy(cleanValues.updatedBy ?? []);
+    setCurrentUpdatedByValue("");
     setErrors({});
   };
   const [labourMedicalInfoRecord, setLabourMedicalInfoRecord] = React.useState(
@@ -276,6 +284,10 @@ export default function LabourMedicalInfoUpdateForm(props) {
   const [currentDependPassValue, setCurrentDependPassValue] =
     React.useState("");
   const dependPassRef = React.createRef();
+  const [currentCreatedByValue, setCurrentCreatedByValue] = React.useState("");
+  const createdByRef = React.createRef();
+  const [currentUpdatedByValue, setCurrentUpdatedByValue] = React.useState("");
+  const updatedByRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     overMD: [],
@@ -288,6 +300,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
     uploadRegis: [{ type: "JSON" }],
     uploadBwn: [{ type: "JSON" }],
     dependPass: [{ type: "JSON" }],
+    createdBy: [{ type: "JSON" }],
+    updatedBy: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -326,6 +340,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
           uploadRegis: uploadRegis ?? null,
           uploadBwn: uploadBwn ?? null,
           dependPass: dependPass ?? null,
+          createdBy: createdBy ?? null,
+          updatedBy: updatedBy ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -397,6 +413,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis,
               uploadBwn,
               dependPass,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -431,6 +449,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis,
               uploadBwn,
               dependPass,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.overMD ?? value;
@@ -465,6 +485,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis,
               uploadBwn,
               dependPass,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.overME ?? value;
@@ -499,6 +521,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis,
               uploadBwn,
               dependPass,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.bruhimsRD ?? value;
@@ -533,6 +557,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis,
               uploadBwn,
               dependPass,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             value = result?.bruhimsRNo ?? value;
@@ -563,6 +589,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis,
               uploadBwn,
               dependPass,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bruneiMAD ?? values;
@@ -618,6 +646,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis,
               uploadBwn,
               dependPass,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.bruneiME ?? values;
@@ -673,6 +703,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis,
               uploadBwn,
               dependPass,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.uploadFitness ?? values;
@@ -730,6 +762,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis: values,
               uploadBwn,
               dependPass,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.uploadRegis ?? values;
@@ -787,6 +821,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis,
               uploadBwn: values,
               dependPass,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.uploadBwn ?? values;
@@ -842,6 +878,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
               uploadRegis,
               uploadBwn,
               dependPass: values,
+              createdBy,
+              updatedBy,
             };
             const result = onChange(modelFields);
             values = result?.dependPass ?? values;
@@ -881,6 +919,120 @@ export default function LabourMedicalInfoUpdateForm(props) {
           ref={dependPassRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "dependPass")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              overMD,
+              overME,
+              bruhimsRD,
+              bruhimsRNo,
+              bruneiMAD,
+              bruneiME,
+              uploadFitness,
+              uploadRegis,
+              uploadBwn,
+              dependPass,
+              createdBy: values,
+              updatedBy,
+            };
+            const result = onChange(modelFields);
+            values = result?.createdBy ?? values;
+          }
+          setCreatedBy(values);
+          setCurrentCreatedByValue("");
+        }}
+        currentFieldValue={currentCreatedByValue}
+        label={"Created by"}
+        items={createdBy}
+        hasError={errors?.createdBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("createdBy", currentCreatedByValue)
+        }
+        errorMessage={errors?.createdBy?.errorMessage}
+        setFieldValue={setCurrentCreatedByValue}
+        inputFieldRef={createdByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Created by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCreatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.createdBy?.hasError) {
+              runValidationTasks("createdBy", value);
+            }
+            setCurrentCreatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("createdBy", currentCreatedByValue)}
+          errorMessage={errors.createdBy?.errorMessage}
+          hasError={errors.createdBy?.hasError}
+          ref={createdByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "createdBy")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              overMD,
+              overME,
+              bruhimsRD,
+              bruhimsRNo,
+              bruneiMAD,
+              bruneiME,
+              uploadFitness,
+              uploadRegis,
+              uploadBwn,
+              dependPass,
+              createdBy,
+              updatedBy: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.updatedBy ?? values;
+          }
+          setUpdatedBy(values);
+          setCurrentUpdatedByValue("");
+        }}
+        currentFieldValue={currentUpdatedByValue}
+        label={"Updated by"}
+        items={updatedBy}
+        hasError={errors?.updatedBy?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("updatedBy", currentUpdatedByValue)
+        }
+        errorMessage={errors?.updatedBy?.errorMessage}
+        setFieldValue={setCurrentUpdatedByValue}
+        inputFieldRef={updatedByRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Updated by"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUpdatedByValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.updatedBy?.hasError) {
+              runValidationTasks("updatedBy", value);
+            }
+            setCurrentUpdatedByValue(value);
+          }}
+          onBlur={() => runValidationTasks("updatedBy", currentUpdatedByValue)}
+          errorMessage={errors.updatedBy?.errorMessage}
+          hasError={errors.updatedBy?.hasError}
+          ref={updatedByRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "updatedBy")}
         ></TextAreaField>
       </ArrayField>
       <Flex
