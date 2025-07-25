@@ -465,16 +465,35 @@ export const OtherDetails = ({ fetchedData }) => {
         (match) => match.tempID === personName
       );
 
-      const createdBy = JSON.stringify([{ userID: EMPID, date: TODAY }]);
-
-      const previousUpdates = checkingPDTable?.updatedBy
+      // Handle Personal Details Update History
+      const empPreviousUpdates = checkingPDTable?.updatedBy
         ? JSON.parse(checkingPDTable.updatedBy)
         : [];
 
-      const updatedBy = JSON.stringify([
-        ...previousUpdates,
+      const empUpdatedBy = [
+        ...empPreviousUpdates,
         { userID: EMPID, date: TODAY },
-      ]);
+      ];
+
+      const orderedEmpUpdatedBy = empUpdatedBy.map((entry) => ({
+        userID: entry.userID,
+        date: entry.date,
+      }));
+
+      // Handle Education Details Update History
+      const eduPreviousUpdates = checkingEDTable?.updatedBy
+        ? JSON.parse(checkingEDTable.updatedBy)
+        : [];
+
+      const eduUpdatedBy = [
+        ...eduPreviousUpdates,
+        { userID: EMPID, date: TODAY },
+      ];
+
+      const orderedEduUpdatedBy = eduUpdatedBy.map((entry) => ({
+        userID: entry.userID,
+        date: entry.date,
+      }));
 
       const reqValue = {
         ...data,
@@ -509,14 +528,15 @@ export const OtherDetails = ({ fetchedData }) => {
         uploadIc: isUploadingString.uploadIc
           ? JSON.stringify(wrapUpload(uploadedIc))
           : uploadedDocs?.uploadIc,
-        createdBy: !isUpdate ? createdBy : null,
-        updatedBy: isUpdate ? updatedBy : null,
+        createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
       };
       // console.log(reqValue);
 
       if (checkingPDTable && checkingEDTable) {
         const updateReqValue = {
           ...reqValue,
+          orderedEmpUpdatedBy: JSON.stringify(orderedEmpUpdatedBy),
+          orderedEduUpdatedBy: JSON.stringify(orderedEduUpdatedBy),
           PDTableID: checkingPDTable.id,
           EDTableID: checkingEDTable.id,
         };

@@ -336,8 +336,8 @@ const LabourImmigration = () => {
       const userIDFind = localStorage.getItem("userID");
       // const formatDate = (date) =>
       //   date ? new Date(date).toLocaleDateString("en-CA") : null;
-      const previousUpdatesLMI = checkingLMIDTable.updatedBy
-        ? JSON.parse(checkingLMIDTable.updatedBy)
+      const previousUpdatesLMI = checkingLMIDTable?.updatedBy
+        ? JSON.parse(checkingLMIDTable?.updatedBy)
         : [];
 
       const updatedByLMI = [
@@ -345,7 +345,7 @@ const LabourImmigration = () => {
         { userID: userIDFind, date: today },
       ];
 
-      const orderedUpdatedByLMI = updatedByLMI.map((entry) => ({
+      const orderedUpdatedByLMI = updatedByLMI?.map((entry) => ({
         userID: entry.userID,
         date: entry.date,
       }));
