@@ -302,13 +302,13 @@ export const Immigration = () => {
           ]),
         ];
 
-        const previousUpdates = checkingEIDTable.updatedBy
+        const previousUpdates = checkingEIDTable?.updatedBy
           ? JSON.parse(checkingEIDTable.updatedBy)
           : [];
 
         const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
 
-        const orderedUpdatedBy = updatedBy.map((entry) => ({
+        const orderedUpdatedBy = updatedBy?.map((entry) => ({
           userID: entry.userID,
           date: entry.date,
         }));

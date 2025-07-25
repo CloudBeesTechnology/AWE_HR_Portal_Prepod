@@ -283,13 +283,13 @@ export const Nlms = () => {
           ...new Set([...(matchedEmployee.nlmsEmpValid || []), nlmsEmpValid]),
         ];
 
-        const previousUpdates = matchedEmployee.updatedBy
+        const previousUpdates = matchedEmployee?.updatedBy
           ? JSON.parse(matchedEmployee.updatedBy)
           : [];
 
         const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
 
-        const orderedUpdatedBy = updatedBy.map((entry) => ({
+        const orderedUpdatedBy = updatedBy?.map((entry) => ({
           userID: entry.userID,
           date: entry.date,
         }));

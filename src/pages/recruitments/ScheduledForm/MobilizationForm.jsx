@@ -186,7 +186,7 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const localMobilizationId = selectedInterviewData.localMobilization.id;
+    const localMobilizationId = selectedInterviewData?.localMobilization.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
     const localUpdatedByData = selectedInterviewData?.localMobilization;
@@ -201,7 +201,7 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const loiOrderedUpdatedBy = loiUpdatedBy.map((entry) => ({
+    const loiOrderedUpdatedBy = loiUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -215,17 +215,17 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
 
     const createData = {
-      mobSignDate: formData.interview.mobSignDate,
+      mobSignDate: formData.interview?.mobSignDate,
       mobFile: isUploadingString.mobFile
-        ? JSON.stringify(wrapUpload(uploadedMOB.mobFile))
-        : formData.interview.mobFile,
-      tempID: candidate.tempID,
+        ? JSON.stringify(wrapUpload(uploadedMOB?.mobFile))
+        : formData.interview?.mobFile,
+      tempID: candidate?.tempID,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
@@ -234,10 +234,10 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
         await loiDetails({
           LoiValue: {
             id: localMobilizationId,
-            mobSignDate: formData.interview.mobSignDate,
+            mobSignDate: formData.interview?.mobSignDate,
             mobFile: isUploadingString.mobFile
-              ? JSON.stringify(wrapUpload(uploadedMOB.mobFile))
-              : formData.interview.mobFile,
+              ? JSON.stringify(wrapUpload(uploadedMOB?.mobFile))
+              : formData.interview?.mobFile,
             updatedBy: JSON.stringify(loiOrderedUpdatedBy),
           },
         });
@@ -248,7 +248,7 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
       await interviewDetails({
         InterviewValue: {
           id: interviewScheduleStatusId,
-          status: formData.interview.status,
+          status: formData.interview?.status,
           updatedBy: JSON.stringify(intOrderedUpdatedBy),
           // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
         },

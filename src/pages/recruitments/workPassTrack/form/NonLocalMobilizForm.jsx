@@ -230,7 +230,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
 
     const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
 
-    const wpOrderedUpdatedBy = wpUpdatedBy.map((entry) => ({
+    const wpOrderedUpdatedBy = wpUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -244,7 +244,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -260,13 +260,13 @@ export const NonLocalMobilizForm = ({ candidate }) => {
     }
 
     const wpTrackingData = {
-      tempID: candidate.tempID,
-      mobSignDate: formData.interview.mobSignDate,
-      agentname: formData.interview.agentname,
-      remarkNLMob: formData.interview.remarkNLMob,
-      mobFile: isUploadingString.mobFile
-        ? JSON.stringify(wrapUpload(uploadedMobiliz.mobFile))
-        : formData.interview.mobFile,
+      tempID: candidate?.tempID,
+      mobSignDate: formData.interview?.mobSignDate,
+      agentname: formData.interview?.agentname,
+      remarkNLMob: formData.interview?.remarkNLMob,
+      mobFile: isUploadingString?.mobFile
+        ? JSON.stringify(wrapUpload(uploadedMobiliz?.mobFile))
+        : formData.interview?.mobFile,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
@@ -275,12 +275,12 @@ export const NonLocalMobilizForm = ({ candidate }) => {
         await wpTrackingDetails({
           WPTrackingValue: {
             id: interviewScheduleId,
-            mobSignDate: formData.interview.mobSignDate,
-            agentname: formData.interview.agentname,
-            remarkNLMob: formData.interview.remarkNLMob,
-            mobFile: isUploadingString.mobFile
-              ? JSON.stringify(wrapUpload(uploadedMobiliz.mobFile))
-              : formData.interview.mobFile,
+            mobSignDate: formData.interview?.mobSignDate,
+            agentname: formData.interview?.agentname,
+            remarkNLMob: formData.interview?.remarkNLMob,
+            mobFile: isUploadingString?.mobFile
+              ? JSON.stringify(wrapUpload(uploadedMobiliz?.mobFile))
+              : formData.interview?.mobFile,
             updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
@@ -292,7 +292,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
 
       const interStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
         updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
 

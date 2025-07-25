@@ -233,7 +233,7 @@ export const SawpForm = ({ candidate }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -241,12 +241,12 @@ export const SawpForm = ({ candidate }) => {
     const requestData = {
       reqValue: {
         ...formData.interview,
-        sawpFile: isUploadingString.sawpFile
-          ? JSON.stringify(wrapUpload(uploadedSawp.sawpFile))
-          : formData.interview.sawpFile,
-        tempID: candidate.tempID,
-        sawpDate: formData.interview.sawpDate,
-        sawpRecivedDate: formData.interview.sawpRecivedDate,
+        sawpFile: isUploadingString?.sawpFile
+          ? JSON.stringify(wrapUpload(uploadedSawp?.sawpFile))
+          : formData.interview?.sawpFile,
+        tempID: candidate?.tempID,
+        sawpDate: formData.interview?.sawpDate,
+        sawpRecivedDate: formData.interview?.sawpRecivedDate,
         tempID: candidate.tempID,
         createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
       },
@@ -257,12 +257,12 @@ export const SawpForm = ({ candidate }) => {
         await wpTrackingDetails({
           WPTrackingValue: {
             id: existingInterviewData.id,
-            sawpDate: formData.interview.sawpDate,
-            sawpRecivedDate: formData.interview.sawpRecivedDate,
-            sawpFile: isUploadingString.sawpFile
-              ? JSON.stringify(wrapUpload(uploadedSawp.sawpFile))
-              : formData.interview.sawpFile,
-            tempID: candidate.tempID,
+            sawpDate: formData.interview?.sawpDate,
+            sawpRecivedDate: formData.interview?.sawpRecivedDate,
+            sawpFile: isUploadingString?.sawpFile
+              ? JSON.stringify(wrapUpload(uploadedSawp?.sawpFile))
+              : formData.interview?.sawpFile,
+            tempID: candidate?.tempID,
             updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
@@ -275,7 +275,7 @@ export const SawpForm = ({ candidate }) => {
 
       const interviewStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
         updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
 

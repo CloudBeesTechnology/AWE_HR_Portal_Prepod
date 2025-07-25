@@ -195,7 +195,7 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const loiOrderedUpdatedBy = loiUpdatedBy.map((entry) => ({
+    const loiOrderedUpdatedBy = loiUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -209,16 +209,16 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
 
     const createData = {
-      cvecApproveDate: formData.interview.cvecApproveDate,
-      cvecFile: isUploadingString.cvecFile
+      cvecApproveDate: formData.interview?.cvecApproveDate,
+      cvecFile: isUploadingString?.cvecFile
         ? JSON.stringify(wrapUpload(uploadedCVEC.cvecFile))
-        : formData.interview.cvecFile,
+        : formData.interview?.cvecFile,
       tempID: candidate.tempID,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
@@ -228,10 +228,10 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
         await loiDetails({
           LoiValue: {
             id: localMobilizationId,
-            cvecApproveDate: formData.interview.cvecApproveDate,
-            cvecFile: isUploadingString.cvecFile
+            cvecApproveDate: formData.interview?.cvecApproveDate,
+            cvecFile: isUploadingString?.cvecFile
               ? JSON.stringify(wrapUpload(uploadedCVEC.cvecFile))
-              : formData.interview.cvecFile,
+              : formData.interview?.cvecFile,
             updatedBy: JSON.stringify(loiOrderedUpdatedBy),
           },
         });
@@ -242,7 +242,7 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
       await interviewDetails({
         InterviewValue: {
           id: interviewScheduleStatusId,
-          status: formData.interview.status,
+          status: formData.interview?.status,
           updatedBy: JSON.stringify(intOrderedUpdatedBy),
         },
       });

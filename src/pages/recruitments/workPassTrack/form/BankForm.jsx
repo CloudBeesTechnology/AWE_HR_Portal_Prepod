@@ -220,7 +220,7 @@ export const BankForm = ({ candidate }) => {
 
     const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
 
-    const wpOrderedUpdatedBy = wpUpdatedBy.map((entry) => ({
+    const wpOrderedUpdatedBy = wpUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -234,7 +234,7 @@ export const BankForm = ({ candidate }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -251,12 +251,12 @@ export const BankForm = ({ candidate }) => {
 
     const wpTrackingData = {
       tempID: candidate.tempID,
-      bgsubmitdate: formData.interview.bgsubmitdate,
-      bgreceivedate: formData.interview.bgreceivedate,
-      bgexpirydate: formData.interview.bgexpirydate,
-      referenceno: formData.interview.referenceno,
-      bgamount: formData.interview.bgamount,
-      bgfile: isUploadingString.bgFile
+      bgsubmitdate: formData.interview?.bgsubmitdate,
+      bgreceivedate: formData.interview?.bgreceivedate,
+      bgexpirydate: formData.interview?.bgexpirydate,
+      referenceno: formData.interview?.referenceno,
+      bgamount: formData.interview?.bgamount,
+      bgfile: isUploadingString?.bgFile
         ? JSON.stringify(wrapUpload(uploadedBank.bgFile))
         : formData.interview.bgfile,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
@@ -268,14 +268,14 @@ export const BankForm = ({ candidate }) => {
         response = await wpTrackingDetails({
           WPTrackingValue: {
             id: interviewScheduleId,
-            bgsubmitdate: formData.interview.bgsubmitdate,
-            bgreceivedate: formData.interview.bgreceivedate,
-            bgexpirydate: formData.interview.bgexpirydate,
-            referenceno: formData.interview.referenceno,
-            bgamount: formData.interview.bgamount,
-            bgfile: isUploadingString.bgFile
-              ? JSON.stringify(wrapUpload(uploadedBank.bgFile))
-              : formData.interview.bgfile,
+            bgsubmitdate: formData.interview?.bgsubmitdate,
+            bgreceivedate: formData.interview?.bgreceivedate,
+            bgexpirydate: formData.interview?.bgexpirydate,
+            referenceno: formData.interview?.referenceno,
+            bgamount: formData.interview?.bgamount,
+            bgfile: isUploadingString?.bgFile
+              ? JSON.stringify(wrapUpload(uploadedBank?.bgFile))
+              : formData.interview?.bgfile,
             updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
@@ -287,7 +287,7 @@ export const BankForm = ({ candidate }) => {
 
       const interStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
         updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
 

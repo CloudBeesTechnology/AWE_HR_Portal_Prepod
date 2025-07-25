@@ -475,7 +475,7 @@ export const OtherDetails = ({ fetchedData }) => {
         { userID: EMPID, date: TODAY },
       ];
 
-      const orderedEmpUpdatedBy = empUpdatedBy.map((entry) => ({
+      const orderedEmpUpdatedBy = empUpdatedBy?.map((entry) => ({
         userID: entry.userID,
         date: entry.date,
       }));
@@ -490,7 +490,7 @@ export const OtherDetails = ({ fetchedData }) => {
         { userID: EMPID, date: TODAY },
       ];
 
-      const orderedEduUpdatedBy = eduUpdatedBy.map((entry) => ({
+      const orderedEduUpdatedBy = eduUpdatedBy?.map((entry) => ({
         userID: entry.userID,
         date: entry.date,
       }));

@@ -154,7 +154,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const localMobilizationId = selectedInterviewData.localMobilization.id;
+    const localMobilizationId = selectedInterviewData?.localMobilization.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
     const localUpdatedByData = selectedInterviewData?.localMobilization;
@@ -169,7 +169,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const loiOrderedUpdatedBy = loiUpdatedBy.map((entry) => ({
+    const loiOrderedUpdatedBy = loiUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -183,41 +183,41 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
 
     const formattedData = {
       id: localMobilizationId,
-      loiIssueDate: formData.interview.loiIssueDate,
-      loiAcceptDate: formData.interview.loiAcceptDate,
-      loiDeclineDate: formData.interview.loiDeclineDate,
-      declineReason: formData.interview.declineReason,
-      loiFile: isUploadingString.loiFile
+      loiIssueDate: formData.interview?.loiIssueDate,
+      loiAcceptDate: formData.interview?.loiAcceptDate,
+      loiDeclineDate: formData.interview?.loiDeclineDate,
+      declineReason: formData.interview?.declineReason,
+      loiFile: isUploadingString?.loiFile
         ? JSON.stringify(wrapUpload(uploadedLOI.loiFile))
-        : formData.interview.loiFile,
-      tempID: candidate.tempID,
+        : formData.interview?.loiFile,
+      tempID: candidate?.tempID,
       updatedBy: JSON.stringify(loiOrderedUpdatedBy),
     };
 
     const interStatus = {
       id: interviewScheduleStatusId,
-      department: formData.interview.department,
-      otherDepartment: formData.interview.otherDepartment,
-      status: formData.interview.status,
+      department: formData.interview?.department,
+      otherDepartment: formData.interview?.otherDepartment,
+      status: formData.interview?.status,
       updatedBy: JSON.stringify(intOrderedUpdatedBy),
     };
 
     const createData = {
-      loiIssueDate: formData.interview.loiIssueDate,
-      loiAcceptDate: formData.interview.loiAcceptDate,
-      loiDeclineDate: formData.interview.loiDeclineDate,
-      declineReason: formData.interview.declineReason,
-      loiFile: isUploadingString.loiFile
-        ? JSON.stringify(wrapUpload(uploadedLOI.loiFile))
-        : formData.interview.loiFile,
-      tempID: candidate.tempID,
+      loiIssueDate: formData.interview?.loiIssueDate,
+      loiAcceptDate: formData.interview?.loiAcceptDate,
+      loiDeclineDate: formData.interview?.loiDeclineDate,
+      declineReason: formData.interview?.declineReason,
+      loiFile: isUploadingString?.loiFile
+        ? JSON.stringify(wrapUpload(uploadedLOI?.loiFile))
+        : formData.interview?.loiFile,
+      tempID: candidate?.tempID,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
