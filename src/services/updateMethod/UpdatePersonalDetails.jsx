@@ -161,8 +161,8 @@ export const CandyDetails = () => {
           variables: { input: totalDataTwo },
         }),
       ]);
-      console.log("update Personal", personaldetails);
-      console.log("Update Education", educationDetails);
+      // console.log("update Personal", personaldetails);
+      // console.log("Update Education", educationDetails);
       // localStorage.removeItem("applicantFormData");
       // localStorage.removeItem("personalFormData");
     } catch (error) {
