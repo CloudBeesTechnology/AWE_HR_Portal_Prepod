@@ -19,7 +19,8 @@ import { DeletePopup } from "../../../utils/DeletePopup";
 export const EmployeeInsurance = () => {
   const { formattedPermissions } = useDeleteAccess();
   const { searchResultData } = useOutletContext();
-  const { EmpInsuranceData, workMenDetails, dropDownVal } = useContext(DataSupply);
+  const { EmpInsuranceData, workMenDetails, dropDownVal } =
+    useContext(DataSupply);
   const { SubmitMPData } = EmpInsDataFun();
   const { UpdateEIDataSubmit } = UpdateEmpInsDataFun();
   const [deletePopup, setDeletePopup] = useState(false);
@@ -32,6 +33,7 @@ export const EmployeeInsurance = () => {
   const [empInsUpload, setEmpInsUpload] = useState([]);
   const [showTitle, setShowTitle] = useState("");
   const [isUploading, setIsUploading] = useState([]);
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const userType = localStorage.getItem("userID");
 
   const {
@@ -75,10 +77,28 @@ export const EmployeeInsurance = () => {
     { label: "Marital Status", key: "marital", type: "text" },
     { label: "Nationality", key: "nationality", type: "text" },
     { label: "Other Nationality", key: "otherNation", type: "text" },
-    { label: "Group H&S Insurance", key: "groupIns", type: "select", options: insuHSDD },
-    { label: "Group H&S Insurance Enrollment Effective Date", key: "groupInsEffectDate", type: "date" },
-    { label: "Group H&S Insurance Enrollment End Date", key: "groupInsEndDate", type: "date" },
-    { label: "Travelling Insurance", key: "travelIns", type: "select", options: ["Yes", "No"] },
+    {
+      label: "Group H&S Insurance",
+      key: "groupIns",
+      type: "select",
+      options: insuHSDD,
+    },
+    {
+      label: "Group H&S Insurance Enrollment Effective Date",
+      key: "groupInsEffectDate",
+      type: "date",
+    },
+    {
+      label: "Group H&S Insurance Enrollment End Date",
+      key: "groupInsEndDate",
+      type: "date",
+    },
+    {
+      label: "Travelling Insurance",
+      key: "travelIns",
+      type: "select",
+      options: ["Yes", "No"],
+    },
   ];
 
   const handleAddFileClick = () => {
@@ -156,7 +176,7 @@ export const EmployeeInsurance = () => {
 
   const handleFileChange = async (e, type, index) => {
     const watchedEmpID = watch("empID");
-    
+
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
       window.location.href = "/insuranceAdd";
@@ -207,9 +227,7 @@ export const EmployeeInsurance = () => {
 
         setValue(`empInsUpload[${index}]`, fileUrl);
       }
-
-    } 
-    catch (err) {
+    } catch (err) {
       console.error("Error uploading file:", err);
       alert("An error occurred while uploading the file. Please try again.");
     }
@@ -228,6 +246,10 @@ export const EmployeeInsurance = () => {
 
   useEffect(() => {
     if (!searchResultData) return;
+
+    if (searchResultData) {
+      setTrackEmpID(true);
+    }
 
     setValue("empID", searchResultData.empID);
     const empStatusType = getLastValue(searchResultData.empStatusType);
@@ -324,16 +346,26 @@ export const EmployeeInsurance = () => {
 
     if (existingEmpInsurance) {
       empInsValue.id = existingEmpInsurance.id;
-      const previous = existingEmpInsurance.updatedBy ? JSON.parse(existingEmpInsurance.updatedBy) : [];
-      const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
-      empInsValue.updatedBy = updatedBy;
-      console.log(empInsValue,"empInsValue");
+
+      const previous = existingEmpInsurance?.updatedBy
+        ? JSON.parse(existingEmpInsurance.updatedBy)
+        : [];
+      const updatedByArr = [...previous, { userID: userType, date: today }];
+      const orderedUpdatedBy = updatedByArr?.map((entry) => ({
+        userID: entry.userID,
+        date: entry.date,
+      }));
+
+      empInsValue.updatedBy = JSON.stringify(orderedUpdatedBy);
+      console.log(empInsValue, "empInsValue");
       await UpdateEIDataSubmit({ empInsValue });
-      
+
       setShowTitle("Employee Insurance Info updated successfully");
     } else {
-      empInsValue.createdBy = JSON.stringify([{ userID: userType, date: today }]);
-      console.log(empInsValue,"empInsValue");
+      empInsValue.createdBy = JSON.stringify([
+        { userID: userType, date: today },
+      ]);
+      console.log(empInsValue, "empInsValue");
       await SubmitMPData({ empInsValue });
       setShowTitle("Employee Insurance Info Saved successfully");
     }
@@ -486,9 +518,7 @@ export const EmployeeInsurance = () => {
                 className="w-full flex items-center px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"
                 onClick={() => {
                   if (uploadedDocs?.empInsUpload?.[index]?.upload) {
-                    alert(
-                      "Please click Add Upload to upload a new one."
-                    );
+                    alert("Please click Add Upload to upload a new one.");
                   }
                 }}
               >
@@ -532,7 +562,8 @@ export const EmployeeInsurance = () => {
                 >
                   <MdCancel className="mr-1 text-[red]" />
                 </button>
-              ) : isUploading[index]?.empInsUpload === true && uploadedDocs.empInsUpload[index]?.upload &&
+              ) : isUploading[index]?.empInsUpload === true &&
+                uploadedDocs.empInsUpload[index]?.upload &&
                 isUploading &&
                 isUploading.length > 0 ? (
                 <button
@@ -570,5 +601,3 @@ export const EmployeeInsurance = () => {
     </section>
   );
 };
-
-
