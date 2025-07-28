@@ -45,6 +45,7 @@ export const Immigration = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const [isUploading, setIsUploading] = useState({
     arrivStampUpload: false,
     immigEmpUpload: false,
@@ -114,6 +115,10 @@ export const Immigration = () => {
 
   useEffect(() => {
     if (!searchResultData) return;
+
+    if (searchResultData) {
+      setTrackEmpID(true);
+    }
 
     setValue("empID", searchResultData.empID);
     const field = [
@@ -340,7 +345,7 @@ export const Immigration = () => {
           empPassExp,
           immigApproval,
           reEntryVisaExp,
-          arrivStampUpload: JSON.stringify(uploadedImmigrate.arrivStampUpload), // Use the uploaded URL
+          arrivStampUpload: JSON.stringify(uploadedImmigrate.arrivStampUpload), 
           immigEmpUpload: JSON.stringify(uploadedImmigrate.immigEmpUpload),
           reEntryUpload: JSON.stringify(uploadedImmigrate.reEntryUpload),
           createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
@@ -373,6 +378,7 @@ export const Immigration = () => {
             type="text"
             placeholder="Enter Employee ID"
             errors={errors}
+            trackEmpID={trackEmpID}
           />
         </div>
       </div>

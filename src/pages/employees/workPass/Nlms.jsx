@@ -25,6 +25,7 @@ export const Nlms = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const [isUploading, setIsUploading] = useState({
     nlmsEmpUpload: false,
   });
@@ -218,6 +219,9 @@ export const Nlms = () => {
   };
 
   useEffect(() => {
+    if (searchResultData) {
+      setTrackEmpID(true);
+    }
     setValue("empID", searchResultData.empID);
 
     const fields = [
@@ -346,6 +350,7 @@ export const Nlms = () => {
             type="text"
             placeholder="Enter Employee ID"
             errors={errors}
+            trackEmpID={trackEmpID}
           />
         </div>
       </div>
