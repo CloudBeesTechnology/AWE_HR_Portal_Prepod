@@ -130,10 +130,10 @@ export const NonLocalAcco = () => {
         const previous = checkingIDTable?.updatedBy
           ? JSON.parse(checkingIDTable.updatedBy)
           : [];
-        const updatedByLoc = JSON.stringify([
+        const updatedByLoc = [
           ...previous,
           { userID: userType, date: today },
-        ]);
+        ];
         const orderedUpdatedBy = updatedByLoc?.map((entry) => ({
           userID: entry.userID,
           date: entry.date,
@@ -142,7 +142,7 @@ export const NonLocalAcco = () => {
           ...data,
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
-          updatedBy: orderedUpdatedBy,
+          updatedBy: JSON.stringify(orderedUpdatedBy),
         };
         // console.log("Updating data with empID:", data.empID);  // Log before calling the update function
 
