@@ -60,6 +60,7 @@ export const AddEmployeeForm = () => {
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [showTitle, setShowTitle] = useState("");
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const [isUploading, setIsUploading] = useState({
     medicalReport: false,
   });
@@ -314,6 +315,8 @@ export const AddEmployeeForm = () => {
       return;
     }
 
+    setTrackEmpID(true);
+
     const workInfo = workInfoData.find((data) => data.empID === result.empID);
 
     if (workInfo) {
@@ -428,115 +431,6 @@ export const AddEmployeeForm = () => {
             }
           });
         }
-
-        // let parsedData;
-        // Validate JSON format before parsing
-        // parsedData = JSON.parse(traineeTrackData);
-        //     const firstParse = JSON.parse(traineeTrackData);
-        //     const fixedJSON = firstParse.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
-        //     const parsedData = JSON.parse(fixedJSON);
-        // //  console.log(typeof traineeTrackData );
-        // if (Array.isArray(parsedData)) {
-        //   console.log("parsedData is an array", parsedData);
-
-        //   setValue("trainingreq", parsedData);
-        //   setSelectedCourse(
-        //     parsedData.map((item, index) => ({
-        //       index,
-        //       courseName: item.courseName,
-        //       company: item.company,
-        //     }))
-        //   );
-        // } else if (typeof parsedData === "object") {
-        //   console.log("parsedData is an object", parsedData);
-
-        //   setValue("trainingreq", [parsedData]);
-        //   setSelectedCourse([
-        //     {
-        //       index: 0,
-        //       courseName: parsedData.courseName,
-        //       company: parsedData.company,
-        //     },
-        //   ]);
-        // } else {
-        //   console.log("parsedData is neither array nor object");
-        // }
-
-        //     if (!Array.isArray(parsedData)) {
-        //       console.error(
-        //         "Invalid insuranceClaims data format:",
-        //         traineeTrackData
-        //       );
-        //       return;
-        //     }
-
-        //     if (parsedData.length > 0) {
-        //       setValue("trainingreq", parsedData);
-
-        //       // console.log(parsedData, "parsedData");
-        //       setSelectedCourse(
-        //         parsedData.map((item, index) => ({
-        //           index,
-        //           courseName: item.courseName,
-        //           company: item.company,
-        //         }))
-        //       );
-        //       const medicalFieldsState = parsedData.reduce((acc, item, i) => {
-        //         acc[i] = item.mediRequired;
-        //         return acc;
-        //       }, {});
-        //       setShowMedicalFields(medicalFieldsState);
-        //       parsedData.forEach((item, idx) => {
-        //         if (item?.medicalReport) {
-        //           try {
-        //             const url = item.medicalReport;
-        //             if (Array.isArray(url) && url.length === 0) return; // Skip empty uploads
-
-        //             const parsedArray =
-        //               typeof url === "string" ? JSON.parse(url) : url;
-
-        //             if (!Array.isArray(parsedArray)) {
-        //               console.error("Invalid traineeTrackUpload format:", url);
-        //               return;
-        //             }
-
-        //             const parsedFiles = parsedArray
-        //               .map((file) => {
-        //                 try {
-        //                   return typeof file === "string" ? JSON.parse(file) : file;
-        //                 } catch (nestedError) {
-        //                   console.error(
-        //                     "Error parsing nested medicalReport item:",
-        //                     file
-        //                   );
-        //                   return null;
-        //                 }
-        //               })
-        //               .filter(Boolean); // Remove null values
-        //             setUploadMedicalReports((prev) => ({
-        //               ...prev,
-        //               medicalReport: {
-        //                 ...prev.medicalReport,
-        //                 [idx]: parsedFiles,
-        //               },
-        //             }));
-
-        //             const fileNames = parsedFiles.map((file) =>
-        //               file && file.upload ? getFileName(file.upload) : ""
-        //             );
-        //             setUploadedFileNames((prev) => ({
-        //               ...prev,
-        //               [`${idx}_medicalReport`]: fileNames,
-        //             }));
-        //           } catch (innerError) {
-        //             console.error(
-        //               "Error parsing medicalReport JSON:",
-        //               item.medicalReport
-        //             );
-        //           }
-        //         }
-        //       });
-        //     }
       } catch (error) {
         console.error(
           "Error parsing traineeTrackData:",
@@ -642,9 +536,6 @@ export const AddEmployeeForm = () => {
   const onSubmit = async (data) => {
     try {
       const currentDate = new Date().toISOString().split("T")[0];
-      // const EmpReqDataRecord = AddEmpReq
-      //   ? AddEmpReq.find((match) => match.empID === data.empID)
-      //   : {};
 
       const EmpReqDataRecord = AddEmpReq
         ? AddEmpReq.filter((match) => match.empID === data.empID)[0]
@@ -960,6 +851,7 @@ ${trainingTable}
                 type="text"
                 className="input-field"
                 {...register("empID")}
+                disabled={trackEmpID}
               />
               {errors.empID && (
                 <p className="text-[red] text-[12px]">{errors.empID.message}</p>

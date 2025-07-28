@@ -275,7 +275,7 @@ export const TrainingCertificatesForm = () => {
 
   const searchResult = (result) => {
     // console.log("Res", result.trainingProof[0]);
-  if (result) {
+    if (result) {
       setTrackEmpID(true);
     }
 
@@ -404,20 +404,12 @@ export const TrainingCertificatesForm = () => {
           }
         });
 
-        const mergedData = parsedProofData.map((trackItem, idx) => {
-          const proofItem = parsedTrackData?.[idx] || {};
-          // console.log(trackItem, "proofItem");
+        const mergedData = parsedTrackData.map((trackItem, idx) => {
+          const proofItem = parsedProofData?.[idx] || {};
+          console.log(trackItem, "proofItem");
 
           return {
-            ...proofItem,
-            MRNo: proofItem.MRNo,
-            company: proofItem.company,
-            courseCode: proofItem.courseCode,
-            courseName: proofItem.courseName,
-            traineeCourseFee: proofItem.traineeCourseFee,
-            traineeED: proofItem.traineeED,
-            traineeSD: proofItem.traineeSD,
-            traineeStatus: proofItem.traineeStatus,
+            ...trackItem,
             certifiExpiry: trackItem.certifiExpiry || proofItem.certifiExpiry,
             eCertifiDate: trackItem.eCertifiDate || proofItem.eCertifiDate,
             orgiCertifiDate:
@@ -583,7 +575,7 @@ export const TrainingCertificatesForm = () => {
             addDescretion,
             trainingUpCertifi,
             traineeSD,
-            traineeED
+            traineeED,
           }) => ({
             certifiExpiry,
             eCertifiDate,
@@ -593,14 +585,22 @@ export const TrainingCertificatesForm = () => {
             addDescretion,
             trainingUpCertifi,
             traineeSD,
-            traineeED
+            traineeED,
           })
         );
       };
 
       if (TCDataRecord) {
-        const previous = TCDataRecord.updatedBy ? JSON.parse(TCDataRecord.updatedBy) : [];
-        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+        const previous = TCDataRecord?.updatedBy
+          ? JSON.parse(TCDataRecord.updatedBy)
+          : [];
+        const updatedByTC = [...previous, { userID: userType, date: today }];
+
+        const orderedUpdatedByTC = updatedByTC?.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
+
         const TCDataUp = {
           ...data,
           trainingProof: extractValues(data?.trainingProof)?.map(
@@ -614,7 +614,7 @@ export const TrainingCertificatesForm = () => {
             }
           ),
           id: TCDataRecord.id,
-          updatedBy,
+          updatedBy: JSON.stringify(orderedUpdatedByTC),
         };
 
         await TCDataFunUp({ TCDataUp });
@@ -671,7 +671,7 @@ export const TrainingCertificatesForm = () => {
               searchResult={searchResult}
               newFormData={allEmpDetails}
               searchIcon2={<IoSearch />}
-              placeholder="Employee Id"
+              placeholder="Search Employee by ID"
               rounded="rounded-lg"
               filteredEmployees={filteredEmployees}
               setFilteredEmployees={setFilteredEmployees}
@@ -685,7 +685,6 @@ export const TrainingCertificatesForm = () => {
             >
               <input
                 type="text"
-                placeholder="Employee ID"
                 className="outline-none w-full"
                 {...register("empID")}
                 disabled={trackEmpID}
