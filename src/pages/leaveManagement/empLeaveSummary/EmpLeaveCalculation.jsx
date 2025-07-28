@@ -716,7 +716,7 @@ export const EmpLeaveCalculation = () => {
 
         return updated;
       });
-      console.log("ERROR : ", err);
+
       // nav("/leaveManagement/leaveBalance");
     }
   }, [primaryData, empDetails, publicHoliday]);

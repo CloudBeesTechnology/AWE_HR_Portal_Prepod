@@ -42,6 +42,7 @@ export const Doe = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const [isUploading, setIsUploading] = useState({
     doeEmpUpload: false,
   });
@@ -178,6 +179,9 @@ export const Doe = () => {
   };
 
   useEffect(() => {
+    if (searchResultData) {
+      setTrackEmpID(true);
+    }
     setValue("empID", searchResultData.empID);
     const fields = [
       "doeEmpSubmit",
@@ -312,6 +316,7 @@ export const Doe = () => {
             type="text"
             placeholder="Enter Employee ID"
             errors={errors}
+            trackEmpID={trackEmpID}
           />
         </div>
       </div>

@@ -6,30 +6,22 @@ import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
 import { FaArrowLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import {
-  trainingUp,
-  uploadDocs,
-} from "../../../services/uploadsDocsS3/UploadDocs";
+import { trainingUp } from "../../../services/uploadsDocsS3/UploadDocs";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { AddEmpFun } from "../../../services/createMethod/AddEmpFun";
-import {
-  FileUpload,
-  FileUploadFieldNew,
-} from "../../employees/medicalDep/FileUploadField";
 import { AddEmpReqUp } from "../../../services/updateMethod/AddEmpReqUp";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { sendEmail } from "../../../services/EmailServices";
 import { DateFormat } from "../../../utils/DateFormat";
 import { useCreateNotification } from "../../../hooks/useCreateNotification";
-import useEmployeePersonalInfo from "../../../hooks/useEmployeePersonalInfo";
 import { DeleteDocsTriningEmpR } from "../../../services/uploadDocsDelete/DeleteDocsTriningEmpR";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../utils/DeletePopup";
 import { FaRegMinusSquare, FaRegPlusSquare } from "react-icons/fa";
-import { DeleteClaim } from "../../insuranceSid/DeleteUpload/DeleteClaim";
 import { GoUpload } from "react-icons/go";
 import { MdCancel } from "react-icons/md";
+import useEmployeePersonalInfo from "../../../hooks/useEmployeePersonalInfo";
 
 export const AddEmployeeForm = () => {
   const { empPIData, workInfoData, AddCourseDetails, AddEmpReq } =
@@ -46,7 +38,6 @@ export const AddEmployeeForm = () => {
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [userID, setUserID] = useState("");
-  const [userType, setUserType] = useState("");
   const [emailData, setEmailData] = useState({
     managerEmpID: "",
     managerOfficialMail: "",
@@ -56,10 +47,10 @@ export const AddEmployeeForm = () => {
   const [notification, setNotification] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState([]);
   const [showMedicalFields, setShowMedicalFields] = useState({});
-  const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [showTitle, setShowTitle] = useState("");
+
   const [isUploading, setIsUploading] = useState({
     medicalReport: false,
   });
@@ -85,7 +76,6 @@ export const AddEmployeeForm = () => {
   } = useForm({
     resolver: yupResolver(TrainingValidationSchema),
     defaultValues: {
-      // trainingreq: [], // Initialize with empty array for dynamic fields
       trainingreq: [
         {
           mediRequired: false,
@@ -114,15 +104,9 @@ export const AddEmployeeForm = () => {
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     setUserID(userID);
-    const userType = localStorage.getItem("userType");
-    setUserType(userType);
   }, []);
 
   const { personalInfo } = useEmployeePersonalInfo(userID);
-
-  // console.log("medi", uploadMedicalReports);
-  // console.log("flieNames", uploadedFileNames);
-  // console.log("File 2", fileNames);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -147,8 +131,6 @@ export const AddEmployeeForm = () => {
             };
           })
           .filter(Boolean);
-
-        setUserDetails(mergedData);
         setAllEmpDetails(mergedData);
       } catch (err) {
         console.log(err);
@@ -185,7 +167,6 @@ export const AddEmployeeForm = () => {
       ...prev,
       [`${idx}_${label}`]: value,
     }));
-    // console.log(idx, value);
   };
 
   const handleFileChange = async (e, type, index) => {
@@ -243,7 +224,6 @@ export const AddEmployeeForm = () => {
         fileName,
         watchedEmpID
       );
-      // console.log(`handleDeleteFile result: ${isDeleted}`);
 
       const isDeletedArrayUpload = await DeleteDocsTriningEmpR(
         fileType,
@@ -269,7 +249,6 @@ export const AddEmployeeForm = () => {
       }
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
-      // console.log(`Deleted "${fileName}". Remaining files:`);
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -310,11 +289,12 @@ export const AddEmployeeForm = () => {
   };
 
   const searchResult = (result) => {
-    // console.log(result,"result");
     if (!result) {
       console.warn("Search result is undefined or null");
       return;
     }
+
+    setTrackEmpID(true);
 
     const workInfo = workInfoData.find((data) => data.empID === result.empID);
 
@@ -358,13 +338,11 @@ export const AddEmployeeForm = () => {
       setValue(field, value);
     });
     const traineeTrackData = result?.traineeTrack;
-    // console.log(traineeTrackData,"sdfghjk");
 
     if (traineeTrackData) {
       try {
         const traineeTrackData = result?.traineeTrack;
         const normalized = normalizeTraineeTrackData(traineeTrackData);
-        // console.log(normalized);
 
         if (normalized.length > 0) {
           setValue("trainingreq", normalized);
@@ -430,115 +408,6 @@ export const AddEmployeeForm = () => {
             }
           });
         }
-
-        // let parsedData;
-        // Validate JSON format before parsing
-        // parsedData = JSON.parse(traineeTrackData);
-        //     const firstParse = JSON.parse(traineeTrackData);
-        //     const fixedJSON = firstParse.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
-        //     const parsedData = JSON.parse(fixedJSON);
-        // //  console.log(typeof traineeTrackData );
-        // if (Array.isArray(parsedData)) {
-        //   console.log("parsedData is an array", parsedData);
-
-        //   setValue("trainingreq", parsedData);
-        //   setSelectedCourse(
-        //     parsedData.map((item, index) => ({
-        //       index,
-        //       courseName: item.courseName,
-        //       company: item.company,
-        //     }))
-        //   );
-        // } else if (typeof parsedData === "object") {
-        //   console.log("parsedData is an object", parsedData);
-
-        //   setValue("trainingreq", [parsedData]);
-        //   setSelectedCourse([
-        //     {
-        //       index: 0,
-        //       courseName: parsedData.courseName,
-        //       company: parsedData.company,
-        //     },
-        //   ]);
-        // } else {
-        //   console.log("parsedData is neither array nor object");
-        // }
-
-        //     if (!Array.isArray(parsedData)) {
-        //       console.error(
-        //         "Invalid insuranceClaims data format:",
-        //         traineeTrackData
-        //       );
-        //       return;
-        //     }
-
-        //     if (parsedData.length > 0) {
-        //       setValue("trainingreq", parsedData);
-
-        //       // console.log(parsedData, "parsedData");
-        //       setSelectedCourse(
-        //         parsedData.map((item, index) => ({
-        //           index,
-        //           courseName: item.courseName,
-        //           company: item.company,
-        //         }))
-        //       );
-        //       const medicalFieldsState = parsedData.reduce((acc, item, i) => {
-        //         acc[i] = item.mediRequired;
-        //         return acc;
-        //       }, {});
-        //       setShowMedicalFields(medicalFieldsState);
-        //       parsedData.forEach((item, idx) => {
-        //         if (item?.medicalReport) {
-        //           try {
-        //             const url = item.medicalReport;
-        //             if (Array.isArray(url) && url.length === 0) return; // Skip empty uploads
-
-        //             const parsedArray =
-        //               typeof url === "string" ? JSON.parse(url) : url;
-
-        //             if (!Array.isArray(parsedArray)) {
-        //               console.error("Invalid traineeTrackUpload format:", url);
-        //               return;
-        //             }
-
-        //             const parsedFiles = parsedArray
-        //               .map((file) => {
-        //                 try {
-        //                   return typeof file === "string" ? JSON.parse(file) : file;
-        //                 } catch (nestedError) {
-        //                   console.error(
-        //                     "Error parsing nested medicalReport item:",
-        //                     file
-        //                   );
-        //                   return null;
-        //                 }
-        //               })
-        //               .filter(Boolean); // Remove null values
-        //             setUploadMedicalReports((prev) => ({
-        //               ...prev,
-        //               medicalReport: {
-        //                 ...prev.medicalReport,
-        //                 [idx]: parsedFiles,
-        //               },
-        //             }));
-
-        //             const fileNames = parsedFiles.map((file) =>
-        //               file && file.upload ? getFileName(file.upload) : ""
-        //             );
-        //             setUploadedFileNames((prev) => ({
-        //               ...prev,
-        //               [`${idx}_medicalReport`]: fileNames,
-        //             }));
-        //           } catch (innerError) {
-        //             console.error(
-        //               "Error parsing medicalReport JSON:",
-        //               item.medicalReport
-        //             );
-        //           }
-        //         }
-        //       });
-        //     }
       } catch (error) {
         console.error(
           "Error parsing traineeTrackData:",
@@ -547,7 +416,6 @@ export const AddEmployeeForm = () => {
         );
       }
     } else {
-      // console.log("reset");
       reset({
         empID: getValues("empID"),
         empBadgeNo: getValues("empBadgeNo"),
@@ -562,11 +430,8 @@ export const AddEmployeeForm = () => {
             medicalReport: [],
           },
         ],
-        // other fields to reset if needed
       });
 
-      setTrackEmpID(true);
-      // setSelectedCourse([{ index: 0, courseName: "", company: "" }]);
       setShowMedicalFields({ 0: false });
       setUploadMedicalReports({ medicalReport: { 0: [] } });
       setUploadedFileNames({ "0_medicalReport": [] });
@@ -645,9 +510,6 @@ export const AddEmployeeForm = () => {
   const onSubmit = async (data) => {
     try {
       const currentDate = new Date().toISOString().split("T")[0];
-      // const EmpReqDataRecord = AddEmpReq
-      //   ? AddEmpReq.find((match) => match.empID === data.empID)
-      //   : {};
 
       const EmpReqDataRecord = AddEmpReq
         ? AddEmpReq.filter((match) => match.empID === data.empID)[0]
@@ -805,7 +667,6 @@ export const AddEmployeeForm = () => {
         await TrReqUp({ TMRDataUp });
         setShowTitle("Training details Updated successfully");
         setNotification(true);
-        // console.log(TMRDataUp, "Training details Updated successfully");
       } else {
         const AddEmpValue = {
           trainingTrack: data?.trainingreq?.map((trainee, index) => {
@@ -822,7 +683,6 @@ export const AddEmployeeForm = () => {
           createdBy: JSON.stringify([{ userID: EMPID, date: currentDate }]),
         };
         await AddEmpData({ AddEmpValue });
-        // console.log(AddEmpValue, "Training details Saved successfully");
         const trainingRows = data?.trainingreq
           ?.map((item, idx) => {
             return `
@@ -1188,18 +1048,12 @@ ${trainingTable}
                       type="checkbox"
                       id={`mediRequired-${index}`}
                       {...register(`trainingreq.${index}.mediRequired`)}
-                      // checked={watch(`trainingreq.${index}.mediRequired`) || false}
                       onChange={(e) => {
                         const newValue = e.target.checked;
-                        // const newValue =
-                        //   !mediRequiredValues?.[index]?.mediRequired;
-                        // console.log(newValue);
-
                         setShowMedicalFields((prev) => ({
                           ...prev,
                           [index]: newValue,
                         }));
-                        // setValue(`trainingreq.${index}.mediRequired`, newValue);
                       }}
                       className="w-[18px] h-[18px] border border-grey rounded appearance-none flex items-center justify-center cursor-pointer"
                     />
@@ -1319,8 +1173,6 @@ ${trainingTable}
                                       className="mt-2 flex justify-between items-center"
                                     >
                                       {file}
-                                      {/* Optional console log for debugging */}
-                                      {/* {console.log(formattedPermissions?.deleteAccess)} */}
                                       <button
                                         type="button"
                                         className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
