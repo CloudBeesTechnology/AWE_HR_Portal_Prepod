@@ -35,6 +35,7 @@ export const DependentInsurance = () => {
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const { depInsuData } = useOutletContext();
   const userType = localStorage.getItem("userID");
 
@@ -212,9 +213,10 @@ export const DependentInsurance = () => {
     }
   };
   // console.log(tempFilesName);
- 
+
   useEffect(() => {
     setValue("empID", depInsuData?.empID);
+    setTrackEmpID(true);
 
     const depInsuranceData = depInsuData?.depInsurance;
 
@@ -372,8 +374,14 @@ export const DependentInsurance = () => {
       );
       const today = new Date().toISOString().split("T")[0];
       if (checkingDITable) {
-        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
-        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+        const previous = checkingDITable?.updatedBy
+          ? JSON.parse(checkingDITable.updatedBy)
+          : [];
+        const updatedByDep = [...previous, { userID: userType, date: today }];
+        const orderedUpdatedByDep = updatedByDep?.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
         const depValue = {
           ...data,
           depInsurance: data?.depInsurance
@@ -395,7 +403,7 @@ export const DependentInsurance = () => {
               };
             }),
           id: checkingDITable.id,
-          updatedBy,
+          updatedBy: JSON.stringify(orderedUpdatedByDep),
         };
         // console.log("depValue : ", depValue);
         await UpdateDIData({ depValue });
@@ -440,6 +448,7 @@ export const DependentInsurance = () => {
               className="input-field"
               placeholder="Enter Employee ID"
               {...register("empID")}
+              disabled={trackEmpID}
             />
             {errors.empID && (
               <p className="text-[red] text-[12px]">{errors.empID.message}</p>
