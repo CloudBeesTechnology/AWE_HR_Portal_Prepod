@@ -9,6 +9,7 @@ export const EmpProDataLeaveCal = ({
   leaveSummary,
 }) => {
   const [leaveSummaryDetails, setLeaveSummaryDetails] = useState({});
+
   const { DownloadExcelPDF } = LeaveSummaryDownload();
 
   const formaatedDate = (date) => {
@@ -59,6 +60,7 @@ export const EmpProDataLeaveCal = ({
     const diffDays = diffTime / (1000 * 60 * 60 * 24);
     return parseFloat(diffDays).toFixed(0);
   };
+
   useEffect(() => {
     const UpdateLeaveSummary = (leaveSummary) => {
       if (!leaveSummary) return;
@@ -101,11 +103,27 @@ export const EmpProDataLeaveCal = ({
     currentDate.setHours(0, 0, 0, 0);
 
     let getCurrentYear = currentDate.getFullYear();
+
+    const getALEffectiveDate = new Date(
+      updateStatusSection?.empAnnualLeaveEffDate
+    );
+    const getALEffectiveDateYear = getALEffectiveDate?.getFullYear();
+
     let getFirstDateOfYear = `${getCurrentYear}-01-01`;
-    let dojOrSpeDate = getFirstDateOfYear || updateStatusSection?.doj;
+    let dojOrSpeDate = "";
+
+    const isEmpFirstEffectiveDate =
+      getALEffectiveDateYear === getCurrentYear &&
+      currentDate >= getALEffectiveDate;
+
+    if (isEmpFirstEffectiveDate) {
+      dojOrSpeDate = updateStatusSection?.empAnnualLeaveEffDate;
+    } else {
+      dojOrSpeDate = getFirstDateOfYear;
+    }
 
     let totalDays = getDaysFromTwoDates(
-      dojOrSpeDate || updateStatusSection?.doj,
+      dojOrSpeDate,
 
       currentDate.toLocaleDateString("en-CA")
     );
@@ -123,14 +141,23 @@ export const EmpProDataLeaveCal = ({
 
     const calCurrentYearALEntitle = parseFloat(
       (currentYearALEntitle / 365) * noOfDaysWorkedMinusUAL
-    ).toFixed(1);
+    ).toFixed(2);
 
     const currentYearALEntitleBal =
       calCurrentYearALEntitle > 0 ? calCurrentYearALEntitle : "0";
 
-    let totalLeaveForAL =
-      parseFloat(updateStatusSection?.annualLeaveBal) +
-      parseFloat(currentYearALEntitleBal);
+    let totalLeaveForAL = 0;
+
+    if (isEmpFirstEffectiveDate) {
+      totalLeaveForAL =
+        parseFloat(updateStatusSection?.annualLeaveBal) +
+        parseFloat(currentYearALEntitleBal) +
+        parseFloat(updateStatusSection?.annualLeaveEntitlement);
+    } else {
+      totalLeaveForAL =
+        parseFloat(updateStatusSection?.annualLeaveBal) +
+        parseFloat(currentYearALEntitleBal);
+    }
 
     let sumOfDTandWP =
       parseFloat(totalLeaveForAL) -
