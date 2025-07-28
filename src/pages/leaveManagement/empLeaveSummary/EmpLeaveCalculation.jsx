@@ -573,7 +573,7 @@ export const EmpLeaveCalculation = () => {
         const getStrDate = new Date(startDate);
         const getEndDate = new Date(endDate);
 
-        return fDate >= getStrDate && eDate <= getEndDate;
+        return fromDate >= getStrDate && toDate <= getEndDate;
       });
 
       setPrimaryData(filteredData);
