@@ -221,7 +221,7 @@ export const AddNewForm = () => {
         { userID: userIDFind, date: today },
       ];
 
-      const orderedUpdatedByUser = updatedByUser.map((entry) => ({
+      const orderedUpdatedByUser = updatedByUser?.map((entry) => ({
         userID: entry.userID,
         date: entry.date,
       }));
@@ -244,7 +244,7 @@ export const AddNewForm = () => {
           })
           .then((res) => {
             // console.log(res);
-            setShowTitle("User updated Successfully");
+            setShowTitle("User updated successfully");
             setNotification(true);
           })
           .catch((err) => {
@@ -307,7 +307,7 @@ export const AddNewForm = () => {
                   "hr_no-reply@adininworks.com",
                   email
                 );
-                setShowTitle("Created a User Successfully");
+                setShowTitle("Created a user successfully");
                 setNotification(true);
               })
               .catch((err) => {
