@@ -217,6 +217,51 @@ export const ProbReviewForm = ({ userID, userType }) => {
     }
   }, [workInfoData, employeeData?.empID, empPIData]);
 
+  const formatDate = (date) => {
+    if (Array.isArray(date)) {
+      if (date?.length === 0) return "-";
+      const lastDate = date[date?.length - 1];
+      return formatDate(lastDate);
+    }
+
+    if (!date) return "-";
+
+    let parsedDate;
+
+    // Check if format is DD/MM/YYYY
+    if (typeof date === "string" && date.includes("/")) {
+      const [day, month, year] = date.split("/");
+      parsedDate = new Date(`${year}-${month}-${day}`);
+    } else {
+      parsedDate = new Date(date);
+    }
+
+    if (isNaN(parsedDate.getTime())) return "-";
+
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const year = parsedDate.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
+
+  const calculateDeadline = (probationEndDate) => {
+    let date;
+
+    // Handle both ISO (YYYY-MM-DD) and DD/MM/YYYY
+    if (probationEndDate?.includes("/")) {
+      const [day, month, year] = probationEndDate?.split("/");
+      date = new Date(`${year}-${month}-${day}`);
+    } else {
+      date = new Date(probationEndDate);
+    }
+
+    if (isNaN(date)) return "Invalid Date";
+
+    date.setDate(date.getDate() - 7);
+    return date.toISOString().split("T")[0];
+  };
+
   useEffect(() => {}, [emailData]);
 
   // auto fetch
@@ -233,12 +278,10 @@ export const ProbReviewForm = ({ userID, userType }) => {
     );
 
     if (!fetchedProbData) {
-      console.log("No matching contract data found");
       return;
     }
 
     if (fetchedProbData.probExtendStatus === "Extended") {
-      console.log("Contract extended data found");
       return;
     }
     const defaultFormData = Object.keys(fetchedProbData).reduce((acc, key) => {
@@ -397,70 +440,60 @@ export const ProbReviewForm = ({ userID, userType }) => {
         probExtendStatus: "probup",
       };
 
-      if (userType === "Supervisor" && !formData.probData.supervisorName) {
-        alert("Supervisor name is required!");
-        setIsLoading(false);
-        return;
-      }
-      if (
-        userType === "Supervisor" &&
-        !formData.probData.supervisorApproved &&
-        !formData.probData.supervisorDate
-      ) {
-        alert("Supervisor approval or rejection required!");
-        setIsLoading(false);
-        return;
-      }
+      if (!supervisorCheck) {
+        if (
+          userType === "Manager" &&
+          gmPosition !== GM &&
+          HRMPosition !== "HR MANAGER" &&
+          !formData.probData.managerName
+        ) {
+          alert("Manager name is required!");
+          setIsLoading(false);
+          return;
+        }
 
-      if (userType === "Supervisor" && !formData.probData.supervisorDate) {
-        alert("Supervisor date is required!");
-        setIsLoading(false);
-        return;
-      }
+        if (
+          userType === "Manager" &&
+          gmPosition !== GM &&
+          HRMPosition !== "HR MANAGER" &&
+          !formData.probData.managerApproved
+        ) {
+          alert("Manager approval or rejection is required!");
+          setIsLoading(false);
+          return;
+        }
 
-      if (
-        userType === "Manager" &&
-        gmPosition !== GM &&
-        HRMPosition !== "HR MANAGER" &&
-        !formData.probData.supervisorApproved &&
-        supervisorCheck === true
-      ) {
-        alert("Supervisor approval required!");
-        setIsLoading(false);
-        return;
-      }
+        if (
+          userType === "Manager" &&
+          gmPosition !== GM &&
+          HRMPosition !== "HR MANAGER" &&
+          !formData.probData.managerDate
+        ) {
+          alert("Manager date is is required!");
+          setIsLoading(false);
+          return;
+        }
+      } else {
+        if (userType === "Supervisor" && !formData.probData.supervisorName) {
+          alert("Supervisor name is is required!");
+          setIsLoading(false);
+          return;
+        }
+        if (
+          userType === "Supervisor" &&
+          !formData.probData.supervisorApproved &&
+          !formData.probData.supervisorDate
+        ) {
+          alert("Supervisor approval or rejection required!");
+          setIsLoading(false);
+          return;
+        }
 
-      if (
-        userType === "Manager" &&
-        gmPosition !== GM &&
-        HRMPosition !== "HR MANAGER" &&
-        !formData.probData.managerName
-      ) {
-        alert("Manager name is required!");
-        setIsLoading(false);
-        return;
-      }
-
-      if (
-        userType === "Manager" &&
-        gmPosition !== GM &&
-        HRMPosition !== "HR MANAGER" &&
-        !formData.probData.managerApproved
-      ) {
-        alert("Manager approval or rejection is required!");
-        setIsLoading(false);
-        return;
-      }
-
-      if (
-        userType === "Manager" &&
-        gmPosition !== GM &&
-        HRMPosition !== "HR MANAGER" &&
-        !formData.probData.managerDate
-      ) {
-        alert("Manager date is required!");
-        setIsLoading(false);
-        return;
+        if (userType === "Supervisor" && !formData.probData.supervisorDate) {
+          alert("Supervisor date is is required!");
+          setIsLoading(false);
+          return;
+        }
       }
 
       if (extendedRecord) {
@@ -785,11 +818,21 @@ export const ProbReviewForm = ({ userID, userType }) => {
                 type="text"
                 name="deadline"
                 {...register("deadline")}
-                value={formData.probData.deadline || employeeData?.deadline}
+                value={
+                  formatDate(
+                    calculateDeadline(formData?.probData?.prevProbExDate)
+                  ) || employeeData?.deadline
+                }
                 onChange={handleInputChange}
                 className="border-b border-black outline-none px-1"
               />
             </p>
+            <input
+              type="hidden"
+              name="empID"
+              value={employeeData?.empID}
+              {...register("empID")}
+            />
           </div>
 
           {/* Employee Details */}
@@ -858,9 +901,11 @@ export const ProbReviewForm = ({ userID, userType }) => {
                     Probation End Date
                   </td>
                   <td className="p-2 border-b w-1/2">
-                    {employeeData?.prevProbExDate
+                    {employeeData?.probationEndDate
+                      ? formatDateIfNeeded(employeeData?.probationEndDate)
+                      : employeeData?.prevProbExDate
                       ? formatDateIfNeeded(employeeData?.prevProbExDate)
-                      : employeeData?.probationEndDate || "-"}
+                      : "-"}
                   </td>
                 </tr>
 

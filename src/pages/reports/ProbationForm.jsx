@@ -226,6 +226,51 @@ export const ProbationForm = ({ userID, userType }) => {
     }
   }, [workInfoData, employeeData?.empID, empPIData]);
 
+  const formatDate = (date) => {
+    if (Array.isArray(date)) {
+      if (date?.length === 0) return "-";
+      const lastDate = date[date?.length - 1];
+      return formatDate(lastDate);
+    }
+
+    if (!date) return "-";
+
+    let parsedDate;
+
+    // Check if format is DD/MM/YYYY
+    if (typeof date === "string" && date.includes("/")) {
+      const [day, month, year] = date.split("/");
+      parsedDate = new Date(`${year}-${month}-${day}`);
+    } else {
+      parsedDate = new Date(date);
+    }
+
+    if (isNaN(parsedDate.getTime())) return "-";
+
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const year = parsedDate.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
+
+  const calculateDeadline = (probationEndDate) => {
+    let date;
+
+    // Handle both ISO (YYYY-MM-DD) and DD/MM/YYYY
+    if (probationEndDate?.includes("/")) {
+      const [day, month, year] = probationEndDate?.split("/");
+      date = new Date(`${year}-${month}-${day}`);
+    } else {
+      date = new Date(probationEndDate);
+    }
+
+    if (isNaN(date)) return "Invalid Date";
+
+    date.setDate(date.getDate() - 7);
+    return date.toISOString().split("T")[0];
+  };
+
   useEffect(() => {}, [emailData]);
 
   useEffect(() => {
@@ -350,23 +395,23 @@ export const ProbationForm = ({ userID, userType }) => {
         (match) => match.id === formDataValues.id
       );
 
-      const empPIRecord = empPIData.find((match) => match.empID === data.empID);
+      const empPIRecord = empPIData.find((match) => match.empID === data?.empID);
       const WorkInfoRecord = workInfoData.find(
-        (match) => match.empID === data.empID
+        (match) => match.empID === data?.empID
       );
       const probationEndFormatted =
-        Array.isArray(WorkInfoRecord.probationEnd) &&
-        WorkInfoRecord.probationEnd.length > 0
-          ? WorkInfoRecord.probationEnd[WorkInfoRecord.probationEnd.length - 1]
+        Array.isArray(WorkInfoRecord?.probationEnd) &&
+        WorkInfoRecord?.probationEnd.length > 0
+          ? WorkInfoRecord?.probationEnd[WorkInfoRecord?.probationEnd.length - 1]
               .split("-")
               .reverse()
               .join("/")
           : "Not mentioned";
 
       const prevProbDate =
-        Array.isArray(WorkInfoRecord.probationEnd) &&
-        WorkInfoRecord.probationEnd.length > 0
-          ? WorkInfoRecord.probationEnd[WorkInfoRecord.probationEnd.length - 1]
+        Array.isArray(WorkInfoRecord?.probationEnd) &&
+        WorkInfoRecord?.probationEnd.length > 0
+          ? WorkInfoRecord?.probationEnd[WorkInfoRecord?.probationEnd.length - 1]
           : "Not mentioned";
 
       const subject = "Probation Assessment Review";
@@ -403,7 +448,7 @@ export const ProbationForm = ({ userID, userType }) => {
         if (
           userType === "Manager" &&
           gmPosition !== GM &&
-          formData.probData.supervisorApproved === null &&
+          !formData.probData.supervisorApproved &&
           supervisorCheck === true
         ) {
           alert("Supervisor approval or rejection required!");
@@ -864,7 +909,7 @@ export const ProbationForm = ({ userID, userType }) => {
                 type="text"
                 name="attention"
                 {...register("attention")}
-                value={formData.probData.attention}
+                value={formData?.probData?.attention}
                 onChange={handleInputChange}
                 className="border-b border-black focus:outline-none px-1"
               />
@@ -875,11 +920,21 @@ export const ProbationForm = ({ userID, userType }) => {
                 type="text"
                 name="deadline"
                 {...register("deadline")}
-                value={formData.probData.deadline || employeeData?.deadline}
+                value={
+                  formatDate(
+                    calculateDeadline(formData?.probData?.prevProbExDate)
+                  ) || employeeData?.deadline
+                }
                 onChange={handleInputChange}
                 className="border-b border-black outline-none px-1"
               />
             </p>
+            <input
+              type="hidden"
+              name="empID"
+              value={employeeData?.empID}
+              {...register("empID")}
+            />
           </div>
 
           {/* Employee Details */}
@@ -963,7 +1018,7 @@ export const ProbationForm = ({ userID, userType }) => {
                       type="date"
                       name="extendDate"
                       {...register("extendDate")}
-                      value={formData.probData.extendDate}
+                      value={formData?.probData?.extendDate}
                       onChange={handleInputChange}
                       className="w-full px-1"
                     />
