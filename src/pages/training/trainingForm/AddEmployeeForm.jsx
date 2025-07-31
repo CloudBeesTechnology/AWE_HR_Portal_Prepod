@@ -50,7 +50,7 @@ export const AddEmployeeForm = () => {
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [showTitle, setShowTitle] = useState("");
-  const [trackEmpID, setTrackEmpID] = useState(false);
+
   const [isUploading, setIsUploading] = useState({
     medicalReport: false,
   });
