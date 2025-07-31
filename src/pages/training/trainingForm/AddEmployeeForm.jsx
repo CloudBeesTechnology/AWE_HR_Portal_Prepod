@@ -63,7 +63,6 @@ export const AddEmployeeForm = () => {
   const [fileNames, setFileNames] = useState({});
   const EMPID = localStorage.getItem("userID");
 
-  const [trackEmpID, setTrackEmpID] = useState(false);
   const {
     register,
     handleSubmit,
@@ -823,7 +822,6 @@ ${trainingTable}
                 type="text"
                 className="input-field"
                 {...register("empID")}
-                disabled={trackEmpID}
                 disabled={trackEmpID}
               />
               {errors.empID && (

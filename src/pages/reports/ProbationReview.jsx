@@ -17,6 +17,7 @@ export const ProbationReview = () => {
   const [endDate, setEndDate] = useState("");
   const [extenFlag, setExtenFlag] = useState([]);
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const [isDateFiltered, setIsDateFiltered] = useState(false);
   const [tableHead] = useState(
     [
       "Emp ID",
@@ -353,6 +354,7 @@ export const ProbationReview = () => {
         endDate={endDate}
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
+        isFiltered={isDateFiltered}
       />
 
       {selectedPerson && (
