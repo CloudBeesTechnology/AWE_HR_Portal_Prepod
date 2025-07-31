@@ -38,6 +38,7 @@ export const AddEmployeeForm = () => {
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [userID, setUserID] = useState("");
+  const [trackEmpID, setTrackEmpID] = useState("");
   const [emailData, setEmailData] = useState({
     managerEmpID: "",
     managerOfficialMail: "",
