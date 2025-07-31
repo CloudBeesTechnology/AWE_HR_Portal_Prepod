@@ -7,6 +7,10 @@ import { LeaveSummaryPopUp } from "./LeaveSummaryPopUp";
 import { NavigateLM } from "./NavigateLM";
 import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 import { FiLoader } from "react-icons/fi";
+import useSeperateLeaves from "../../hooks/useSeperateLeaves";
+import { useLeaveSummaryFuncs } from "../../hooks/useLeaveSummaryFuncs";
+import { usePublicHolidayList } from "../../hooks/usePublicHolidayList";
+import useLeaveSummaryCal2 from "../../hooks/useLeaveSummaryCal2";
 
 export const EmpLeaveBalance = () => {
   const { mergedData, userType, loading } = useOutletContext();
@@ -21,6 +25,11 @@ export const EmpLeaveBalance = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [mergedLeaveData, setMergedLeaveData] = useState([]);
 
+  const { handleSeperateLeaves } = useSeperateLeaves();
+  const { publicHoliday } = usePublicHolidayList();
+  const { convertToFormattedHolidays } = useLeaveSummaryFuncs();
+  const { filterOnshoreOffshorePHbasis } = useLeaveSummaryCal2();
+
   let nav = useNavigate();
   const heading = [
     "S.No",
@@ -34,134 +43,21 @@ export const EmpLeaveBalance = () => {
   ];
 
   useEffect(() => {
-    const formattedDate = (selectedDate) => {
-      let leaveDateObj = null;
+    const seperatedLeaves = handleSeperateLeaves({ mergedData });
 
-      if (selectedDate?.includes("/")) {
-        // Format: DD/MM/YYYY
-        const [day, month, year] = selectedDate.split("/").map(Number);
-        leaveDateObj = new Date(year, month - 1, day);
-      } else if (selectedDate?.includes("-")) {
-        // Format: YYYY-MM-DD
-        leaveDateObj = new Date(selectedDate);
-      }
-      leaveDateObj.setHours(0, 0, 0, 0);
-      return leaveDateObj;
-    };
+    const { formattedPHList } = convertToFormattedHolidays({ publicHoliday });
+    const { isOffshoreOrOnshoreEmp } = filterOnshoreOffshorePHbasis({
+      formattedPHList,
+      seperatedLeaves,
+    });
 
-    function seperateLeaves(data) {
-      const hasOnlySlashOrDash = /[\/-]/;
-      const seperatedLeaves = [];
+    const finalLeaveData =
+      Array.isArray(isOffshoreOrOnshoreEmp) &&
+      isOffshoreOrOnshoreEmp?.length > 0
+        ? isOffshoreOrOnshoreEmp?.flatMap((val) => val.seperatedLeaves)
+        : [];
 
-      data.forEach((item) => {
-        let fromDate = null;
-        let toDate = null;
-
-        if (
-          String(item?.empLeaveSelectedFrom) &&
-          String(item?.empLeaveSelectedTo) &&
-          hasOnlySlashOrDash.test(item?.empLeaveSelectedFrom) &&
-          hasOnlySlashOrDash.test(item?.empLeaveSelectedTo)
-        ) {
-          fromDate = formattedDate(item.empLeaveSelectedFrom);
-          toDate = formattedDate(item.empLeaveSelectedTo);
-        } else if (
-          String(item?.empLeaveStartDate) &&
-          String(item?.empLeaveEndDate) &&
-          hasOnlySlashOrDash.test(item?.empLeaveStartDate) &&
-          hasOnlySlashOrDash.test(item?.empLeaveEndDate)
-        ) {
-          fromDate = formattedDate(item.empLeaveStartDate);
-          toDate = formattedDate(item.empLeaveEndDate);
-        }
-
-        if (!fromDate || !toDate) {
-          console.log("⛔ Invalid item (missing valid dates):", item);
-          return;
-        }
-
-        let currentDate = new Date(fromDate);
-        currentDate.setHours(0, 0, 0, 0);
-        const formatLocalDate = (dateObj) => {
-          const year = dateObj.getFullYear();
-          const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-          const day = String(dateObj.getDate()).padStart(2, "0");
-          return `${year}-${month}-${day}`;
-        };
-
-        const formatLocalDateTime = (dateObj) => {
-          const yyyy_mm_dd = formatLocalDate(dateObj);
-          return `${yyyy_mm_dd}T00:00:00.000`;
-        };
-
-        // Count total leave days between two dates (inclusive)
-        const dayCount =
-          Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
-
-        const leaveTakenCount = dayCount > item?.days ? dayCount : item?.days;
-        const totalLeave = parseFloat(dayCount);
-        // const isHalfDay = totalLeave % 1 !== 0;
-
-        for (let i = 0; i < dayCount; i++) {
-          const leaveDate = new Date(currentDate);
-          const formattedDate = formatLocalDate(leaveDate);
-          const isoDateStr = formatLocalDateTime(leaveDate);
-
-          let assignedDays = 1;
-
-          // 🔁 If only 1 day and it's half-day
-          if (dayCount === 1 && parseFloat(item?.days) === 0.5) {
-            assignedDays = 0.5;
-
-            // 🔁 If last day and total leave includes fraction
-          }
-          // else if (i === dayCount - 1 && parseFloat(item?.days) % 1 !== 0) {
-          //   console.log("assignedDays : ", parseFloat(item?.days) % 1);
-          //   assignedDays = parseFloat(item?.days) % 1;
-
-          //   // 🔁 If i exceeds the number of actual leave days
-          // }
-          // else if (i >= Math.floor(parseFloat(item?.days))) {
-          //   break;
-          // }
-
-          // if (i === dayCount - 1 && parseFloat(item?.days) === 0.5) {
-          //   assignedDays = 0.5;
-          // } else if (i === dayCount - 1 && parseFloat(item?.days) !== 0.5) {
-          //   assignedDays = totalLeave - Math.floor(totalLeave);
-          // } else if (i >= Math.floor(totalLeave)) {
-          //   break; // prevent adding extra days if `days` < `dayCount`
-          // }
-
-          seperatedLeaves.push({
-            ...item,
-            empLeaveSelectedFrom: formattedDate,
-            empLeaveSelectedTo: formattedDate,
-            empLeaveStartDate: isoDateStr,
-            empLeaveEndDate: isoDateStr,
-            leaveTakenCount: assignedDays,
-          });
-
-          currentDate.setDate(currentDate.getDate() + 1);
-        }
-      });
-
-      return seperatedLeaves;
-    }
-
-    // const filteredData = mergedData?.filter((fil) => {
-    //   if (fil.empID === "1705" && fil?.leaveType === "Compensate Leave") {
-    //     return fil;
-    //   }
-    // });
-    // console.log("empLeaveBalance filteredData : ", filteredData);
-
-    // const splittedLeaveData = seperateLeaves(filteredData);
-    // console.log("splittedLeaveData : ",splittedLeaveData);
-
-    const splittedLeaveData = seperateLeaves(mergedData);
-
-    setMergedLeaveData(splittedLeaveData);
+    setMergedLeaveData(finalLeaveData);
   }, [mergedData]);
 
   useEffect(() => {

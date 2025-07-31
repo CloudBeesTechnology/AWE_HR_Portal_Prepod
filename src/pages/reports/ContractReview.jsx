@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FilterTable } from "./FilterTable";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo/logo-with-name.svg";
@@ -16,6 +16,7 @@ export const ContractReview = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [isDateFiltered, setIsDateFiltered] = useState(false);
   const { gmPosition, HRMPosition } = useTempID();
   const userID = localStorage.getItem("userID");
   const userType = localStorage.getItem("userType");
@@ -55,8 +56,7 @@ export const ContractReview = () => {
     return `${day}-${month}-${year}`;
   };
 
-
- const contractExpiryMergedData = (data) => {
+  const contractExpiryMergedData = (data) => {
     const today = new Date();
     const startOfNextMonth = new Date(
       today.getFullYear(),
@@ -69,7 +69,7 @@ export const ContractReview = () => {
       1
     );
     endOfTwoMonthsAfter.setMilliseconds(-1);
- 
+
     const empIDsToIgnore = new Set(
       contractForms
         .filter((item) => item.extendedStatus === "noExtended")
@@ -112,14 +112,12 @@ export const ContractReview = () => {
           .filter((cf) => cf.empID === item.empID)
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
 
-
         if (
           !lastDate ||
           (latestItemForEmp?.depHead && latestItemForEmp.hrManager === "") ||
           (item.contStatus && item.extendedStatus === "noExtended") ||
           item.extendedStatus === "hrmView" ||
           item.extendedStatus === "gmView"
-         
         ) {
           return null;
         }
@@ -187,9 +185,7 @@ export const ContractReview = () => {
           }
         } else if (revDateObj && !upgradeDateObj) {
           finalPosition = today >= revDateObj && positionRev;
-   
         } else if (upgradeDateObj && !revDateObj) {
-  
           finalPosition = today >= upgradeDateObj && upgradePosition;
         } else {
           finalPosition = item.position?.[item.position.length - 1];
@@ -256,7 +252,6 @@ export const ContractReview = () => {
       .sort((a, b) => a.lastDate - b.lastDate)
       .map(({ lastDate, ...rest }) => rest); // remove lastDate
 
-
     // Final mapped result without the date object
     return sortedData;
   };
@@ -273,7 +268,7 @@ export const ContractReview = () => {
     }
   }, [allData, userType, gmPosition, userID, HRMPosition]);
 
- const handleViewDetails = (personData) => {
+  const handleViewDetails = (personData) => {
     const employeeHistory = contractForms.filter(
       (val) => val.empID === personData.empID
     );
@@ -292,7 +287,7 @@ export const ContractReview = () => {
       });
     }
   };
- const handleDate = (e, type) => {
+  const handleDate = (e, type) => {
     const value = e.target.value;
 
     if (type === "startDate") setStartDate(value);
@@ -357,7 +352,6 @@ export const ContractReview = () => {
         const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
         const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
         if (revDateObj && upgradeDateObj) {
-       
           if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
             finalPosition = item.position?.[item.position.length - 1];
           } else if (revDateObj > upgradeDateObj) {
@@ -377,9 +371,7 @@ export const ContractReview = () => {
           }
         } else if (revDateObj && !upgradeDateObj) {
           finalPosition = today >= revDateObj && positionRev;
-   
         } else if (upgradeDateObj && !revDateObj) {
-       
           finalPosition = today >= upgradeDateObj && upgradePosition;
         } else {
           finalPosition = item.position?.[item.position.length - 1];
@@ -404,7 +396,7 @@ export const ContractReview = () => {
             item.otherPosition[item.otherPosition.length - 1],
           contractStartDate: formatDate(startDate),
           contractEndDate: formatDate(lastDate),
-           oldCED:
+          oldCED:
             item.oldCED === formatDate(lastDate)
               ? item.oldCED
               : formatDate(lastDate),
@@ -427,11 +419,21 @@ export const ContractReview = () => {
       .sort((a, b) => a.lastDate - b.lastDate)
       .map(({ lastDate, ...rest }) => rest);
 
+    if (start || end) {
+      if (filtered.length === 0) {
+        setIsDateFiltered(true);
+      } else {
+        setIsDateFiltered(false);
+      }
+    } else {
+      setIsDateFiltered(false);
+    }
+
     setFilteredData(filtered);
   };
 
   return (
-<div>
+    <div>
       <FilterTable
         tableBody={filteredData.length ? filteredData : tableBody}
         tableHead={tableHead}
@@ -440,6 +442,7 @@ export const ContractReview = () => {
         endDate={endDate}
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
+        isFiltered={isDateFiltered}
       />
 
       {selectedPerson && (
@@ -458,15 +461,11 @@ export const ContractReview = () => {
             </h2>
             <p className="flex mb-2">
               <strong className="w-[30%]">Name</strong>{" "}
-              <span className=" flex-1">
-                : &nbsp;{selectedPerson.name}
-              </span>
+              <span className=" flex-1">: &nbsp;{selectedPerson.name}</span>
             </p>
             <p className="flex mb-2">
               <strong className="w-[30%]">Emp ID</strong>{" "}
-              <span className=" flex-1">
-                : &nbsp;{selectedPerson.empID}
-              </span>
+              <span className=" flex-1">: &nbsp;{selectedPerson.empID}</span>
             </p>
             <p className="flex mb-2">
               <strong className="w-[30%]">Emp Badge No</strong>{" "}
@@ -488,7 +487,9 @@ export const ContractReview = () => {
             </p>
             <p className="flex mb-2">
               <strong className="w-[30%]">Position:</strong>
-              <span className=" flex-1">  : &nbsp;
+              <span className=" flex-1">
+                {" "}
+                : &nbsp;
                 {selectedPerson.position === "OTHER"
                   ? selectedPerson.otherPosition
                   : selectedPerson.position}
@@ -496,31 +497,37 @@ export const ContractReview = () => {
             </p>
             <p className="flex mb-2">
               <strong className="w-[30%]">Department:</strong>{" "}
-              <span className=" flex-1">  : &nbsp;
+              <span className=" flex-1">
+                {" "}
+                : &nbsp;
                 {selectedPerson.department === "OTHER"
                   ? selectedPerson.otherDepartment
                   : selectedPerson.department}
               </span>
             </p>
             {/* selectedPerson.genManager && */}
-            {historyData.length > 0 &&
-           (
-                <div className="mt-10">
-                  <h5 className="text-xl font-semibold text-center mb-5">
-                    Contract Extension History
-                  </h5>
-                  <div className=" center">
-                    <div className="py-7 max-w-[350px] w-full center shadow-[2px_2px_8px_rgba(0,0,0,0.3)] rounded-md">
-                      <table className="border ">
-                        <thead className="border ">
-                          <tr className="bg-medium_grey  text-white  border">
-                            <th className="border px-3 py-2">No of Time</th>
-                            <th className="border px-3 py-2">Date</th>
-                            <th className="border px-3 py-2">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody className="text-sm">
-                          {historyData.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map((val, idx) => {
+            {historyData.length > 0 && (
+              <div className="mt-10">
+                <h5 className="text-xl font-semibold text-center mb-5">
+                  Contract Extension History
+                </h5>
+                <div className=" center">
+                  <div className="py-7 max-w-[350px] w-full center shadow-[2px_2px_8px_rgba(0,0,0,0.3)] rounded-md">
+                    <table className="border ">
+                      <thead className="border ">
+                        <tr className="bg-medium_grey  text-white  border">
+                          <th className="border px-3 py-2">No of Time</th>
+                          <th className="border px-3 py-2">Date</th>
+                          <th className="border px-3 py-2">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm">
+                        {historyData
+                          .sort(
+                            (a, b) =>
+                              new Date(b.createdAt) - new Date(a.createdAt)
+                          )
+                          .map((val, idx) => {
                             return (
                               <tr key={idx}>
                                 {(val.genManager ||
@@ -546,12 +553,12 @@ export const ContractReview = () => {
                               </tr>
                             );
                           })}
-                        </tbody>
-                      </table>
-                    </div>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
             <div className="flex justify-evenly items-center p-3 mt-10">
               <button className="primary_btn" onClick={() => handleNavigate()}>

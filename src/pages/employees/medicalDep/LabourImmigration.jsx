@@ -30,8 +30,6 @@ const LabourImmigration = () => {
   const { updateMedicalSubmit } = UpdateMedical();
   const { empPIData, LMIData } = useContext(DataSupply);
 
-  // console.log("formattedPermissions : ", formattedPermissions);
-  // const [deletePermission, setDeletePermission] = useState(null);
 
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [arrayUploadDocs, setArrayUploadDocs] = useState([]);
@@ -103,11 +101,8 @@ const LabourImmigration = () => {
       ...prev,
       [label]: value,
     }));
-    // console.log(value);
   };
 
-  // console.log(uploadedFileNames);
-  // console.log(arrayUploadDocs)
 
   const handleFileChange = async (e, label) => {
     const watchedEmpID = watch("empID");
@@ -184,7 +179,6 @@ const LabourImmigration = () => {
         );
         return;
       }
-      // console.log(`Deleted "${fileName}". Remaining files:`);
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
@@ -196,7 +190,6 @@ const LabourImmigration = () => {
   const getLastValue = (value) => {
     if (Array.isArray(value)) {
       const lastValue = value[value.length - 1];
-      // Remove square brackets if present
       return typeof lastValue === "string" &&
         lastValue.startsWith("[") &&
         lastValue.endsWith("]")
@@ -235,7 +228,6 @@ const LabourImmigration = () => {
 
     let day, month, year;
 
-    // Check if the input date string is in MM/DD/YYYY format
     if (dateParts[0] > 12) {
       [day, month, year] = dateParts;
     } else {
@@ -251,12 +243,10 @@ const LabourImmigration = () => {
   };
 
   const searchResult = (result) => {
-    // console.log(result);
-
+ 
     const keysToSet = ["empID", "bruhimsRNo", "overMD", "overME", "bruhimsRD"];
-
     keysToSet.forEach((key) => {
-      // console.log("key : ", key);
+
       if (result[key]) {
         let value = result[key];
         if (key === "overMD" || key === "overME" || key === "bruhimsRD") {
@@ -270,7 +260,7 @@ const LabourImmigration = () => {
     }
 
     const fields = ["bruneiMAD", "bruneiME"];
-    // fields.forEach((field) => setValue(field, getLastValue(result[field])));
+
     fields.forEach((field) => {
       const cleanedValue = getLastValue(result[field]);
       const formattedValue = formatDateValue(cleanedValue);
@@ -291,19 +281,15 @@ const LabourImmigration = () => {
     uploadFields.forEach((field) => {
       if (result && result[field]) {
         try {
-          // Parse the field data if it exists
           const parsedArray = JSON.parse(result[field]);
 
-          // Then, parse each element inside the array (if it's stringified as well)
           const parsedFiles = parsedArray.map((item) =>
             typeof item === "string" ? JSON.parse(item) : item
           );
-          // console.log(parsedFiles);
           setValue(field, parsedFiles);
-
           setDocsUploaded((prev) => ({
             ...prev,
-            [field]: parsedFiles, // Dynamically set based on field name
+            [field]: parsedFiles, 
           }));
 
           setUploadedFileNames((prev) => ({
@@ -317,14 +303,13 @@ const LabourImmigration = () => {
     });
   };
   const getFileName = (filePath) => {
-    const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
-    // const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    const fileNameWithExtension = filePath.split("/").pop(); 
     return fileNameWithExtension;
   };
-  // console.log(arrayUploadDocs, "94652196532");
+
 
   const onSubmit = async (data) => {
-    // console.log(data.dependPass);
+
     try {
       const checkingPITable = empPIData.find(
         (match) => match.empID === data.empID
@@ -334,10 +319,9 @@ const LabourImmigration = () => {
       );
       const today = new Date().toISOString().split("T")[0];
       const userIDFind = localStorage.getItem("userID");
-      // const formatDate = (date) =>
-      //   date ? new Date(date).toLocaleDateString("en-CA") : null;
-      const previousUpdatesLMI = checkingLMIDTable.updatedBy
-        ? JSON.parse(checkingLMIDTable.updatedBy)
+
+      const previousUpdatesLMI = checkingLMIDTable?.updatedBy
+        ? JSON.parse(checkingLMIDTable?.updatedBy)
         : [];
 
       const updatedByLMI = [
@@ -345,13 +329,13 @@ const LabourImmigration = () => {
         { userID: userIDFind, date: today },
       ];
 
-      const orderedUpdatedByLMI = updatedByLMI.map((entry) => ({
+      const orderedUpdatedByLMI = updatedByLMI?.map((entry) => ({
         userID: entry.userID,
         date: entry.date,
       }));
       const formatDate = (dateString) => {
         if (!dateString || isNaN(new Date(dateString).getTime())) {
-          return; // Return an empty string or a custom message if invalid
+          return; 
         }
         const date = new Date(dateString);
         const day = date.getDate().toString().padStart(2, "0");
@@ -404,36 +388,26 @@ const LabourImmigration = () => {
                 ? arrayUploadDocs.uploadDr
                 : Object.values(arrayUploadDocs.uploadDr || {});
 
-              // console.log("Index:", index);
-              // console.log("uploadDpArray:", uploadDpArray);
-              // console.log("uploadDrArray:", uploadDrArray);
-
-              // Fetch correct index value
               const uploadDp =
                 uploadDpArray[index] && uploadDpArray[index].length > 0
                   ? uploadDpArray[index]
-                  : val.uploadDp || []; // Preserve existing value
+                  : val.uploadDp || []; 
 
               const uploadDr =
                 uploadDrArray[index] && uploadDrArray[index].length > 0
                   ? uploadDrArray[index]
                   : val.uploadDr || [];
-              // const uploadDp = flatDocs[index]?.upload || val.uploadDp;
-
-              // console.log(uploadDp, "uploaddp");
-              // console.log(uploadDr, "uploaddr");
-
+      
               return {
                 ...val,
-                uploadDp, // Assign the array for uploadDp
-                uploadDr, // Assign the array for uploadDr
+                uploadDp, 
+                uploadDr, 
               };
             })
           ),
           LabTable: checkingLMIDTable.id,
           updatedBy: JSON.stringify(orderedUpdatedByLMI),
         };
-        // console.log("Update Method :", LabUpValue);
 
         await updateMedicalSubmit({ LabUpValue });
         setShowTitle("Medical and Dependent Info details updated successfully");
@@ -462,14 +436,13 @@ const LabourImmigration = () => {
                 arrayUploadDocs?.uploadDr?.[index] || val.uploadDr;
               return {
                 ...val,
-                uploadDp, // Assign the array for uploadDp
-                uploadDr, // Assign the array for uploadDr
+                uploadDp, 
+                uploadDr, 
               };
             })
           ),
           createdBy: JSON.stringify([{ userID: userIDFind, date: today }]),
         };
-        // console.log("Create Method :", labValue);
         await SubmitMPData({ labValue });
         setShowTitle("Medical and Dependent Info details saved successfully");
         setNotification(true);
@@ -485,10 +458,7 @@ const LabourImmigration = () => {
   };
 
   const requiredPermissions = ["Medical & Dependent Info"];
-
   const access = "Employee";
-
-  console.log("Up", isUploading);
 
   return (
     <form

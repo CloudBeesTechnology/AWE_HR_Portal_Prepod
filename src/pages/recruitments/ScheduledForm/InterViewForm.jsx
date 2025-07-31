@@ -109,7 +109,7 @@ export const InterviewForm = ({ candidate }) => {
 
     const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
 
-    const orderedUpdatedBy = updatedBy.map((entry) => ({
+    const orderedUpdatedBy = updatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -119,12 +119,12 @@ export const InterviewForm = ({ candidate }) => {
       await interviewDetails({
         InterviewValue: {
           id: interviewScheduleId,
-          interDate: formData.interview.date,
-          interTime: formData.interview.time,
-          venue: formData.interview.venue,
-          interType: formData.interview.interviewType,
-          message: formData.interview.message,
-          manager: formData.interview.interviewer,
+          interDate: formData.interview?.date,
+          interTime: formData.interview?.time,
+          venue: formData.interview?.venue,
+          interType: formData.interview?.interviewType,
+          message: formData.interview?.message,
+          manager: formData.interview?.interviewer,
           updatedBy: JSON.stringify(orderedUpdatedBy),
         },
       });

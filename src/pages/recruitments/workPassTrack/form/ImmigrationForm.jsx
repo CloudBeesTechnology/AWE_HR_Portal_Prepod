@@ -222,7 +222,7 @@ export const ImmigrationForm = ({ candidate }) => {
 
     const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
 
-    const wpOrderedUpdatedBy = wpUpdatedBy.map((entry) => ({
+    const wpOrderedUpdatedBy = wpUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -236,7 +236,7 @@ export const ImmigrationForm = ({ candidate }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -253,13 +253,13 @@ export const ImmigrationForm = ({ candidate }) => {
 
     const wpTrackingData = {
       tempID: candidate.tempID,
-      immbdno: formData.interview.immbdno,
-      docsubmitdate: formData.interview.docsubmitdate,
-      visaapprovedate: formData.interview.visaapprovedate,
-      visareferenceno: formData.interview.visareferenceno,
-      visaFile: isUploadingString.visaFile
-        ? JSON.stringify(wrapUpload(uploadedVisa.visaFile))
-        : formData.interview.visaFile,
+      immbdno: formData.interview?.immbdno,
+      docsubmitdate: formData.interview?.docsubmitdate,
+      visaapprovedate: formData.interview?.visaapprovedate,
+      visareferenceno: formData.interview?.visareferenceno,
+      visaFile: isUploadingString?.visaFile
+        ? JSON.stringify(wrapUpload(uploadedVisa?.visaFile))
+        : formData.interview?.visaFile,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
@@ -269,13 +269,13 @@ export const ImmigrationForm = ({ candidate }) => {
         response = await wpTrackingDetails({
           WPTrackingValue: {
             id: interviewScheduleId,
-            immbdno: formData.interview.immbdno,
-            docsubmitdate: formData.interview.docsubmitdate,
-            visaapprovedate: formData.interview.visaapprovedate,
-            visareferenceno: formData.interview.visareferenceno,
-            visaFile: isUploadingString.visaFile
-              ? JSON.stringify(wrapUpload(uploadedVisa.visaFile))
-              : formData.interview.visaFile,
+            immbdno: formData.interview?.immbdno,
+            docsubmitdate: formData.interview?.docsubmitdate,
+            visaapprovedate: formData.interview?.visaapprovedate,
+            visareferenceno: formData.interview?.visareferenceno,
+            visaFile: isUploadingString?.visaFile
+              ? JSON.stringify(wrapUpload(uploadedVisa?.visaFile))
+              : formData.interview?.visaFile,
             updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
@@ -287,7 +287,7 @@ export const ImmigrationForm = ({ candidate }) => {
 
       const interStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
         updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
 

@@ -118,10 +118,12 @@ export const ProbationPDF = ({ userID, userType }) => {
         HRMPosition !== "HR MANAGER"
       ) {
         return (
-          isProbationActive && lastManager === userID && isSupervisorApproved
+          (isProbationActive &&
+            lastManager === userID &&
+            isSupervisorApproved) ||
+          (isProbationActive && lastManager === userID && isManagerApproved)
         );
       }
-
       if (gmPosition === "GENERAL MANAGER") {
         if (skillPool === "SKILLED" || skillPool === "UNSKILLED") {
           return false;
@@ -163,39 +165,51 @@ export const ProbationPDF = ({ userID, userType }) => {
         const lastDate = probationEndDates[probationEndDates.length - 1];
 
         const today = new Date();
+
         const positionRevDate =
           item.positionRevDate?.[item.positionRevDate.length - 1];
         const positionRev = item.positionRev?.[item.positionRev.length - 1];
         const upgradePosition =
           item.upgradePosition?.[item.upgradePosition.length - 1];
         const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
-        let finalPosition;
 
         const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
         const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+
+        let finalPosition;
 
         if (revDateObj && upgradeDateObj) {
           if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
             finalPosition = item.position?.[item.position.length - 1];
           } else if (revDateObj > upgradeDateObj) {
-            finalPosition =
-              today >= revDateObj
-                ? positionRev
-                : today >= upgradeDateObj
-                ? upgradePosition
-                : item.position?.[item.position.length - 1];
+            if (today >= revDateObj) {
+              finalPosition = positionRev;
+            } else if (today >= upgradeDateObj) {
+              finalPosition = upgradePosition;
+            } else {
+              finalPosition = item.position?.[item.position.length - 1];
+            }
           } else {
-            finalPosition =
-              today >= upgradeDateObj
-                ? upgradePosition
-                : today >= revDateObj
-                ? positionRev
-                : item.position?.[item.position.length - 1];
+            if (today >= upgradeDateObj) {
+              finalPosition = upgradePosition;
+            } else if (today >= revDateObj) {
+              finalPosition = positionRev;
+            } else {
+              finalPosition = item.position?.[item.position.length - 1];
+            }
           }
-        } else if (revDateObj) {
-          finalPosition = today >= revDateObj && positionRev;
-        } else if (upgradeDateObj) {
-          finalPosition = today >= upgradeDateObj && upgradePosition;
+        } else if (revDateObj && !upgradeDateObj) {
+          if (today >= revDateObj) {
+            finalPosition = positionRev;
+          } else {
+            finalPosition = item.position?.[item.position.length - 1];
+          }
+        } else if (upgradeDateObj && !revDateObj) {
+          if (today >= upgradeDateObj) {
+            finalPosition = upgradePosition;
+          } else {
+            finalPosition = item.position?.[item.position.length - 1];
+          }
         } else {
           finalPosition = item.position?.[item.position.length - 1];
         }

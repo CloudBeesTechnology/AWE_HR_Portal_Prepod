@@ -25,6 +25,7 @@ export const Nlms = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const [isUploading, setIsUploading] = useState({
     nlmsEmpUpload: false,
   });
@@ -218,6 +219,9 @@ export const Nlms = () => {
   };
 
   useEffect(() => {
+    if (searchResultData) {
+      setTrackEmpID(true);
+    }
     setValue("empID", searchResultData.empID);
 
     const fields = [
@@ -283,13 +287,13 @@ export const Nlms = () => {
           ...new Set([...(matchedEmployee.nlmsEmpValid || []), nlmsEmpValid]),
         ];
 
-        const previousUpdates = matchedEmployee.updatedBy
+        const previousUpdates = matchedEmployee?.updatedBy
           ? JSON.parse(matchedEmployee.updatedBy)
           : [];
 
         const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
 
-        const orderedUpdatedBy = updatedBy.map((entry) => ({
+        const orderedUpdatedBy = updatedBy?.map((entry) => ({
           userID: entry.userID,
           date: entry.date,
         }));
@@ -346,6 +350,7 @@ export const Nlms = () => {
             type="text"
             placeholder="Enter Employee ID"
             errors={errors}
+            trackEmpID={trackEmpID}
           />
         </div>
       </div>

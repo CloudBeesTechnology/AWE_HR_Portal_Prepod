@@ -233,7 +233,7 @@ export const NlmsForm = ({ candidate }) => {
 
     const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
 
-    const wpOrderedUpdatedBy = wpUpdatedBy.map((entry) => ({
+    const wpOrderedUpdatedBy = wpUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -247,7 +247,7 @@ export const NlmsForm = ({ candidate }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -258,15 +258,15 @@ export const NlmsForm = ({ candidate }) => {
     }
 
     const wpTrackingData = {
-      tempID: candidate.tempID,
-      nlmssubmitdate: formData.interview.nlmssubmitdate,
-      submissionrefrenceno: formData.interview.submissionrefrenceno,
-      nlmsapprovedate: formData.interview.nlmsapprovedate,
-      nlmsexpirydate: formData.interview.nlmsexpirydate,
-      ldreferenceno: formData.interview.ldreferenceno,
-      nlmsfile: isUploadingString.nlmsFile
-        ? JSON.stringify(wrapUpload(uploadedNlms.nlmsFile))
-        : formData.interview.nlmsfile,
+      tempID: candidate?.tempID,
+      nlmssubmitdate: formData.interview?.nlmssubmitdate,
+      submissionrefrenceno: formData.interview?.submissionrefrenceno,
+      nlmsapprovedate: formData.interview?.nlmsapprovedate,
+      nlmsexpirydate: formData.interview?.nlmsexpirydate,
+      ldreferenceno: formData.interview?.ldreferenceno,
+      nlmsfile: isUploadingString?.nlmsFile
+        ? JSON.stringify(wrapUpload(uploadedNlms?.nlmsFile))
+        : formData.interview?.nlmsfile,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
@@ -275,14 +275,14 @@ export const NlmsForm = ({ candidate }) => {
         const response = await wpTrackingDetails({
           WPTrackingValue: {
             id: interviewScheduleId,
-            nlmssubmitdate: formData.interview.nlmssubmitdate,
-            submissionrefrenceno: formData.interview.submissionrefrenceno,
-            nlmsapprovedate: formData.interview.nlmsapprovedate,
-            nlmsexpirydate: formData.interview.nlmsexpirydate,
-            ldreferenceno: formData.interview.ldreferenceno,
-            nlmsfile: isUploadingString.nlmsFile
-              ? JSON.stringify(wrapUpload(uploadedNlms.nlmsFile))
-              : formData.interview.nlmsfile,
+            nlmssubmitdate: formData.interview?.nlmssubmitdate,
+            submissionrefrenceno: formData.interview?.submissionrefrenceno,
+            nlmsapprovedate: formData.interview?.nlmsapprovedate,
+            nlmsexpirydate: formData.interview?.nlmsexpirydate,
+            ldreferenceno: formData.interview?.ldreferenceno,
+            nlmsfile: isUploadingString?.nlmsFile
+              ? JSON.stringify(wrapUpload(uploadedNlms?.nlmsFile))
+              : formData.interview?.nlmsfile,
             updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
@@ -294,7 +294,7 @@ export const NlmsForm = ({ candidate }) => {
 
       const interStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
         updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
 

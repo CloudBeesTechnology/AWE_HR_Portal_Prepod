@@ -245,9 +245,6 @@ export const PersonalDetails = () => {
               setShowOtherLangInput(true);
               setOtherLanguage(otherItem.replace("Other: ", "").trim());
             }
-
-            console.log(langData, "Processed Language Data");
-
             setValue("lang", langData);
           }
         }

@@ -222,7 +222,7 @@ export const AirTktForm = ({ candidate }) => {
 
     const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
 
-    const wpOrderedUpdatedBy = wpUpdatedBy.map((entry) => ({
+    const wpOrderedUpdatedBy = wpUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -236,7 +236,7 @@ export const AirTktForm = ({ candidate }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -253,13 +253,13 @@ export const AirTktForm = ({ candidate }) => {
 
     const wpTrackingData = {
       tempID: candidate.tempID,
-      departuredate: formData.interview.departuredate,
-      arrivaldate: formData.interview.arrivaldate,
-      cityname: formData.interview.cityname,
-      airfare: formData.interview.airfare,
-      airticketfile: isUploadingString.airTktFile
-        ? JSON.stringify(wrapUpload(uploadedAirTkt.airTktFile))
-        : formData.interview.airticketfile,
+      departuredate: formData.interview?.departuredate,
+      arrivaldate: formData.interview?.arrivaldate,
+      cityname: formData.interview?.cityname,
+      airfare: formData.interview?.airfare,
+      airticketfile: isUploadingString?.airTktFile
+        ? JSON.stringify(wrapUpload(uploadedAirTkt?.airTktFile))
+        : formData.interview?.airticketfile,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
@@ -270,13 +270,13 @@ export const AirTktForm = ({ candidate }) => {
         response = await wpTrackingDetails({
           WPTrackingValue: {
             id: interviewScheduleId,
-            departuredate: formData.interview.departuredate,
-            arrivaldate: formData.interview.arrivaldate,
-            cityname: formData.interview.cityname,
-            airfare: formData.interview.airfare,
-            airticketfile: isUploadingString.airTktFile
-              ? JSON.stringify(wrapUpload(uploadedAirTkt.airTktFile))
-              : formData.interview.airticketfile,
+            departuredate: formData.interview?.departuredate,
+            arrivaldate: formData.interview?.arrivaldate,
+            cityname: formData.interview?.cityname,
+            airfare: formData.interview?.airfare,
+            airticketfile: isUploadingString?.airTktFile
+              ? JSON.stringify(wrapUpload(uploadedAirTkt?.airTktFile))
+              : formData.interview?.airticketfile,
             updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
@@ -288,7 +288,7 @@ export const AirTktForm = ({ candidate }) => {
 
       const interStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
         updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
 

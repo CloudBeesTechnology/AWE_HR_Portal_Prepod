@@ -220,7 +220,7 @@ export const LabourDepForm = ({ candidate }) => {
 
     const wpUpdatedBy = [...wpPreviousUpdates, { userID: EMPID, date: TODAY }];
 
-    const wpOrderedUpdatedBy = wpUpdatedBy.map((entry) => ({
+    const wpOrderedUpdatedBy = wpUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -234,7 +234,7 @@ export const LabourDepForm = ({ candidate }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -250,13 +250,13 @@ export const LabourDepForm = ({ candidate }) => {
     }
 
     const wpTrackingData = {
-      tempID: candidate.tempID,
-      lbrDepoNum: formData.interview.lbrDepoNum,
-      lbrEndroseDate: formData.interview.lbrEndroseDate,
-      lbrDepoAmount: formData.interview.lbrDepoAmount,
-      lbrFile: isUploadingString.lbrFile
-        ? JSON.stringify(wrapUpload(uploadedLabDep.lbrFile))
-        : formData.interview.lbrFile,
+      tempID: candidate?.tempID,
+      lbrDepoNum: formData.interview?.lbrDepoNum,
+      lbrEndroseDate: formData.interview?.lbrEndroseDate,
+      lbrDepoAmount: formData.interview?.lbrDepoAmount,
+      lbrFile: isUploadingString?.lbrFile
+        ? JSON.stringify(wrapUpload(uploadedLabDep?.lbrFile))
+        : formData.interview?.lbrFile,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
@@ -267,12 +267,12 @@ export const LabourDepForm = ({ candidate }) => {
         response = await wpTrackingDetails({
           WPTrackingValue: {
             id: interviewScheduleId,
-            lbrDepoNum: formData.interview.lbrDepoNum,
-            lbrEndroseDate: formData.interview.lbrEndroseDate,
-            lbrDepoAmount: formData.interview.lbrDepoAmount,
-            lbrFile: isUploadingString.lbrFile
-              ? JSON.stringify(wrapUpload(uploadedLabDep.lbrFile))
-              : formData.interview.lbrFile,
+            lbrDepoNum: formData.interview?.lbrDepoNum,
+            lbrEndroseDate: formData.interview?.lbrEndroseDate,
+            lbrDepoAmount: formData.interview?.lbrDepoAmount,
+            lbrFile: isUploadingString?.lbrFile
+              ? JSON.stringify(wrapUpload(uploadedLabDep?.lbrFile))
+              : formData.interview?.lbrFile,
             updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
@@ -284,7 +284,7 @@ export const LabourDepForm = ({ candidate }) => {
 
       const interStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
         updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
 

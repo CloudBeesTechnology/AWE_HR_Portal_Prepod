@@ -8,6 +8,7 @@ export const EmpPE = () => {
   const { allData, title } = location.state || {};
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [isDateFiltered, setIsDateFiltered] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
@@ -23,9 +24,8 @@ export const EmpPE = () => {
     "Pass Expiry",
   ]);
 
-
   // Check if the date is strictly in the next month
-  
+
   const isInNextMonth = (expiryDate) => {
     if (!expiryDate) return false;
 
@@ -64,10 +64,14 @@ export const EmpPE = () => {
       .filter((item) => {
         if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
           const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
-        
-          if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION") {
+
+          if (
+            lastWorkStatus.toUpperCase() === "TERMINATION" ||
+            lastWorkStatus.toUpperCase() === "RESIGNATION"
+          ) {
             return false; // Exclude items with TERMINATION or RESIGNATION
-          }}
+          }
+        }
         const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
         return isInNextMonth(lastPassExp);
       })
@@ -80,24 +84,25 @@ export const EmpPE = () => {
           name: item.name || "-",
           nationality: item.nationality || "-",
           dateOfJoin: DateFormat(item.doj) || "-",
-           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+          department: Array.isArray(item.department)
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           passExpiry: DateFormat(lastPassExp) || "-",
         };
-      })      .sort((a, b) => a.lastPassExp - b.lastPassExp); // Sort using lastPassExp
-  
-      // Remove lastPassExp after sorting
-      return sortedData.map(({ lastPassExp, ...rest }) => rest);
+      })
+      .sort((a, b) => a.lastPassExp - b.lastPassExp); // Sort using lastPassExp
+
+    // Remove lastPassExp after sorting
+    return sortedData.map(({ lastPassExp, ...rest }) => rest);
   };
 
   useEffect(() => {
@@ -123,13 +128,16 @@ export const EmpPE = () => {
       .filter((data) => {
         if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
           return false; // Return early if workStatus is undefined or an empty array
-      }
-      
-      const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
-      
-      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
+        }
+
+        const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
+
+        if (
+          lastWorkStatus?.toUpperCase() === "TERMINATION" ||
+          lastWorkStatus?.toUpperCase() === "RESIGNATION"
+        ) {
           return false; // Exclude records with TERMINATION or RESIGNATION
-      }
+        }
         const expiryArray = data.empPassExp || [];
         const expiryDate = expiryArray.length
           ? new Date(expiryArray[expiryArray.length - 1])
@@ -152,24 +160,34 @@ export const EmpPE = () => {
           name: item.name || "-",
           nationality: item.nationality || "-",
           dateOfJoin: DateFormat(item.doj) || "-",
-           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+          department: Array.isArray(item.department)
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           passExpiry: DateFormat(lastPassExp) || "-",
         };
       })
       .sort((a, b) => a.lastPassExp - b.lastPassExp) // Sort by lastPassExp
       .map(({ lastPassExp, ...rest }) => rest); // Remove lastPassExp after sorting
-  
+
+    if (start || end) {
+      if (filtered.length === 0) {
+        setIsDateFiltered(true); // No data found
+      } else {
+        setIsDateFiltered(false); // Data exists
+      }
+    } else {
+      setIsDateFiltered(false); // No date filters applied
+    }
+
     setFilteredData(filtered);
   };
 
@@ -182,6 +200,7 @@ export const EmpPE = () => {
         startDate={startDate}
         endDate={endDate}
         handleDate={handleDate}
+        isFiltered={isDateFiltered}
       />
     </div>
   );

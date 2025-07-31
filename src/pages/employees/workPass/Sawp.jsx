@@ -27,6 +27,7 @@ export const Sawp = () => {
   const [requestDate, setRequestDate] = useState([]);
   const [recivedDate, setRecivedDate] = useState([]);
   const [empId, setEmpID] = useState("");
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const [isUploading, setIsUploading] = useState({
     sawpEmpUpload: false,
   });
@@ -176,6 +177,9 @@ export const Sawp = () => {
   };
 
   useEffect(() => {
+    if (searchResultData) {
+      setTrackEmpID(true);
+    }
     setValue("empID", searchResultData.empID);
     setValue("sawpEmpLtrReq", searchResultData.sawpEmpLtrReq || []);
     setRequestDate(searchResultData.sawpEmpLtrReq || []);
@@ -245,13 +249,13 @@ export const Sawp = () => {
           ]),
         ];
 
-        const previousUpdates = checkingEIDTable.updatedBy
+        const previousUpdates = checkingEIDTable?.updatedBy
           ? JSON.parse(checkingEIDTable.updatedBy)
           : [];
 
         const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
 
-        const orderedUpdatedBy = updatedBy.map((entry) => ({
+        const orderedUpdatedBy = updatedBy?.map((entry) => ({
           userID: entry.userID,
           date: entry.date,
         }));
@@ -305,6 +309,7 @@ export const Sawp = () => {
             placeholder="Enter Employee ID"
             errors={errors}
             watch={empID}
+            trackEmpID={trackEmpID}
           />
         </div>
       </div>

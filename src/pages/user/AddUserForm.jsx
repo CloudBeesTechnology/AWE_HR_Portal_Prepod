@@ -244,7 +244,7 @@ export const AddNewForm = () => {
           })
           .then((res) => {
             // console.log(res);
-            setShowTitle("User updated Successfully");
+            setShowTitle("User updated successfully");
             setNotification(true);
           })
           .catch((err) => {
@@ -307,7 +307,7 @@ export const AddNewForm = () => {
                   "hr_no-reply@adininworks.com",
                   email
                 );
-                setShowTitle("Created a User Successfully");
+                setShowTitle("Created a user successfully");
                 setNotification(true);
               })
               .catch((err) => {

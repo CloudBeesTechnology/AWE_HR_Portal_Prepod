@@ -7,6 +7,7 @@ export const Termination = () => {
   const { allData, title } = location.state || {};
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [isDateFiltered, setIsDateFiltered] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
@@ -55,23 +56,27 @@ export const Termination = () => {
           dateOfJoin: formatDate(item.doj) || "-",
           nationality: item.nationality || "-",
           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
           position: (() => {
             const today = new Date();
-            const positionRevDate = item.positionRevDate?.[item.positionRevDate.length - 1];
+            const positionRevDate =
+              item.positionRevDate?.[item.positionRevDate.length - 1];
             const positionRev = item.positionRev?.[item.positionRev.length - 1];
-            const upgradePosition = item.upgradePosition?.[item.upgradePosition.length - 1];
+            const upgradePosition =
+              item.upgradePosition?.[item.upgradePosition.length - 1];
             const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
             let finalPosition;
-  
+
             // Convert to dates for comparison (ensure dates are valid before comparing)
-            const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
+            const revDateObj = positionRevDate
+              ? new Date(positionRevDate)
+              : null;
             const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
-  
+
             if (revDateObj && upgradeDateObj) {
               if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
                 finalPosition = item.position?.[item.position.length - 1];
@@ -97,7 +102,7 @@ export const Termination = () => {
             } else {
               finalPosition = item.position?.[item.position.length - 1];
             }
-  
+
             return finalPosition || "-";
           })(),
           otherPosition: Array.isArray(item.otherPosition)
@@ -109,10 +114,9 @@ export const Termination = () => {
       })
       .sort((a, b) => a.termiDate - b.termiDate) // Sort by termiDate in ascending order
       .map(({ termiDate, ...rest }) => rest); // Remove termiDate after sorting
-  
+
     return sortedData; // Return the sorted and formatted data
   };
-  
 
   useEffect(() => {
     setTableBody(resignationMergedData(allData));
@@ -132,16 +136,16 @@ export const Termination = () => {
     const end =
       type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
 
-      const filtered = allData
+    const filtered = allData
       .filter((data) => {
         const termiDate = data.termiDate ? new Date(data.termiDate) : null;
-    
+
         if (!termiDate || isNaN(termiDate.getTime())) return false;
-    
+
         if (start && end) return termiDate >= start && termiDate <= end;
         if (start) return termiDate >= start;
         if (end) return termiDate <= end;
-    
+
         return true;
       })
       .map((item) => ({
@@ -151,16 +155,18 @@ export const Termination = () => {
         dateOfJoin: formatDate(item.doj) || "-", // Ensures date is formatted
         nationality: item.nationality || "-",
         department: Array.isArray(item.department)
-        ? item.department[item.department.length - 1]
-        : "-",
-        otherDepartment:Array.isArray(item.otherDepartment)
-        ? item.otherDepartment[item.otherDepartment.length - 1]
-        : "-",
+          ? item.department[item.department.length - 1]
+          : "-",
+        otherDepartment: Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
         position: (() => {
           const today = new Date();
-          const positionRevDate = item.positionRevDate?.[item.positionRevDate.length - 1];
+          const positionRevDate =
+            item.positionRevDate?.[item.positionRevDate.length - 1];
           const positionRev = item.positionRev?.[item.positionRev.length - 1];
-          const upgradePosition = item.upgradePosition?.[item.upgradePosition.length - 1];
+          const upgradePosition =
+            item.upgradePosition?.[item.upgradePosition.length - 1];
           const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
           let finalPosition;
 
@@ -205,9 +211,19 @@ export const Termination = () => {
       }))
       .sort((a, b) => a.rawTermiDate - b.rawTermiDate) // Sort by raw termiDate
       .map(({ rawTermiDate, ...rest }) => rest); // Remove raw date after sorting
-    
+
+    if (start || end) {
+      if (filtered.length === 0) {
+        setIsDateFiltered(true); // No data found
+      } else {
+        setIsDateFiltered(false); // Data exists
+      }
+    } else {
+      setIsDateFiltered(false); // No date filters applied
+    }
+
     setFilteredData(filtered);
-    }    
+  };
 
   return (
     <div>
@@ -219,6 +235,7 @@ export const Termination = () => {
         endDate={endDate}
         title={title}
         handleDate={handleDate}
+        isFiltered={isDateFiltered}
       />
     </div>
   );

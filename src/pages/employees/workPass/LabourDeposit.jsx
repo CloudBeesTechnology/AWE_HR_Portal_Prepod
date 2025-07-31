@@ -41,6 +41,7 @@ export const LabourDeposit = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const [isUploading, setIsUploading] = useState({
     lbrDepoUpload: false,
   });
@@ -204,6 +205,9 @@ export const LabourDeposit = () => {
   };
 
   useEffect(() => {
+    if (searchResultData) {
+      setTrackEmpID(true);
+    }
     setValue("empID", searchResultData.empID);
     const fields = [
       "lbrReceiptNo",
@@ -262,13 +266,13 @@ export const LabourDeposit = () => {
           ...new Set([...(matchedEmployee.lbrDepoSubmit || []), lbrDepoSubmit]),
         ];
 
-        const previousUpdates = matchedEmployee.updatedBy
+        const previousUpdates = matchedEmployee?.updatedBy
           ? JSON.parse(matchedEmployee.updatedBy)
           : [];
 
         const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
 
-        const orderedUpdatedBy = updatedBy.map((entry) => ({
+        const orderedUpdatedBy = updatedBy?.map((entry) => ({
           userID: entry.userID,
           date: entry.date,
         }));
@@ -321,6 +325,7 @@ export const LabourDeposit = () => {
             type="text"
             placeholder="Enter Employee ID"
             errors={errors}
+            trackEmpID={trackEmpID}
           />
         </div>
       </div>

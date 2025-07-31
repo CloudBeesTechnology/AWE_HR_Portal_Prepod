@@ -4,7 +4,7 @@ import { GoUpload } from "react-icons/go";
 import { ClaimInsuranceSchema } from "../../services/EmployeeValidation";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs, insClaim } from "../../services/uploadsDocsS3/UploadDocs";
+import { insClaim } from "../../services/uploadsDocsS3/UploadDocs";
 import { InsClaimFun } from "../../services/createMethod/InsClaimFun";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { DataSupply } from "../../utils/DataStoredContext";
@@ -45,7 +45,7 @@ export const InsuranceClaim = () => {
     setValue,
     watch,
     getValues,
-    reset
+    reset,
   } = useForm({
     resolver: yupResolver(ClaimInsuranceSchema),
     defaultValues: {
@@ -99,7 +99,7 @@ export const InsuranceClaim = () => {
   const handleRemoveFileClick = async (index) => {
     setinsuranceClaims((prevClaims) => {
       const newClaims = prevClaims.filter((_, i) => i !== index);
-      // console.log(newClaims, "Updated insuranceClaims");
+
       return newClaims;
     });
     // console.log(newFields, "95462");
@@ -133,7 +133,7 @@ export const InsuranceClaim = () => {
 
       // Ensure `insuranceClaims` exists
       if (updatedDocs.insuranceClaims) {
-        delete updatedDocs.insuranceClaims[index]; // Remove the specific index
+        delete updatedDocs.insuranceClaims[index]; 
       }
 
       return updatedDocs;
@@ -145,7 +145,6 @@ export const InsuranceClaim = () => {
       ...prev,
       [`${idx}_${label}`]: value,
     }));
-    // console.log(idx, value);
   };
 
   const handleFileChange = async (e, type, index) => {
@@ -181,7 +180,6 @@ export const InsuranceClaim = () => {
     }
   };
   const claimUp = "insuranceClaims";
-  // console.log(isUploading);
   const searchResult = (result) => {
     if (result) {
       setTrackEmpID(true);
@@ -189,7 +187,6 @@ export const InsuranceClaim = () => {
     // Reset the state before setting new data
     setValue("empID", result?.empID);
     const insuranceClaimsData = result?.insuranceClaims;
-    // console.log(insuranceClaimsData);
 
     if (insuranceClaimsData) {
       try {
@@ -289,8 +286,8 @@ export const InsuranceClaim = () => {
   };
 
   const getFileName = (filePath) => {
-    const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
-    // const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    const fileNameWithExtension = filePath.split("/").pop();
+
     return fileNameWithExtension;
   };
   const handleDeleteMsg = () => {
@@ -308,7 +305,6 @@ export const InsuranceClaim = () => {
         fileName,
         watchedEmpID
       );
-      // console.log(`handleDeleteFile result: ${isDeleted}`);
 
       const isDeletedArrayUpload = await DeleteClaim(
         fileType,
@@ -334,17 +330,14 @@ export const InsuranceClaim = () => {
       }
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
-      // console.log(`Deleted "${fileName}". Remaining files:`);
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
   };
-  // console.log(uploadedDocs, "ins1");
-  // console.log(uploadedFileDep, "ins1filename");
+
 
   const onSubmit = async (data) => {
-    // console.log(data);
     try {
       const today = new Date().toISOString().split("T")[0];
 
@@ -353,19 +346,26 @@ export const InsuranceClaim = () => {
       );
 
       if (checkingDITable) {
-        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
-        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+        const previous = checkingDITable?.updatedBy
+          ? JSON.parse(checkingDITable.updatedBy)
+          : [];
+        const updatedByIns = [...previous, { userID: userType, date: today }];
+        const orderedUpdatedByIns = updatedByIns?.map((entry) => ({
+          userID: entry.userID,
+          date: entry.date,
+        }));
         const ICValuse = {
           ...data,
           insuranceClaims: data?.insuranceClaims?.map((insurance, index) => {
             return {
               ...insurance,
-              claimUpload:
-                JSON.stringify(uploadedDocs?.insuranceClaims?.[index]) || [],
+              claimUpload: JSON.stringify(
+                uploadedDocs?.insuranceClaims?.[index] || []
+              ),
             };
           }),
           id: checkingDITable.id,
-          updatedBy,
+          updatedBy: JSON.stringify(orderedUpdatedByIns),
         };
         // console.log(ICValuse, "update");
         await InsClaimUpData({ ICValuse });
@@ -377,8 +377,9 @@ export const InsuranceClaim = () => {
           insuranceClaims: data?.insuranceClaims.map((insurance, index) => {
             return {
               ...insurance,
-              claimUpload:
-                JSON.stringify(uploadedDocs.insuranceClaims[index]) || [],
+              claimUpload: JSON.stringify(
+                uploadedDocs?.insuranceClaims?.[index] || []
+              ),
             };
           }),
           createdBy: JSON.stringify([{ userID: userType, date: today }]),
@@ -397,20 +398,17 @@ export const InsuranceClaim = () => {
 
   const access = "Insurance";
 
-
   const parsedClaims = insuranceClaims
     ?.map((entry) => {
       try {
-        // Parse only if entry is a string
         return typeof entry === "string" ? JSON.parse(entry) : entry;
       } catch (error) {
         console.error("Error parsing claims:", error);
         return null;
       }
     })
-    .flat() // Flatten if entries contain nested arrays
-    .filter((item) => item && typeof item === "object"); // Remove null values
-  // console.log(parsedClaims);
+    .flat() 
+    .filter((item) => item && typeof item === "object");
 
   return (
     <>

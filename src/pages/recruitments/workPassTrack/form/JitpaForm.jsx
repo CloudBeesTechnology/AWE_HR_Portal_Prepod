@@ -237,7 +237,7 @@ export const JitpaForm = ({ candidate }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -254,13 +254,13 @@ export const JitpaForm = ({ candidate }) => {
 
     const wpTrackingData = {
       tempID: candidate.tempID,
-      tbapurchasedate: formData.interview.tbapurchasedate,
-      submitdateendorsement: formData.interview.submitdateendorsement,
-      jitpaexpirydate: formData.interview.jitpaexpirydate,
-      jitpaamount: formData.interview.jitpaamount,
-      jitpafile: isUploadingString.jitpaFile
-        ? JSON.stringify(wrapUpload(uploadedJitpa.jitpaFile))
-        : formData.interview.jitpafile,
+      tbapurchasedate: formData.interview?.tbapurchasedate,
+      submitdateendorsement: formData.interview?.submitdateendorsement,
+      jitpaexpirydate: formData.interview?.jitpaexpirydate,
+      jitpaamount: formData.interview?.jitpaamount,
+      jitpafile: isUploadingString?.jitpaFile
+        ? JSON.stringify(wrapUpload(uploadedJitpa?.jitpaFile))
+        : formData.interview?.jitpafile,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
@@ -271,13 +271,13 @@ export const JitpaForm = ({ candidate }) => {
         response = await wpTrackingDetails({
           WPTrackingValue: {
             id: interviewScheduleId,
-            tbapurchasedate: formData.interview.tbapurchasedate,
-            submitdateendorsement: formData.interview.submitdateendorsement,
-            jitpaexpirydate: formData.interview.jitpaexpirydate,
-            jitpaamount: formData.interview.jitpaamount,
-            jitpafile: isUploadingString.jitpaFile
-              ? JSON.stringify(wrapUpload(uploadedJitpa.jitpaFile))
-              : formData.interview.jitpafile,
+            tbapurchasedate: formData.interview?.tbapurchasedate,
+            submitdateendorsement: formData.interview?.submitdateendorsement,
+            jitpaexpirydate: formData.interview?.jitpaexpirydate,
+            jitpaamount: formData.interview?.jitpaamount,
+            jitpafile: isUploadingString?.jitpaFile
+              ? JSON.stringify(wrapUpload(uploadedJitpa?.jitpaFile))
+              : formData.interview?.jitpafile,
             updatedBy: JSON.stringify(wpOrderedUpdatedBy),
           },
         });
@@ -289,7 +289,7 @@ export const JitpaForm = ({ candidate }) => {
 
       const interStatus = {
         id: interviewScheduleStatusId,
-        status: formData.interview.status,
+        status: formData.interview?.status,
         updatedBy: JSON.stringify(intOrderedUpdatedBy),
       };
 

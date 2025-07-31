@@ -76,7 +76,8 @@ export const CandyDetails = () => {
       status,
       PDTableID,
       EDTableID,
-      updatedBy,
+      orderedEmpUpdatedBy,
+      orderedEduUpdatedBy,
     } = reqValue;
 
     const totalData = {
@@ -119,7 +120,7 @@ export const CandyDetails = () => {
       religion,
       status,
       workExperience,
-      updatedBy,
+      updatedBy: orderedEmpUpdatedBy,
     };
 
     const totalDataTwo = {
@@ -146,7 +147,7 @@ export const CandyDetails = () => {
       uploadCertificate,
       uploadPp,
       uploadIc,
-      updatedBy,
+      updatedBy: orderedEduUpdatedBy,
     };
 
     try {
@@ -160,8 +161,8 @@ export const CandyDetails = () => {
           variables: { input: totalDataTwo },
         }),
       ]);
-      console.log("update Personal", personaldetails);
-      console.log("Update Education", educationDetails);
+      // console.log("update Personal", personaldetails);
+      // console.log("Update Education", educationDetails);
       // localStorage.removeItem("applicantFormData");
       // localStorage.removeItem("personalFormData");
     } catch (error) {

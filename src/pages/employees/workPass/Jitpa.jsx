@@ -40,6 +40,7 @@ export const Jitpa = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [trackEmpID, setTrackEmpID] = useState(false);
   const [isUploading, setIsUploading] = useState({
     jpEmpUpload: false,
   });
@@ -209,6 +210,10 @@ export const Jitpa = () => {
   };
 
   useEffect(() => {
+    if (searchResultData) {
+      setTrackEmpID(true);
+    }
+
     setValue("empID", searchResultData.empID);
     const fields = [
       "tbaPurchase",
@@ -259,7 +264,7 @@ export const Jitpa = () => {
       );
 
       const formatDate = (date) =>
-        date ? new Date(date).toLocaleDateString("en-CA") : null; // 'en-CA' gives yyyy-mm-dd format
+        date ? new Date(date).toLocaleDateString("en-CA") : null; 
       const tbaPurchase = formatDate(data.tbaPurchase);
       const jpValid = formatDate(data.jpValid);
       const jpEndorse = formatDate(data.jpEndorse);
@@ -267,32 +272,32 @@ export const Jitpa = () => {
       if (matchedEmployee) {
         const updatedSubmissionDate = [
           ...new Set([
-            ...(matchedEmployee.tbaPurchase || []), // ensure it's an array before spreading
+            ...(matchedEmployee.tbaPurchase || []), 
             tbaPurchase,
           ]),
         ];
 
         const updatedEndorseDate = [
           ...new Set([
-            ...(matchedEmployee.jpEndorse || []), // ensure it's an array before spreading
+            ...(matchedEmployee.jpEndorse || []), 
             jpEndorse,
           ]),
         ];
 
         const updatedValidDate = [
           ...new Set([
-            ...(matchedEmployee.jpValid || []), // ensure it's an array before spreading
+            ...(matchedEmployee.jpValid || []), 
             jpValid,
           ]),
         ];
 
-        const previousUpdates = matchedEmployee.updatedBy
+        const previousUpdates = matchedEmployee?.updatedBy
           ? JSON.parse(matchedEmployee.updatedBy)
           : [];
 
         const updatedBy = [...previousUpdates, { userID: EMPID, date: TODAY }];
 
-        const orderedUpdatedBy = updatedBy.map((entry) => ({
+        const orderedUpdatedBy = updatedBy?.map((entry) => ({
           userID: entry.userID,
           date: entry.date,
         }));
@@ -348,6 +353,7 @@ export const Jitpa = () => {
             type="text"
             placeholder="Enter Employee ID"
             errors={errors}
+            trackEmpID={trackEmpID}
           />
         </div>
       </div>

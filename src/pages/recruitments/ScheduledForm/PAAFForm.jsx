@@ -182,11 +182,11 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
 
-    const selectedInterviewData = mergedInterviewData.find(
+    const selectedInterviewData = mergedInterviewData?.find(
       (data) => data.tempID === candidate?.tempID
     );
 
-    const selectedInterviewDataStatus = IVSSDetails.find(
+    const selectedInterviewDataStatus = IVSSDetails?.find(
       (data) => data.tempID === candidate?.tempID
     );
 
@@ -205,7 +205,7 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const loiOrderedUpdatedBy = loiUpdatedBy.map((entry) => ({
+    const loiOrderedUpdatedBy = loiUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
@@ -219,16 +219,16 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
       { userID: EMPID, date: TODAY },
     ];
 
-    const intOrderedUpdatedBy = intUpdatedBy.map((entry) => ({
+    const intOrderedUpdatedBy = intUpdatedBy?.map((entry) => ({
       userID: entry.userID,
       date: entry.date,
     }));
 
     const createData = {
-      paafApproveDate: formData.interview.paafApproveDate,
-      paafFile: isUploadingString.paafFile
-        ? JSON.stringify(wrapUpload(uploadedPAAF.paafFile))
-        : formData.interview.paafFile,
+      paafApproveDate: formData.interview?.paafApproveDate,
+      paafFile: isUploadingString?.paafFile
+        ? JSON.stringify(wrapUpload(uploadedPAAF?.paafFile))
+        : formData.interview?.paafFile,
       tempID: candidate.tempID,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
@@ -238,10 +238,10 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
         await loiDetails({
           LoiValue: {
             id: localMobilizationId,
-            paafApproveDate: formData.interview.paafApproveDate,
-            paafFile: isUploadingString.paafFile
-              ? JSON.stringify(wrapUpload(uploadedPAAF.paafFile))
-              : formData.interview.paafFile,
+            paafApproveDate: formData.interview?.paafApproveDate,
+            paafFile: isUploadingString?.paafFile
+              ? JSON.stringify(wrapUpload(uploadedPAAF?.paafFile))
+              : formData.interview?.paafFile,
             updatedBy: JSON.stringify(loiOrderedUpdatedBy),
           },
         });
@@ -252,7 +252,7 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
       await interviewDetails({
         InterviewValue: {
           id: interviewScheduleStatusId,
-          status: formData.interview.status,
+          status: formData.interview?.status,
           updatedBy: JSON.stringify(intOrderedUpdatedBy),
         },
       });
