@@ -221,7 +221,7 @@ export const AddNewForm = () => {
         { userID: userIDFind, date: today },
       ];
 
-      const orderedUpdatedByUser = updatedByUser.map((entry) => ({
+      const orderedUpdatedByUser = updatedByUser?.map((entry) => ({
         userID: entry.userID,
         date: entry.date,
       }));
