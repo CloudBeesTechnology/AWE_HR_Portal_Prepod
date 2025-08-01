@@ -24,65 +24,85 @@
   .screen-size {
     @apply max-w-screen-2xl w-[95%] mx-auto;
   }
+
   .center {
     @apply flex justify-center items-center;
   }
+
   .vertical-center {
     @apply flex justify-center;
   }
+
   .horizontal-center {
     @apply flex items-center justify-evenly;
   }
+
   .title {
     @apply text-[24px] font-semibold;
   }
+
   .text_size_1 {
     @apply text-3xl font-semibold;
   }
+
   .text_size_2 {
     @apply text-xl font-semibold;
   }
+
   .text_size_3 {
     @apply text-lg font-semibold;
   }
+
   .text_size_4 {
     @apply text-lg font-medium;
   }
+
   .text_size_5 {
     @apply text-[16px] font-semibold;
   }
+
   .text_size_6 {
     @apply text-[16px] font-medium;
   }
+
   .text_size_7 {
     @apply text-sm font-semibold;
   }
+
   .text_size_8 {
     @apply text-sm font-medium;
   }
+
   .text_size_9 {
     @apply text-xs font-medium;
   }
+
   .text_size_10 {
     @apply text-[10px] font-medium;
   }
+
   .text_size_11 {
     @apply text-[8px] font-medium;
   }
+
   .primary_btn {
     @apply bg-primary font-bold py-2 px-24 text-dark_grey rounded-md;
   }
+
   .secondary_btn {
     @apply bg-medium_grey py-2 px-5 text-yellow rounded-md;
   }
+
   .btn_1 {
     @apply bg-primary py-2 px-10 text-zinc rounded-2xl;
   }
+
   .btn_2 {
     @apply bg-secondary py-2 px-3 rounded-md text-white;
   }
+
   .input-field {
-    @apply w-full h-[45px] bg-lite_skyBlue px-2 mt-2 border outline-none border-[#dedddd] rounded ;
+    @apply w-full h-[45px] bg-lite_skyBlue px-2 mt-2 border outline-none border-[#dedddd] rounded;
   }
 
   .form-group {
@@ -93,13 +113,15 @@
     from {
       transform: rotate(0deg);
     }
+
     to {
       transform: rotate(360deg);
     }
   }
 
   .animate-spin-slow {
-    animation: spin 3s linear infinite; /* Adjust speed (3s) as needed */
+    animation: spin 3s linear infinite;
+    /* Adjust speed (3s) as needed */
   }
 }
 
@@ -109,40 +131,56 @@
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollBar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
+
 .label-new {
   display: inline-block;
-  background-color: #ff7f25; /* Orange color */
+  background-color: #ff7f25;
+  /* Orange color */
   color: white;
   font-weight: bold;
   font-size: 14px;
   padding: 4px 12px;
-  border-radius: 20px 0 20px 0px; /* Rounded on the left side */
+  border-radius: 20px 0 20px 0px;
+  /* Rounded on the left side */
 }
+
 .select-custom {
   background: url("./assets/drop.png") no-repeat;
   background-position: right 4% center;
   background-color: #f5f7fb;
-  background-size: 18px 18px; /* Adjust size if needed */
-  appearance: none; /* Remove default arrow */
-  padding: 0 33px 0 5px;
+  background-size: 18px 18px;
+  /* Adjust size if needed */
+  appearance: none;
+  /* Remove default arrow */
+  padding: 9px 40px 9px 9px;
 }
+
 input:disabled {
   background-color: white;
-  color: black; /* Optional: Ensure text is visible */
-  opacity: 1; /* Override default opacity */
-  cursor: not-allowed; /* Optional: Show disabled state */
+  color: black;
+  /* Optional: Ensure text is visible */
+  opacity: 1;
+  /* Override default opacity */
+  cursor: not-allowed;
+  /* Optional: Show disabled state */
 }
+
 .select-filter {
   background: url("./assets/filter.png") no-repeat;
   background-position: right 4% center;
   background-color: #f5f7fb;
-  background-size: 18px 18px; /* Adjust size if needed */
-  appearance: none; /* Remove default arrow */
-  
+  background-size: 18px 18px;
+  /* Adjust size if needed */
+  appearance: none;
+  /* Remove default arrow */
+
 }
+
 /* added by hari --------------------------------------*/
 
 .leaveManagementTable::-webkit-scrollbar {
@@ -216,25 +254,31 @@ input:disabled {
 .checkbox-container {
   display: flex;
   align-items: center;
-  gap: 8px; /* Adjust the gap between checkbox and label as needed */
+  gap: 8px;
+  /* Adjust the gap between checkbox and label as needed */
 }
 
 /* @media print {
   /* Styles for print or PDF */
 .checkbox-container {
-  display: flex; /* Ensure layout is preserved */
-  align-items: center; /* Align items */
+  display: flex;
+  /* Ensure layout is preserved */
+  align-items: center;
+  /* Align items */
 }
 
 .your-element {
   /* Adjust styles specifically for print if necessary */
-  margin: 0; /* Example */
+  margin: 0;
+  /* Example */
 }
 
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none; /* Chrome/Safari */
-  margin: 0; /* Remove margin */
+  -webkit-appearance: none;
+  /* Chrome/Safari */
+  margin: 0;
+  /* Remove margin */
 }
 
 input[type="number"] {
@@ -243,23 +287,31 @@ input[type="number"] {
   appearance: none;
   margin: 0;
 }
+
 .export-container {
   /* text-align: center; Center align all content */
-  margin: 0; /* Remove margins */
-  padding: 0; /* Remove padding */
-  width: 100%; /* Set full width */
+  margin: 0;
+  /* Remove margins */
+  padding: 0;
+  /* Remove padding */
+  width: 100%;
+  /* Set full width */
 }
 
 /* Scrollable table for TSheet %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 .table-container {
-  margin-top: 2.25rem; /* mt-9 */
+  margin-top: 2.25rem;
+  /* mt-9 */
   max-height: 500px;
   min-width: 100px;
-  overflow-y: scroll; /* Enable vertical scrolling */
+  overflow-y: scroll;
+  /* Enable vertical scrolling */
   display: block;
-  width:100%; /*Ensures full width for the table */
-  scrollbar-width: thin; /* For Firefox (stylish scroll) */
+  width: 100%;
+  /*Ensures full width for the table */
+  scrollbar-width: thin;
+  /* For Firefox (stylish scroll) */
   /* scrollbar-color: #bfc1c2 #f2f0f0; Scrollbar color (thumb and track) */
   box-shadow: #9c0f0f;
 }
@@ -270,7 +322,7 @@ input[type="number"] {
   top: 0;
   background-color: #939393;
   z-index: 1;
-  text-align:left;
+  text-align: left;
   box-shadow: 0px 2px 4px rgba(26, 25, 25, 0.1);
   color: #f0f0f0;
   height: 45px;
@@ -286,15 +338,20 @@ input[type="number"] {
 }
 
 @media print {
+
   /* Remove margins to ensure content fills the entire page */
   body {
     margin: 0;
   }
+
   /* Force page breaks for the PDF content */
   .invoice-content {
-    page-break-before: always; /* Ensures each new page starts with a fresh break */
-    page-break-after: always; /* Forces a break after each PDF page */
-    break-inside: avoid; /* Prevents breaking content between pages */
+    page-break-before: always;
+    /* Ensures each new page starts with a fresh break */
+    page-break-after: always;
+    /* Forces a break after each PDF page */
+    break-inside: avoid;
+    /* Prevents breaking content between pages */
   }
 
   .print-contract-form {
@@ -306,17 +363,21 @@ input[type="number"] {
   .print-width {
     width: 160px;
   }
+
   .print-box {
     margin: 0 !important;
     padding: 0px !important;
     width: 100%;
   }
-  .print-remark{
+
+  .print-remark {
     margin-block: 100px !important;
   }
+
   .print-renewalContract {
     overflow: hidden;
   }
+
   /* Ensure the PDF content doesn't overflow the page */
   .pdfViewer {
     max-width: 100%;
@@ -332,11 +393,12 @@ input[type="number"] {
 }
 
 .custom-shadow {
-  box-shadow: 0px 0px 1px 0px ;
+  box-shadow: 0px 0px 1px 0px;
 }
 
 @media (min-width: 1300px) {
   .custom-gap {
-    row-gap: 2rem; /* 40px equivalent to gap-y-10 */
+    row-gap: 2rem;
+    /* 40px equivalent to gap-y-10 */
   }
 }

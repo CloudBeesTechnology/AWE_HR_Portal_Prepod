@@ -126,9 +126,13 @@ export const FilterTable = ({
       "hrmStatus",
       "gmStatus",
       "matchedID",
-      "oldCED","probID", "probCreatedAt", "probExtendStatus" , "prevProbExDate"
+      "oldCED",
+      "probID",
+      "probCreatedAt",
+      "probExtendStatus",
+      "prevProbExDate",
     ];
-   const processedData = filteredTableBody.map((row) => {
+    const processedData = filteredTableBody.map((row) => {
       const processedRow = {};
       for (const [key, value] of Object.entries(row)) {
         if (excludeKeys.includes(key)) continue;
@@ -173,7 +177,7 @@ export const FilterTable = ({
     }
 
     worksheet.addRow(dateRow);
-    worksheet.addRow([]); 
+    worksheet.addRow([]);
 
     // Add header row with formatted keys
     const tableHeader = Object.keys(processedData[0]).map(formatKey);
@@ -196,7 +200,7 @@ export const FilterTable = ({
         horizontal: "center",
         vertical: "middle",
         wrapText: true,
-      }; 
+      };
     });
 
     // Apply styles for all data rows
@@ -224,7 +228,7 @@ export const FilterTable = ({
       saveAs(blob, `${title}.xlsx`);
     });
   };
-  
+
   const isClickableRow = [
     "Probation Review",
     "Probation Form Update",
@@ -234,7 +238,7 @@ export const FilterTable = ({
   ].includes(title);
 
   return (
-   <div className="w-full px-7 bg-[#F5F6F1CC]">
+    <div className="w-full px-7 bg-[#F5F6F1CC]">
       <div className="w-full flex items-center justify-between gap-5 ">
         <Link to="/reports" className="text-xl flex-1 text-grey ">
           <FaArrowLeft />
@@ -252,7 +256,6 @@ export const FilterTable = ({
             placeholder="Search"
             value={searchQuery}
             onChange={handleSearchChange}
-   
             className="outline-none rounded-lg px-4 py-2 shadow-md border border-[#C5C5C5] text-grey"
           />
           <div className=" absolute right-3 top-2 bg-white text-[24px]">
@@ -269,7 +272,7 @@ export const FilterTable = ({
                   htmlFor="start-date"
                   className="block text-[16px] font-medium"
                 >
-                  Start Date
+                  Start date
                 </label>
                 <input
                   id="start-date"
@@ -284,7 +287,7 @@ export const FilterTable = ({
                   htmlFor="end-date"
                   className="block text-[16px] font-medium"
                 >
-                  End Date
+                  End date
                 </label>
                 <input
                   id="end-date"
@@ -318,7 +321,7 @@ export const FilterTable = ({
           <select
             value={selectedDepartment}
             onChange={handleDepartmentChange}
-            className="outline-none rounded-lg p-2 shadow-md border border-[#8a8888] text-grey select-custom w-[200px] select-filter"
+            className="outline-none rounded-lg p- shadow-md border border-[#8a8888] text-grey select-custom w-[200px]"
           >
             <option value="">All Departments</option>
             {departmentOptions?.map((dept, index) => (
@@ -343,9 +346,12 @@ export const FilterTable = ({
       {currentItems?.length > 0 ? (
         <div>
           <div className="w-full overflow-x-auto overflow-y-auto h-[500px] shadow-lg my-5">
-            <table className=" border-collapse w-full"> 
+            <table className=" border-collapse w-full">
               <thead className="w-full sticky top-0">
                 <tr className="bg-[#939393] rounded-sm">
+                  <th className="px-6 py-5 text-[15px] text-white">
+                    <span className="center uppercase">S.No</span>
+                  </th>
                   {tableHead.map((head, idx) => (
                     <th
                       key={idx}
@@ -360,11 +366,14 @@ export const FilterTable = ({
                 {currentItems.map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
-                    className={`text-sm border-b-2 border-[#CECECE] ${
+                    className={`text-sm border-b-2 border-[#CECECE] min-[40px] ${
                       isClickableRow ? "hover:bg-gray-100 cursor-pointer" : ""
                     }`}
                     onClick={() => isClickableRow && handleViewDetails(row)}
                   >
+                    <td className="font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2">
+                      {(currentPage - 1) * itemsPerPage + rowIndex + 1}
+                    </td>
                     {Object.entries(row)
                       .filter(
                         ([key]) =>

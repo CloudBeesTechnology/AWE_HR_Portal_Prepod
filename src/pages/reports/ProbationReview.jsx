@@ -84,7 +84,7 @@ export const ProbationReview = () => {
 
     const firstDayOfNextMonth = new Date(
       today.getFullYear(),
-      today.getMonth() + 1,
+      today.getMonth() - 1,
       1
     );
     const lastDayOfNextMonth = new Date(
@@ -275,11 +275,13 @@ export const ProbationReview = () => {
         };
       })
       .filter(Boolean)
-      .sort((a, b) => a.lastDate - b.lastDate)
       .sort((a, b) => {
+        // 1. "Pending" status should be first
         if (a.status === "Pending" && b.status !== "Pending") return -1;
         if (a.status !== "Pending" && b.status === "Pending") return 1;
-        return 0;
+
+        // 2. Within same status, latest probation end date first
+        return b.lastDate - a.lastDate;
       });
 
     return sortedData?.map(({ lastDate, ...rest }) => rest);
