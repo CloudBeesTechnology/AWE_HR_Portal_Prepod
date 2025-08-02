@@ -401,7 +401,7 @@ export const FilterTable = ({
                         return (
                           <td
                             key={colIndex}
-                            className={`font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2 ${
+                            className={`h-[60px] font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2 ${
                               isExpired ? "text-[red]" : ""
                             } ${
                               key === "status"
