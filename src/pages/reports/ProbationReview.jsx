@@ -107,29 +107,29 @@ export const ProbationReview = () => {
             return false;
           }
 
-          const probationEndDates = item.probationEnd || [];
-          const lastDate = probationEndDates[probationEndDates.length - 1];
+          const probationEndDates = item?.probationEnd || [];
+          const lastDate = probationEndDates[probationEndDates?.length - 1];
 
           if (!lastDate) return false;
 
           const probationEnd = new Date(lastDate);
 
           let prevProbExDate = null;
-          if (item.prevProbExDate) {
-            const [day, month, year] = item.prevProbExDate.split("/");
+          if (item?.prevProbExDate) {
+            const [day, month, year] = item?.prevProbExDate?.split("/");
             prevProbExDate = new Date(`${year}-${month}-${day}`);
           }
 
           if (
             prevProbExDate &&
-            probationEnd.toDateString() === prevProbExDate.toDateString()
+            probationEnd?.toDateString() === prevProbExDate?.toDateString()
           ) {
             return false;
           }
 
           if (
-            item.probExtendStatus === "probup" ||
-            item.probExtendStatus === "completed"
+            item?.probExtendStatus === "probup" ||
+            item?.probExtendStatus === "completed"
           ) {
             return false;
           }
@@ -317,19 +317,19 @@ export const ProbationReview = () => {
   useEffect(() => {
     if (selectedPerson) {
       const empRecords = allData.filter(
-        (item) => item.empID === selectedPerson.empID
+        (item) => item?.empID === selectedPerson?.empID
       );
 
       // Filter out records where probExtendStatus === "item.probExtendStatus"
       const filteredRecords = empRecords.filter(
-        (item) => item.probExtendStatus !== "probup"
+        (item) => item?.probExtendStatus !== "probup"
       );
 
       // Check if any remaining records have "extended" or "completed"
       const hasExtended = filteredRecords.some(
         (item) =>
-          item.probExtendStatus?.trim().toLowerCase() === "extended" ||
-          item.probExtendStatus?.trim().toLowerCase() === "completed"
+          item?.probExtendStatus?.trim().toLowerCase() === "extended" ||
+          item?.probExtendStatus?.trim().toLowerCase() === "completed"
       );
 
       if (hasExtended) {
