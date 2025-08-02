@@ -819,9 +819,13 @@ export const ProbReviewForm = ({ userID, userType }) => {
                 name="deadline"
                 {...register("deadline")}
                 value={
+                  employeeData?.deadline ||
                   formatDate(
-                    calculateDeadline(formData?.probData?.prevProbExDate)
-                  ) || employeeData?.deadline
+                    calculateDeadline(
+                      employeeData?.probationEndDate ||
+                        employeeData?.prevProbExDate
+                    )
+                  )
                 }
                 onChange={handleInputChange}
                 className="border-b border-black outline-none px-1"
