@@ -116,8 +116,12 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
         (emp) =>
           (emp?.empBadgeNo &&
             getEmpBadgeNo &&
-            String(emp?.empBadgeNo) === String(getEmpBadgeNo)) ||
-          (emp?.fidNo && getFidNo && String(emp?.fidNo) === String(getFidNo))
+            String(emp?.empBadgeNo)?.toUpperCase()?.trim() ===
+              String(getEmpBadgeNo)?.toUpperCase()?.trim()) ||
+          (emp?.fidNo &&
+            getFidNo &&
+            String(emp?.fidNo)?.toUpperCase()?.trim() ===
+              String(getFidNo)?.toUpperCase()?.trim())
       );
 
       const filteredGroupData =
@@ -164,10 +168,12 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
         (emp) =>
           (emp?.empBadgeNo &&
             outputData?.empBadgeNo &&
-            String(emp?.empBadgeNo) === String(outputData?.empBadgeNo)) ||
+            String(emp?.empBadgeNo)?.toUpperCase()?.trim() ===
+              String(outputData?.empBadgeNo)?.toUpperCase()?.trim()) ||
           (emp?.fidNo &&
             outputData?.fidNo &&
-            String(emp?.fidNo) === String(outputData?.fidNo))
+            String(emp?.fidNo)?.toUpperCase()?.trim() ===
+              String(outputData?.fidNo)?.toUpperCase()?.trim())
       );
 
       if (!matchedEmp?.data || !Array.isArray(matchedEmp.data)) {
@@ -229,7 +235,7 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
         status: "Verified",
         // verify: "Yes",
       };
-     
+
       try {
         const response = await client.graphql({
           query: createTimeSheet,

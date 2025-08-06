@@ -195,7 +195,9 @@ export const useLeaveManage = () => {
           leaveDetailsCreatedAt: leaveDetails.createdAt,
           leaveDetailsUpdatedAt: leaveDetails.updatedAt,
           empsickLeaveTaken: leaveDetails.sickLeaveTaken,
+
           empSickLeaveDate: leaveDetails.sickLeaveDate,
+
           empAnnualLeaveDate: leaveDetails?.annualLeaveDate,
         };
       });

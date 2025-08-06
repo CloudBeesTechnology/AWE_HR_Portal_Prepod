@@ -557,8 +557,8 @@ export const UseFetchDataForSummary = (
 
                 const filteredWorkInfo = parsedWorkInfo.filter(
                   (info) =>
-                    String(info?.LOCATION).toUpperCase() ===
-                    String(location).toUpperCase()
+                    String(info?.LOCATION)?.toUpperCase()?.trim() ===
+                    String(location)?.toUpperCase()?.trim()
                 );
                 if (filteredWorkInfo.length === 0) return [];
                 return [
@@ -569,8 +569,8 @@ export const UseFetchDataForSummary = (
                   },
                 ];
               } else {
-                return String(entry?.companyName).toUpperCase() ===
-                  String(location).toUpperCase()
+                return String(entry?.companyName)?.toUpperCase()?.trim() ===
+                  String(location)?.toUpperCase()?.trim()
                   ? [{ ...entry }] // 🟢 clone to avoid reference issues
                   : [];
               }

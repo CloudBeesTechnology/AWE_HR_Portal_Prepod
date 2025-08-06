@@ -162,7 +162,9 @@ export const ViewOffshoreORMCsheet = ({
               const mergedDatas = empInfo
                 .map((empInf) => {
                   const interviewDetails = sapNoRemoved.find(
-                    (item) => item?.empID === empInf?.empID
+                    (item) =>
+                      String(item?.empID)?.toUpperCase()?.trim() ===
+                      String(empInf?.empID)?.toUpperCase()?.trim()
                   );
 
                   if (!interviewDetails) {
@@ -178,7 +180,9 @@ export const ViewOffshoreORMCsheet = ({
 
               const mergedData = fetchedData.map((item) => {
                 const workInfoItem = mergedDatas.find(
-                  (info) => String(info?.sapNo) === String(item?.NO)
+                  (info) =>
+                    String(info?.sapNo)?.toUpperCase()?.trim() ===
+                    String(item?.NO)?.toUpperCase()?.trim()
                 );
 
                 return {
@@ -1150,7 +1154,7 @@ export const ViewOffshoreORMCsheet = ({
 
       if (Array.isArray(empAndWorkInfo)) {
         empAndWorkInfo.forEach((item) => {
-          const key = String(item?.sapNo).toUpperCase();
+          const key = String(item?.sapNo)?.toUpperCase()?.trim();
           empInfoMap.set(key, item);
         });
       }
@@ -1158,7 +1162,7 @@ export const ViewOffshoreORMCsheet = ({
       const addedNWHPD =
         Array.isArray(data) &&
         data.map((val) => {
-          const badgeKey = String(val?.NO).toUpperCase();
+          const badgeKey = String(val?.NO)?.toUpperCase()?.trim();
           const workInfoItem = empInfoMap.get(badgeKey);
 
           const lastWorkHour =

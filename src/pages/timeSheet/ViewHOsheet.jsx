@@ -998,7 +998,12 @@ export const ViewHOsheet = ({
 
   const convertDateFormat = (inputDateStr) => {
     if (inputDateStr) {
-      const [day, month, year] = inputDateStr?.split("/");
+      const dateStr =
+        typeof inputDateStr === "string"
+          ? inputDateStr
+          : inputDateStr?.toString();
+
+      const [day, month, year] = dateStr?.split("/");
 
       // Convert string to numbers to remove any leading zeros
       const dayNum = parseInt(day, 10);
@@ -1091,7 +1096,10 @@ export const ViewHOsheet = ({
 
       if (Array.isArray(empAndWorkInfo)) {
         empAndWorkInfo.forEach((item) => {
-          empInfoMap?.set(String(item?.empBadgeNo).toUpperCase(), item);
+          empInfoMap?.set(
+            String(item?.empBadgeNo)?.toUpperCase()?.trim(),
+            item
+          );
         });
       }
 
@@ -1099,7 +1107,7 @@ export const ViewHOsheet = ({
       const addedNWHPD =
         Array.isArray(data) &&
         data.map((val) => {
-          const badgeKey = String(val?.BADGE).toUpperCase();
+          const badgeKey = String(val?.BADGE)?.toUpperCase()?.trim();
           const workInfoItem = empInfoMap?.get(badgeKey);
 
           const lastWorkHour =

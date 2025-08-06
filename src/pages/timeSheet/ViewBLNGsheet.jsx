@@ -172,10 +172,10 @@ export const ViewBLNGsheet = ({
 
                 const mergedDatas = empInfo
                   .map((empInf) => {
-                    const interviewDetails = sapNoRemoved.find(
+                    const interviewDetails = sapNoRemoved?.find(
                       (item) =>
-                        String(item?.empID).toUpperCase() ===
-                        String(empInf?.empID).toUpperCase()
+                        String(item?.empID)?.toUpperCase()?.trim() ===
+                        String(empInf?.empID)?.toUpperCase()?.trim()
                     );
 
                     if (!interviewDetails) {
@@ -189,11 +189,11 @@ export const ViewBLNGsheet = ({
                   })
                   .filter((item) => item !== null);
 
-                const mergedData = fetchedData.map((item) => {
+                const mergedData = fetchedData?.map((item) => {
                   const workInfoItem = mergedDatas.find(
                     (info) =>
-                      String(info?.sapNo).toUpperCase() ===
-                      String(item?.FID).toUpperCase()
+                      String(info?.sapNo)?.toUpperCase()?.trim() ===
+                      String(item?.FID)?.toUpperCase()?.trim()
                   );
 
                   return {
@@ -1257,7 +1257,7 @@ export const ViewBLNGsheet = ({
 
       if (Array.isArray(empAndWorkInfo)) {
         empAndWorkInfo.forEach((item) => {
-          const key = String(item?.sapNo).toUpperCase();
+          const key = String(item?.sapNo)?.toUpperCase()?.trim();
           empInfoMap.set(key, item);
         });
       }
@@ -1265,7 +1265,7 @@ export const ViewBLNGsheet = ({
       const addedNWHPD =
         Array.isArray(data) &&
         data.map((val) => {
-          const badgeKey = String(val?.FID).toUpperCase();
+          const badgeKey = String(val?.FID)?.toUpperCase()?.trim();
           const workInfoItem = empInfoMap.get(badgeKey);
 
           const lastWorkHour =
