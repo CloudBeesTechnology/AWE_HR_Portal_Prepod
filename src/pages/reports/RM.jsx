@@ -11,6 +11,7 @@ export const RM = () => {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [isDateFiltered, setIsDateFiltered] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [tableHead] = useState([
@@ -98,7 +99,7 @@ export const RM = () => {
         return dateA - dateB; // Sort by date in ascending order
       })
 
-      .map((item) => ({  
+      .map((item) => ({
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
@@ -109,13 +110,13 @@ export const RM = () => {
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
           : "-",
-          otherPosition: Array.isArray(item.otherPosition)
+        otherPosition: Array.isArray(item.otherPosition)
           ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
         department: Array.isArray(item.department)
           ? item.department[item.department.length - 1]
           : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
+        otherDepartment: Array.isArray(item.otherDepartment)
           ? item.otherDepartment[item.otherDepartment.length - 1]
           : "-",
         contactNo: item.contactNo || "-",
@@ -157,7 +158,8 @@ export const RM = () => {
         jitpaamount: item.jitpaamount || "-",
         lbrDepoNum: item.lbrDepoNum || "-",
         lbrDepoAmount: item.lbrDepoAmount || "-",
-        missingsubmitdateendorsement: formatDate(item.missingSubmitdateendorsement) || "-",
+        missingsubmitdateendorsement:
+          formatDate(item.missingSubmitdateendorsement) || "-",
         submitdateendorsement: formatDate(item.submitdateendorsement) || "-",
         lbrEndroseDate: formatDate(item.lbrEndroseDate) || "-",
         docsubmitdate: formatDate(item.docsubmitdate) || "-",
@@ -208,20 +210,26 @@ export const RM = () => {
     const value = e.target.value;
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
-  
-    const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
-    const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-  
+
+    const start =
+      type === "startDate"
+        ? new Date(value)
+        : startDate
+        ? new Date(startDate)
+        : null;
+    const end =
+      type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+
     const filtered = allData
       .filter((data) => {
         const doj = data.doj ? new Date(data.doj) : null;
-  
+
         if (!doj || isNaN(doj.getTime())) return false;
-  
+
         if (start && end) return doj >= start && doj <= end;
         if (start) return doj >= start;
         if (end) return doj <= end;
-  
+
         return true;
       })
       .map((item) => ({
@@ -235,13 +243,13 @@ export const RM = () => {
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
           : "-",
-          otherPosition: Array.isArray(item.otherPosition)
+        otherPosition: Array.isArray(item.otherPosition)
           ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
         department: Array.isArray(item.department)
           ? item.department[item.department.length - 1]
           : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
+        otherDepartment: Array.isArray(item.otherDepartment)
           ? item.otherDepartment[item.otherDepartment.length - 1]
           : "-",
         contactNo: item.contactNo || "-",
@@ -283,7 +291,8 @@ export const RM = () => {
         jitpaamount: item.jitpaamount || "-",
         lbrDepoNum: item.lbrDepoNum || "-",
         lbrDepoAmount: item.lbrDepoAmount || "-",
-        missingSubmitdateendorsement: formatDate(item.missingSubmitdateendorsement) || "-",
+        missingSubmitdateendorsement:
+          formatDate(item.missingSubmitdateendorsement) || "-",
         submitdateendorsement: formatDate(item.submitdateendorsement) || "-",
         lbrEndroseDate: formatDate(item.lbrEndroseDate) || "-",
         docsubmitdate: formatDate(item.docsubmitdate) || "-",
@@ -293,10 +302,17 @@ export const RM = () => {
         cityname: item.cityname || "-",
         airfare: item.airfare || "-",
         remarkNLMob: item.remarkNLMob || "-",
-        // contractStart: Array.isArray(item.contractStart) ? formatDate(item.contractStart[item.contractStart.length - 1]) : "-",
-        // contractEnd: Array.isArray(item.contractEnd) ? formatDate(item.contractEnd[item.contractEnd.length - 1]) : "-",
-        // PreviousEmployment: item.preEmp || "-",
       }));
+
+    if (start || end) {
+      if (filtered.length === 0) {
+        setIsDateFiltered(true); // No data found
+      } else {
+        setIsDateFiltered(false); // Data exists
+      }
+    } else {
+      setIsDateFiltered(false); // No date filters applied
+    }
 
     setFilteredData(filtered);
   };
@@ -311,6 +327,7 @@ export const RM = () => {
         endDate={endDate}
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
+        isFiltered={isDateFiltered}
       />
 
       {selectedPerson && (
@@ -350,4 +367,3 @@ export const RM = () => {
     </div>
   );
 };
-

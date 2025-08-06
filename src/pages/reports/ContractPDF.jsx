@@ -1,4 +1,4 @@
-import React, { useContext,useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FilterTable } from "./FilterTable";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo/logo-with-name.svg";
@@ -7,7 +7,7 @@ import { useTempID } from "../../utils/TempIDContext";
 import { DataSupply } from "../../utils/DataStoredContext";
 
 export const ContractPDF = ({ userID, userType }) => {
-    const { contractForms } = useContext(DataSupply);
+  const { contractForms } = useContext(DataSupply);
   const navigate = useNavigate();
   const location = useLocation();
   const { gmPosition, HRMPosition } = useTempID();
@@ -18,7 +18,7 @@ export const ContractPDF = ({ userID, userType }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedPerson, setSelectedPerson] = useState(null);
-    const [historyData, setHistoryData] = useState([]);
+  const [historyData, setHistoryData] = useState([]);
   const [tableHead] = useState(
     [
       "Emp ID",
@@ -34,15 +34,14 @@ export const ContractPDF = ({ userID, userType }) => {
       "Contract End Date",
       "LD Expiry",
       userType !== "SuperAdmin" && "Status",
-    
     ].filter(Boolean)
   );
 
   const formatDate = (date) => {
-     const ddmmyyyyRegex = /^\d{2}-\d{2}-\d{4}$/;
-  if (typeof date === "string" && ddmmyyyyRegex.test(date)) {
-    return date;
-  }
+    const ddmmyyyyRegex = /^\d{2}-\d{2}-\d{4}$/;
+    if (typeof date === "string" && ddmmyyyyRegex.test(date)) {
+      return date;
+    }
     if (Array.isArray(date)) {
       if (date.length === 0) return "-";
       const lastDate = date[date.length - 1];
@@ -58,7 +57,6 @@ export const ContractPDF = ({ userID, userType }) => {
 
     return `${day}-${month}-${year}`;
   };
-
 
   const contractExpiryMergedData = (data) => {
     const processedEmpIDs = new Set();
@@ -94,7 +92,8 @@ export const ContractPDF = ({ userID, userType }) => {
         const startDate = contractStartDates[contractStartDates.length - 1];
 
         const today = new Date();
-        const positionRevDate = emp.positionRevDate?.[emp.positionRevDate.length - 1];
+        const positionRevDate =
+          emp.positionRevDate?.[emp.positionRevDate.length - 1];
         const positionRev = emp.positionRev?.[emp.positionRev.length - 1];
         const upgradePosition =
           emp.upgradePosition?.[emp.upgradePosition.length - 1];
@@ -113,15 +112,15 @@ export const ContractPDF = ({ userID, userType }) => {
               today >= revDateObj
                 ? positionRev
                 : today >= upgradeDateObj
-                  ? upgradePosition
-                  : emp.position?.[emp.position.length - 1];
+                ? upgradePosition
+                : emp.position?.[emp.position.length - 1];
           } else if (upgradeDateObj > revDateObj) {
             finalPosition =
               today >= upgradeDateObj
                 ? upgradePosition
                 : today >= revDateObj
-                  ? positionRev
-                  : emp.position?.[emp.position.length - 1];
+                ? positionRev
+                : emp.position?.[emp.position.length - 1];
           }
         } else if (revDateObj && !upgradeDateObj) {
           finalPosition = today >= revDateObj && positionRev;
@@ -160,19 +159,29 @@ export const ContractPDF = ({ userID, userType }) => {
           ...(userType === "Manager" &&
             gmPosition !== "GENERAL MANAGER" &&
             HRMPosition !== "HR MANAGER" && {
-            status: contract.depHead ? "Approved" : "Pending",
-          }),
+              status: contract.depHead ? "Approved" : "Pending",
+            }),
           ...(HRMPosition === "HR MANAGER"
             ? {
-              status: contract.hrManager ? "Approved" : "Pending",
-            }
+                status: contract.hrManager ? "Approved" : "Pending",
+              }
             : {}),
           ...(gmPosition === "GENERAL MANAGER" && {
             status: contract.genManager ? "Approved" : "Pending",
           }),
           ...(userType === "HR" && {
-            status: contract.hrSign && contract.extendedStatus === "extended" ? "Extended" : "Not Extended",
+            status: contract.hrSign
+              ? contract.extendedStatus === "extended"
+                ? "Extended"
+                : "Not Extended"
+              : "Pending",
           }),
+          // ...(userType === "HR" && {
+          //   status:
+          //     contract.hrSign && contract.extendedStatus === "extended"
+          //       ? "Extended"
+          //       : "Not Extended",
+          // }),
         };
       })
       .filter((item) => item !== null)
@@ -186,13 +195,11 @@ export const ContractPDF = ({ userID, userType }) => {
         return getPriority(a) - getPriority(b);
       });
 
-  
-
     setStoreData(mergedData);
     return mergedData;
   };
 
- useEffect(() => {
+  useEffect(() => {
     if (allData.length > 0 && contractForms.length > 0) {
       const data = contractExpiryMergedData(
         allData,
@@ -206,7 +213,7 @@ export const ContractPDF = ({ userID, userType }) => {
     }
   }, [allData, contractForms, userType, gmPosition, userID, HRMPosition]);
 
- const handleDate = (e, type) => {
+  const handleDate = (e, type) => {
     const value = e.target.value;
 
     if (type === "startDate") setStartDate(value);
@@ -216,8 +223,8 @@ export const ContractPDF = ({ userID, userType }) => {
       type === "startDate"
         ? new Date(value)
         : startDate
-          ? new Date(startDate)
-          : null;
+        ? new Date(startDate)
+        : null;
     const end =
       type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
 
@@ -265,7 +272,6 @@ export const ContractPDF = ({ userID, userType }) => {
         const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
         const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
         if (revDateObj && upgradeDateObj) {
-  
           if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
             finalPosition = item.position?.[item.position.length - 1];
           } else if (revDateObj > upgradeDateObj) {
@@ -274,22 +280,20 @@ export const ContractPDF = ({ userID, userType }) => {
               today >= revDateObj
                 ? positionRev
                 : today >= upgradeDateObj
-                  ? upgradePosition
-                  : item.position?.[item.position.length - 1];
+                ? upgradePosition
+                : item.position?.[item.position.length - 1];
           } else if (upgradeDateObj > revDateObj) {
             // finalPosition = today >= upgradeDateObj && upgradePosition;
             finalPosition =
               today >= upgradeDateObj
                 ? upgradePosition
                 : today >= revDateObj
-                  ? positionRev
-                  : item.position?.[item.position.length - 1];
+                ? positionRev
+                : item.position?.[item.position.length - 1];
           }
         } else if (revDateObj && !upgradeDateObj) {
           finalPosition = today >= revDateObj && positionRev;
-   
         } else if (upgradeDateObj && !revDateObj) {
-    
           finalPosition = today >= upgradeDateObj && upgradePosition;
         } else {
           finalPosition = item.position?.[item.position.length - 1];
@@ -318,8 +322,8 @@ export const ContractPDF = ({ userID, userType }) => {
           ...(userType === "Manager" &&
             gmPosition !== "GENERAL MANAGER" &&
             HRMPosition !== "HR MANAGER" && {
-            status: item.depHead ? "Approved" : "Pending",
-          }),
+              status: item.depHead ? "Approved" : "Pending",
+            }),
           ...(HRMPosition === "HR MANAGER" || userType === "HR"
             ? { status: item.hrManager ? "Approved" : "Pending" }
             : {}),
@@ -331,13 +335,11 @@ export const ContractPDF = ({ userID, userType }) => {
     setFilteredData(filtered);
   };
 
-
   const handleViewDetails = (personData) => {
     const employeeHistory = contractForms.filter(
       (val) => val.empID === personData.empID && val.genManager.trim() !== ""
     );
     setHistoryData(employeeHistory);
-
 
     setSelectedPerson(personData);
   };
@@ -345,7 +347,6 @@ export const ContractPDF = ({ userID, userType }) => {
   const closeModal = () => {
     setSelectedPerson(null);
   };
-
 
   const handleNavigate = (id) => {
     closeModal();
@@ -357,7 +358,7 @@ export const ContractPDF = ({ userID, userType }) => {
   };
 
   return (
-  <div>
+    <div>
       <FilterTable
         tableBody={filteredData.length ? filteredData : tableBody}
         startDate={startDate}
@@ -385,15 +386,11 @@ export const ContractPDF = ({ userID, userType }) => {
             </h2>
             <p className="flex mb-2">
               <strong className="w-[30%]">Name</strong>{" "}
-              <span className=" flex-1">
-                : &nbsp;{selectedPerson.name}
-              </span>
+              <span className=" flex-1">: &nbsp;{selectedPerson.name}</span>
             </p>
             <p className="flex mb-2">
               <strong className="w-[30%]">Emp ID</strong>{" "}
-              <span className=" flex-1">
-                : &nbsp;{selectedPerson.empID}
-              </span>
+              <span className=" flex-1">: &nbsp;{selectedPerson.empID}</span>
             </p>
             <p className="flex mb-2">
               <strong className="w-[30%]">Emp Badge No</strong>{" "}
@@ -415,7 +412,9 @@ export const ContractPDF = ({ userID, userType }) => {
             </p>
             <p className="flex mb-2">
               <strong className="w-[30%]">Position:</strong>
-              <span className=" flex-1">  : &nbsp;
+              <span className=" flex-1">
+                {" "}
+                : &nbsp;
                 {selectedPerson.position === "OTHER"
                   ? selectedPerson.otherPosition
                   : selectedPerson.position}
@@ -423,7 +422,9 @@ export const ContractPDF = ({ userID, userType }) => {
             </p>
             <p className="flex mb-2">
               <strong className="w-[30%]">Department:</strong>
-              <span className=" flex-1">  : &nbsp;
+              <span className=" flex-1">
+                {" "}
+                : &nbsp;
                 {selectedPerson.department === "OTHER"
                   ? selectedPerson.otherDepartment
                   : selectedPerson.department}
@@ -451,25 +452,25 @@ export const ContractPDF = ({ userID, userType }) => {
                             <tr key={idx}>
                               {(val.genManager ||
                                 val.genManager.trim() !== "") && (
-                                  <th className="border px-3 py-2 text-dark_grey">
-                                    {idx + 1}
-                                  </th>
-                                )}
+                                <th className="border px-3 py-2 text-dark_grey">
+                                  {idx + 1}
+                                </th>
+                              )}
                               {(val.genManager ||
                                 val.genManager.trim() !== "") && (
-                                  <>
-                                    <th className="border px-3 py-2 text-dark_grey">
-                                      {formatDate(val.oldCED)}
-                                    </th>
-                               
-                                    <th
-                                      className="border px-3 py-2 text-blue underline cursor-pointer"
-                                      onClick={() => handleNavigate(val.id)}
-                                    >
-                                      View
-                                    </th>
-                                  </>
-                                )}
+                                <>
+                                  <th className="border px-3 py-2 text-dark_grey">
+                                    {formatDate(val.oldCED)}
+                                  </th>
+
+                                  <th
+                                    className="border px-3 py-2 text-blue underline cursor-pointer"
+                                    onClick={() => handleNavigate(val.id)}
+                                  >
+                                    View
+                                  </th>
+                                </>
+                              )}
                             </tr>
                           );
                         })}

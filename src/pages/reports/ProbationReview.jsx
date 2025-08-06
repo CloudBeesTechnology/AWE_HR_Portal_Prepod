@@ -17,6 +17,7 @@ export const ProbationReview = () => {
   const [endDate, setEndDate] = useState("");
   const [extenFlag, setExtenFlag] = useState([]);
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const [isDateFiltered, setIsDateFiltered] = useState(false);
   const [tableHead] = useState(
     [
       "Emp ID",
@@ -81,13 +82,9 @@ export const ProbationReview = () => {
   const probationReviewMergedData = (data) => {
     const today = new Date();
 
-    // const today = new Date("2025-07-01");
-    // const today = testDate ? new Date(testDate) : new Date();
-
-    //range 1 month ex. From: 01-08-2025 To: 31-08-2025
     const firstDayOfNextMonth = new Date(
       today.getFullYear(),
-      today.getMonth() + 1,
+      today.getMonth() - 1,
       1
     );
     const lastDayOfNextMonth = new Date(
@@ -110,29 +107,29 @@ export const ProbationReview = () => {
             return false;
           }
 
-          const probationEndDates = item.probationEnd || [];
-          const lastDate = probationEndDates[probationEndDates.length - 1];
+          const probationEndDates = item?.probationEnd || [];
+          const lastDate = probationEndDates[probationEndDates?.length - 1];
 
           if (!lastDate) return false;
 
           const probationEnd = new Date(lastDate);
 
           let prevProbExDate = null;
-          if (item.prevProbExDate) {
-            const [day, month, year] = item.prevProbExDate.split("/");
+          if (item?.prevProbExDate) {
+            const [day, month, year] = item?.prevProbExDate?.split("/");
             prevProbExDate = new Date(`${year}-${month}-${day}`);
           }
 
           if (
             prevProbExDate &&
-            probationEnd.toDateString() === prevProbExDate.toDateString()
+            probationEnd?.toDateString() === prevProbExDate?.toDateString()
           ) {
             return false;
           }
 
           if (
-            item.probExtendStatus === "probup" ||
-            item.probExtendStatus === "completed"
+            item?.probExtendStatus === "probup" ||
+            item?.probExtendStatus === "completed"
           ) {
             return false;
           }
@@ -145,49 +142,84 @@ export const ProbationReview = () => {
         return false;
       })
       .map((item) => {
-        const probationEndDates = item.probationEnd || [];
-        const lastDate = probationEndDates[probationEndDates.length - 1];
+        const probationEndDates = item?.probationEnd || [];
+        const lastDate = probationEndDates[probationEndDates?.length - 1];
 
-        if (userType === "Manager" && HRMPosition !== "HR MANAGER") {
-          return null;
+        const lastManager =
+          Array.isArray(item.manager) && item?.manager.length > 0
+            ? item.manager[item?.manager?.length - 1]
+            : null;
+
+        if (
+          userType === "Manager" &&
+          gmPosition !== "GENERAL MANAGER" &&
+          HRMPosition !== "HR MANAGER"
+        ) {
+          const supervisor = item?.supervisor;
+          const hasSupervisor =
+            (Array.isArray(supervisor)
+              ? supervisor[supervisor?.length - 1]
+              : supervisor
+            )?.trim() || "";
+
+          const supervisorValid =
+            hasSupervisor &&
+            hasSupervisor !== "null" &&
+            hasSupervisor !== "N/A" &&
+            hasSupervisor !== "";
+
+          if (lastManager !== userID && supervisorValid) return null;
         } else if (userType === "HR" || HRMPosition === "HR MANAGER") {
         } else if (gmPosition === "GENERAL MANAGER") {
           return null;
         }
 
         const today = new Date();
+
         const positionRevDate =
           item.positionRevDate?.[item.positionRevDate.length - 1];
         const positionRev = item.positionRev?.[item.positionRev.length - 1];
         const upgradePosition =
           item.upgradePosition?.[item.upgradePosition.length - 1];
         const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
-        let finalPosition;
 
         const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
         const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+
+        let finalPosition;
+
         if (revDateObj && upgradeDateObj) {
           if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
             finalPosition = item.position?.[item.position.length - 1];
           } else if (revDateObj > upgradeDateObj) {
-            finalPosition =
-              today >= revDateObj
-                ? positionRev
-                : today >= upgradeDateObj
-                ? upgradePosition
-                : item.position?.[item.position.length - 1];
-          } else if (upgradeDateObj > revDateObj) {
-            finalPosition =
-              today >= upgradeDateObj
-                ? upgradePosition
-                : today >= revDateObj
-                ? positionRev
-                : item.position?.[item.position.length - 1];
+            if (today >= revDateObj) {
+              finalPosition = positionRev;
+            } else if (today >= upgradeDateObj) {
+              finalPosition = upgradePosition;
+            } else {
+              finalPosition = item.position?.[item.position.length - 1];
+            }
+          } else {
+            if (today >= upgradeDateObj) {
+              finalPosition = upgradePosition;
+            } else if (today >= revDateObj) {
+              finalPosition = positionRev;
+            } else {
+              finalPosition = item.position?.[item.position.length - 1];
+            }
           }
         } else if (revDateObj && !upgradeDateObj) {
-          finalPosition = today >= revDateObj && positionRev;
+          if (today >= revDateObj) {
+            finalPosition = positionRev;
+          } else {
+            finalPosition = item.position?.[item.position.length - 1];
+          }
         } else if (upgradeDateObj && !revDateObj) {
-          finalPosition = today >= upgradeDateObj && upgradePosition;
+          if (today >= upgradeDateObj) {
+            finalPosition = upgradePosition;
+          } else {
+            finalPosition = item.position?.[item.position.length - 1];
+          }
         } else {
           finalPosition = item.position?.[item.position.length - 1];
         }
@@ -243,11 +275,13 @@ export const ProbationReview = () => {
         };
       })
       .filter(Boolean)
-      .sort((a, b) => a.lastDate - b.lastDate)
       .sort((a, b) => {
+        // 1. "Pending" status should be first
         if (a.status === "Pending" && b.status !== "Pending") return -1;
         if (a.status !== "Pending" && b.status === "Pending") return 1;
-        return 0;
+
+        // 2. Within same status, latest probation end date first
+        return b.lastDate - a.lastDate;
       });
 
     return sortedData?.map(({ lastDate, ...rest }) => rest);
@@ -283,19 +317,19 @@ export const ProbationReview = () => {
   useEffect(() => {
     if (selectedPerson) {
       const empRecords = allData.filter(
-        (item) => item.empID === selectedPerson.empID
+        (item) => item?.empID === selectedPerson?.empID
       );
 
       // Filter out records where probExtendStatus === "item.probExtendStatus"
       const filteredRecords = empRecords.filter(
-        (item) => item.probExtendStatus !== "probup"
+        (item) => item?.probExtendStatus !== "probup"
       );
 
       // Check if any remaining records have "extended" or "completed"
       const hasExtended = filteredRecords.some(
         (item) =>
-          item.probExtendStatus?.trim().toLowerCase() === "extended" ||
-          item.probExtendStatus?.trim().toLowerCase() === "completed"
+          item?.probExtendStatus?.trim().toLowerCase() === "extended" ||
+          item?.probExtendStatus?.trim().toLowerCase() === "completed"
       );
 
       if (hasExtended) {
@@ -353,6 +387,7 @@ export const ProbationReview = () => {
         endDate={endDate}
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
+        isFiltered={isDateFiltered}
       />
 
       {selectedPerson && (

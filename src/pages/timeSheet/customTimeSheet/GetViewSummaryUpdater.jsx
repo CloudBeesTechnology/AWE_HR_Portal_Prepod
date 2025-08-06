@@ -36,7 +36,9 @@ export const GetViewSummaryUpdater = (getEmpID) => {
       );
 
       return getSummaryUpdaterName;
-    } catch (err) {}
+    } catch (err) {
+      console.log("Error : ",err)
+    }
   }
 
   const returnEmpDetails = fetchEmployeeData();

@@ -22,7 +22,7 @@ export const RecruDash = () => {
     } else if (title === "WorkPass Tracking") {
       navigate("/recrutiles/workpasstracking");
     } else if (title === "Hiring Job") {
-      navigate("/hiringJob");
+      navigate("/recrutiles/hiringJob");
     }
   };
   // console.log(recruitmentPermissions);
@@ -33,11 +33,7 @@ export const RecruDash = () => {
 
   return (
     <section className="min-h-screen p-10 bg-[#F5F6F1]">
-      <div
-        className={`screen-size flex ${
-          filteredCards.length <= 2 ? "justify-start" : "justify-evenly"
-        } items-center flex-wrap gap-10 text-black`}
-      >
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-6 justify-items-center py-10 text-black">
         {filteredCards.map((value, index) => (
           <div
             key={index}

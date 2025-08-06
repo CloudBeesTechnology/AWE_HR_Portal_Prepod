@@ -68,7 +68,7 @@ export const ViewSummaryTable = ({
   const location = selectedLocation?.toUpperCase();
 
   // Pagination
-  const itemsPerPage = 10;
+  const itemsPerPage = 3;
   const safeData = allExcelSheetData || [];
 
   const indexOfLastItem = currentPage * itemsPerPage;

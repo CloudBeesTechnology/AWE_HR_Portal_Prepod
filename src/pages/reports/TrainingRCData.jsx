@@ -8,6 +8,7 @@ export const TrainingRCData = () => {
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
+  const [isDateFiltered, setIsDateFiltered] = useState(false);
   const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
     "Emp ID",
@@ -257,6 +258,16 @@ export const TrainingRCData = () => {
           }));
       });
 
+    if (start || end) {
+      if (filtered.length === 0) {
+        setIsDateFiltered(true); // No data found
+      } else {
+        setIsDateFiltered(false); // Data exists
+      }
+    } else {
+      setIsDateFiltered(false); // No date filters applied
+    }
+
     setFilteredData(filtered);
   };
 
@@ -270,6 +281,7 @@ export const TrainingRCData = () => {
         tableHead={tableHead}
         title={title}
         handleDate={handleDate}
+        isFiltered={isDateFiltered}
       />
     </div>
   );

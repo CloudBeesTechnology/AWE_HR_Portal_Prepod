@@ -20,8 +20,11 @@ const Login = () => {
     handleSubmit,
   } = useForm({ resolver: yupResolver(LoginSchema) });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const Submit = handleSubmit(async (data) => {
+    setLoading(true);
     try {
       const username = data.userID;
 
@@ -60,6 +63,7 @@ const Login = () => {
           const userType = foundUser.selectType;
           localStorage.setItem("userType", userType);
           window.location.href = "/dashboard";
+          setToastMessage("Login successful!");
         } else {
           alert("Invalid credentials. Please try again.");
         }
@@ -79,6 +83,11 @@ const Login = () => {
     // <Authenticator>
 
     <section className="screen-size mx-auto flex h-screen">
+      {toastMessage && (
+        <div className="fixed top-6 left-1/2 z-50 -translate-x-1/2 bg-[#22c55e] text-white px-6 py-3 rounded shadow-lg font-semibold transition-all duration-300">
+          {toastMessage}
+        </div>
+      )}
       <div className="flex-1 border-r-2  border-[#E9E9E9] center">
         <img
           className="w-full max-w-[450px]"
@@ -164,8 +173,18 @@ const Login = () => {
           </div>
 
           <div className="center ">
-            <button className="primary_btn text_size_4 my-5" onClick={Submit}>
-              Login
+            <button
+              className="bg-primary text-dark_grey text-lg font-bold rounded-md px-2 py-2 flex items-center justify-center gap-2 min-w-[240px] h-[40px]"
+              onClick={Submit}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="ml-1 animate-spin border-2 border-t-2 border-t-white border-gray-300 rounded-full w-4 h-4"></span>
+                </>
+              ) : (
+                "Login"
+              )}
             </button>
           </div>
           {/* <hr className="border-[1.5px] text-[#B3B3B3]" />

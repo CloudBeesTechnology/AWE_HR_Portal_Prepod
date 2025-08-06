@@ -9,6 +9,7 @@ export const EmploymentMedical = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [isDateFiltered, setIsDateFiltered] = useState(false);
   const { allData, title } = location.state || {};
 
   // console.log("All data received:", allData);
@@ -89,8 +90,16 @@ export const EmploymentMedical = () => {
 
     const expiry = parseDate(expiryDate);
     const today = new Date();
-    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 3, 1);
-    const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 4, 1);
+    const startOfNextMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 3,
+      1
+    );
+    const endOfNextMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 4,
+      1
+    );
 
     // console.log("Expiry:", expiry, "Start of next 3 months:", startOfNextMonth, "End of next 3 months:", endOfNextMonth);
 
@@ -98,53 +107,59 @@ export const EmploymentMedical = () => {
   };
 
   const medicalReviewMergedData = (data) => {
-    
     // console.log("Processing medical review data:", data);
 
-    const filteringValue = data?.map((val) => {
-      if (Array.isArray(val.workStatus) && val.workStatus.length > 0) {
-        const lastWorkStatus = val.workStatus[val.workStatus.length - 1]; // Get last element
-      
-        if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION") {
-          return false; // Exclude vals with TERMINATION or RESIGNATION
-        }}
-      if (!val.bruneiME || val?.bruneiME?.length === 0) {
-        // console.log("Skipping entry due to missing bruneiME:", val);
-        return false;
-      }
+    const filteringValue = data
+      ?.map((val) => {
+        if (Array.isArray(val.workStatus) && val.workStatus.length > 0) {
+          const lastWorkStatus = val.workStatus[val.workStatus.length - 1]; // Get last element
 
-      const medicalExpiryDate = val?.bruneiME[val?.bruneiME.length - 1];
-      const isExpiryInNextThreeMonths = isInNextThreeMonths(medicalExpiryDate);
+          if (
+            lastWorkStatus.toUpperCase() === "TERMINATION" ||
+            lastWorkStatus.toUpperCase() === "RESIGNATION"
+          ) {
+            return false; // Exclude vals with TERMINATION or RESIGNATION
+          }
+        }
+        if (!val.bruneiME || val?.bruneiME?.length === 0) {
+          // console.log("Skipping entry due to missing bruneiME:", val);
+          return false;
+        }
 
-      if (!isExpiryInNextThreeMonths) {
-        // console.log("Skipping entry due to expiry not in range:", val);
-        return false;
-      }
+        const medicalExpiryDate = val?.bruneiME[val?.bruneiME.length - 1];
+        const isExpiryInNextThreeMonths =
+          isInNextThreeMonths(medicalExpiryDate);
 
-      const formattedEntry = {
-        empID: val?.empID,
-        empBadgeNo: val?.empBadgeNo,
-        name: val?.name,
-        dateOfJoin: formatDate(val?.doj) || "-",
-        nationality: val?.nationality,
-        department: Array.isArray(val.department)
-        ? val.department[val.department.length - 1]
-        : "-",
-        otherDepartment:Array.isArray(val.otherDepartment)
-        ? val.otherDepartment[val.otherDepartment.length - 1]
-        : "-",
-      position: Array.isArray(val.position)
-        ? val.position[val.position.length - 1]
-        : "-",
-        otherPosition: Array.isArray(val.otherPosition)
-          ? val.otherPosition[val.otherPosition.length - 1]
-          : "-",
-        medicalExpiryDate: formatDate(medicalExpiryDate) || "-",
-      };
+        if (!isExpiryInNextThreeMonths) {
+          // console.log("Skipping entry due to expiry not in range:", val);
+          return false;
+        }
 
-      // console.log("Filtered entry:", formattedEntry);
-      return formattedEntry;
-    }).filter((val) => val !== false);
+        const formattedEntry = {
+          empID: val?.empID,
+          empBadgeNo: val?.empBadgeNo,
+          name: val?.name,
+          dateOfJoin: formatDate(val?.doj) || "-",
+          nationality: val?.nationality,
+          department: Array.isArray(val.department)
+            ? val.department[val.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(val.otherDepartment)
+            ? val.otherDepartment[val.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(val.position)
+            ? val.position[val.position.length - 1]
+            : "-",
+          otherPosition: Array.isArray(val.otherPosition)
+            ? val.otherPosition[val.otherPosition.length - 1]
+            : "-",
+          medicalExpiryDate: formatDate(medicalExpiryDate) || "-",
+        };
+
+        // console.log("Filtered entry:", formattedEntry);
+        return formattedEntry;
+      })
+      .filter((val) => val !== false);
 
     // console.log("Final filtered data:", filteringValue);
     return filteringValue;
@@ -156,38 +171,43 @@ export const EmploymentMedical = () => {
     setTableBody(data);
   }, [allData]);
 
-
   const handleDate = (e, type) => {
     const value = e.target.value;
     const newDate = value ? parseDate(value) : null;
-  
+
     // Set the state based on the date type (startDate or endDate)
     if (type === "startDate") setStartDate(newDate);
     if (type === "endDate") setEndDate(newDate);
-  
+
     // Use the newly selected date (newDate) to filter data
     const filtered = allData
       .filter((data) => {
-
         if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
-            return false; // Return early if workStatus is undefined or an empty array
+          return false; // Return early if workStatus is undefined or an empty array
         }
-        
+
         const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
-        
-        if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
-            return false; // Exclude records with TERMINATION or RESIGNATION
+
+        if (
+          lastWorkStatus?.toUpperCase() === "TERMINATION" ||
+          lastWorkStatus?.toUpperCase() === "RESIGNATION"
+        ) {
+          return false; // Exclude records with TERMINATION or RESIGNATION
         }
 
         const expiryArray = data.bruneiME || [];
-        const expiryDate = expiryArray.length ? parseDate(expiryArray[expiryArray.length - 1]) : null;
-  
+        const expiryDate = expiryArray.length
+          ? parseDate(expiryArray[expiryArray.length - 1])
+          : null;
+
         if (!expiryDate || isNaN(expiryDate.getTime())) return false;
-  
+
         // Filtering based on start and end dates
         if (newDate) {
-          if (type === "startDate" && endDate) return expiryDate >= newDate && expiryDate <= endDate;
-          if (type === "endDate" && startDate) return expiryDate >= startDate && expiryDate <= newDate;
+          if (type === "startDate" && endDate)
+            return expiryDate >= newDate && expiryDate <= endDate;
+          if (type === "endDate" && startDate)
+            return expiryDate >= startDate && expiryDate <= newDate;
           return true;
         }
         return true;
@@ -201,25 +221,33 @@ export const EmploymentMedical = () => {
           dateOfJoin: formatDate(item?.doj) || "-",
           nationality: item?.nationality,
           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           medicalExpiryDate: formatDate(lastValidDate),
         };
       });
-  
+
+    if (startDate || endDate) {
+      if (filtered.length === 0) {
+        setIsDateFiltered(true); 
+      } else {
+        setIsDateFiltered(false); 
+      }
+    } else {
+      setIsDateFiltered(false); 
+    }
+
     setFilteredData(filtered);
   };
-  
-  
 
   return (
     <div>
@@ -230,6 +258,7 @@ export const EmploymentMedical = () => {
         startDate={startDate ? formatDate(startDate) : ""}
         endDate={endDate ? formatDate(endDate) : ""}
         handleDate={handleDate}
+        isFiltered={isDateFiltered}
       />
     </div>
   );
