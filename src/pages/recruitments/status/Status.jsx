@@ -633,7 +633,7 @@ export const Status = () => {
 
       {/* Results Section */}
       {loading ? (
-        <p>Loading...</p>
+        <p className="mt-24 flex items-center justify-center">Loading...</p>
       ) : error ? (
         <p>{error}</p>
       ) : (

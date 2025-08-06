@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { RecDashdetails } from "./RecDashdetails";
-import usePermission from "../../hooks/usePermissionDashInside";
 import { useTempID } from "../../utils/TempIDContext";
+import usePermission from "../../hooks/usePermissionDashInside";
 
 export const RecruTiles = () => {
   useEffect(() => {
@@ -20,52 +20,52 @@ export const RecruTiles = () => {
     if (location.pathname.includes("/applyemployreq")) {
       setSelectedTile("/Apply Employee Requisition");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/employreq")) {
       setSelectedTile("Employee Requisition");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/candidate")) {
       setSelectedTile("Candidate");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/localcandi")) {
       setSelectedTile("Local CV");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/nonloccandi")) {
       setSelectedTile("Non Local CV");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/status")) {
       setSelectedTile("Status");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/workpasstracking")) {
       setSelectedTile("WorkPass Tracking");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     }
   }, [location.pathname]);
 
@@ -78,7 +78,7 @@ export const RecruTiles = () => {
   );
   return (
     <section className="h-full bg-[#F5F6F1]">
-      <div className="flex flex-wrap justify-center sm:justify-evenly items-center gap-4 py-10 text-black">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 justify-items-center py-10 text-black">
         {filteredCards.map((value, index) => (
           <div
             key={index}

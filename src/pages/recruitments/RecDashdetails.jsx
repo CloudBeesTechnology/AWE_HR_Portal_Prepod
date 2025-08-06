@@ -62,6 +62,6 @@ export const RecDashdetails = [
     bg1: "bg-[#E993FF]",
     icons: icon8,
     title: "Hiring Job",
-    path: "/hiringJob",
+    path: "hiringJob",
   },
 ];
