@@ -63,6 +63,7 @@ const Login = () => {
           const userType = foundUser.selectType;
           localStorage.setItem("userType", userType);
           window.location.href = "/dashboard";
+          setToastMessage("Login successful!");
         } else {
           alert("Invalid credentials. Please try again.");
         }
@@ -82,6 +83,11 @@ const Login = () => {
     // <Authenticator>
 
     <section className="screen-size mx-auto flex h-screen">
+      {toastMessage && (
+        <div className="fixed top-6 left-1/2 z-50 -translate-x-1/2 bg-[#22c55e] text-white px-6 py-3 rounded shadow-lg font-semibold transition-all duration-300">
+          {toastMessage}
+        </div>
+      )}
       <div className="flex-1 border-r-2  border-[#E9E9E9] center">
         <img
           className="w-full max-w-[450px]"
