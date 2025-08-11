@@ -122,7 +122,7 @@ export function PrintExcelSheet({
               <td rowspan="2">${emp?.empLeaveCount?.UAL || 0}</td>
               <td rowspan="2">${Number(emp.__totalOT || 0).toFixed(2)}</td>
               <td rowspan="2">${emp.__allFieldsYes ? "Yes" : ""}</td>
-              <td rowspan="2">${escapeHtml(
+              <td rowspan="2" class="empName">${escapeHtml(
                 emp.__uniqueTimeKeeperName || ""
               )}</td>
             </tr>
