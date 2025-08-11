@@ -1546,14 +1546,14 @@ export const ViewTSTBeforeSave = ({
                 }
                 onClick={() => {
                   if (userIdentification !== "Manager") {
-                    if (selectedRows && selectedRows.length > 0) {
+                    if (
+                      Array.isArray(selectedRows) &&
+                      selectedRows?.length > 0
+                    ) {
                       let tempVar = null;
 
-                      if (
-                        Array.isArray(visibleData) &&
-                        visibleData.length > 0
-                      ) {
-                        visibleData.forEach((val) => {
+                      if (Array.isArray(finalData) && finalData.length > 0) {
+                        finalData?.forEach((val) => {
                           if (
                             parseFloat(val?.WORKINGHOURS) >
                               parseFloat(val?.NORMALWORKINGHRSPERDAY) &&

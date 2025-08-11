@@ -1535,7 +1535,30 @@ export const ViewOffshoreORMCsheet = ({
                 }
                 onClick={() => {
                   if (userIdentification !== "Manager") {
-                    if (selectedRows && selectedRows.length > 0) {
+                    if (
+                      Array.isArray(selectedRows) &&
+                      selectedRows?.length > 0
+                    ) {
+                      let tempVar = null;
+
+                      if (Array.isArray(finalData) && finalData.length > 0) {
+                        finalData?.forEach((val) => {
+                          if (
+                            parseFloat(val?.WORKINGHOURS) >
+                              parseFloat(val?.NORMALWORKINGHRSPERDAY) &&
+                            !tempVar
+                          ) {
+                            tempVar = true;
+                          }
+                        });
+                      }
+
+                      if (tempVar === true) {
+                        alert(
+                          `Working hours cannot be greater than 'Normal Working Hrs Per Day`
+                        );
+                        return;
+                      }
                       toggleFunctionForAssiMana();
                     } else if (excelData && excelData) {
                       storeInitialData();
