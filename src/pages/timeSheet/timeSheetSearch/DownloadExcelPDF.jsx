@@ -30,11 +30,7 @@ export const generateTimesheetPDF = (tableId, location, startDate, endDate) => {
       titleY
     );
     doc.setFontSize(10);
-    doc.text(
-      `FOR THE PERIOD ${startDate} TO ${endDate}`,
-      titleX,
-      titleY + 5
-    );
+    doc.text(`FOR THE PERIOD ${startDate} TO ${endDate}`, titleX, titleY + 5);
 
     // Clone the table from DOM
     const table = document.getElementById(tableId).cloneNode(true);
@@ -115,9 +111,16 @@ export const generateTimesheetPDF = (tableId, location, startDate, endDate) => {
 
     // Column styles
     const totalColumns = headers[headers.length - 1]?.length || 0;
+
     const columnStyles = {};
     columnStyles[0] = { cellWidth: 30 }; // Employee Name
     columnStyles[1] = { cellWidth: 15 }; // Project
+
+    // const findLastIndex = columnStyles[columnStyles.length - 1];
+    const updaterIndex = totalColumns - 1; // last column index
+    columnStyles[updaterIndex] = { cellWidth: 30, overflow: "linebreak" }; // Fixed width for Updater
+
+    // columnStyles[14] = { cellWidth: 12, overflow: "linebreak" };
     const dayStartIndex = 2;
     let dayEndIndex = totalColumns - 10;
     for (let i = dayStartIndex; i <= dayEndIndex; i++) {
@@ -126,6 +129,7 @@ export const generateTimesheetPDF = (tableId, location, startDate, endDate) => {
 
     // Generate PDF table
     doc.autoTable({
+      tableWidth: "wrap",
       head: headers,
       body: body,
       useCss: true,
@@ -150,7 +154,7 @@ export const generateTimesheetPDF = (tableId, location, startDate, endDate) => {
         fillColor: [255, 255, 255],
       },
       pageBreak: "auto",
-      horizontalPageBreak: true,
+      horizontalPageBreak: false,
 
       // Footer for each page
       didDrawPage: (data) => {
