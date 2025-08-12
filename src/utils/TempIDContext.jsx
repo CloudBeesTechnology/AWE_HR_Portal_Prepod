@@ -22,6 +22,8 @@ export const TempIDProvider = ({ children }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [getStartDate, setGetStartDate] = useState(new Date());
   const [getEndDate, setGetEndDate] = useState(new Date());
+  const [selectSapNoOrBadgeNo, setSelectSapNoOrBadgeNo] = useState("");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const [gmMail, setGmMail] = useState();
   const [hrManagerMail, setHrManagerMail] = useState();
@@ -33,7 +35,7 @@ export const TempIDProvider = ({ children }) => {
   const [gmPosition, setGmPosition] = useState("");
   const [GMEmpID, setGMEmpID] = useState("");
   const [supervisorCheck, setSupervisorCheck] = useState(true);
-  const [offshoreType, setOffshoreType] = useState("");
+  const [offshoreType, setOffshoreType] = useState("All");
   const [PDInfo, setPDInfo] = useState(null);
 
   const { workInfoData, empPIData } = useContext(DataSupply);
@@ -225,6 +227,10 @@ export const TempIDProvider = ({ children }) => {
         tableData,
         setOffshoreType,
         offshoreType,
+        selectSapNoOrBadgeNo,
+        setSelectSapNoOrBadgeNo,
+        refreshTrigger,
+        setRefreshTrigger,
       }}
     >
       {children}

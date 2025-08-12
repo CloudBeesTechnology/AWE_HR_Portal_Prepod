@@ -11,6 +11,7 @@ export const SearchBoxForTimeSheet = ({
   searchIcon1,
   searchIcon2,
   border,
+  empPIData
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();

@@ -1053,7 +1053,7 @@ export const ViewSBWsheet = ({
 
       if (Array.isArray(empAndWorkInfo)) {
         empAndWorkInfo.forEach((item) => {
-          empInfoMap.set(String(item.empBadgeNo).toUpperCase(), item);
+          empInfoMap.set(String(item.empBadgeNo)?.toUpperCase()?.trim(), item);
         });
       }
 
@@ -1061,7 +1061,7 @@ export const ViewSBWsheet = ({
       const addedNWHPD =
         Array.isArray(data) &&
         data.map((val) => {
-          const badgeKey = String(val.BADGE).toUpperCase();
+          const badgeKey = String(val.BADGE)?.toUpperCase()?.trim();
           const workInfoItem = empInfoMap.get(badgeKey);
 
           const lastWorkHour =

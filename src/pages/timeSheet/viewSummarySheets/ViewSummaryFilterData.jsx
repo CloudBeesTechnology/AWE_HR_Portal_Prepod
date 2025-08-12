@@ -5,6 +5,7 @@ import { useTempID } from "../../../utils/TempIDContext";
 import { SearchDisplayForTimeSheet } from "../timeSheetSearch/SearchDisplayForTS";
 import { SearchBoxForTimeSheet } from "../../../utils/SearchBoxForTimeSheet";
 import { FiSearch } from "react-icons/fi";
+import { IoSearch } from "react-icons/io5";
 import SelectOffshoreType from "../timeSheetSearch/SelectOffshoreType";
 
 export const ViewSummaryFilterData = ({
@@ -14,6 +15,8 @@ export const ViewSummaryFilterData = ({
   searchResult,
   //   setEmptyTableMess
   resetTableFunc,
+  empPIData,
+  setRefreshTrigger,
 }) => {
   const {
     setStartDate,
@@ -22,11 +25,19 @@ export const ViewSummaryFilterData = ({
     endDate,
     setSelectedLocation,
     setOffshoreType,
+    setSelectSapNoOrBadgeNo,
   } = useTempID();
   const selectLocationFunc = async (data) => {
     resetTableFunc();
     if (data.location) {
       setSelectedLocation(data.location);
+    }
+  };
+
+  const selectSapNoOrBadgeNo = async (data) => {
+    resetTableFunc();
+    if (data) {
+      setSelectSapNoOrBadgeNo(data);
     }
   };
 
@@ -57,7 +68,6 @@ export const ViewSummaryFilterData = ({
   const handleTypeSelect = (value) => {
     if (value) {
       setOffshoreType(value);
-      
     }
   };
 
@@ -93,20 +103,32 @@ export const ViewSummaryFilterData = ({
             searchIcon2={<FiSearch />}
             identify="viewSummary"
             setSelectedLocation={setSelectedLocation}
+            setRefreshTrigger={setRefreshTrigger}
           />
         </div>
 
         <SelectOffshoreType
-          options={["Direct", "Indirect"]}
+          options={["All", "Direct", "Indirect"]}
           handleTypeSelect={handleTypeSelect}
         />
-
+        {/* 
         <SearchBoxForTimeSheet
           allEmpDetails={data}
           searchResult={searchResult}
           secondaryData={secondaryData}
           placeholder="SAP ID / BADGE"
           Position="viewSummary"
+          empPIData={empPIData}
+        /> */}
+
+        <SearchDisplayForTimeSheet
+          newFormData={empPIData}
+          searchResult={selectSapNoOrBadgeNo}
+          placeholder="Sap No / Badge No / Name"
+          rounded="rounded"
+          searchIcon1={<IoSearch />}
+          identify="VS_SapNo_BadgeNo"
+          setRefreshTrigger={setRefreshTrigger}
         />
       </div>
     </div>

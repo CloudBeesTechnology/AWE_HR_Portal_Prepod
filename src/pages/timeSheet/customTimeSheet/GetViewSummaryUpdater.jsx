@@ -30,11 +30,15 @@ export const GetViewSummaryUpdater = (getEmpID) => {
       const candidates = empPersonalInfos;
 
       const getSummaryUpdaterName = candidates?.find(
-        (fin) => String(fin.empID) === String(getEmpID)
+        (fin) =>
+          String(fin.empID)?.toUpperCase()?.trim() ===
+          String(getEmpID)?.toUpperCase()?.trim()
       );
 
       return getSummaryUpdaterName;
-    } catch (err) {}
+    } catch (err) {
+      console.log("Error : ",err)
+    }
   }
 
   const returnEmpDetails = fetchEmployeeData();

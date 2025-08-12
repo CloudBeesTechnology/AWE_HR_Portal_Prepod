@@ -13,12 +13,13 @@ import { EditViewSummary } from "./viewSummarySheets/EditViewSummary";
 import { ViewSummaryTable } from "./viewSummarySheets/ViewSummaryTable";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GetHolidayList } from "./customTimeSheet/GetHolidayList";
 import { HoursMinuAbsentCal } from "./customTimeSheet/HoursMinuAbsentCal";
 
 import { useTableMergedData } from "./customTimeSheet/useTableMergedData";
 import { useGetTimeSheetData } from "./customTimeSheet/useGetTimeSheetData";
+import { DataSupply } from "../../utils/DataStoredContext";
 
 export const ViewSummary = () => {
   const [data, setData] = useState(null);
@@ -31,6 +32,8 @@ export const ViewSummary = () => {
   // const [leaveStatuses, setLeaveStatuses] = useState([]);
   // const [resultOfWHrsAbsCal, setResultOfWHrsAbsCal] = useState("");
 
+  const { empPIData } = useContext(DataSupply);
+
   const {
     startDate,
     endDate,
@@ -40,6 +43,9 @@ export const ViewSummary = () => {
     getEndDate,
     setGetEndDate,
     offshoreType,
+    selectSapNoOrBadgeNo,
+    setRefreshTrigger,
+    refreshTrigger,
   } = useTempID();
 
   const { workHrsAbsentCal } = HoursMinuAbsentCal();
@@ -180,7 +186,9 @@ export const ViewSummary = () => {
     selectedLocation,
     ProcessedDataFunc,
     offshoreType,
-    allData
+    allData,
+    selectSapNoOrBadgeNo,
+    refreshTrigger
   );
 
   useEffect(() => {
@@ -489,6 +497,8 @@ export const ViewSummary = () => {
         resetTableFunc={resetTableFunc}
         toggleEditViewSummaryFunc={toggleEditViewSummaryFunc}
         editViewSummaryObject={editViewSummaryObject}
+        empPIData={empPIData}
+        setRefreshTrigger={setRefreshTrigger}
         // resultOfWHrsAbsCal={resultOfWHrsAbsCal}
 
         // updatedResData={updatedResData}

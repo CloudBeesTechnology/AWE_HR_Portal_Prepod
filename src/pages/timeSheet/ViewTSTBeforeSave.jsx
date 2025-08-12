@@ -171,8 +171,8 @@ export const ViewTSTBeforeSave = ({
                 .map((empInf) => {
                   const interviewDetails = sapNoRemoved.find(
                     (item) =>
-                      String(item?.empID).toUpperCase() ===
-                      String(empInf?.empID).toUpperCase()
+                      String(item?.empID)?.toUpperCase()?.trim() ===
+                      String(empInf?.empID)?.toUpperCase()?.trim()
                   );
 
                   if (!interviewDetails) {
@@ -189,8 +189,8 @@ export const ViewTSTBeforeSave = ({
               const mergedData = fetchedData.map((item) => {
                 const workInfoItem = mergedDatas.find(
                   (info) =>
-                    String(info?.sapNo).toUpperCase() ===
-                    String(item?.NO).toUpperCase()
+                    String(info?.sapNo)?.toUpperCase()?.trim() ===
+                    String(item?.NO)?.toUpperCase()?.trim()
                 );
 
                 return {
@@ -1149,7 +1149,7 @@ export const ViewTSTBeforeSave = ({
 
       if (Array.isArray(empAndWorkInfo)) {
         empAndWorkInfo.forEach((item) => {
-          const key = String(item?.sapNo).toUpperCase();
+          const key = String(item?.sapNo)?.toUpperCase()?.trim();
           empInfoMap.set(key, item);
         });
       }
@@ -1157,7 +1157,7 @@ export const ViewTSTBeforeSave = ({
       const addedNWHPD =
         Array.isArray(data) &&
         data.map((val) => {
-          const badgeKey = String(val?.NO).toUpperCase();
+          const badgeKey = String(val?.NO)?.toUpperCase()?.trim();
           const workInfoItem = empInfoMap.get(badgeKey);
 
           const lastWorkHour =
@@ -1546,14 +1546,14 @@ export const ViewTSTBeforeSave = ({
                 }
                 onClick={() => {
                   if (userIdentification !== "Manager") {
-                    if (selectedRows && selectedRows.length > 0) {
+                    if (
+                      Array.isArray(selectedRows) &&
+                      selectedRows?.length > 0
+                    ) {
                       let tempVar = null;
 
-                      if (
-                        Array.isArray(visibleData) &&
-                        visibleData.length > 0
-                      ) {
-                        visibleData.forEach((val) => {
+                      if (Array.isArray(finalData) && finalData.length > 0) {
+                        finalData?.forEach((val) => {
                           if (
                             parseFloat(val?.WORKINGHOURS) >
                               parseFloat(val?.NORMALWORKINGHRSPERDAY) &&

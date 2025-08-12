@@ -1,14 +1,8 @@
-import { useEffect, useLayoutEffect, useState } from "react";
-import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../../assets/logo/logo-with-name.svg";
-import { IoArrowBack, IoArrowBackOutline } from "react-icons/io5";
-import {
-  capitalizedLetter,
-  DateFormat,
-  DateNewFormat,
-  FTDateFormat,
-} from "../../../utils/DateFormat";
-import { useLeaveSummaryCal } from "../../../hooks/useLeaveSummaryCal";
+import { IoArrowBackOutline } from "react-icons/io5";
+
 import { usePublicHolidayList } from "../../../hooks/usePublicHolidayList";
 import { useLeaveSummaryFuncs } from "../../../hooks/useLeaveSummaryFuncs";
 import { EmpProDataLeaveCal } from "./EmpProDataLeaveCal";
@@ -23,7 +17,6 @@ export const EmpLeaveCalculation = () => {
 
   const { publicHoliday } = usePublicHolidayList();
 
-  const { filterOnshoreOffshorePHbasis } = useLeaveSummaryCal();
   const { convertToFormattedHolidays, getSelectedMonthName } =
     useLeaveSummaryFuncs();
   const { PrintExcelSheet } = LeaveSummaryPrint();
@@ -88,8 +81,20 @@ export const EmpLeaveCalculation = () => {
   };
 
   const filterLeaveSummaryByHeader = (item, leaveSummaryHeader) => {
+    // let condition1 =
+    //   item?.supervisorStatus === "Approved" &&
+    //   item?.managerStatus !== "Rejected" &&
+    //   item?.empStatus !== "Cancelled";
+
+    // let condition2 =
+    //   item?.supervisorStatus !== "Rejected" &&
+    //   item?.managerStatus === "Approved" &&
+    //   item?.empStatus !== "Cancelled";
+
     let takenLeaves =
       item?.managerStatus === "Approved" && item?.empStatus !== "Cancelled";
+
+    // let takenLeaves = condition1 || condition2;
 
     let waitingForApproval =
       item?.managerStatus === "Pending" &&
@@ -110,7 +115,9 @@ export const EmpLeaveCalculation = () => {
     currentYear,
     effectiveDate,
     leaveTypeName,
-    leaveSummaryHeader
+    leaveSummaryHeader,
+    startDate,
+    endDate
   ) => {
     try {
       const effectiveYear = new Date(effectiveDate).getFullYear();
@@ -138,6 +145,14 @@ export const EmpLeaveCalculation = () => {
       }
 
       if (
+        startDate &&
+        endDate &&
+        item?.empLeaveType === leaveTypeName &&
+        item?.empBadgeNo === empDetails?.empBadgeNo &&
+        selectedCondition
+      ) {
+        return item;
+      } else if (
         leaveDateObj >= rangeStart &&
         leaveDateObj <= rangeEnd &&
         item?.empLeaveType === leaveTypeName &&
@@ -156,7 +171,9 @@ export const EmpLeaveCalculation = () => {
     currentDate,
     effectiveDate,
     leaveTypeName,
-    leaveSummaryHeader
+    leaveSummaryHeader,
+    startDate,
+    endDate
   ) => {
     const effectiveDateObj = new Date(effectiveDate);
 
@@ -184,8 +201,15 @@ export const EmpLeaveCalculation = () => {
         item,
         leaveSummaryHeader
       );
-      // If leave date falls in range
+
       if (
+        startDate &&
+        endDate &&
+        item?.empLeaveType === leaveTypeName &&
+        selectedCondition
+      ) {
+        return item;
+      } else if (
         leaveDateObj &&
         leaveDateObj >= windowStart &&
         leaveDateObj < windowEnd &&
@@ -202,12 +226,15 @@ export const EmpLeaveCalculation = () => {
   const handleOtherLeaveConditions = (
     item,
     leaveTypeName,
-    leaveSummaryHeader
+    leaveSummaryHeader,
+    startDate,
+    endDate
   ) => {
     const selectedCondition = filterLeaveSummaryByHeader(
       item,
       leaveSummaryHeader
     );
+
     if (
       item?.empLeaveType === leaveTypeName &&
       item?.empBadgeNo === empDetails?.empBadgeNo &&
@@ -221,7 +248,9 @@ export const EmpLeaveCalculation = () => {
     item,
     currentDate,
     leaveTypeName,
-    leaveSummaryHeader
+    leaveSummaryHeader,
+    startDate,
+    endDate
   ) => {
     let currentYear = currentDate.getFullYear();
     let rangeStart = new Date(`${currentYear}-01-01`);
@@ -244,7 +273,16 @@ export const EmpLeaveCalculation = () => {
         : leaveTypeName === "Unpaid Authorize Sick"
         ? "Unpaid Authorize - Sick"
         : leaveTypeName;
+
     if (
+      startDate &&
+      endDate &&
+      item?.empLeaveType === correctedLeaveType &&
+      item?.empBadgeNo === empDetails?.empBadgeNo &&
+      selectedCondition
+    ) {
+      return item;
+    } else if (
       leaveDateObj >= rangeStart &&
       leaveDateObj <= rangeEnd &&
       item?.empLeaveType === correctedLeaveType &&
@@ -276,7 +314,12 @@ export const EmpLeaveCalculation = () => {
     return { leaveTaken, waitingForApproval, getRemainingLeave };
   };
 
-  const getCurrentYearLeaves = (getUpdatedLeaveData, getMatchedEmpLeaves) => {
+  const getCurrentYearLeaves = (
+    getUpdatedLeaveData,
+    getMatchedEmpLeaves,
+    startDate,
+    endDate
+  ) => {
     const today = new Date();
     const currentYear = today.getFullYear();
 
@@ -336,7 +379,7 @@ export const EmpLeaveCalculation = () => {
               ? leaveData?.empAnnualLeaveDate[
                   leaveData?.empAnnualLeaveDate.length - 1
                 ]
-              : leaveData?.empAnnualLeaveDate;
+              : "";
 
             if (leaveTypeName === "Annual Leave" && latestAnnualLeaveEffDate) {
               let getDaysTakenList = handleAnnualLeaveConditions(
@@ -344,14 +387,18 @@ export const EmpLeaveCalculation = () => {
                 currentYear,
                 latestAnnualLeaveEffDate,
                 leaveTypeName,
-                "daysTaken"
+                "daysTaken",
+                startDate,
+                endDate
               );
               let getWaitingForApprovalList = handleAnnualLeaveConditions(
                 leaveData,
                 currentYear,
                 latestAnnualLeaveEffDate,
                 leaveTypeName,
-                "waitingApproval"
+                "waitingApproval",
+                startDate,
+                endDate
               );
 
               const { leaveTaken, waitingForApproval, getRemainingLeave } =
@@ -394,7 +441,9 @@ export const EmpLeaveCalculation = () => {
                 getCurrentDate,
                 SickLeaveEffDate,
                 leaveTypeName,
-                "daysTaken"
+                "daysTaken",
+                startDate,
+                endDate
               );
 
               let getWaitingForApprovalList = handleSickLeaveConditions(
@@ -402,7 +451,9 @@ export const EmpLeaveCalculation = () => {
                 getCurrentDate,
                 SickLeaveEffDate,
                 leaveTypeName,
-                "waitingApproval"
+                "waitingApproval",
+                startDate,
+                endDate
               );
 
               const { leaveTaken, waitingForApproval, getRemainingLeave } =
@@ -439,13 +490,17 @@ export const EmpLeaveCalculation = () => {
               let getDaysTakenList = handleOtherLeaveConditions(
                 leaveData,
                 leaveTypeName,
-                "daysTaken"
+                "daysTaken",
+                startDate,
+                endDate
               );
 
               let getWaitingForApprovalList = handleOtherLeaveConditions(
                 leaveData,
                 leaveTypeName,
-                "waitingApproval"
+                "waitingApproval",
+                startDate,
+                endDate
               );
 
               const { leaveTaken, waitingForApproval, getRemainingLeave } =
@@ -476,14 +531,18 @@ export const EmpLeaveCalculation = () => {
                 leaveData,
                 getCurrentDate,
                 leaveTypeName,
-                "daysTaken"
+                "daysTaken",
+                startDate,
+                endDate
               );
 
               let getWaitingForApprovalList = handleAllCLLeaveConditions(
                 leaveData,
                 getCurrentDate,
                 leaveTypeName,
-                "waitingApproval"
+                "waitingApproval",
+                startDate,
+                endDate
               );
 
               let leaveTaken = getMatchedEmpLeaves[leaveType]?.daysTaken || 0;
@@ -683,7 +742,9 @@ export const EmpLeaveCalculation = () => {
 
       const allCurrentYearLeaves = getCurrentYearLeaves(
         primaryData,
-        getMatchedEmpLeaves
+        getMatchedEmpLeaves,
+        startDate,
+        endDate
       );
 
       setLeaveSummary(allCurrentYearLeaves);
@@ -719,7 +780,7 @@ export const EmpLeaveCalculation = () => {
 
       // nav("/leaveManagement/leaveBalance");
     }
-  }, [primaryData, empDetails, publicHoliday]);
+  }, [primaryData, empDetails, publicHoliday, startDate, endDate]);
 
   const getDisplayDateRange = () => {
     if (startDate && endDate) {
@@ -756,7 +817,9 @@ export const EmpLeaveCalculation = () => {
     <main className="w-full">
       <i
         className="text-2xl text-dark_grey cursor-pointer"
-        onClick={() => nav("/leaveManagement/leaveBalance")}
+        onClick={() => {
+          nav("/leaveManagement/leaveBalance");
+        }}
       >
         <IoArrowBackOutline />
       </i>

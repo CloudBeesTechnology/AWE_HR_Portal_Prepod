@@ -123,7 +123,7 @@
 //           if (dayCount === 1 && parseFloat(item?.days) === 0.5) {
 //             assignedDays = 0.5;
 //           }
-        
+
 //           totalLeaveCount += assignedDays;
 //           seperatedLeaves.push({
 //             ...item,
@@ -306,6 +306,7 @@ const useSeperateLeaves = () => {
             empLeaveStartDate: formattedDateStr,
             empLeaveEndDate: formattedDateStr,
             leaveTakenCount: assignedDays,
+            leaveType: item?.leaveType,
           });
 
           currentDate.setDate(currentDate.getDate() + 1);
@@ -320,6 +321,9 @@ const useSeperateLeaves = () => {
           days: item?.days,
           totalLeaveCount: totalLeaveCount,
           workWeek: item?.workWeek,
+          supervisorStatus: item?.supervisorStatus,
+          managerStatus: item?.managerStatus,
+          empStatus: item?.empStatus,
           fromDate: formatLocalDate(itemsDate?.fromDate),
           toDate: formatLocalDate(itemsDate?.toDate),
           startDate: formatLocalDateTime(itemsDate?.startDate),
@@ -328,6 +332,55 @@ const useSeperateLeaves = () => {
         });
       });
 
+      // const getSeperatedData = result?.flatMap((val) => val.seperatedLeaves);
+
+      // let dayCount = 0;
+      // const fResult = result.filter((fil) => {
+      //   let getYear = new Date(fil?.fromDate).getFullYear();
+
+      // let filterLeaves =
+      //   (fil?.managerStatus === "Approved" &&
+      //     fil?.supervisorStatus !== "Rejected") ||
+      //   (fil?.supervisorStatus === "Approved" &&
+      //     fil?.managerStatus !== "Rejected");
+
+      // if (
+      //   fil.empID === "7916" &&
+      //   fil.leaveType === "Annual Leave" &&
+      //   getYear === 2025 &&
+      //   filterLeaves &&
+      //   fil?.empStatus !== "Cancelled"
+      // ) {
+      //   dayCount += fil?.days;
+      //   return fil;
+      // }
+
+      // if (
+      //   fil.managerStatus === "Approved" ||
+      //   fil.supervisorStatus === "Approved"
+      // ) {
+      //   if (
+      //     fil.empStatus !== "Cancelled" &&
+      //     fil.empID === "7916" &&
+      //     fil.leaveType === "Annual Leave" &&
+      //     getYear === 2025
+      //   ) {
+      //     return (dayCount += fil?.days);
+      //   }
+      // }
+      //   if (
+      //     fil.empID === "7916" &&
+      //     fil.leaveType === "Annual Leave" &&
+      //     getYear === 2025 &&
+      //     fil.fromDate === "2025-02-20"
+      //   ) {
+      //     dayCount += fil?.days;
+      //     return fil;
+      //   }
+      // });
+
+      // console.log("dayCount : ", dayCount);
+      // console.log("fResult : ", fResult);
       return result;
     }
   }

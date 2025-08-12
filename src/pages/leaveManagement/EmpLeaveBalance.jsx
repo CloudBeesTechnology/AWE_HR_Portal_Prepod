@@ -14,6 +14,9 @@ import useLeaveSummaryCal2 from "../../hooks/useLeaveSummaryCal2";
 
 export const EmpLeaveBalance = () => {
   const { mergedData, userType, loading } = useOutletContext();
+
+  //  handleLeaveCount,
+  //       renderLeaveData
   const [showPopup, setShowPopup] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [secondartyData, setSecondartyData] = useState([]);
@@ -45,6 +48,12 @@ export const EmpLeaveBalance = () => {
   useEffect(() => {
     const seperatedLeaves = handleSeperateLeaves({ mergedData });
 
+    // const seperatedLeaves = seperatedLeavess?.filter(
+    //   (val) => val.empID === "2045"
+    // );
+
+    // console.log("seperatedLeaves : ", seperatedLeaves);
+
     const { formattedPHList } = convertToFormattedHolidays({ publicHoliday });
     const { isOffshoreOrOnshoreEmp } = filterOnshoreOffshorePHbasis({
       formattedPHList,
@@ -54,12 +63,13 @@ export const EmpLeaveBalance = () => {
     const finalLeaveData =
       Array.isArray(isOffshoreOrOnshoreEmp) &&
       isOffshoreOrOnshoreEmp?.length > 0
-        ? isOffshoreOrOnshoreEmp?.flatMap((val) => val.seperatedLeaves)
+        ? isOffshoreOrOnshoreEmp?.flatMap((val) => val?.seperatedLeaves)
         : [];
 
     setMergedLeaveData(finalLeaveData);
-  }, [mergedData]);
+  }, [mergedData, publicHoliday, userType]);
 
+  // mergedData, userType
   useEffect(() => {
     const userID = localStorage.getItem("userID");
 
