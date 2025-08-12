@@ -92,7 +92,7 @@ export const RecentNotify = () => {
               );
             })}
 
-            <div className="text-center my-4">
+            <div className="text-center mt-4">
               <Link
                 to="/notifications"
                 className="text-sm text-[blue] underline"
@@ -102,7 +102,7 @@ export const RecentNotify = () => {
             </div>
           </section>
         ) : (
-          <div className="text-gray-500 text-center h-full py-20">
+          <div className="text-xs h-full flex items-center justify-center">
             <p>No new notifications available.</p>
           </div>
         )}

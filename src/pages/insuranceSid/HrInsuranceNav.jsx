@@ -83,11 +83,7 @@ export const HrInsuranceNav = () => {
   return (
     <section className="w-full bg-[#F5F6F1]">
       <div className="relative mx-auto p-5 h-full">
-        <div className="w-full">
-          <p className="flex-1 text-center mt-2 text_size_2 uppercase">
-            Insurance Info
-          </p>
-        </div>
+      
         <div className="flex justify-between border-b m-4 text-[16px] font-semibold">
           <button
             className={`py-2 px-4 focus:outline-none ${

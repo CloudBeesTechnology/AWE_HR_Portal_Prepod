@@ -58,6 +58,7 @@ module.exports = {
       actionGreen: "#10b981",
       actionGreenHover: "#059669",
       disabledBg: "#d1d5db",
+      tableHeadCol: "#DDDDDD"
     },
   },
   plugins: [require('tailwind-scrollbar-hide')],

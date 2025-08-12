@@ -55,15 +55,16 @@ export const ApplicationReceived = () => {
                 if (expiryDate < currentDate) return null; // Skip expired posts
 
                 // Count matching positions in empPDData
-                const positionCount = empPDData?.filter((emp) => {
-                  const empCreatedAt = new Date(emp.createdAt);
-                  return (
-                    emp?.position?.trim().toLowerCase() ===
-                      item?.jobTitle?.trim().toLowerCase() &&
-                    empCreatedAt >= startDate &&
-                    empCreatedAt <= expiryDate
-                  );
-                }).length || 0;
+                const positionCount =
+                  empPDData?.filter((emp) => {
+                    const empCreatedAt = new Date(emp.createdAt);
+                    return (
+                      emp?.position?.trim().toLowerCase() ===
+                        item?.jobTitle?.trim().toLowerCase() &&
+                      empCreatedAt >= startDate &&
+                      empCreatedAt <= expiryDate
+                    );
+                  }).length || 0;
 
                 return (
                   <div
@@ -93,10 +94,8 @@ export const ApplicationReceived = () => {
                 );
               })
             ) : (
-              <div className="flex justify-center items-center w-full h-full">
-                <p className="text-dark_grey text-lg ">
-                  No Hiring Job Posts Available
-                </p>
+              <div className="text-xs h-full flex items-center justify-center mt-12">
+                <p>No hiring job posts available.</p>
               </div>
             )}
           </div>
