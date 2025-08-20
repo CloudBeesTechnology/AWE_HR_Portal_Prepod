@@ -1,48 +1,96 @@
-import React from 'react'
+export const DeleteDocsTrainingTC = (
+  fileType,
+  fileName,
+  watchedEmpID,
+  setUploadedCertify,
+  setFileNames,
+  setUploadedDocs,
+  index,
+  setIsUploading
+) => {
+  try {
+    // First, ensure index is not undefined and has valid value
+    if (index === undefined || index === null) {
+      return; // Exit early if index is invalid
+    }
 
-export const DeleteDocsTrainingTC = (fileType, fileName, empID,setUploadedFileNames,setUploadTC,setIsUploading) => {
-try{
-    
-    setUploadedFileNames((prev) => {
-        const updatedFiles = { ...prev };
-      
-        if (Array.isArray(updatedFiles[fileType])) {
-          updatedFiles[fileType] = updatedFiles[fileType].filter((name) => name !== fileName);
-        } else if (typeof updatedFiles[fileType] === "string") {
-          // Handle case where fileType is a single string instead of an array
-          if (updatedFiles[fileType] === fileName) {
-            updatedFiles[fileType] = [];
-          }
-        }
-      
-        // Ensure fileType always remains an array, even if empty
-        if (!updatedFiles[fileType] || updatedFiles[fileType].length === 0) {
-          updatedFiles[fileType] = []; // Set empty array instead of deleting the key
-        }
-      
-        return updatedFiles;
-      });
-      
-      setUploadTC((prev) => {
-        const updatedFiles = { ...prev };
-        if (Array.isArray(updatedFiles[fileType])) {
-          updatedFiles[fileType] = updatedFiles[fileType].filter(
-            (file) =>
-              file.upload !== `public/${fileType}/${empID}/${fileName}`
+    setFileNames((prev) => {
+      const updatedDepFiles = { ...prev }; // Clone the state
+
+      Object.keys(updatedDepFiles).forEach((key) => {
+        if (updatedDepFiles[key].includes(fileName)) {
+          updatedDepFiles[key] = updatedDepFiles[key].filter(
+            (file) => file !== fileName
           );
-          if (!updatedFiles[fileType] || updatedFiles[fileType].length === 0) {
-            updatedFiles[fileType] = []; // Assign an empty array instead of deleting the key
-          }
         }
-        return updatedFiles;
       });
-      setIsUploading((prev) => ({
-        ...prev,
-        [fileType]: false,
-      }));
-}catch(error){
-    console.log(error,"deletedarrayUpload in employe info");
-    
-}
-  
-}
+
+      return updatedDepFiles;
+    });
+
+    // Update uploadedDocs
+    setUploadedDocs((prev) => {
+      const updatedFiles = { ...prev };
+
+      // Ensure  trainingUpCertifiyy exists
+      if (!updatedFiles.trainingUpCertifi) {
+        updatedFiles.trainingUpCertifi = {};
+      }
+
+      // Ensure that the index exists in  trainingUpCertifi
+      if (!updatedFiles.trainingUpCertifi[index]) {
+        updatedFiles.trainingUpCertifi[index] = [];
+      }
+
+      // Find the file to remove by matching the upload path
+      const objectIndex = updatedFiles.trainingUpCertifi[index].findIndex(
+        (file) =>
+          file.upload === `public/${fileType}/${watchedEmpID}/${fileName}`
+      );
+
+      if (objectIndex !== -1) {
+        updatedFiles.trainingUpCertifi[index].splice(objectIndex, 1);
+      }
+
+      // If the inner array is now empty, delete it
+      if (updatedFiles.trainingUpCertifi[index].length === 0) {
+        delete updatedFiles.trainingUpCertifi[index];
+      }
+
+      return updatedFiles;
+    });
+
+    const key = `${index}_${fileType}`;
+
+    setUploadedCertify((prev) => {
+      const updatedFileNames = { ...prev };
+
+      if (Array.isArray(updatedFileNames[key])) {
+        updatedFileNames[key] = [...updatedFileNames[key]].filter(
+          (name) => name !== fileName
+        );
+
+        // ✅ Remove key if empty
+        if (updatedFileNames[key].length === 0) {
+          delete updatedFileNames[key];
+        }
+      }
+      return updatedFileNames;
+    });
+
+    setIsUploading((prev) => {
+      const updatedState = { ...prev };
+
+      // Use the same key format as in updateUploadingState
+      const key = `${index}_${fileType}`;
+
+      if (updatedState[key]) {
+        updatedState[key] = false;
+      }
+
+      return updatedState;
+    });
+  } catch (err) {
+    console.log("Caught error:", err);
+  }
+};

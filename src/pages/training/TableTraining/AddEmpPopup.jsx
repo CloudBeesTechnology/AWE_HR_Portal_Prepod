@@ -19,8 +19,9 @@ const AddEmpPopup = ({ details, popupAll, onClose }) => {
     { header: "End Date", key: "traineeED" },
     { header: "Status", key: "traineeStatus" },
     { header: "Training Course Fee", key: "traineeCourseFee" },
-    { header: "Upload Report", key: "medicalReport" },
+    { header: "Uploaded Reports", key: "medicalReport" },
   ];
+  
   useEffect(() => {
     let parsedData = [];
 
@@ -28,7 +29,7 @@ const AddEmpPopup = ({ details, popupAll, onClose }) => {
       let raw = details?.traineeTrack || "[]";
       let firstParse = JSON.parse(raw);
 
-      // If it's a string, and looks like invalid JSON, try fixing keys (very hacky!)
+      // If it's a string, and looks like invalid JSON, try fixing keys
       if (typeof firstParse === "string") {
         let fixed = firstParse
           .replace(/([{,])(\s*)(\w+)\s*:/g, '$1"$3":') // add quotes to keys
@@ -48,9 +49,6 @@ const AddEmpPopup = ({ details, popupAll, onClose }) => {
           try {
             const rawReport = item?.medicalReport;
 
-            // Log the raw value to inspect what's coming through
-            // console.log("Raw medicalReport:", rawReport);
-
             // Check for empty, null, or non-JSON values
             if (
               !rawReport ||
@@ -58,10 +56,8 @@ const AddEmpPopup = ({ details, popupAll, onClose }) => {
               rawReport === "null" ||
               rawReport === ""
             ) {
-              // console.log(`Skipping empty or invalid report at index ${i}`);
               continue; // Skip empty or invalid reports
             }
-            // console.log(rawReport);
 
             // Try parsing the raw report string
             let parsedReport = [];
@@ -71,15 +67,21 @@ const AddEmpPopup = ({ details, popupAll, onClose }) => {
               // Parse the string only if it's a string
               parsedReport = JSON.parse(rawReport);
             } else {
-              // console.warn(`Unexpected rawReport type at index ${i}:`, typeof rawReport);
               continue; // Skip if rawReport is neither an array nor a string
             }
 
             // Check if parsedReport is an array and contains data
             if (Array.isArray(parsedReport) && parsedReport.length > 0) {
-              const filePath = parsedReport[0].upload;
-              const { url } = await getUrl({ path: filePath });
-              urls[i] = url;
+              const fileUrlsForItem = [];
+              for (const report of parsedReport) {
+                const filePath = report.upload;
+                const { url } = await getUrl({ path: filePath });
+                fileUrlsForItem.push({
+                  url,
+                  name: filePath.split('/').pop() // Extract filename from path
+                });
+              }
+              urls[i] = fileUrlsForItem;
             }
           } catch (err) {
             console.error("Error processing report at index", i, err);
@@ -93,8 +95,6 @@ const AddEmpPopup = ({ details, popupAll, onClose }) => {
       console.error("Error parsing traineeTrack:", error);
     }
   }, [details, popupAll]);
-
-  // console.log(storedData);
 
   return (
     <div className="fixed top-0 w-full left-0 bg-black bg-opacity-50 z-[9999] py-7 min-h-screen flex items-center justify-center ">
@@ -113,14 +113,12 @@ const AddEmpPopup = ({ details, popupAll, onClose }) => {
         <div className=" shadow-md rounded-md px-10 py-5">
           <article className="flex flex-col mb-4">
             {popupAll?.flatMap((field, index) => {
-              // console.log(details[field.key]);
               return (
                 <article key={index} className="mb-2 flex flex-col">
                   <article className="flex justify-between text-[14px]">
                     <p className="flex-1 text-start font-medium">
                       {field?.header}
                     </p>
-                    {/* <p className="flex-1 text-center">:</p> */}
                     <p className="flex-1 text-start">{details[field?.key]}</p>
                   </article>
                 </article>
@@ -155,24 +153,26 @@ const AddEmpPopup = ({ details, popupAll, onClose }) => {
                         <p className="flex-1 text-start font-medium">
                           {item.header}
                         </p>
-                        {/* <p className=" text-center">:</p> */}
-
                         <p className="flex-1 text-start">
                           {item.key === "medicalReport" ? (
-                            fileUrls[idx] ? (
-                              <a
-                                href={fileUrls[idx]}
-                                className="text-blue underline"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Download
-                              </a>
+                            fileUrls[idx] && fileUrls[idx].length > 0 ? (
+                              <div className="flex flex-col">
+                                {fileUrls[idx].map((file, fileIndex) => (
+                                  <a
+                                    key={fileIndex}
+                                    href={file.url}
+                                    className="text-blue underline mb-1"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    {fileIndex + 1}. {file.name}
+                                  </a>
+                                ))}
+                              </div>
                             ) : (
                               "N/A"
                             )
                           ) : (
-                            // val[item.key] || "N/A"
                             formattedValue || "N/A"
                           )}
                         </p>
