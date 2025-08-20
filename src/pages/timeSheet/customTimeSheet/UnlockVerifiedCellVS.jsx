@@ -47,14 +47,20 @@ export const UnlockVerifiedCellVS = async ({
         ? item.fidNo
         : item.empBadgeNo;
 
+    const location = String(item?.companyName)?.toUpperCase()?.trim();
+
     if (identifier === "create") {
-      const key = `${item.fileType}|${item.date.trim()}|${badgeNoOrFidNo}`;
+      const key = `${
+        item.fileType
+      }|${item.date.trim()}|${badgeNoOrFidNo}|${location}`;
       timeSheetMap.set(key, item);
     } else if (
       item.status === "Verified" &&
       identifier === "updateStoredData"
     ) {
-      const key = `${item.fileType}|${item.date.trim()}|${badgeNoOrFidNo}`;
+      const key = `${
+        item.fileType
+      }|${item.date.trim()}|${badgeNoOrFidNo}|${location}`;
       timeSheetMap.set(key, item);
     }
   }
@@ -68,7 +74,9 @@ export const UnlockVerifiedCellVS = async ({
         ? record.fidNo
         : record.empBadgeNo;
 
-    const key = `${record.fileType}|${record.date.trim()}|${badgeNoOrFidNo}`;
+    const location = String(record?.companyName)?.toUpperCase()?.trim();
+
+    const key = `${record.fileType}|${record.date.trim()}|${badgeNoOrFidNo}|${location}`;
     // if (timeSheetMap.has(key)) {
     //   filteredResult.push(timeSheetMap.get(key));
     // }
