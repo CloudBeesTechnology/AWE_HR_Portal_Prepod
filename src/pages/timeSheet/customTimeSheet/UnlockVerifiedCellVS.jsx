@@ -12,6 +12,7 @@ export const UnlockVerifiedCellVS = async ({
   const client = generateClient();
   let allData = [];
   let notMatchedResult = [];
+  let matchedResult = [];
   let filteredResult = [];
   let successCount = 0;
   let deleteDuplicateData = "";
@@ -94,6 +95,7 @@ export const UnlockVerifiedCellVS = async ({
     }
 
     if (timeSheetMap.has(key) && identifier === "create" && !alreadyShown) {
+      matchedResult.push(record);
       alreadyShown = true;
       setShowDuplicateAlert?.(true);
       setCancelAction?.(true);
@@ -143,5 +145,6 @@ export const UnlockVerifiedCellVS = async ({
   return {
     filteredResults: notMatchedResult,
     deleteDuplicateData,
+    duplicateData: matchedResult,
   };
 };
