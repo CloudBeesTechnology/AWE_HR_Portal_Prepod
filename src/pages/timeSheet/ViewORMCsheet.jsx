@@ -82,6 +82,7 @@ export const ViewORMCsheet = ({
   const [successMess, setSuccessMess] = useState(null);
   const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
   const [changePopupMessage, setChangePopupMessage] = useState(null);
+  const [duplicateRecord, setDuplicateRecord] = useState([]);
   const [popupMess, setPopupMess] = useState({});
 
   const [showConfirm, setShowConfirm] = useState(false);
@@ -714,10 +715,17 @@ export const ViewORMCsheet = ({
   };
 
   useEffect(() => {
-    if (changePopupMessage && changePopupMessage.length > 0) {
+    if (
+      changePopupMessage &&
+      changePopupMessage.length > 0 &&
+      duplicateRecord &&
+      duplicateRecord?.length > 0
+    ) {
+      const getBadgeNo = Array.isArray(duplicateRecord)
+        ? duplicateRecord[0]?.empBadgeNo
+        : [];
       setPopupMess({
-        message:
-          "Some data in the uploaded Excel sheet has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.",
+        message: `Some data in the uploaded Excel sheet (Badge ID: ${getBadgeNo}) has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.`,
         buttonName: "Save",
       });
     } else if (changePopupMessage && changePopupMessage.length === 0) {
@@ -727,7 +735,7 @@ export const ViewORMCsheet = ({
         buttonName: "OK",
       });
     }
-  }, [changePopupMessage]);
+  }, [changePopupMessage, duplicateRecord]);
 
   const checkBadgeNoOrNWHPD = async (data, decision) => {
     if (decision === "Allowed") return false;
@@ -819,8 +827,8 @@ export const ViewORMCsheet = ({
 
     if (resultOfBadgeNo) return;
 
-    const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
-      {
+    const { filteredResults, deleteDuplicateData, duplicateData } =
+      await UnlockVerifiedCellVS({
         finalResult,
         setLoadingMessForDelay,
         identifier,
@@ -832,9 +840,9 @@ export const ViewORMCsheet = ({
           cancelActionRef.current = val;
           setCancelAction(val); // for UI
         },
-      }
-    );
+      });
     setChangePopupMessage(filteredResults);
+    setDuplicateRecord(duplicateData);
 
     if (filteredResults.length === finalResult.length) setCancelAction(false);
 

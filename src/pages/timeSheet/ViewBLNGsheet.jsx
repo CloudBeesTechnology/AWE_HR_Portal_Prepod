@@ -96,6 +96,7 @@ export const ViewBLNGsheet = ({
   const [selectedOption, setSelectedOption] = useState("");
 
   const [changePopupMessage, setChangePopupMessage] = useState(null);
+  const [duplicateRecord, setDuplicateRecord] = useState([]);
   const [popupMess, setPopupMess] = useState({});
 
   const [showConfirm, setShowConfirm] = useState(false);
@@ -853,10 +854,17 @@ export const ViewBLNGsheet = ({
   };
 
   useEffect(() => {
-    if (changePopupMessage && changePopupMessage.length > 0) {
+    if (
+      changePopupMessage &&
+      changePopupMessage.length > 0 &&
+      duplicateRecord &&
+      duplicateRecord?.length > 0
+    ) {
+      const getFidNo = Array.isArray(duplicateRecord)
+        ? duplicateRecord[0]?.fidNo
+        : [];
       setPopupMess({
-        message:
-          "Some data in the uploaded Excel sheet has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.",
+        message: `Some data in the uploaded Excel sheet (SAP ID: ${getFidNo}) has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.`,
         buttonName: "Save",
       });
     } else if (changePopupMessage && changePopupMessage.length === 0) {
@@ -866,7 +874,7 @@ export const ViewBLNGsheet = ({
         buttonName: "OK",
       });
     }
-  }, [changePopupMessage]);
+  }, [changePopupMessage, duplicateRecord]);
 
   const checkBadgeNoOrNWHPD = async (data, decision) => {
     if (decision === "Allowed") return false;
@@ -958,8 +966,8 @@ export const ViewBLNGsheet = ({
 
     if (resultOfBadgeNo) return;
 
-    const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
-      {
+    const { filteredResults, deleteDuplicateData, duplicateData } =
+      await UnlockVerifiedCellVS({
         finalResult,
         setLoadingMessForDelay,
         identifier,
@@ -971,9 +979,9 @@ export const ViewBLNGsheet = ({
           cancelActionRef.current = val;
           setCancelAction(val); // for UI
         },
-      }
-    );
+      });
     setChangePopupMessage(filteredResults);
+    setDuplicateRecord(duplicateData);
 
     if (filteredResults.length === finalResult.length) setCancelAction(false);
 

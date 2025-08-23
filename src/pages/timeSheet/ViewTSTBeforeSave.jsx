@@ -833,7 +833,7 @@ export const ViewTSTBeforeSave = ({
         ? duplicateRecord[0]?.fidNo
         : [];
       setPopupMess({
-        message: `Some data in the uploaded Excel sheet (FID No: ${getFidNo}) has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.`,
+        message: `Some data in the uploaded Excel sheet (SAP ID: ${getFidNo}) has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.`,
         buttonName: "Save",
       });
     } else if (changePopupMessage && changePopupMessage.length === 0) {

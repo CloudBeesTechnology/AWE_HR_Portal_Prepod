@@ -77,7 +77,9 @@ export const UnlockVerifiedCellVS = async ({
 
     const location = String(record?.companyName)?.toUpperCase()?.trim();
 
-    const key = `${record.fileType}|${record.date.trim()}|${badgeNoOrFidNo}|${location}`;
+    const key = `${
+      record.fileType
+    }|${record.date.trim()}|${badgeNoOrFidNo}|${location}`;
     // if (timeSheetMap.has(key)) {
     //   filteredResult.push(timeSheetMap.get(key));
     // }

@@ -195,9 +195,13 @@ export const ViewSummaryTable = ({
     }
   };
 
+  function sortByNameAscending(arr) {
+    return arr?.sort((a, b) => a?.name?.localeCompare(b?.name));
+  }
+
   // Pagination
   const itemsPerPage = 3;
-  const safeData = allExcelSheetData || [];
+  const safeData = sortByNameAscending(allExcelSheetData) || [];
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -207,7 +211,7 @@ export const ViewSummaryTable = ({
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   // var data = currentData;
-  var data = isDownloading ? allExcelSheetData : currentData;
+  var data = isDownloading ? safeData : currentData;
 
   return (
     <div className="bg-[#fafaf6] h-screen">
@@ -506,7 +510,7 @@ export const ViewSummaryTable = ({
                           const isChecked = Boolean(isVerified);
                           return (
                             <td
-                              className={`border px-2 py-1 border-dark_grey cursor-pointer max-w-[70px] min-w-[70px] break-words whitespace-normal
+                              className={`border px-2 py-1 border-dark_grey text-center cursor-pointer max-w-[70px] min-w-[70px] break-words whitespace-normal
                                ${
                                  isChecked
                                    ? "bg-[#f59a51] bg-opacity-50 z-0"
@@ -621,7 +625,7 @@ export const ViewSummaryTable = ({
                           const isChecked = Boolean(isVerified);
                           return (
                             <td
-                              className={`border px-2 py-1 border-dark_grey  ${
+                              className={`border px-2 py-1 border-dark_grey text-center ${
                                 isChecked
                                   ? "bg-[#f59a51] bg-opacity-50 z-0"
                                   : dayOfWeek === "Sunday"
@@ -698,7 +702,7 @@ export const ViewSummaryTable = ({
                           const formattedBruneiDateTime = `${day}/${month}/${year} ${time}`;
                           return (
                             <td
-                              className={`border px-2 py-2 border-dark_grey
+                              className={`border px-2 py-2 border-dark_grey text-center
                               ${
                                 isChecked
                                   ? "bg-[#f59a51] bg-opacity-50  z-0"
@@ -750,7 +754,7 @@ export const ViewSummaryTable = ({
 
                           return (
                             <td
-                              className={`${i === 0 ? "border" : "border"}`}
+                              className={`${i === 0 ? "border" : "border-b"}`}
                               key={currentDayIndex}
                             ></td>
                           );
