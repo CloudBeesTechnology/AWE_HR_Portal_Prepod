@@ -754,7 +754,7 @@ export const ViewSummaryTable = ({
 
                           return (
                             <td
-                              className={`${i === 0 ? "border" : "border-b"}`}
+                              className={`${i === 0 ? "border" : "border"}`}
                               key={currentDayIndex}
                             ></td>
                           );

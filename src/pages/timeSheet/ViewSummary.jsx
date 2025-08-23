@@ -483,6 +483,7 @@ export const ViewSummary = () => {
         dayCounts={dayCounts}
         mergedData={mergedData}
         leaveStatuses={leaveStatuses}
+        empPIData={empPIData}
       />
 
       <ViewSummaryTable
