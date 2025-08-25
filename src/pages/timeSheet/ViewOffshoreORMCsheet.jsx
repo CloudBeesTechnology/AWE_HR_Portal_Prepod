@@ -848,7 +848,7 @@ export const ViewOffshoreORMCsheet = ({
 
       if (!workHrs || workHrs === "0" || workHrs === "N/A") {
         hasMissingField = true;
-        message = `Normal working hours per day are missing for employee (SAP No: ${fid}). Please verify the employee's SAP No in the empInfo table.`;
+        message = `Normal working hours per day are missing for employee (SAP No: ${fid}). Please verify the employee's SAP No in the 'Employee Info' table.`;
         // return true;
         break;
       }

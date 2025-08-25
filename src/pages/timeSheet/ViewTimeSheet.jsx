@@ -390,7 +390,6 @@ import { IoMdDownload } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { FilterForTimeSheet } from "./FilterForTimeSheet";
-import { useFetchData } from "./customTimeSheet/UseFetchData";
 import { FaArrowLeft } from "react-icons/fa";
 import { ListTimeSheet } from "./ListTimeSheet";
 import { useTempID } from "../../utils/TempIDContext";
@@ -399,6 +398,7 @@ import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
 import { useFetchDataForVT } from "./customTimeSheet/useFetchDataForVT";
 import usePermission from "../../hooks/usePermissionDashInside";
+import { FiLoader } from "react-icons/fi";
 
 export const ViewTimeSheet = () => {
   const prevCategoryRef = useRef(null);
@@ -408,6 +408,7 @@ export const ViewTimeSheet = () => {
 
   const [selectedCategory, setSelectedCategory] = useState("All Records");
   const [data, setData] = useState(null);
+  const [loadingMessForDelay, setLoadingMessForDelay] = useState(true);
 
   // const [loading, setLoading] = useState(false);
   const [secondaryData, setSecondaryData] = useState(null);
@@ -456,6 +457,9 @@ export const ViewTimeSheet = () => {
     setGrantedFileTypes(getFileTypes);
     prevCategoryRef.current = getFileTypes[0];
     handleForSelectTSheet(getFileTypes[0]);
+    if (getFileTypes?.length > 0) {
+      setLoadingMessForDelay(false);
+    }
   }, [timeSheetPermissions]);
 
   const {
@@ -649,6 +653,21 @@ export const ViewTimeSheet = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   visibleData = currentData;
+
+  if (loadingMessForDelay) {
+    return (
+      <div className="flex items-center justify-center h-[82vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          <div className="flex justify-between gap-2">
+            <p className="text-sm font-semibold">Loading </p>
+            <p>
+              <FiLoader className="animate-spin mt-[4px]" size={15} />
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
