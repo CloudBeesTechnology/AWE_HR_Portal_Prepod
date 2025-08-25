@@ -755,12 +755,11 @@ export const ViewHOsheet = ({
       duplicateRecord &&
       duplicateRecord?.length > 0
     ) {
-       const getBadgeNo = Array.isArray(duplicateRecord)
+      const getBadgeNo = Array.isArray(duplicateRecord)
         ? duplicateRecord[0]?.empBadgeNo
         : [];
       setPopupMess({
-        message:
-          `Some data in the uploaded Excel sheet (Badge ID: ${getBadgeNo}) has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.`,
+        message: `Some data in the uploaded Excel sheet (Badge ID: ${getBadgeNo}) has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.`,
         buttonName: "Save",
       });
     } else if (changePopupMessage && changePopupMessage.length === 0) {
@@ -801,8 +800,7 @@ export const ViewHOsheet = ({
 
       if (!workHrs || workHrs === "0" || workHrs === "N/A") {
         hasMissingField = true;
-        message =
-          "One or more records have missing 'Normal Working Hours Per Day'.";
+        message = `Normal working hours per day are missing for employee (BADGE No: ${badge}). Please verify the employee's BADGE No in the empInfo table.`;
         // return true;
         break;
       }
@@ -887,7 +885,7 @@ export const ViewHOsheet = ({
       });
     setChangePopupMessage(filteredResults);
     setDuplicateRecord(duplicateData);
-    
+
     if (filteredResults.length === finalResult.length) setCancelAction(false);
 
     if (

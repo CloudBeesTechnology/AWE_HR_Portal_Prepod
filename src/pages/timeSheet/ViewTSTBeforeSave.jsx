@@ -873,8 +873,7 @@ export const ViewTSTBeforeSave = ({
 
       if (!workHrs || workHrs === "0" || workHrs === "N/A") {
         hasMissingField = true;
-        message =
-          "One or more records have missing 'Normal Working Hours Per Day'.";
+        message = `Normal working hours per day are missing for employee (SAP No: ${fid}). Please verify the employee's SAP No in the empInfo table.`;
         // return true;
         break;
       }

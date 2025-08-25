@@ -765,8 +765,7 @@ export const ViewORMCsheet = ({
 
       if (!workHrs || workHrs === "0" || workHrs === "N/A") {
         hasMissingField = true;
-        message =
-          "One or more records have missing 'Normal Working Hours Per Day'.";
+        message = `Normal working hours per day are missing for employee (BADGE No: ${badge}). Please verify the employee's BADGE No in the empInfo table.`;
         // return true;
         break;
       }

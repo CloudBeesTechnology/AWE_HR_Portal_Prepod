@@ -904,8 +904,7 @@ export const ViewBLNGsheet = ({
 
       if (!workHrs || workHrs === "0" || workHrs === "N/A") {
         hasMissingField = true;
-        message =
-          "One or more records have missing 'Normal Working Hours Per Day'.";
+        message = `Normal working hours per day are missing for employee (FID No: ${fid}). Please verify the employee's SAP No in the empInfo table.`;
         // return true;
         break;
       }
@@ -1792,62 +1791,66 @@ export const ViewBLNGsheet = ({
       )}
 
       {/* <button
-  onClick={async () => {
-    try {
-      console.log("Fetching and Deleting BLNG Data...");
-      let nextToken = null;
-      let deleteCount = 0;  // 🟢 Counter to track deletions
+        onClick={async () => {
+          try {
+            console.log("Fetching and Deleting BLNG Data...");
+            let nextToken = null;
+            let deleteCount = 0; // 🟢 Counter to track deletions
 
-      do {
-        const filter = {
-          and: [{ fileType: { eq: "BLNG" } }],
-        };
+            do {
+              const filter = {
+                and: [{ fileType: { eq: "BLNG" } }],
+              };
 
-        const response = await client.graphql({
-          query: listTimeSheets,
-          variables: {
-            filter: filter,
-            nextToken: nextToken,
-            limit: 1000, // optional: ensure limit is large enough
-          },
-        });
-
-        const SBWdata = response?.data?.listTimeSheets?.items || [];
-        nextToken = response?.data?.listTimeSheets?.nextToken;
-
-        console.log(`Fetched ${SBWdata.length} BLNG items in this batch.`);
-
-        await Promise.all(
-          SBWdata.map(async (item) => {
-            try {
-              const deleteResponse = await client.graphql({
-                query: deleteTimeSheet,
-                variables: { input: { id: item.id } },
+              const response = await client.graphql({
+                query: listTimeSheets,
+                variables: {
+                  filter: filter,
+                  nextToken: nextToken,
+                  limit: 1000, // optional: ensure limit is large enough
+                },
               });
-              deleteCount++; // ✅ Increment counter
-              console.log(`Deleted item ID: ${item.id}`);
-            } catch (deleteError) {
-              console.error(
-                `Error deleting item with ID ${item.id}:`,
-                deleteError
+
+              const SBWdata = response?.data?.listTimeSheets?.items || [];
+              nextToken = response?.data?.listTimeSheets?.nextToken;
+
+              console.log(
+                `Fetched ${SBWdata.length} BLNG items in this batch.`
               );
-            }
-          })
-        );
 
-        console.log(`Batch deletion completed. Total deleted so far: ${deleteCount}`);
+              await Promise.all(
+                SBWdata.map(async (item) => {
+                  try {
+                    const deleteResponse = await client.graphql({
+                      query: deleteTimeSheet,
+                      variables: { input: { id: item.id } },
+                    });
+                    deleteCount++; // ✅ Increment counter
+                    console.log(`Deleted item ID: ${item.id}`);
+                  } catch (deleteError) {
+                    console.error(
+                      `Error deleting item with ID ${item.id}:`,
+                      deleteError
+                    );
+                  }
+                })
+              );
 
-      } while (nextToken);
+              console.log(
+                `Batch deletion completed. Total deleted so far: ${deleteCount}`
+              );
+            } while (nextToken);
 
-      console.log(`✅ All BLNG items deletion process completed. Total deleted: ${deleteCount}`);
-
-    } catch (fetchError) {
-      console.error("❌ Error in fetchDataAndDelete:", fetchError);
-    }
-  }}
->
-  Delete BLNG Data
-</button> */}
+            console.log(
+              `✅ All BLNG items deletion process completed. Total deleted: ${deleteCount}`
+            );
+          } catch (fetchError) {
+            console.error("❌ Error in fetchDataAndDelete:", fetchError);
+          }
+        }}
+      >
+        Delete BLNG Data
+      </button> */}
     </div>
   );
 };

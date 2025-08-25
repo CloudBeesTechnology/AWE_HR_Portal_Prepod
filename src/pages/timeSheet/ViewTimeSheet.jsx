@@ -398,6 +398,7 @@ import { ExportTableToExcel } from "./customTimeSheet/DownloadTableToExcel";
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
 import { useFetchDataForVT } from "./customTimeSheet/useFetchDataForVT";
+import usePermission from "../../hooks/usePermissionDashInside";
 
 export const ViewTimeSheet = () => {
   const prevCategoryRef = useRef(null);
@@ -413,6 +414,7 @@ export const ViewTimeSheet = () => {
   const [allExcelSheetData, setAllExcelSheetData] = useState(null);
   const [message, setMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [grantedFileTypes, setGrantedFileTypes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   const {
@@ -432,6 +434,29 @@ export const ViewTimeSheet = () => {
     tableData,
     setTableData,
   } = useTempID();
+
+  const timeSheetPermissions = usePermission("userID", "TimeSheet");
+
+  useEffect(() => {
+    const fileTypes = [
+      "Offshore",
+      "HO",
+      "SBW",
+      "ORMC",
+      "Offshore's ORMC",
+      "BLNG",
+    ];
+    const getFileTypes = [];
+    for (var list of timeSheetPermissions) {
+      if (fileTypes?.includes(list)) {
+        getFileTypes?.push(list);
+      }
+    }
+
+    setGrantedFileTypes(getFileTypes);
+    prevCategoryRef.current = getFileTypes[0];
+    handleForSelectTSheet(getFileTypes[0]);
+  }, [timeSheetPermissions]);
 
   const {
     convertedStringToArrayObj,
@@ -714,7 +739,7 @@ export const ViewTimeSheet = () => {
               }}
             >
               <input
-                value={categoryFilter}
+                value={categoryFilter || ""}
                 placeholder="Select type"
                 className="border border-[#D9D9D9] cursor-pointer rounded outline-none p-2 text-[#1b1b1b] text_size_8"
                 readOnly
@@ -729,14 +754,7 @@ export const ViewTimeSheet = () => {
                     setToggleClick(!toggleClick);
                   }}
                 >
-                  {[
-                    "Offshore",
-                    "HO",
-                    "SBW",
-                    "ORMC",
-                    "Offshore's ORMC",
-                    "BLNG",
-                  ].map((category) => (
+                  {grantedFileTypes?.map((category) => (
                     <p
                       key={category}
                       className={`p-1 cursor-pointer ${
