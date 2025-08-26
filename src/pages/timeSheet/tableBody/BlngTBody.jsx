@@ -113,8 +113,10 @@ export const BlngTBody = ({
                   <td className="text-center px-4 flex-1">
                     {rowData?.otTime || 0}
                   </td>
-                  <td className="text-center px-4 flex-1">
-                    {rowData?.remarks}
+                 <td className="text-center px-4 flex-1">
+                    <div className="truncate w-[100px]" title={rowData.remarks}>
+                      {rowData.remarks}
+                    </div>
                   </td>
                 </tr>
               );

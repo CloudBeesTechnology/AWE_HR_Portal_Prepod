@@ -500,6 +500,7 @@ export const ViewSummary = () => {
         editViewSummaryObject={editViewSummaryObject}
         empPIData={empPIData}
         setRefreshTrigger={setRefreshTrigger}
+        refreshTrigger={refreshTrigger}
         // resultOfWHrsAbsCal={resultOfWHrsAbsCal}
 
         // updatedResData={updatedResData}
