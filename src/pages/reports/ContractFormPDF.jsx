@@ -364,9 +364,9 @@ export const ContractFormPDF = () => {
     try {
       if (
         HRMPosition === "HR MANAGER" &&
-        (!formData.contract.hrManager || !formData.contract.hrmDate) &&
-        (formData.contract.hrManager.trim() === "" ||
-          formData.contract.hrmDate.trim() === "")
+        (!formData?.contract?.hrManager || !formData?.contract?.hrmDate) &&
+        (formData?.contract?.hrManager?.trim() === "" ||
+          formData?.contract?.hrmDate?.trim() === "")
       ) {
         alert("HRM Name and Date is required!");
         return;
@@ -374,18 +374,19 @@ export const ContractFormPDF = () => {
 
       if (
         gmPosition === "GENERAL MANAGER" &&
-        (!formData.contract.genManager || !formData.contract.gmDate) &&
-        (formData.contract.genManager.trim() === "" ||
-          formData.contract.gmDate.trim() === "")
+        (!formData?.contract?.genManager || !formData?.contract?.gmDate) &&
+        (formData?.contract?.genManager?.trim() === "" ||
+          formData?.contract?.gmDate?.trim() === "")
       ) {
         alert("GM Name and Date is required!");
         return;
       }
+
       if (
         userType === "HR" &&
-        (!formData.contract.hrSign || !formData.contract.hrDate) &&
-        (formData.contract.hrSign.trim() === "" ||
-          formData.contract.hrDate.trim() === "")
+        (!formData?.contract?.hrSign || !formData?.contract?.hrDate) &&
+        (formData?.contract?.hrSign?.trim() === "" ||
+          formData?.contract?.hrDate?.trim() === "")
       ) {
         alert("HR Name and Date is required!");
         return;
@@ -395,9 +396,9 @@ export const ContractFormPDF = () => {
         userType === "Manager" &&
         gmPosition !== "GENERAL MANAGER" &&
         HRMPosition !== "HR MANAGER" &&
-        (!formData.contract.depHead || !formData.contract.managerDate) &&
-        (formData.contract.depHead.trim() === "" ||
-          formData.contract.managerDate.trim() === "")
+        (!formData?.contract?.depHead || !formData?.contract?.managerDate) &&
+        (formData?.contract?.depHead?.trim() === "" ||
+          formData?.contract?.managerDate?.trim() === "")
       ) {
         alert(" Department Head Name and Date is required!");
         return;
@@ -446,24 +447,23 @@ export const ContractFormPDF = () => {
       }
       //created form
       const formPayload = {
-        empID: employeeData.empID,
-        conAttn: formData.contract.conAttn,
-        depHead: formData.contract.depHead,
-        hrManager: formData.contract.hrManager,
-        genManager: formData.contract.genManager,
-        remarks: formData.contract.remarks,
-        managerDate: formData.contract.managerDate,
-        remarkHr: formData.contract.remarkHr,
-        hrmDate: formData.contract.hrmDate,
-        remarkGm: formData.contract.remarkGm,
-        gmDate: formData.contract.gmDate,
-        hrDate: formData.contract.hrDate,
-        hrSign: formData.contract.hrSign,
+        empID: employeeData?.empID,
+        conAttn: formData?.contract?.conAttn,
+        depHead: formData?.contract?.depHead,
+        hrManager: formData?.contract?.hrManager,
+        genManager: formData?.contract?.genManager,
+        remarks: formData?.contract?.remarks,
+        managerDate: formData?.contract?.managerDate,
+        remarkHr: formData?.contract?.remarkHr,
+        hrmDate: formData?.contract?.hrmDate,
+        remarkGm: formData?.contract?.remarkGm,
+        gmDate: formData?.contract?.gmDate,
+        hrDate: formData?.contract?.hrDate,
+        hrSign: formData?.contract?.hrSign,
         extendedStatus: renewalStatus,
-        renewalContract: formData.contract.renewalContract,
+        renewalContract: formData?.contract?.renewalContract,
         contStatus: true,
         ...(renewalStatus === "hrmView" && { oldCED: contractEndDateStr }),
-        // status:"Approved"
       };
 
       if (matchedID) {
