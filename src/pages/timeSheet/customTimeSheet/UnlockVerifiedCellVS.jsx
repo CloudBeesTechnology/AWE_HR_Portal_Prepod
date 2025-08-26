@@ -12,6 +12,7 @@ export const UnlockVerifiedCellVS = async ({
   const client = generateClient();
   let allData = [];
   let notMatchedResult = [];
+  let matchedResult = [];
   let filteredResult = [];
   let successCount = 0;
   let deleteDuplicateData = "";
@@ -76,7 +77,9 @@ export const UnlockVerifiedCellVS = async ({
 
     const location = String(record?.companyName)?.toUpperCase()?.trim();
 
-    const key = `${record.fileType}|${record.date.trim()}|${badgeNoOrFidNo}|${location}`;
+    const key = `${
+      record.fileType
+    }|${record.date.trim()}|${badgeNoOrFidNo}|${location}`;
     // if (timeSheetMap.has(key)) {
     //   filteredResult.push(timeSheetMap.get(key));
     // }
@@ -94,6 +97,7 @@ export const UnlockVerifiedCellVS = async ({
     }
 
     if (timeSheetMap.has(key) && identifier === "create" && !alreadyShown) {
+      matchedResult.push(record);
       alreadyShown = true;
       setShowDuplicateAlert?.(true);
       setCancelAction?.(true);
@@ -143,5 +147,6 @@ export const UnlockVerifiedCellVS = async ({
   return {
     filteredResults: notMatchedResult,
     deleteDuplicateData,
+    duplicateData: matchedResult,
   };
 };

@@ -23,6 +23,7 @@ export const ApplyVSFunction = ({
   dayCounts,
   mergedData,
   leaveStatuses,
+  empPIData,
 }) => {
   const { getStartDate, getEndDate } = useTempID();
 
@@ -903,7 +904,7 @@ export const ApplyVSFunction = ({
             filteredData.map(async (val) => {
               const timeKeeperNames = await Promise.all(
                 val.data.map(async (fin) => {
-                  const getHisName = await GetViewSummaryUpdater(fin?.assignBy);
+                  const getHisName = await GetViewSummaryUpdater(empPIData,fin?.assignBy);
                   return getHisName?.name || null;
                 })
               );

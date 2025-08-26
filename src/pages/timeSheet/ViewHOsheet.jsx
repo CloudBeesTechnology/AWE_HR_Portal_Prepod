@@ -77,6 +77,7 @@ export const ViewHOsheet = ({
 
   const [rejectTab, setRejectTab] = useState(false);
   const [changePopupMessage, setChangePopupMessage] = useState(null);
+  const [duplicateRecord, setDuplicateRecord] = useState([]);
   const [popupMess, setPopupMess] = useState({});
 
   const [showConfirm, setShowConfirm] = useState(false);
@@ -748,10 +749,17 @@ export const ViewHOsheet = ({
   };
 
   useEffect(() => {
-    if (changePopupMessage && changePopupMessage.length > 0) {
+    if (
+      changePopupMessage &&
+      changePopupMessage.length > 0 &&
+      duplicateRecord &&
+      duplicateRecord?.length > 0
+    ) {
+      const getBadgeNo = Array.isArray(duplicateRecord)
+        ? duplicateRecord[0]?.empBadgeNo
+        : [];
       setPopupMess({
-        message:
-          "Some data in the uploaded Excel sheet has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.",
+        message: `Some data in the uploaded Excel sheet (Badge ID: ${getBadgeNo}) has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.`,
         buttonName: "Save",
       });
     } else if (changePopupMessage && changePopupMessage.length === 0) {
@@ -761,7 +769,7 @@ export const ViewHOsheet = ({
         buttonName: "OK",
       });
     }
-  }, [changePopupMessage]);
+  }, [changePopupMessage, duplicateRecord]);
 
   // Checking BadgeNo and NWHPD is exists in the submitteded data or not.
   const checkBadgeNoOrNWHPD = async (data, decision) => {
@@ -792,8 +800,7 @@ export const ViewHOsheet = ({
 
       if (!workHrs || workHrs === "0" || workHrs === "N/A") {
         hasMissingField = true;
-        message =
-          "One or more records have missing 'Normal Working Hours Per Day'.";
+        message = `Normal working hours per day are missing for employee (BADGE No: ${badge}). Please verify the employee's BADGE No in the 'Employee Info' table.`;
         // return true;
         break;
       }
@@ -862,8 +869,8 @@ export const ViewHOsheet = ({
 
     if (resultOfBadgeNo) return;
 
-    const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
-      {
+    const { filteredResults, deleteDuplicateData, duplicateData } =
+      await UnlockVerifiedCellVS({
         finalResult,
         setLoadingMessForDelay,
         identifier,
@@ -875,9 +882,9 @@ export const ViewHOsheet = ({
           cancelActionRef.current = val;
           setCancelAction(val); // for UI
         },
-      }
-    );
+      });
     setChangePopupMessage(filteredResults);
+    setDuplicateRecord(duplicateData);
 
     if (filteredResults.length === finalResult.length) setCancelAction(false);
 
