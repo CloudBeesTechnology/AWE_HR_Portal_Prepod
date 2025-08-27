@@ -1128,6 +1128,7 @@ export const ViewTSTBeforeSave = ({
       acc[val.id] = true;
       return acc;
     }, {});
+    
     setCheckedItems((prev) => ({
       ...prev,
       ...updatedCheckedItems,
