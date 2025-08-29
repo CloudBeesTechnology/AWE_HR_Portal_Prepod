@@ -19,7 +19,7 @@ import { DataSupply } from "../../../../utils/DataStoredContext";
 export const AirTktForm = ({ candidate }) => {
   const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
-  const { interviewSchedules } = useFetchCandy();
+  const { interviewSchedules, loading: interviewLoading } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { interviewDetails } = UpdateInterviewData();
   const { createWPTrackingHandler } = useCreateWPTracking();
@@ -48,10 +48,10 @@ export const AirTktForm = ({ candidate }) => {
     airTktFile: null,
   });
 
+  const [submitLoading, setSubmitLoading] = useState(false);
+
   const {
     register,
-    handleSubmit,
-    watch,
     formState: { errors },
     setValue,
   } = useForm({
@@ -106,7 +106,12 @@ export const AirTktForm = ({ candidate }) => {
     if (typeof url === "string" && url) {
       const decodedUrl = decodeURIComponent(url);
       const fileNameWithParams = decodedUrl.split("/").pop();
-      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
+      const cleanName = fileNameWithParams
+        .split("?")[0]
+        .split(",")[0]
+        .split("#")[0]
+        .replace(/"/g, "");
+      return cleanName;
     }
     return "";
   };
@@ -116,7 +121,6 @@ export const AirTktForm = ({ candidate }) => {
       ...prev,
       [type]: value,
     }));
-    // console.log(value);
   };
 
   const handleFileUpload = async (e, type) => {
@@ -201,7 +205,7 @@ export const AirTktForm = ({ candidate }) => {
 
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
-
+    setSubmitLoading(true);
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
@@ -300,6 +304,8 @@ export const AirTktForm = ({ candidate }) => {
       // }
     } catch (err) {
       console.error("Error submitting interview details:", err);
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
@@ -317,9 +323,60 @@ export const AirTktForm = ({ candidate }) => {
 
   const access = "Recruitment";
 
+  // Loading overlay component
+  const LoadingOverlay = () => (
+    <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="mt-2 text-gray-600"></p>
+      </div>
+    </div>
+  );
+
+  // Submit button with loading state
+  const SubmitButton = () => (
+    <button
+      type="submit"
+      disabled={submitLoading}
+      className={`py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow flex items-center justify-center ${
+        submitLoading ? "opacity-70 cursor-not-allowed" : ""
+      }`}
+    >
+      {submitLoading ? (
+        <>
+          <svg
+            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Submitting...
+        </>
+      ) : (
+        "Submit"
+      )}
+    </button>
+  );
+
   return (
     <>
       <form onSubmit={handleSubmitTwo} className="p-5">
+        {/* Loading overlay for data fetching */}
+        {interviewLoading && <LoadingOverlay />}
         <div className="grid grid-cols-2 gap-5 mt-5">
           <div>
             <label htmlFor="departuredate">Date of Departure</label>
@@ -332,6 +389,7 @@ export const AirTktForm = ({ candidate }) => {
               onChange={(e) =>
                 handleInputChange("departuredate", e.target.value)
               }
+              disabled={interviewLoading || submitLoading}
             />
           </div>
 
@@ -344,6 +402,7 @@ export const AirTktForm = ({ candidate }) => {
               {...register("arrivaldate")}
               value={formData.interview.arrivaldate}
               onChange={(e) => handleInputChange("arrivaldate", e.target.value)}
+              disabled={interviewLoading || submitLoading}
             />
           </div>
           <div>
@@ -355,6 +414,7 @@ export const AirTktForm = ({ candidate }) => {
               {...register("cityname")}
               value={formData.interview.cityname}
               onChange={(e) => handleInputChange("cityname", e.target.value)}
+              disabled={interviewLoading || submitLoading}
             />
           </div>
           <div>
@@ -366,6 +426,7 @@ export const AirTktForm = ({ candidate }) => {
               {...register("airfare")}
               value={formData.interview.airfare}
               onChange={(e) => handleInputChange("airfare", e.target.value)}
+              disabled={interviewLoading || submitLoading}
             />
           </div>
           <div>
@@ -376,6 +437,7 @@ export const AirTktForm = ({ candidate }) => {
               {...register("status")}
               value={formData.interview.status}
               onChange={(e) => handleInputChange("status", e.target.value)}
+              disabled={interviewLoading || submitLoading}
             >
               {statusOptions.map((status, index) => (
                 <option key={index} value={status}>
@@ -398,18 +460,14 @@ export const AirTktForm = ({ candidate }) => {
                 formattedPermissions={formattedPermissions}
                 requiredPermissions={requiredPermissions}
                 access={access}
+                disabled={interviewLoading || submitLoading}
               />
             </div>
           </div>
         </div>
 
         <div className="mt-5 flex justify-center">
-          <button
-            type="submit"
-            className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
-          >
-            Submit
-          </button>
+          <SubmitButton />
         </div>
       </form>
       {notification && (

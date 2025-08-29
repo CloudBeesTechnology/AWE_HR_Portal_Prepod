@@ -9,9 +9,11 @@ import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterv
 import { SpinLogo } from "../../../utils/SpinLogo";
 
 export const CandidateForm = ({ candidate }) => {
-  const { mergedInterviewData } = useFetchInterview();
+  const { mergedInterviewData, loading: interviewLoading } =
+    useFetchInterview();
   const { interviewDetails } = UpdateInterviewData();
   const [notification, setNotification] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
       position: "",
@@ -74,12 +76,14 @@ export const CandidateForm = ({ candidate }) => {
 
   const handleSubmitCandy = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const selectedInterviewData = mergedInterviewData.find(
       (data) => data.tempID === candidate?.tempID
     );
 
     if (!selectedInterviewData) {
+      setLoading(false);
       console.error("No interview data found for the selected candidate.");
       alert("No interview data found for the selected candidate.");
       return;
@@ -88,6 +92,7 @@ export const CandidateForm = ({ candidate }) => {
     const interviewScheduleId = selectedInterviewData?.interviewSchedules?.id;
 
     if (!interviewScheduleId) {
+      setLoading(false);
       alert("Interview schedule ID not found.");
       return;
     }
@@ -117,13 +122,25 @@ export const CandidateForm = ({ candidate }) => {
 
       setNotification(true);
     } catch (error) {
+      setLoading(false);
       console.error("Error submitting interview details:", error);
       alert("Failed to update interview details. Please try again.");
     }
   };
 
+  // Loading overlay component
+  const LoadingOverlay = () => (
+    <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    </div>
+  );
+
   return (
-    <form onSubmit={handleSubmitCandy} className="p-4">
+    <form onSubmit={handleSubmitCandy} className="p-4 relative">
+      {/* Loading overlay for data fetching */}
+      {interviewLoading && <LoadingOverlay />}
       <div className="mb-4 max-w-[400px]">
         <label className="block mb-2">
           Selected Position
@@ -133,6 +150,7 @@ export const CandidateForm = ({ candidate }) => {
             className="w-full p-2 border rounded mt-1"
             value={formData.interview.position}
             onChange={(e) => handleInputChange("position", e.target.value)}
+            disabled={interviewLoading}
           />
           {errors.position && (
             <p className="text-[red]">{errors.position.message}</p>
@@ -148,6 +166,7 @@ export const CandidateForm = ({ candidate }) => {
             className="w-full p-2 border rounded mt-1"
             value={formData.interview.department}
             onChange={(e) => handleInputChange("department", e.target.value)}
+            disabled={interviewLoading}
           >
             <option value=""></option>
             {DepartmentDD.map((dept, idx) => (
@@ -175,6 +194,7 @@ export const CandidateForm = ({ candidate }) => {
               onChange={(e) =>
                 handleInputChange("otherDepartment", e.target.value)
               }
+              disabled={interviewLoading}
             />
             {errors.otherDepartment && (
               <p className="text-[red]">{errors.otherDepartment.message}</p>
@@ -187,8 +207,9 @@ export const CandidateForm = ({ candidate }) => {
         <button
           type="submit"
           className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
+          disabled={interviewLoading || loading}
         >
-          Submit
+          {loading ? "Submitting..." : "Submit"}
         </button>
       </div>
       {notification && (

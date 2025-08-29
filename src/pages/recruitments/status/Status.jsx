@@ -46,7 +46,12 @@ export const Status = () => {
   const [dropOption, setDropOption] = useState();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { empPDData, educDetailsData, IVSSDetails } = useContext(DataSupply);
+  const {
+    empPDData,
+    educDetailsData,
+    IVSSDetails,
+    loading: statusLoading,
+  } = useContext(DataSupply);
 
   const mergeContextData = (empPDData, educDetailsData) => {
     return empPDData.map((piData) => {
@@ -461,6 +466,7 @@ export const Status = () => {
             formatDate={formatDate}
             fileUpload={fileUpload}
             urlValue={urlValue}
+            loading={statusLoading}
           />
         );
       case "Selected Candidate":
@@ -518,6 +524,15 @@ export const Status = () => {
         );
     }
   };
+
+  const LoadingOverlay = () => (
+    <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="mt-2 text-gray-600"></p>
+      </div>
+    </div>
+  );
 
   return (
     <section className="screen-size min-h-screen mb-4">
@@ -631,13 +646,8 @@ export const Status = () => {
         </div>
       </div>
 
-      {/* Results Section */}
-      {loading ? (
-        <p className="mt-24 flex items-center justify-center">Loading...</p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : (
-        <>
+   
+    
           {renderComponent()}
           {isFormVisible && (
             <StatusForm
@@ -646,8 +656,7 @@ export const Status = () => {
               onClose={closeForm}
             />
           )}
-        </>
-      )}
+      
     </section>
   );
 };

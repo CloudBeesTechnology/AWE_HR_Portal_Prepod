@@ -388,7 +388,7 @@ export const NonLocalMobTable = ({ data, fileUpload, urlValue }) => {
                       View
                     </td>
                     <td
-                      className="text-2xl cursor-pointer py-3 center"
+                      className="text-2xl text-[#EA4F4F] cursor-pointer py-3 center"
                       onClick={() => handleShowForm(item)}
                     >
                       <RiFileEditLine />

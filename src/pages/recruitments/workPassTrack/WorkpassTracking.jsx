@@ -30,7 +30,7 @@ export const WorkpassTracking = () => {
   const [candidateTypeDropdownOpen, setCandidateTypeDropdownOpen] =
     useState(false);
   const [urlValue, setURLValue] = useState("");
-  const { WPTrackings, empPDData, IVSSDetails, educDetailsData, localMobiliz } =
+  const { WPTrackings, empPDData, IVSSDetails, educDetailsData, localMobiliz, loading } =
     useContext(DataSupply);
 
   // Process and merge data
@@ -347,6 +347,7 @@ export const WorkpassTracking = () => {
             formatDate={formatDate}
             fileUpload={fileUpload}
             urlValue={urlValue}
+            loading={loading}
           />
         );
       case "DOE":
