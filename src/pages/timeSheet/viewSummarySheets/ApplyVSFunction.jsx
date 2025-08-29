@@ -1,19 +1,19 @@
-import { generateClient } from "@aws-amplify/api";
-import React, { useEffect } from "react";
+// import { generateClient } from "@aws-amplify/api";
+import { useEffect } from "react";
 
-import {
-  listEmpLeaveDetails,
-  listEmpPersonalInfos,
-  listEmpWorkInfos,
-  listLeaveStatuses,
-} from "../../../graphql/queries";
+// import {
+//   listEmpLeaveDetails,
+//   listEmpPersonalInfos,
+//   listEmpWorkInfos,
+//   listLeaveStatuses,
+// } from "../../../graphql/queries";
 
 import "jspdf-autotable";
 
 import { useTempID } from "../../../utils/TempIDContext";
 import { GetViewSummaryUpdater } from "../customTimeSheet/GetViewSummaryUpdater";
 
-const client = generateClient();
+// const client = generateClient();
 
 export const ApplyVSFunction = ({
   convertedStringToArrayObj,
@@ -253,12 +253,14 @@ export const ApplyVSFunction = ({
             const empBadgeNoMatch =
               leave.empBadgeNo &&
               emp.empBadgeNo &&
-              String(leave.empBadgeNo) === String(emp.empBadgeNo);
+              String(leave.empBadgeNo)?.toUpperCase()?.trim() ===
+                String(emp.empBadgeNo)?.toUpperCase()?.trim();
 
             const sapNoMatch =
               leave.sapNo &&
               emp.fidNo &&
-              String(leave.sapNo) === String(emp.fidNo);
+              String(leave.sapNo)?.toUpperCase()?.trim() ===
+                String(emp.fidNo)?.toUpperCase()?.trim();
 
             if (empBadgeNoMatch || sapNoMatch) {
               return emp.data.some((entry) => {
@@ -428,10 +430,16 @@ export const ApplyVSFunction = ({
             if (
               val.empBadgeNo &&
               fi.empBadgeNo &&
-              val.empBadgeNo === fi.empBadgeNo
+              String(val.empBadgeNo)?.toUpperCase()?.trim() ===
+                String(fi.empBadgeNo)?.toUpperCase()?.trim()
             ) {
               return fi;
-            } else if (val.fidNo && fi.fidNo && val.fidNo === fi.fidNo) {
+            } else if (
+              val.fidNo &&
+              fi.fidNo &&
+              String(val.fidNo)?.toUpperCase()?.trim() ===
+                String(fi.fidNo)?.toUpperCase()?.trim()
+            ) {
               return fi;
             }
           });
@@ -440,10 +448,16 @@ export const ApplyVSFunction = ({
             if (
               val.empBadgeNo &&
               fi.empBadgeNo &&
-              val.empBadgeNo === fi.empBadgeNo
+              String(val.empBadgeNo)?.toUpperCase()?.trim() ===
+                String(fi.empBadgeNo)?.toUpperCase()?.trim()
             ) {
               return fi;
-            } else if (val.fidNo && fi.sapNo && val.fidNo === fi.sapNo) {
+            } else if (
+              val.fidNo &&
+              fi.sapNo &&
+              String(val.fidNo)?.toUpperCase()?.trim() ===
+                String(fi.sapNo)?.toUpperCase()?.trim()
+            ) {
               return fi;
             }
           });
@@ -797,12 +811,14 @@ export const ApplyVSFunction = ({
                 const isSameBadgeNo =
                   data.empBadgeNo &&
                   compareData.empBadgeNo &&
-                  String(data.empBadgeNo) === String(compareData.empBadgeNo);
+                  String(data.empBadgeNo)?.toUpperCase()?.trim() ===
+                    String(compareData.empBadgeNo)?.toUpperCase()?.trim();
 
                 const isSameFidWithDifferentJobcode =
                   data.fidNo &&
                   compareData.fidNo &&
-                  String(data.fidNo) === String(compareData.fidNo);
+                  String(data.fidNo)?.toUpperCase()?.trim() ===
+                    String(compareData.fidNo)?.toUpperCase()?.trim();
 
                 if (
                   (isSameBadgeNo || isSameFidWithDifferentJobcode) &&
@@ -904,7 +920,10 @@ export const ApplyVSFunction = ({
             filteredData.map(async (val) => {
               const timeKeeperNames = await Promise.all(
                 val.data.map(async (fin) => {
-                  const getHisName = await GetViewSummaryUpdater(empPIData,fin?.assignBy);
+                  const getHisName = await GetViewSummaryUpdater(
+                    empPIData,
+                    fin?.assignBy
+                  );
                   return getHisName?.name || null;
                 })
               );
@@ -923,12 +942,14 @@ export const ApplyVSFunction = ({
             const empBadgeNoMatch =
               datasetItem.empBadgeNo &&
               item.empBadgeNo &&
-              String(datasetItem.empBadgeNo) === String(item.empBadgeNo);
+              String(datasetItem.empBadgeNo)?.toUpperCase()?.trim() ===
+                String(item.empBadgeNo)?.toUpperCase()?.trim();
 
             const sapNoMatch =
               datasetItem.sapNo &&
               item.fidNo &&
-              String(datasetItem.sapNo) === String(item.fidNo);
+              String(datasetItem.sapNo)?.toUpperCase()?.trim() ===
+                String(item.fidNo)?.toUpperCase()?.trim();
 
             return empBadgeNoMatch || sapNoMatch;
           });

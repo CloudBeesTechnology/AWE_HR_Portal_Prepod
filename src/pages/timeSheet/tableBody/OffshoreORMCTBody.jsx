@@ -73,7 +73,11 @@ export const OffshoreORMCTBody = ({
                     {m.actualWorkHrs || 0}
                   </td>
                   <td className="text-center px-4 flex-1">{m.otTime || 0}</td>
-                  <td className="text-center px-4 flex-1">{m.remarks}</td>
+                  <td className="text-center px-4 flex-1">
+                    <div className="truncate w-[100px]" title={m.remarks}>
+                      {m.remarks}
+                    </div>
+                  </td>
                 </tr>
               );
             };

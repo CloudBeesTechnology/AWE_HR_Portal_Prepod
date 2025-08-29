@@ -1387,7 +1387,12 @@ export const ViewOffshoreORMCsheet = ({
                               {m?.OT || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m?.REMARKS}
+                              <div
+                                className="truncate w-[100px]"
+                                title={m?.REMARKS}
+                              >
+                                {m?.REMARKS}
+                              </div>
                             </td>
 
                             {isStatusPending && (

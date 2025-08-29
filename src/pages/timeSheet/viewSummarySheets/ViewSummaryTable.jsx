@@ -27,7 +27,7 @@ export const ViewSummaryTable = ({
   editViewSummaryObject,
   empPIData,
   setRefreshTrigger,
-
+  refreshTrigger,
   // resultOfWHrsAbsCal,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,7 +76,7 @@ export const ViewSummaryTable = ({
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [allExcelSheetData]);
+  }, [selectedLocation, startDate, endDate, refreshTrigger]);
 
   const preparePrintRows = (rows = []) => {
     return (rows || []).map((employee, idx) => {
