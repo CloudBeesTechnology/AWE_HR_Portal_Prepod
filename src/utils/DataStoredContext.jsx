@@ -87,8 +87,11 @@ const DataStoredContext = ({ children }) => {
     candyToEmp: [],
   });
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const queries = [
           { query: listUsers, key: "userData" },
@@ -126,9 +129,9 @@ const DataStoredContext = ({ children }) => {
           { query: listContractForms, key: "contractForms" },
           { query: listLocalMobilizations, key: "localMobiliz" },
           { query: listGroupHandS, key: "groupHSData" },
-          { query: listTravelIns, key: "travelInsData" }, 
+          { query: listTravelIns, key: "travelInsData" },
           { query: listPersonalAccidents, key: "personalAcciData" },
-          { query: listCandIToEMPS, key: "candyToEmp"}
+          { query: listCandIToEMPS, key: "candyToEmp" }
         ];
         const responses = await Promise.all(
           queries.map(async ({ query, key }) => {
@@ -142,15 +145,15 @@ const DataStoredContext = ({ children }) => {
                   variables: { limit: 100, nextToken },
                 })
                 .catch((error) => {
-                
-                  return { data: { items: [] } }; 
+
+                  return { data: { items: [] } };
                 });
 
               const items =
                 response?.data?.[Object.keys(response.data)[0]]?.items || [];
               allItems = [...allItems, ...items];
 
-          
+
               nextToken =
                 response?.data?.[Object.keys(response.data)[0]]?.nextToken;
             } while (nextToken);
@@ -158,7 +161,7 @@ const DataStoredContext = ({ children }) => {
             return { key, items: allItems };
           })
         );
-   
+
         const newData = responses.reduce((acc, { key, items }) => {
           return { ...acc, [key]: items };
         }, {});
@@ -168,6 +171,9 @@ const DataStoredContext = ({ children }) => {
       } catch (error) {
         console.error("Data Fetch Error:", error);
       }
+       finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
@@ -175,7 +181,7 @@ const DataStoredContext = ({ children }) => {
 
 
   return (
-    <DataSupply.Provider value={dataState}>{children}</DataSupply.Provider>
+    <DataSupply.Provider value={{...dataState, loading}}>{children}</DataSupply.Provider>
   );
 };
 
