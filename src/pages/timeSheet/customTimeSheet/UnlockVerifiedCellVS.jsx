@@ -40,6 +40,7 @@ export const UnlockVerifiedCellVS = async ({
 
   // Step 2️⃣: Build a Map for O(1) lookup
   const timeSheetMap = new Map();
+  const idMap = new Map();
   for (const item of allData) {
     const badgeNoOrFidNo =
       item.fileType === "Offshore" ||
@@ -49,11 +50,11 @@ export const UnlockVerifiedCellVS = async ({
         : item.empBadgeNo;
 
     const location = String(item?.companyName)?.toUpperCase()?.trim();
-
+    const jobcode = String(item?.tradeCode)?.toUpperCase()?.trim();
     if (identifier === "create") {
       const key = `${
         item.fileType
-      }|${item.date.trim()}|${badgeNoOrFidNo}|${location}`;
+      }|${item.date.trim()}|${badgeNoOrFidNo}|${location}|${jobcode}`;
       timeSheetMap.set(key, item);
     } else if (
       item.status === "Verified" &&
@@ -61,9 +62,11 @@ export const UnlockVerifiedCellVS = async ({
     ) {
       const key = `${
         item.fileType
-      }|${item.date.trim()}|${badgeNoOrFidNo}|${location}`;
+      }|${item?.date?.trim()}|${badgeNoOrFidNo}|${location}`;
       timeSheetMap.set(key, item);
     }
+    const idMapKey = `${item.id}|${item?.status}`;
+    idMap.set(idMapKey, item);
   }
 
   // Step 3️⃣: Match finalResult records against the map
@@ -76,10 +79,11 @@ export const UnlockVerifiedCellVS = async ({
         : record.empBadgeNo;
 
     const location = String(record?.companyName)?.toUpperCase()?.trim();
+    const jobcode = String(record?.tradeCode)?.toUpperCase()?.trim();
 
     const key = `${
       record.fileType
-    }|${record.date.trim()}|${badgeNoOrFidNo}|${location}`;
+    }|${record?.date?.trim()}|${badgeNoOrFidNo}|${location}|${jobcode}`;
     // if (timeSheetMap.has(key)) {
     //   filteredResult.push(timeSheetMap.get(key));
     // }
@@ -92,7 +96,9 @@ export const UnlockVerifiedCellVS = async ({
       // );
     }
     if (!timeSheetMap.has(key) && identifier === "updateStoredData") {
-      notMatchedResult.push(record);
+      const { id, ...rest } = record;
+      console.log();
+      notMatchedResult.push(rest);
       // alert("The newly edited data has been assigned to the Manager.");
     }
 
@@ -105,6 +111,12 @@ export const UnlockVerifiedCellVS = async ({
 
     if (!timeSheetMap.has(key) && identifier === "create") {
       notMatchedResult.push(record); // Store unmatched record
+    }
+    const idMapKey = `${record.id}|${"Unsubmitted"}`;
+    if (identifier === "updateStoredData" && idMap.has(idMapKey)) {
+      console.log("Yes exists : ", idMap.get(idMapKey));
+
+      filteredResult.push(idMap.get(idMapKey));
     }
   }
 

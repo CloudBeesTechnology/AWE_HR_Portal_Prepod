@@ -456,49 +456,95 @@ export const ViewHOsheet = ({
       selectedRows &&
       selectedRows.length > 0
     ) {
-      const result =
-        selectedRows &&
-        selectedRows.length > 0 &&
-        selectedRows.map((val) => {
-          return {
-            id: val.id,
-            rec: val.REC || "",
-            ctr: val.CTR || "",
-            empDept: val.DEPT || "",
-            empID: val.EMPLOYEEID || "",
-            empBadgeNo: val.BADGE || "",
-            empName: val.NAME || "",
-            date: val.DATE || "",
-            onAM: val.ONAM || "",
-            offAM: val.OFFAM || "",
-            onPM: val.ONPM || "",
-            offPM: val.OFFPM || "",
-            inTime: val.IN || "",
-            outTime: val.OUT || "",
-            totalInOut: val.TOTALINOUT || "",
-            allDayHrs: val.ALLDAYMINUTES || "",
-            netMins: val.NETMINUTES || "",
-            totalHrs: val.TOTALHOURS || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val?.WORKINGHOURS || 0,
-            otTime: val?.OT || 0,
-            actualWorkHrs: val.TOTALACTUALHOURS || "",
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-            fileType: "HO",
-            status: "Pending",
-            remarks: val.REMARKS || "",
-            companyName: val?.LOCATION,
-          };
-        });
+      // const result =
+      //   selectedRows &&
+      //   selectedRows.length > 0 &&
+      //   selectedRows.map((val) => {
+      //     return {
+      // id: val.id,
+      // rec: val.REC || "",
+      // ctr: val.CTR || "",
+      // empDept: val.DEPT || "",
+      // empID: val.EMPLOYEEID || "",
+      // empBadgeNo: val.BADGE || "",
+      // empName: val.NAME || "",
+      // date: val.DATE || "",
+      // onAM: val.ONAM || "",
+      // offAM: val.OFFAM || "",
+      // onPM: val.ONPM || "",
+      // offPM: val.OFFPM || "",
+      // inTime: val.IN || "",
+      // outTime: val.OUT || "",
+      // totalInOut: val.TOTALINOUT || "",
+      // allDayHrs: val.ALLDAYMINUTES || "",
+      // netMins: val.NETMINUTES || "",
+      // totalHrs: val.TOTALHOURS || "",
+      // normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+      // actualWorkHrs: val?.WORKINGHOURS || 0,
+      // otTime: val?.OT || 0,
+      // actualWorkHrs: val.TOTALACTUALHOURS || "",
+      // empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+      // fileType: "HO",
+      // status: "Pending",
+      // remarks: val.REMARKS || "",
+      // companyName: val?.LOCATION,
+      //     };
+      //   });
 
-      const finalResult = result.map((val) => {
-        return {
-          ...val,
+      // const finalResult = result.map((val) => {
+      //   return {
+      //     ...val,
+      // assignTo: managerData.mbadgeNo,
+      // assignBy: uploaderID,
+      // fromDate: managerData.mfromDate,
+      // untilDate: managerData.muntilDate,
+      //   };
+      // });
+
+      const finalResult = selectedRows?.flatMap((val) => {
+        const baseItem = {
+          id: val.id,
+          fileName: val.fileName,
+          rec: val.REC || "",
+          ctr: val.CTR || "",
+          empDept: val.DEPT || "",
+          empID: val.EMPLOYEEID || "",
+          empBadgeNo: val.BADGE || "",
+          empName: val.NAME || "",
+          date: val.DATE || "",
+          onAM: val.ONAM || "",
+          offAM: val.OFFAM || "",
+          onPM: val.ONPM || "",
+          offPM: val.OFFPM || "",
+          inTime: val.IN || "",
+          outTime: val.OUT || "",
+          totalInOut: val.TOTALINOUT || "",
+          allDayHrs: val.ALLDAYMINUTES || "",
+          netMins: val.NETMINUTES || "",
+          totalHrs: val.TOTALHOURS || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val?.WORKINGHOURS || 0,
+          otTime: val?.OT || 0,
+          actualWorkHrs: val.TOTALACTUALHOURS || "",
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          fileType: "HO",
+          status: "Pending",
+          remarks: val.REMARKS || "",
+          companyName: val?.LOCATION,
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
           fromDate: managerData.mfromDate,
           untilDate: managerData.muntilDate,
         };
+
+        // return one record per job
+        return (val.jobLocaWhrs || [])?.map((job) => ({
+          ...baseItem,
+          companyName: job.LOCATION,
+          location: job.LOCATION,
+          tradeCode: job.JOBCODE,
+          empWorkInfo: [JSON.stringify({ ...job, id: 1 })], // each output has only one job
+        }));
       });
 
       let identifier = "updateStoredData";

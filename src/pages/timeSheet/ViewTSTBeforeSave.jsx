@@ -538,42 +538,81 @@ export const ViewTSTBeforeSave = ({
       selectedRows &&
       selectedRows.length > 0
     ) {
-      const result =
-        selectedRows &&
-        selectedRows.length > 0 &&
-        selectedRows.map((val) => {
-          return {
-            id: val.id,
-            empName: val.NAME || "",
-            fidNo: val.NO || "",
-            companyName: val.LOCATIONATTOP
-              ? val.LOCATIONATTOP
-              : val.LOCATION || "",
-            location: val.LOCATION || "",
-            trade: val.TRADE || "",
-            date: val.DATE || "",
-            totalNT: val.TOTALHOURS || "",
-            totalOT: val.TOTALHOURS2 || "",
-            totalNTOT: val.TOTALHOURS3 || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val.WORKINGHOURS || "",
-            otTime: val.OT || "",
-            remarks: val.REMARKS || "",
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+      // const result =
+      //   selectedRows &&
+      //   selectedRows.length > 0 &&
+      //   selectedRows.map((val) => {
+      //     return {
+      // id: val.id,
+      // empName: val.NAME || "",
+      // fidNo: val.NO || "",
+      // companyName: val.LOCATIONATTOP
+      //   ? val.LOCATIONATTOP
+      //   : val.LOCATION || "",
+      // location: val.LOCATION || "",
+      // trade: val.TRADE || "",
+      // date: val.DATE || "",
+      // totalNT: val.TOTALHOURS || "",
+      // totalOT: val.TOTALHOURS2 || "",
+      // totalNTOT: val.TOTALHOURS3 || "",
+      // normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+      // actualWorkHrs: val.WORKINGHOURS || "",
+      // otTime: val.OT || "",
+      // remarks: val.REMARKS || "",
+      // empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
 
-            fileType: "Offshore",
-            status: "Pending",
-          };
-        });
+      // fileType: "Offshore",
+      // status: "Pending",
+      //     };
+      //   });
 
-      const finalResult = result.map((val) => {
-        return {
-          ...val,
+      // const finalResult = result.map((val) => {
+      //   return {
+      //     ...val,
+      // assignTo: managerData.mbadgeNo,
+      // assignBy: uploaderID,
+      // fromDate: managerData.mfromDate,
+      // untilDate: managerData.muntilDate,
+      //   };
+      // });
+
+      const finalResult = selectedRows?.flatMap((val) => {
+        const baseItem = {
+          id: val.id,
+          fileName: val.fileName,
+          empName: val.NAME || "",
+          fidNo: val.NO || "",
+          companyName: val.LOCATIONATTOP
+            ? val.LOCATIONATTOP
+            : val.LOCATION || "",
+          location: val.LOCATION || "",
+          trade: val.TRADE || "",
+          date: val.DATE || "",
+          totalNT: val.TOTALHOURS || "",
+          totalOT: val.TOTALHOURS2 || "",
+          totalNTOT: val.TOTALHOURS3 || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val.WORKINGHOURS || "",
+          otTime: val.OT || "",
+          remarks: val.REMARKS || "",
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+
+          fileType: "Offshore",
+          status: "Pending",
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
           fromDate: managerData.mfromDate,
           untilDate: managerData.muntilDate,
         };
+
+        // return one record per job
+        return (val.jobLocaWhrs || [])?.map((job) => ({
+          ...baseItem,
+          companyName: job.LOCATION,
+          location: job.LOCATION,
+          tradeCode: job.JOBCODE,
+          empWorkInfo: [JSON.stringify({ ...job, id: 1 })], // each output has only one job
+        }));
       });
 
       // console.log("finalResult : ", finalResult);
@@ -1128,7 +1167,7 @@ export const ViewTSTBeforeSave = ({
       acc[val.id] = true;
       return acc;
     }, {});
-    
+
     setCheckedItems((prev) => ({
       ...prev,
       ...updatedCheckedItems,

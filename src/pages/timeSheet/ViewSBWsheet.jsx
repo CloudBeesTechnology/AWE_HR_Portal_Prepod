@@ -431,42 +431,80 @@ export const ViewSBWsheet = ({
       selectedRows &&
       selectedRows.length > 0
     ) {
-      const processedData = await Promise.all(
-        selectedRows.map(async (val) => {
-          return {
-            id: val.id,
-            empName: val.NAME || "",
-            empDept: val.DEPTDIV || "",
-            empBadgeNo: val.BADGE || "",
-            date: val.DATE || "",
-            inTime: val.IN || "",
-            outTime: val.OUT || "",
-            totalInOut: val.TOTALINOUT || "",
-            allDayHrs: val.ALLDAYMINHRS || "",
-            netMins: val.NETMINUTES || "",
-            totalHrs: val.TOTALHOURS || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val.WORKINGHOURS || "",
-            otTime: val.OT || "",
-            companyName: val?.LOCATION,
-            remarks: val.REMARKS || "",
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-            fileType: "SBW",
-            status: "Pending",
-          };
-        })
-      );
+      // const processedData = await Promise.all(
+      //   selectedRows.map(async (val) => {
+      //     return {
+      // id: val.id,
+      // empName: val.NAME || "",
+      // empDept: val.DEPTDIV || "",
+      // empBadgeNo: val.BADGE || "",
+      // date: val.DATE || "",
+      // inTime: val.IN || "",
+      // outTime: val.OUT || "",
+      // totalInOut: val.TOTALINOUT || "",
+      // allDayHrs: val.ALLDAYMINHRS || "",
+      // netMins: val.NETMINUTES || "",
+      // totalHrs: val.TOTALHOURS || "",
+      // normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+      // actualWorkHrs: val.WORKINGHOURS || "",
+      // otTime: val.OT || "",
+      // companyName: val?.LOCATION,
+      // remarks: val.REMARKS || "",
+      // empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+      // fileType: "SBW",
+      // status: "Pending",
+      //     };
+      //   })
+      // );
 
-      const result = processedData;
+      // const result = processedData;
 
-      const finalResult = result.map((val) => {
-        return {
-          ...val,
+      // const finalResult = result.map((val) => {
+      //   return {
+      //     ...val,
+      // assignTo: managerData.mbadgeNo,
+      // assignBy: uploaderID,
+      // fromDate: managerData.mfromDate,
+      // untilDate: managerData.muntilDate,
+      //   };
+      // });
+
+      const finalResult = selectedRows?.flatMap((val) => {
+        const baseItem = {
+          id: val.id,
+          fileName: val.fileName,
+          empName: val.NAME || "",
+          empDept: val.DEPTDIV || "",
+          empBadgeNo: val.BADGE || "",
+          date: val.DATE || "",
+          inTime: val.IN || "",
+          outTime: val.OUT || "",
+          totalInOut: val.TOTALINOUT || "",
+          allDayHrs: val.ALLDAYMINHRS || "",
+          netMins: val.NETMINUTES || "",
+          totalHrs: val.TOTALHOURS || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val.WORKINGHOURS || "",
+          otTime: val.OT || "",
+          companyName: val?.LOCATION,
+          remarks: val.REMARKS || "",
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          fileType: "SBW",
+          status: "Pending",
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
           fromDate: managerData.mfromDate,
           untilDate: managerData.muntilDate,
         };
+
+        // return one record per job
+        return (val.jobLocaWhrs || [])?.map((job) => ({
+          ...baseItem,
+          companyName: job.LOCATION,
+          location: job.LOCATION,
+          tradeCode: job.JOBCODE,
+          empWorkInfo: [JSON.stringify({ ...job, id: 1 })], // each output has only one job
+        }));
       });
 
       let identifier = "updateStoredData";
@@ -1589,6 +1627,7 @@ export const ViewSBWsheet = ({
       ) : (
         ""
       )}
+
       {showConfirm && (
         <PopupForCheckBadgeNo
           handleDecision={handleDecision}
@@ -1657,6 +1696,70 @@ export const ViewSBWsheet = ({
         }}
       >
         Delete Offshore Data
+      </button> */}
+
+      {/* <button
+        className="px-4 py-2 rounded bg-primary text_size_5"
+        onClick={() => {
+          const fetchData = async () => {
+            let nextToken = null;
+            let allData = [];
+
+            // ✅ Using "or" filter for status
+            const filter = {
+              and: [
+                {
+                  or: [
+                    { status: { eq: "Approved" } },
+                    { status: { eq: "Verified" } },
+                  ],
+                },
+                { fileType: { eq: "HO" } },
+                { empBadgeNo: { eq: "1425A" } },
+              ].filter(Boolean),
+            };
+
+            try {
+              do {
+                const response = await client.graphql({
+                  query: listTimeSheets,
+                  variables: {
+                    filter,
+                    limit: 800,
+                    nextToken,
+                  },
+                });
+
+                const fetchedData = response?.data?.listTimeSheets?.items || [];
+                nextToken = response?.data?.listTimeSheets?.nextToken;
+
+                const validData = fetchedData.filter(
+                  (item) => item !== null && item !== undefined
+                );
+                allData = [...allData, ...validData];
+              } while (nextToken);
+
+              console.log("allData : ", allData);
+
+              // ✅ Filtering further by LOCATION = "HR"
+              const result = allData?.filter((fil) => {
+                let workingHrs = JSON.parse(fil?.empWorkInfo || "[]");
+
+                return workingHrs.some(
+                  (data) => data?.LOCATION === "PURCHASING"
+                );
+              });
+
+              console.log("result : ", result);
+            } catch (error) {
+              console.log("Error : ", error);
+            }
+          };
+
+          fetchData();
+        }}
+      >
+        Filtered Data
       </button> */}
     </div>
   );

@@ -586,40 +586,77 @@ export const ViewBLNGsheet = ({
       selectedRows &&
       selectedRows.length > 0
     ) {
-      const result =
-        selectedRows &&
-        selectedRows.length > 0 &&
-        selectedRows.map((val, i) => {
-          return {
-            id: val.id,
-            fidNo: val?.FID || 0,
-            empName: val?.NAMEFLAST || "",
-            date: val?.ENTRANCEDATEUSED || "",
-            inTime: val?.ENTRANCEDATETIME || "",
-            outTime: val?.EXITDATETIME || "",
-            // day: val?.DAYDIFFERENCE || 0,
-            avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
-            totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-            aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val?.WORKINGHOURS || 0,
-            otTime: val?.OT || 0,
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-            fileType: "BLNG",
-            status: "Pending",
-            remarks: val?.REMARKS || "",
-            companyName: val?.LOCATION,
-          };
-        });
+      // const result =
+      //   selectedRows &&
+      //   selectedRows.length > 0 &&
+      //   selectedRows.map((val, i) => {
+      //     return {
+      // id: val.id,
+      // fidNo: val?.FID || 0,
+      // empName: val?.NAMEFLAST || "",
+      // date: val?.ENTRANCEDATEUSED || "",
+      // inTime: val?.ENTRANCEDATETIME || "",
+      // outTime: val?.EXITDATETIME || "",
+      // // day: val?.DAYDIFFERENCE || 0,
+      // avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+      // totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+      // aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+      // normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+      // actualWorkHrs: val?.WORKINGHOURS || 0,
+      // otTime: val?.OT || 0,
+      // empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+      // fileType: "BLNG",
+      // status: "Pending",
+      // remarks: val?.REMARKS || "",
+      // companyName: val?.LOCATION,
+      //     };
+      //   });
 
-      const finalResult = result.map((val) => {
-        return {
-          ...val,
+      // const finalResult = result.map((val) => {
+      //   return {
+      //     ...val,
+      // assignTo: managerData.mbadgeNo,
+      // assignBy: uploaderID,
+      // fromDate: managerData.mfromDate,
+      // untilDate: managerData.muntilDate,
+      //   };
+      // });
+
+      const finalResult = selectedRows?.flatMap((val) => {
+        const baseItem = {
+          id: val.id,
+          fileName: val.fileName,
+          fidNo: val?.FID || 0,
+          empName: val?.NAMEFLAST || "",
+          date: val?.ENTRANCEDATEUSED || "",
+          inTime: val?.ENTRANCEDATETIME || "",
+          outTime: val?.EXITDATETIME || "",
+          // day: val?.DAYDIFFERENCE || 0,
+          avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+          totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+          aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val?.WORKINGHOURS || 0,
+          otTime: val?.OT || 0,
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          fileType: "BLNG",
+          status: "Pending",
+          remarks: val?.REMARKS || "",
+          companyName: val?.LOCATION,
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
           fromDate: managerData.mfromDate,
           untilDate: managerData.muntilDate,
         };
+
+        // return one record per job
+        return (val.jobLocaWhrs || [])?.map((job) => ({
+          ...baseItem,
+          companyName: job.LOCATION,
+          location: job.LOCATION,
+          tradeCode: job.JOBCODE,
+          empWorkInfo: [JSON.stringify({ ...job, id: 1 })], // each output has only one job
+        }));
       });
 
       let identifier = "updateStoredData";
@@ -644,7 +681,6 @@ export const ViewBLNGsheet = ({
           finalResult,
           toggleSFAMessage,
           setStoringMess,
-
           Position,
           action,
           handleAssignManager,

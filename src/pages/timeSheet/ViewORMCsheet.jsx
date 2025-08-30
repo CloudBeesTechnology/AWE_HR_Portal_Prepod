@@ -442,43 +442,81 @@ export const ViewORMCsheet = ({
       selectedRows &&
       selectedRows.length > 0
     ) {
-      const result =
-        selectedRows &&
-        selectedRows.length > 0 &&
-        selectedRows.map((val) => {
-          return {
-            id: val.id,
+      // const result =
+      //   selectedRows &&
+      //   selectedRows.length > 0 &&
+      //   selectedRows.map((val) => {
+      //     return {
+      // id: val.id,
 
-            empName: val.NAME || "",
-            empDept: val.DEPTDIV || "",
-            empBadgeNo: val.BADGE || "",
-            date: val.DATE || "",
-            inTime: val.IN || "",
-            outTime: val.OUT || "",
-            totalInOut: val.TOTALINOUT || "",
-            allDayHrs: val.ALLDAYMINHRS || "",
-            netMins: val.NETMINUTES || "",
-            totalHrs: val.TOTALHOURS || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val.WORKINGHOURS || "",
-            otTime: val.OT || "",
-            remarks: val.REMARKS || "",
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-            fileType: "ORMC",
-            status: "Pending",
-            companyName: val?.LOCATION,
-          };
-        });
+      // empName: val.NAME || "",
+      // empDept: val.DEPTDIV || "",
+      // empBadgeNo: val.BADGE || "",
+      // date: val.DATE || "",
+      // inTime: val.IN || "",
+      // outTime: val.OUT || "",
+      // totalInOut: val.TOTALINOUT || "",
+      // allDayHrs: val.ALLDAYMINHRS || "",
+      // netMins: val.NETMINUTES || "",
+      // totalHrs: val.TOTALHOURS || "",
+      // normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+      // actualWorkHrs: val.WORKINGHOURS || "",
+      // otTime: val.OT || "",
+      // remarks: val.REMARKS || "",
+      // empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+      // fileType: "ORMC",
+      // status: "Pending",
+      // companyName: val?.LOCATION,
+      //     };
+      //   });
 
       // const mergeData = [...result, managerData];
-      const finalResult = result.map((val) => {
-        return {
-          ...val,
+      // const finalResult = result.map((val) => {
+      //   return {
+      //     ...val,
+      // assignTo: managerData.mbadgeNo,
+      // assignBy: uploaderID,
+      // fromDate: managerData.mfromDate,
+      // untilDate: managerData.muntilDate,
+      //   };
+      // });
+
+      const finalResult = selectedRows?.flatMap((val) => {
+        const baseItem = {
+          id: val.id,
+          fileName: val.fileName,
+          empName: val.NAME || "",
+          empDept: val.DEPTDIV || "",
+          empBadgeNo: val.BADGE || "",
+          date: val.DATE || "",
+          inTime: val.IN || "",
+          outTime: val.OUT || "",
+          totalInOut: val.TOTALINOUT || "",
+          allDayHrs: val.ALLDAYMINHRS || "",
+          netMins: val.NETMINUTES || "",
+          totalHrs: val.TOTALHOURS || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val.WORKINGHOURS || "",
+          otTime: val.OT || "",
+          remarks: val.REMARKS || "",
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          fileType: "ORMC",
+          status: "Pending",
+          companyName: val?.LOCATION,
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
           fromDate: managerData.mfromDate,
           untilDate: managerData.muntilDate,
         };
+
+        // return one record per job
+        return (val.jobLocaWhrs || [])?.map((job) => ({
+          ...baseItem,
+          companyName: job.LOCATION,
+          location: job.LOCATION,
+          tradeCode: job.JOBCODE,
+          empWorkInfo: [JSON.stringify({ ...job, id: 1 })], // each output has only one job
+        }));
       });
 
       let identifier = "updateStoredData";
