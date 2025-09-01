@@ -1769,7 +1769,7 @@ export const ViewTSTBeforeSave = ({
         Delete Offshore Data
       </button> */}
 
-         <button
+      {/* <button
               className="px-4 py-2 rounded bg-primary text_size_5"
               onClick={() => {
                 const fetchData = async () => {
@@ -1820,7 +1820,7 @@ export const ViewTSTBeforeSave = ({
               }}
             >
               Filtered Data
-            </button>
+          </button> */}
     </div>
   );
 };
