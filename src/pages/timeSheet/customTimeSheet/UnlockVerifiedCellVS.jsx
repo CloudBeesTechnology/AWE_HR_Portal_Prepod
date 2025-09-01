@@ -38,9 +38,21 @@ export const UnlockVerifiedCellVS = async ({
     return { filteredResults: [], deleteDuplicateData: "" };
   }
 
+  function formatDate(dateString) {
+    const [month, day, year] = dateString.split(/[-/]/)?.map((p) => p.trim());
+    const formattedMonth = month.padStart(2, "0");
+    const formattedDay = day.padStart(2, "0");
+
+    return `${formattedMonth}/${formattedDay}/${year}`;
+  }
   // Step 2️⃣: Build a Map for O(1) lookup
   const timeSheetMap = new Map();
   const idMap = new Map();
+
+  console.log(
+    "allData : ",
+    allData?.filter((fil) => fil?.fileType === "SBW")
+  );
   for (const item of allData) {
     const badgeNoOrFidNo =
       item.fileType === "Offshore" ||
@@ -51,25 +63,16 @@ export const UnlockVerifiedCellVS = async ({
 
     const location = String(item?.companyName)?.toUpperCase()?.trim();
     const jobcode = String(item?.tradeCode)?.toUpperCase()?.trim();
-    if (identifier === "create") {
-      const key = `${
-        item.fileType
-      }|${item.date.trim()}|${badgeNoOrFidNo}|${location}|${jobcode}`;
-      timeSheetMap.set(key, item);
-    } else if (
-      item.status === "Verified" &&
-      identifier === "updateStoredData"
-    ) {
-      const key = `${
-        item.fileType
-      }|${item?.date?.trim()}|${badgeNoOrFidNo}|${location}`;
+
+    if (identifier === "updateStoredData") {
+      const formattedDate = formatDate(item?.date?.trim());
+      const key = `${item.fileType}|${formattedDate}|${badgeNoOrFidNo}|${location}|${jobcode}`;
       timeSheetMap.set(key, item);
     }
     const idMapKey = `${item.id}|${item?.status}`;
     idMap.set(idMapKey, item);
   }
 
-  // Step 3️⃣: Match finalResult records against the map
   for (const record of finalResult) {
     const badgeNoOrFidNo =
       record.fileType === "Offshore" ||
@@ -80,43 +83,54 @@ export const UnlockVerifiedCellVS = async ({
 
     const location = String(record?.companyName)?.toUpperCase()?.trim();
     const jobcode = String(record?.tradeCode)?.toUpperCase()?.trim();
-
-    const key = `${
-      record.fileType
-    }|${record?.date?.trim()}|${badgeNoOrFidNo}|${location}|${jobcode}`;
-    // if (timeSheetMap.has(key)) {
-    //   filteredResult.push(timeSheetMap.get(key));
-    // }
-
-    if (timeSheetMap.has(key) && identifier === "updateStoredData") {
-      filteredResult.push(timeSheetMap.get(key));
+    const formattedDate = formatDate(record?.date?.trim());
+    const key = `${record.fileType}|${formattedDate}|${badgeNoOrFidNo}|${location}|${jobcode}`;
+    if (
+      identifier === "updateStoredData" &&
+      record.status !== "Verified" &&
+      record.status !== "Rejected"
+    ) {
+      if (timeSheetMap.has(key)) {
+        matchedResult.push(record);
+      }
+    } else if (identifier === "create") {
       notMatchedResult.push(record);
-      // alert(
-      //   "Deleted existing 'Verified' data and updated with the latest edited data."
-      // );
     }
-    if (!timeSheetMap.has(key) && identifier === "updateStoredData") {
-      const { id, ...rest } = record;
-      console.log();
-      notMatchedResult.push(rest);
-      // alert("The newly edited data has been assigned to the Manager.");
-    }
+  }
 
-    if (timeSheetMap.has(key) && identifier === "create" && !alreadyShown) {
-      matchedResult.push(record);
-      alreadyShown = true;
-      setShowDuplicateAlert?.(true);
-      setCancelAction?.(true);
-    }
+  if (matchedResult && matchedResult?.length === 0) {
+    // Step 3️⃣: Match finalResult records against the map
+    for (const record of finalResult) {
+      const badgeNoOrFidNo =
+        record.fileType === "Offshore" ||
+        record.fileType === "BLNG" ||
+        record.fileType === "Offshore's ORMC"
+          ? record.fidNo
+          : record.empBadgeNo;
 
-    if (!timeSheetMap.has(key) && identifier === "create") {
-      notMatchedResult.push(record); // Store unmatched record
-    }
-    const idMapKey = `${record.id}|${"Unsubmitted"}`;
-    if (identifier === "updateStoredData" && idMap.has(idMapKey)) {
-      console.log("Yes exists : ", idMap.get(idMapKey));
+      const location = String(record?.companyName)?.toUpperCase()?.trim();
+      const jobcode = String(record?.tradeCode)?.toUpperCase()?.trim();
+      const formattedDate = formatDate(record?.date?.trim());
+      const key = `${record.fileType}|${formattedDate}|${badgeNoOrFidNo}|${location}|${jobcode}`;
 
-      filteredResult.push(idMap.get(idMapKey));
+      if (identifier === "updateStoredData" && timeSheetMap.has(key)) {
+        const getData = timeSheetMap.get(key);
+
+        if (getData && getData.status === "Verified") {
+          filteredResult.push(getData);
+        }
+      }
+
+      if (!timeSheetMap.has(key) && identifier === "updateStoredData") {
+        const { id, ...rest } = record;
+        notMatchedResult.push(rest);
+      }
+
+      const idMapKey = `${record.id}|${"Unsubmitted"}`;
+      if (identifier === "updateStoredData" && idMap.has(idMapKey)) {
+        const getUnSubData = idMap.get(idMapKey);
+        filteredResult.push(getUnSubData);
+      }
     }
   }
 

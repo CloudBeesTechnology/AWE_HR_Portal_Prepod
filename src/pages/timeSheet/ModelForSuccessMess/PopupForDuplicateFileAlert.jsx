@@ -1,15 +1,12 @@
 import { IoMdCloseCircleOutline } from "react-icons/io";
 
 const PopupForDuplicateFileAlert = ({
-  setCancelAction,
   onClose,
   fileNameForSuccessful,
   title,
   message,
   buttonName,
   popupIdentification,
-  onClearData,
-  
 }) => {
   return (
     <div
@@ -25,7 +22,6 @@ const PopupForDuplicateFileAlert = ({
           <i
             className="cursor-pointer mb-auto text-dark_grey text-2xl"
             onClick={() => {
-              setCancelAction?.(true);
               onClose?.();
             }}
           >
@@ -40,17 +36,14 @@ const PopupForDuplicateFileAlert = ({
 
         <p className="text_size_6 mb-2 text-justify">{message}</p>
 
-        <div className={`flex justify-end text-dark_grey text_size_5`}>
+        <div className={`flex justify-center text-dark_grey text_size_5 pt-1`}>
           <button
             className="px-6 py-2 bg-primary rounded"
             onClick={async () => {
               if (buttonName === "OK") {
-                onClearData?.();
                 onClose?.();
               } else if (buttonName === "Save") {
-                setCancelAction?.(false);
                 onClose?.();
-                
               } else {
                 onClose?.();
               }

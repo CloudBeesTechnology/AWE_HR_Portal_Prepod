@@ -9,7 +9,9 @@ export const UpdateViewSummary = async (object) => {
 
     // dd-mm-yyyy to yyyy-mm-dd
     const convertToISODate = (dateString) => {
-      const [day, month, year] = dateString?.split(/[-/]/);
+      const [day, month, year] = dateString
+        ?.split(/[-/]/)
+        ?.map((p) => p.trim());
       const formattedMonth = String(parseInt(month, 10)).padStart(2, "0");
       const formattedDay = String(parseInt(day, 10)).padStart(2, "0");
       return `${year}-${formattedMonth}-${formattedDay}`;
@@ -17,7 +19,9 @@ export const UpdateViewSummary = async (object) => {
 
     // mm/dd/yyyy to yyyy-mm-dd
     const convertToDateFormat = (dateString) => {
-      const [day, month, year] = dateString?.split(/[-/]/);
+      const [day, month, year] = dateString
+        ?.split(/[-/]/)
+        ?.map((p) => p.trim());
       const formattedMonth = String(parseInt(month, 10)).padStart(2, "0");
       const formattedDay = String(parseInt(day, 10)).padStart(2, "0");
       return `${year}-${formattedDay}-${formattedMonth}`;
@@ -25,7 +29,7 @@ export const UpdateViewSummary = async (object) => {
 
     // dd-mm-yyyy to mm/dd/yyyy
     const handleDateFormat = (dateString) => {
-      const [day, month, year] = dateString.split("-");
+      const [day, month, year] = dateString.split("-")?.map((p) => p.trim());
       const formattedMonth = String(parseInt(month, 10)).padStart(2, "0");
       const formattedDay = String(parseInt(day, 10)).padStart(2, "0");
       return `${formattedMonth}/${formattedDay}/${year}`;
@@ -47,8 +51,6 @@ export const UpdateViewSummary = async (object) => {
     const groupedData = new Map();
     const getFirstData = object?.data[0];
 
-    console.log("object?.data : ", object?.data);
-
     object?.data.forEach((item) => {
       const key = convertToDateFormat(item.date);
       groupedData.set(key, item);
@@ -60,6 +62,7 @@ export const UpdateViewSummary = async (object) => {
 
       const typeOfMethod =
         type === "update" ? updateTimeSheet : createTimeSheet;
+
       try {
         const response = await client.graphql({
           query: typeOfMethod,
@@ -87,7 +90,6 @@ export const UpdateViewSummary = async (object) => {
     ];
 
     if (groupedData.has(obj?.date)) {
-      console.log(obj?.date);
       const value = groupedData.get(obj?.date);
 
       const updatedData = {
