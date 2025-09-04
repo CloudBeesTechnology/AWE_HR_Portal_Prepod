@@ -529,7 +529,10 @@ export const ViewTimeSheet = () => {
             (fil) => fil.status !== "Unsubmitted"
           );
           filterDataByPosition = removeStatusAll;
-        } else if (Position === "SuperAdmin" && arrayOfObj) {
+        } else if (
+          (Position === "SuperAdmin" || Position === "HR") &&
+          arrayOfObj
+        ) {
           filterDataByPosition = convertedStringToArrayObj;
         } else if (categoryFilter !== "Select Excel Sheet" && arrayOfObj) {
           filterDataByPosition = await FindSpecificTimeKeeper(

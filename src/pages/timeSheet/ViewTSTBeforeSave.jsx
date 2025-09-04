@@ -1392,7 +1392,9 @@ export const ViewTSTBeforeSave = ({
                               {m?.WORKINGHOURS || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m?.OT || 0}
+                              {excelData && excelData?.length > 0
+                                ? 0
+                                : m?.OT || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
                               <div

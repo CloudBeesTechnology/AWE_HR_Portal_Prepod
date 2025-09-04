@@ -49,10 +49,6 @@ export const UnlockVerifiedCellVS = async ({
   const timeSheetMap = new Map();
   const idMap = new Map();
 
-  console.log(
-    "allData : ",
-    allData?.filter((fil) => fil?.fileType === "SBW")
-  );
   for (const item of allData) {
     const badgeNoOrFidNo =
       item.fileType === "Offshore" ||
