@@ -150,7 +150,6 @@ export const ViewSummary = () => {
     const getType = finalResult?.type;
     const isJobcodeExists = getResponse?.tradeCode;
 
-    console.log("getResponse : ", getResponse);
     // mm/dd/yyyy to yyyy-mm-dd
     const convertToDateFormat = (dateString) => {
       const [day, month, year] = dateString?.split(/[-/]/);

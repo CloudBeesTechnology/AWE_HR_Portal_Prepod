@@ -1082,8 +1082,11 @@ export const ViewORMCsheet = ({
     setSelectedOption(option);
   };
 
+  const sortedByAlphabetical = finalData?.sort((a, b) =>
+    a?.NAME?.localeCompare(b?.NAME)
+  );
   const itemsPerPage = 25;
-  const safeData = finalData || [];
+  const safeData = sortedByAlphabetical || [];
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;

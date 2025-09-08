@@ -1193,7 +1193,11 @@ export const ViewOffshoreORMCsheet = ({
     setSelectedOption(option);
   };
 
-  const safeData = finalData || [];
+  const sortedByAlphabetical = finalData?.sort((a, b) =>
+    a?.NAME?.localeCompare(b?.NAME)
+  );
+
+  const safeData = sortedByAlphabetical || [];
   const itemsPerPage = 25;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;

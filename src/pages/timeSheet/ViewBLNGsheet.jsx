@@ -1291,9 +1291,11 @@ export const ViewBLNGsheet = ({
   const handleSelectItem = (option) => {
     setSelectedOption(option);
   };
-
-  const safeData = finalData || [];
-  const itemsPerPage = 1000;
+  const sortedByAlphabetical = finalData?.sort((a, b) =>
+    a?.NAMEFLAST?.localeCompare(b?.NAMEFLAST)
+  );
+  const safeData = sortedByAlphabetical || [];
+  const itemsPerPage = 700;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);

@@ -1151,8 +1151,11 @@ export const ViewHOsheet = ({
     setSelectedOption(option);
   };
 
+  const sortedByAlphabetical = finalData?.sort((a, b) =>
+    a?.NAME?.localeCompare(b?.NAME)
+  );
   const itemsPerPage = 100;
-  const safeData = finalData || [];
+  const safeData = sortedByAlphabetical || [];
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
