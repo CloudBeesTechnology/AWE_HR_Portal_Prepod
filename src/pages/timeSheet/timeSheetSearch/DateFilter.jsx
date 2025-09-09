@@ -13,7 +13,7 @@ export const DateFilter = () => {
           type="date"
           value={startDate || ""}
           onChange={(e) => setStartDate(e.target.value)}
-          className="border border-lite_grey rounded px-2 py-1"
+          className="border border-lite_grey rounded px-2 py-1 outline-none"
         />
       </div>
 
@@ -25,7 +25,7 @@ export const DateFilter = () => {
           type="date"
           value={endDate || ""}
           onChange={(e) => setEndDate(e.target.value)}
-          className="ml-2 border border-lite_grey rounded px-2 py-1 "
+          className="ml-2 border border-lite_grey rounded px-2 py-1 outline-none"
         />
       </div>
     </div>

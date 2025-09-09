@@ -1,3 +1,11 @@
+type TimesheetDropdown @aws_iam @aws_api_key {
+  id: ID!
+  dropdownType: String
+  value: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
 type ContractForm @aws_iam @aws_api_key {
   id: ID!
   empID: String!
@@ -1099,38 +1107,25 @@ enum ModelSortDirection {
   DESC
 }
 
-type ModelContractFormConnection @aws_api_key @aws_iam {
-  items: [ContractForm]!
+type ModelTimesheetDropdownConnection @aws_api_key @aws_iam {
+  items: [TimesheetDropdown]!
   nextToken: String
 }
 
-input ModelContractFormFilterInput {
+input ModelTimesheetDropdownFilterInput {
   id: ModelIDInput
-  empID: ModelStringInput
-  conAttn: ModelStringInput
-  depHead: ModelStringInput
-  hrManager: ModelStringInput
-  genManager: ModelStringInput
-  remarks: ModelStringInput
-  contStatus: ModelBooleanInput
-  remarkHr: ModelStringInput
-  remarkGm: ModelStringInput
-  renewalContract: ModelStringInput
-  managerDate: ModelStringInput
-  hrmDate: ModelStringInput
-  gmDate: ModelStringInput
-  extendedStatus: ModelStringInput
-  oldCED: ModelStringInput
-  hrSign: ModelStringInput
-  hrDate: ModelStringInput
+  dropdownType: ModelStringInput
+  value: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
-  and: [ModelContractFormFilterInput]
-  or: [ModelContractFormFilterInput]
-  not: ModelContractFormFilterInput
+  and: [ModelTimesheetDropdownFilterInput]
+  or: [ModelTimesheetDropdownFilterInput]
+  not: ModelTimesheetDropdownFilterInput
 }
 
 type Query {
+  getTimesheetDropdown(id: ID!): TimesheetDropdown @aws_api_key @aws_iam
+  listTimesheetDropdowns(filter: ModelTimesheetDropdownFilterInput, limit: Int, nextToken: String): ModelTimesheetDropdownConnection @aws_api_key @aws_iam
   getContractForm(id: ID!): ContractForm @aws_api_key @aws_iam
   listContractForms(filter: ModelContractFormFilterInput, limit: Int, nextToken: String): ModelContractFormConnection @aws_api_key @aws_iam
   getKeyValueStore(id: ID!): KeyValueStore @aws_api_key @aws_iam
@@ -1215,78 +1210,36 @@ type Query {
   listLeaveStatuses(filter: ModelLeaveStatusFilterInput, limit: Int, nextToken: String): ModelLeaveStatusConnection @aws_api_key @aws_iam
 }
 
-input ModelContractFormConditionInput {
-  empID: ModelStringInput
-  conAttn: ModelStringInput
-  depHead: ModelStringInput
-  hrManager: ModelStringInput
-  genManager: ModelStringInput
-  remarks: ModelStringInput
-  contStatus: ModelBooleanInput
-  remarkHr: ModelStringInput
-  remarkGm: ModelStringInput
-  renewalContract: ModelStringInput
-  managerDate: ModelStringInput
-  hrmDate: ModelStringInput
-  gmDate: ModelStringInput
-  extendedStatus: ModelStringInput
-  oldCED: ModelStringInput
-  hrSign: ModelStringInput
-  hrDate: ModelStringInput
-  and: [ModelContractFormConditionInput]
-  or: [ModelContractFormConditionInput]
-  not: ModelContractFormConditionInput
+input ModelTimesheetDropdownConditionInput {
+  dropdownType: ModelStringInput
+  value: ModelStringInput
+  and: [ModelTimesheetDropdownConditionInput]
+  or: [ModelTimesheetDropdownConditionInput]
+  not: ModelTimesheetDropdownConditionInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
 }
 
-input CreateContractFormInput {
+input CreateTimesheetDropdownInput {
   id: ID
-  empID: String!
-  conAttn: String
-  depHead: String
-  hrManager: String
-  genManager: String
-  remarks: String
-  contStatus: Boolean
-  remarkHr: String
-  remarkGm: String
-  renewalContract: String
-  managerDate: String
-  hrmDate: String
-  gmDate: String
-  extendedStatus: String
-  oldCED: String
-  hrSign: String
-  hrDate: String
+  dropdownType: String
+  value: String
 }
 
-input UpdateContractFormInput {
+input UpdateTimesheetDropdownInput {
   id: ID!
-  empID: String
-  conAttn: String
-  depHead: String
-  hrManager: String
-  genManager: String
-  remarks: String
-  contStatus: Boolean
-  remarkHr: String
-  remarkGm: String
-  renewalContract: String
-  managerDate: String
-  hrmDate: String
-  gmDate: String
-  extendedStatus: String
-  oldCED: String
-  hrSign: String
-  hrDate: String
+  dropdownType: String
+  value: String
 }
 
-input DeleteContractFormInput {
+input DeleteTimesheetDropdownInput {
   id: ID!
 }
 
 type Mutation {
+  createTimesheetDropdown(input: CreateTimesheetDropdownInput!, condition: ModelTimesheetDropdownConditionInput): TimesheetDropdown @aws_api_key @aws_iam
+  updateTimesheetDropdown(input: UpdateTimesheetDropdownInput!, condition: ModelTimesheetDropdownConditionInput): TimesheetDropdown @aws_api_key @aws_iam
+  deleteTimesheetDropdown(input: DeleteTimesheetDropdownInput!, condition: ModelTimesheetDropdownConditionInput): TimesheetDropdown @aws_api_key @aws_iam
   createContractForm(input: CreateContractFormInput!, condition: ModelContractFormConditionInput): ContractForm @aws_api_key @aws_iam
   updateContractForm(input: UpdateContractFormInput!, condition: ModelContractFormConditionInput): ContractForm @aws_api_key @aws_iam
   deleteContractForm(input: DeleteContractFormInput!, condition: ModelContractFormConditionInput): ContractForm @aws_api_key @aws_iam
@@ -1412,32 +1365,20 @@ type Mutation {
   deleteLeaveStatus(input: DeleteLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus @aws_api_key @aws_iam
 }
 
-input ModelSubscriptionContractFormFilterInput {
+input ModelSubscriptionTimesheetDropdownFilterInput {
   id: ModelSubscriptionIDInput
-  empID: ModelSubscriptionStringInput
-  conAttn: ModelSubscriptionStringInput
-  depHead: ModelSubscriptionStringInput
-  hrManager: ModelSubscriptionStringInput
-  genManager: ModelSubscriptionStringInput
-  remarks: ModelSubscriptionStringInput
-  contStatus: ModelSubscriptionBooleanInput
-  remarkHr: ModelSubscriptionStringInput
-  remarkGm: ModelSubscriptionStringInput
-  renewalContract: ModelSubscriptionStringInput
-  managerDate: ModelSubscriptionStringInput
-  hrmDate: ModelSubscriptionStringInput
-  gmDate: ModelSubscriptionStringInput
-  extendedStatus: ModelSubscriptionStringInput
-  oldCED: ModelSubscriptionStringInput
-  hrSign: ModelSubscriptionStringInput
-  hrDate: ModelSubscriptionStringInput
+  dropdownType: ModelSubscriptionStringInput
+  value: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
-  and: [ModelSubscriptionContractFormFilterInput]
-  or: [ModelSubscriptionContractFormFilterInput]
+  and: [ModelSubscriptionTimesheetDropdownFilterInput]
+  or: [ModelSubscriptionTimesheetDropdownFilterInput]
 }
 
 type Subscription {
+  onCreateTimesheetDropdown(filter: ModelSubscriptionTimesheetDropdownFilterInput): TimesheetDropdown @aws_subscribe(mutations: ["createTimesheetDropdown"]) @aws_api_key @aws_iam
+  onUpdateTimesheetDropdown(filter: ModelSubscriptionTimesheetDropdownFilterInput): TimesheetDropdown @aws_subscribe(mutations: ["updateTimesheetDropdown"]) @aws_api_key @aws_iam
+  onDeleteTimesheetDropdown(filter: ModelSubscriptionTimesheetDropdownFilterInput): TimesheetDropdown @aws_subscribe(mutations: ["deleteTimesheetDropdown"]) @aws_api_key @aws_iam
   onCreateContractForm(filter: ModelSubscriptionContractFormFilterInput): ContractForm @aws_subscribe(mutations: ["createContractForm"]) @aws_api_key @aws_iam
   onUpdateContractForm(filter: ModelSubscriptionContractFormFilterInput): ContractForm @aws_subscribe(mutations: ["updateContractForm"]) @aws_api_key @aws_iam
   onDeleteContractForm(filter: ModelSubscriptionContractFormFilterInput): ContractForm @aws_subscribe(mutations: ["deleteContractForm"]) @aws_api_key @aws_iam
@@ -1561,6 +1502,133 @@ type Subscription {
   onCreateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["createLeaveStatus"]) @aws_api_key @aws_iam
   onUpdateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["updateLeaveStatus"]) @aws_api_key @aws_iam
   onDeleteLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["deleteLeaveStatus"]) @aws_api_key @aws_iam
+}
+
+type ModelContractFormConnection @aws_api_key @aws_iam {
+  items: [ContractForm]!
+  nextToken: String
+}
+
+input ModelContractFormFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  conAttn: ModelStringInput
+  depHead: ModelStringInput
+  hrManager: ModelStringInput
+  genManager: ModelStringInput
+  remarks: ModelStringInput
+  contStatus: ModelBooleanInput
+  remarkHr: ModelStringInput
+  remarkGm: ModelStringInput
+  renewalContract: ModelStringInput
+  managerDate: ModelStringInput
+  hrmDate: ModelStringInput
+  gmDate: ModelStringInput
+  extendedStatus: ModelStringInput
+  oldCED: ModelStringInput
+  hrSign: ModelStringInput
+  hrDate: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelContractFormFilterInput]
+  or: [ModelContractFormFilterInput]
+  not: ModelContractFormFilterInput
+}
+
+input ModelContractFormConditionInput {
+  empID: ModelStringInput
+  conAttn: ModelStringInput
+  depHead: ModelStringInput
+  hrManager: ModelStringInput
+  genManager: ModelStringInput
+  remarks: ModelStringInput
+  contStatus: ModelBooleanInput
+  remarkHr: ModelStringInput
+  remarkGm: ModelStringInput
+  renewalContract: ModelStringInput
+  managerDate: ModelStringInput
+  hrmDate: ModelStringInput
+  gmDate: ModelStringInput
+  extendedStatus: ModelStringInput
+  oldCED: ModelStringInput
+  hrSign: ModelStringInput
+  hrDate: ModelStringInput
+  and: [ModelContractFormConditionInput]
+  or: [ModelContractFormConditionInput]
+  not: ModelContractFormConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateContractFormInput {
+  id: ID
+  empID: String!
+  conAttn: String
+  depHead: String
+  hrManager: String
+  genManager: String
+  remarks: String
+  contStatus: Boolean
+  remarkHr: String
+  remarkGm: String
+  renewalContract: String
+  managerDate: String
+  hrmDate: String
+  gmDate: String
+  extendedStatus: String
+  oldCED: String
+  hrSign: String
+  hrDate: String
+}
+
+input UpdateContractFormInput {
+  id: ID!
+  empID: String
+  conAttn: String
+  depHead: String
+  hrManager: String
+  genManager: String
+  remarks: String
+  contStatus: Boolean
+  remarkHr: String
+  remarkGm: String
+  renewalContract: String
+  managerDate: String
+  hrmDate: String
+  gmDate: String
+  extendedStatus: String
+  oldCED: String
+  hrSign: String
+  hrDate: String
+}
+
+input DeleteContractFormInput {
+  id: ID!
+}
+
+input ModelSubscriptionContractFormFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  conAttn: ModelSubscriptionStringInput
+  depHead: ModelSubscriptionStringInput
+  hrManager: ModelSubscriptionStringInput
+  genManager: ModelSubscriptionStringInput
+  remarks: ModelSubscriptionStringInput
+  contStatus: ModelSubscriptionBooleanInput
+  remarkHr: ModelSubscriptionStringInput
+  remarkGm: ModelSubscriptionStringInput
+  renewalContract: ModelSubscriptionStringInput
+  managerDate: ModelSubscriptionStringInput
+  hrmDate: ModelSubscriptionStringInput
+  gmDate: ModelSubscriptionStringInput
+  extendedStatus: ModelSubscriptionStringInput
+  oldCED: ModelSubscriptionStringInput
+  hrSign: ModelSubscriptionStringInput
+  hrDate: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionContractFormFilterInput]
+  or: [ModelSubscriptionContractFormFilterInput]
 }
 
 type ModelKeyValueStoreConnection @aws_api_key @aws_iam {

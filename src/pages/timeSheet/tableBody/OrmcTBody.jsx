@@ -77,7 +77,11 @@ export const OrmcTBody = ({
                     {m.actualWorkHrs || 0}
                   </td>
                   <td className="text-center px-4 flex-1">{m.otTime || 0}</td>
-                  <td className="text-center px-4 flex-1">{m.remarks}</td>
+                  <td className="text-center px-4 flex-1">
+                    <div className="truncate w-[100px]" title={m.remarks}>
+                      {m.remarks}
+                    </div>
+                  </td>
                 </tr>
               );
             };
@@ -89,7 +93,7 @@ export const OrmcTBody = ({
                 colSpan="100%"
                 className="text-center text-dark_ash text_size_5 bg-white"
               >
-                <p className="p-5">{message || "Please wait few seconds."}</p>
+                <p className="p-5">{message || "No data available."}</p>
               </td>
             </tr>
           ) ?? (

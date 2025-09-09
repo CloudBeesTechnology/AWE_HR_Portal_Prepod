@@ -19,7 +19,7 @@ import { DataSupply } from "../../../../utils/DataStoredContext";
 export const DoeForm = ({ candidate }) => {
   const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
-  const { interviewSchedules } = useFetchCandy();
+  const { interviewSchedules, loading: interviewLoading } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
   const { createWPTrackingHandler } = useCreateWPTracking();
   const { wpTrackingDetails } = useUpdateWPTracking();
@@ -48,6 +48,8 @@ export const DoeForm = ({ candidate }) => {
   const [uploadedDoe, setUploadedDoe] = useState({
     doeFile: null,
   });
+
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   const {
     register,
@@ -106,7 +108,12 @@ export const DoeForm = ({ candidate }) => {
     if (typeof url === "string" && url) {
       const decodedUrl = decodeURIComponent(url);
       const fileNameWithParams = decodedUrl.split("/").pop();
-      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
+      const cleanName = fileNameWithParams
+        .split("?")[0]
+        .split(",")[0]
+        .split("#")[0]
+        .replace(/"/g, "");
+      return cleanName;
     }
     return "";
   };
@@ -200,6 +207,7 @@ export const DoeForm = ({ candidate }) => {
 
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
+    setSubmitLoading(true);
 
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
@@ -242,11 +250,13 @@ export const DoeForm = ({ candidate }) => {
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
+      setSubmitLoading(false);
       return;
     }
 
     if (!formData?.interview?.status) {
       console.error("Missing interview status in formData.");
+      setSubmitLoading(false);
       return;
     }
 
@@ -301,6 +311,8 @@ export const DoeForm = ({ candidate }) => {
       } else {
         console.error("Unexpected error:", err);
       }
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
@@ -318,9 +330,59 @@ export const DoeForm = ({ candidate }) => {
 
   const access = "Recruitment";
 
+  // Loading overlay component
+  const LoadingOverlay = () => (
+    <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    </div>
+  );
+
+  // Submit button with loading state
+  const SubmitButton = () => (
+    <button
+      type="submit"
+      disabled={submitLoading || interviewLoading}
+      className={`py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow flex items-center justify-center ${
+        submitLoading || interviewLoading ? "opacity-70 cursor-not-allowed" : ""
+      }`}
+    >
+      {submitLoading ? (
+        <>
+          <svg
+            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Submitting...
+        </>
+      ) : (
+        "Submit"
+      )}
+    </button>
+  );
+
   return (
     <>
-      <form className="p-5" onSubmit={handleSubmitTwo}>
+      <form className="p-5 relative" onSubmit={handleSubmitTwo}>
+        {/* Loading overlay for data fetching */}
+        {interviewLoading && <LoadingOverlay />}
         <div className="grid grid-cols-2 gap-5 mt-5">
           <div>
             <label htmlFor="doesubmitdate">Date of Submission</label>
@@ -333,6 +395,7 @@ export const DoeForm = ({ candidate }) => {
               onChange={(e) =>
                 handleInputChange("doesubmitdate", e.target.value)
               }
+              disabled={interviewLoading || submitLoading}
             />
             {errors.doesubmitdate && (
               <span>{errors.doesubmitdate.message}</span>
@@ -349,6 +412,7 @@ export const DoeForm = ({ candidate }) => {
               onChange={(e) =>
                 handleInputChange("doeapprovedate", e.target.value)
               }
+              disabled={interviewLoading || submitLoading}
             />
             {errors.doeapprovedate && (
               <span>{errors.doeapprovedate.message}</span>
@@ -365,6 +429,7 @@ export const DoeForm = ({ candidate }) => {
               onChange={(e) =>
                 handleInputChange("doeexpirydate", e.target.value)
               }
+              disabled={interviewLoading || submitLoading}
             />
             {errors.doeexpirydate && (
               <span>{errors.doeexpirydate.message}</span>
@@ -379,6 +444,7 @@ export const DoeForm = ({ candidate }) => {
               {...register("doerefno")}
               value={formData.interview.doerefno}
               onChange={(e) => handleInputChange("doerefno", e.target.value)}
+              disabled={interviewLoading || submitLoading}
             />
             {errors.doerefno && <span>{errors.doerefno.message}</span>}
           </div>
@@ -391,6 +457,7 @@ export const DoeForm = ({ candidate }) => {
               {...register("status")}
               value={formData.interview.status}
               onChange={(e) => handleInputChange("status", e.target.value)}
+              disabled={interviewLoading || submitLoading}
             >
               {statusOptions.map((status, index) => (
                 <option key={index} value={status}>
@@ -414,18 +481,14 @@ export const DoeForm = ({ candidate }) => {
                 formattedPermissions={formattedPermissions}
                 requiredPermissions={requiredPermissions}
                 access={access}
+                disabled={interviewLoading || submitLoading}
               />
             </div>
           </div>
         </div>
 
         <div className="mt-5 flex justify-center">
-          <button
-            type="submit"
-            className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
-          >
-            Submit
-          </button>
+          <SubmitButton />
         </div>
       </form>
       {notification && (

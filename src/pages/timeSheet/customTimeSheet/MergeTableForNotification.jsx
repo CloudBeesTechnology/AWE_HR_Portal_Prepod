@@ -27,11 +27,15 @@ export const MergeTableForNotification = async (responseData) => {
 
     if (candidates && responseData) {
       const getManager = candidates.find(
-        (candidate) => candidate.empBadgeNo === responseData.assignTo
+        (candidate) =>
+          String(candidate.empBadgeNo)?.toUpperCase()?.trim() ===
+          String(responseData.assignTo)?.toUpperCase()?.trim()
       );
 
       const getTimeKeeper = candidates.find(
-        (candidate) => candidate.empID === responseData.assignBy
+        (candidate) =>
+          String(candidate.empID)?.toUpperCase()?.trim() ===
+          String(responseData.assignBy)?.toUpperCase()?.trim()
       );
 
       const emailInfo = {

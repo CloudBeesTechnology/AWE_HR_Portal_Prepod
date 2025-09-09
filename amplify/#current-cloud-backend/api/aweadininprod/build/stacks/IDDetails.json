@@ -49,10 +49,10 @@
     "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
       "Type": "String"
     },
-    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunction3913C484FunctionId": {
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownauth0FunctionQuerygetTimesheetDropdownauth0FunctionAppSyncFunctionDFEC1B4F63": {
       "Type": "String"
     },
-    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId": {
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7": {
       "Type": "String"
     },
     "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
@@ -61,19 +61,19 @@
     "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
       "Type": "String"
     },
-    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationcreateContractForminit0FunctionMutationcreateContractForminit0FunctionAppSyncFunctionC8750CDCFunctionId": {
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationcreateTimesheetDropdowninit0FunctionMutationcreateTimesheetDropdowninit0FunctionAppSy67CFF9A4": {
       "Type": "String"
     },
-    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationcreateContractFormauth0FunctionMutationcreateContractFormauth0FunctionAppSyncFunction5DEF2B7BFunctionId": {
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationcreateTimesheetDropdownauth0FunctionMutationcreateTimesheetDropdownauth0FunctionAppSyBCA0847E": {
       "Type": "String"
     },
-    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationupdateContractForminit0FunctionMutationupdateContractForminit0FunctionAppSyncFunctionA6BC10BDFunctionId": {
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationupdateTimesheetDropdowninit0FunctionMutationupdateTimesheetDropdowninit0FunctionAppSy2480CAD9": {
       "Type": "String"
     },
-    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionE9F67D22FunctionId": {
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptiononCreateTimesheetDropdownauth0FunctionSubscriptiononCreateTimesheetDropdownauth0FCCBC55B9": {
       "Type": "String"
     },
-    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction404107DF3": {
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptionOnCreateTimesheetDropdownDataResolverFnSubscriptionOnCreateTimesheetDropdownDataR9FED0F60": {
       "Type": "String"
     }
   },
@@ -436,10 +436,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunction3913C484FunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownauth0FunctionQuerygetTimesheetDropdownauth0FunctionAppSyncFunctionDFEC1B4F63"
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
               "Fn::GetAtt": [
@@ -547,10 +547,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunction3913C484FunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownauth0FunctionQuerygetTimesheetDropdownauth0FunctionAppSyncFunctionDFEC1B4F63"
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
               "Fn::GetAtt": [
@@ -658,13 +658,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationcreateContractForminit0FunctionMutationcreateContractForminit0FunctionAppSyncFunctionC8750CDCFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationcreateTimesheetDropdowninit0FunctionMutationcreateTimesheetDropdowninit0FunctionAppSy67CFF9A4"
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationcreateContractFormauth0FunctionMutationcreateContractFormauth0FunctionAppSyncFunction5DEF2B7BFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationcreateTimesheetDropdownauth0FunctionMutationcreateTimesheetDropdownauth0FunctionAppSyBCA0847E"
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
               "Fn::GetAtt": [
@@ -823,7 +823,7 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationupdateContractForminit0FunctionMutationupdateContractForminit0FunctionAppSyncFunctionA6BC10BDFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationupdateTimesheetDropdowninit0FunctionMutationupdateTimesheetDropdowninit0FunctionAppSy2480CAD9"
             },
             {
               "Fn::GetAtt": [
@@ -832,7 +832,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
               "Fn::GetAtt": [
@@ -997,7 +997,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
               "Fn::GetAtt": [
@@ -1054,13 +1054,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionE9F67D22FunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptiononCreateTimesheetDropdownauth0FunctionSubscriptiononCreateTimesheetDropdownauth0FCCBC55B9"
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction404107DF3"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptionOnCreateTimesheetDropdownDataResolverFnSubscriptionOnCreateTimesheetDropdownDataR9FED0F60"
             }
           ]
         },
@@ -1107,13 +1107,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionE9F67D22FunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptiononCreateTimesheetDropdownauth0FunctionSubscriptiononCreateTimesheetDropdownauth0FCCBC55B9"
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction404107DF3"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptionOnCreateTimesheetDropdownDataResolverFnSubscriptionOnCreateTimesheetDropdownDataR9FED0F60"
             }
           ]
         },
@@ -1160,13 +1160,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionE9F67D22FunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptiononCreateTimesheetDropdownauth0FunctionSubscriptiononCreateTimesheetDropdownauth0FCCBC55B9"
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
-              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction404107DF3"
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptionOnCreateTimesheetDropdownDataResolverFnSubscriptionOnCreateTimesheetDropdownDataR9FED0F60"
             }
           ]
         },

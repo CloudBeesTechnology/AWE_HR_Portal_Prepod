@@ -293,8 +293,8 @@ const NavigationLinks = () => {
             {/* <Route path="employreq" element={<EmployReq />} /> */}
             <Route path="status" element={<Status />} />
             <Route path="workpasstracking" element={<WorkpassTracking />} />
+          <Route path="hiringJob" element={<HiringJob />} />
           </Route>
-          <Route path="/hiringJob" element={<HiringJob />} />
           <Route path="/postJob" element={<CreateJob />} />
           <Route path="/addCandidates" Component={AddCandidates}>
             <Route index element={<ApplicantDetails />} />

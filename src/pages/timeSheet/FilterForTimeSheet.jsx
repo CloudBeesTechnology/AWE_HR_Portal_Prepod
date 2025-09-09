@@ -1,13 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoFilterOutline } from "react-icons/io5";
 
 export const FilterForTimeSheet = ({
   handleFilterChange,
+  selectedCategory,
   toggleDropdown,
   isOpen,
 }) => {
   const Position = localStorage.getItem("userType");
-  const [selectedFilter, setSelectedFilter] = useState("All Records");
+  const [selectedFilter, setSelectedFilter] = useState(selectedCategory);
+
+  useEffect(() => {
+    setSelectedFilter(selectedCategory);
+  }, [selectedCategory]);
 
   const onFilterSelect = (filter) => {
     setSelectedFilter(filter);

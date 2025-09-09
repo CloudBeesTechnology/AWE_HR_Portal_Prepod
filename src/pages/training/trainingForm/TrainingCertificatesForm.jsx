@@ -1,11 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { trainingCertificatesValidation } from "../../../services/TrainingValidation";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { TCDataFun } from "../../../services/createMethod/TCDataFun";
 import { DataSupply } from "../../../utils/DataStoredContext";
-import { FileUpload } from "../../employees/medicalDep/FileUploadField";
 import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
 import { FormField } from "../../../utils/FormField";
@@ -36,7 +35,6 @@ export const TrainingCertificatesForm = () => {
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
-  const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [showTitle, setShowTitle] = useState("");
@@ -108,8 +106,6 @@ export const TrainingCertificatesForm = () => {
             };
           })
           .filter(Boolean);
-
-        setUserDetails(mergedData);
         setAllEmpDetails(mergedData);
       } catch (err) {
         console.log(err);
@@ -422,7 +418,6 @@ export const TrainingCertificatesForm = () => {
               trackItem.trainingUpCertifi || proofItem.trainingUpCertifi || [],
           };
         });
-        console.log(mergedData, "mergedData");
 
         setValue("trainingProof", mergedData);
       } catch (error) {
@@ -533,9 +528,7 @@ export const TrainingCertificatesForm = () => {
         setUploadedCertify,
         setFileNames,
         setUploadedDocs,
-        uploadedDocs,
         index,
-        field,
         setIsUploading
       );
 

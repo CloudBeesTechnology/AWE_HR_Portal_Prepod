@@ -315,7 +315,7 @@ export const AllEmployee = () => {
   return (
     <section className="bg-[#F5F6F1CC] w-full flex items-center flex-col h-screen pt-14">
       <div className="w-full px-10 flex justify-between items-center mb-10">
-        <div className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
+        <div className="py-2 px-3 rounded-lg text-[18px] font-semibold">
           All Employee Details
         </div>
         <div className="flex items-center space-x-4 ">
@@ -356,7 +356,7 @@ export const AllEmployee = () => {
       <div className="overflow-x-auto mt-8 max-w-[100%] px-6">
         <div className="allEmployeeTable w-full max-h-[calc(70vh-7rem)] overflow-y-auto rounded-xl">
           <table className="w-full rounded-xl table-auto">
-            <thead className="bg-[#939393] text-center text-white sticky top-0">
+            <thead className="bg-[#939393] text-center text-white sticky top-0 p-4">
               <tr className="">
                 <th className="py-4 px-2">S.No</th>
                 <th className="py-4 px-2">Employee ID</th>

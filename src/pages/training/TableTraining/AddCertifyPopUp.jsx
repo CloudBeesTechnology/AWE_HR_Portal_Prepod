@@ -22,7 +22,7 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
     { header: "PO Number", key: "poNo" },
     { header: "Expiry Condition", key: "addDescretion" },
     { header: "Training Remarks", key: "tcRemarks" },
-    { header: "Upload Certificate", key: "trainingUpCertifi" },
+    { header: "Uploaded Certificates", key: "trainingUpCertifi" },
   ];
 
   const safeParseData = (data) => {
@@ -39,7 +39,7 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
         raw = JSON.parse(raw);
       }
 
-          if (typeof raw === "string") {
+      if (typeof raw === "string") {
         const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
         const parsed = JSON.parse(fixedJSON);
 
@@ -73,9 +73,16 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
         try {
           const parsedCert = JSON.parse(item?.trainingUpCertifi || "[]");
           if (parsedCert.length > 0) {
-            const filePath = parsedCert[0].upload;
-            const { url } = await getUrl({ path: filePath });
-            urls[i] = url;
+            const fileUrlsForItem = [];
+            for (const cert of parsedCert) {
+              const filePath = cert.upload;
+              const { url } = await getUrl({ path: filePath });
+              fileUrlsForItem.push({
+                url,
+                name: filePath.split('/').pop() // Extract filename from path
+              });
+            }
+            urls[i] = fileUrlsForItem;
           }
         } catch (err) {
           console.error("Invalid certificate format:", err);
@@ -96,6 +103,9 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
     }
     return value;
   };
+
+  console.log("Merged data", mergedData);
+  
 
   return (
     <div className="fixed top-0 w-full left-0 bg-black bg-opacity-50 z-[9999] py-7 min-h-screen flex items-center justify-center ">
@@ -158,15 +168,20 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
                         </p>
                         <p className="flex-1 text-start">
                           {item.key === "trainingUpCertifi" ? (
-                            fileUrls[idx] ? (
-                              <a
-                                href={fileUrls[idx]}
-                                className="text-blue underline"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Download
-                              </a>
+                            fileUrls[idx] && fileUrls[idx].length > 0 ? (
+                              <div className="flex flex-col">
+                                {fileUrls[idx].map((file, fileIndex) => (
+                                  <a
+                                    key={fileIndex}
+                                    href={file.url}
+                                    className="text-blue underline mb-1"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    {fileIndex + 1}. {file.name}
+                                  </a>
+                                ))}
+                              </div>
                             ) : (
                               "N/A"
                             )

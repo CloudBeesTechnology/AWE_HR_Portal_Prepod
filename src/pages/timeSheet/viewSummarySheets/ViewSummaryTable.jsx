@@ -8,10 +8,11 @@ import { ViewSummaryFilterData } from "./ViewSummaryFilterData";
 import { IoMdDownload } from "react-icons/io";
 
 import { BiSolidPrinter } from "react-icons/bi";
-import { DownloadExcelPDF } from "../timeSheetSearch/DownloadExcelPDF";
 import { PrintExcelSheet } from "../timeSheetSearch/PrintExcelSheet";
 import { Pagination } from "../timeSheetSearch/Pagination";
 import { HoursMinuAbsentCal } from "../customTimeSheet/HoursMinuAbsentCal";
+import { DownloadVSpdf } from "../timeSheetSearch/DownloadVSpdf";
+import { DownloadExcelPDF } from "../timeSheetSearch/DownloadExcelPDF";
 
 export const ViewSummaryTable = ({
   dayCounts,
@@ -24,11 +25,15 @@ export const ViewSummaryTable = ({
   resetTableFunc,
   toggleEditViewSummaryFunc,
   editViewSummaryObject,
-
+  empPIData,
+  setRefreshTrigger,
+  refreshTrigger,
   // resultOfWHrsAbsCal,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [adjustTheaderDownload, setAdjustTheaderDownload] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const {
     selectedLocation,
     setSelectedLocation,
@@ -39,6 +44,8 @@ export const ViewSummaryTable = ({
     setStartDate,
     setEndDate,
     setOffshoreType,
+    selectSapNoOrBadgeNo,
+    setSelectSapNoOrBadgeNo,
   } = useTempID();
 
   const toggleSticky = () => {
@@ -67,9 +74,134 @@ export const ViewSummaryTable = ({
   const formattedEndDate = formatDate(endDate);
   const location = selectedLocation?.toUpperCase();
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedLocation, startDate, endDate, refreshTrigger]);
+
+  const preparePrintRows = (rows = []) => {
+    return (rows || []).map((employee, idx) => {
+      // 1) Total OT (same logic as in your render)
+      const addAllOT = Object.values(employee?.OVERTIMEHRS || {}).reduce(
+        (acc, ot) => acc + parseFloat(ot || 0),
+        0
+      );
+      const totalOT = addAllOT.toFixed(2);
+
+      // 2) Total working hours (use your helper)
+      const getTotalHours = calculateTotalWorkingHours(employee) || 0;
+      const totalHours = Number(getTotalHours) || 0;
+
+      // 3) Normal days (same as render, guard divide by zero)
+      const getLastIndexOfNWhrs =
+        Array.isArray(employee?.workHrs) && employee?.workHrs.length > 0
+          ? employee?.workHrs[employee?.workHrs.length - 1]
+          : employee?.workHrs || "0";
+
+      const NWHPD = parseFloat(getLastIndexOfNWhrs) || 0;
+      const NormalDays = NWHPD ? Number(totalHours) / NWHPD : 0;
+
+      // 4) PH-D logic (same as in render)
+      const getLastWorkHr = parseFloat(employee?.workHrs?.at(-1) || "0");
+      const getLastWorkMonth = parseFloat(employee?.workMonth?.at(-1) || "0");
+      const calculatedPHD =
+        getLastWorkHr === 8 && getLastWorkMonth === 24
+          ? parseFloat(employee.hollydayCounts?.PHD || 0) / 2
+          : employee.hollydayCounts?.PHD || 0;
+
+      // 5) Total Absence (use your helper)
+      const totalAbsence = calculateTotalAbsence(employee, getLastIndexOfNWhrs);
+      const roundedTotalAbsentiesHrs = Number(
+        parseFloat(totalAbsence || 0).toFixed(2)
+      );
+
+      // 6) Verified check (build same checkVerifiedAll map)
+      const checkVerifiedAll = Array.from({ length: dayCounts }, (_, i) => {
+        const currentDay = new Date(getStartDate);
+        currentDay.setDate(getStartDate.getDate() + i);
+        const formattedDate = `${currentDay.getDate()}-${
+          currentDay.getMonth() + 1
+        }-${currentDay.getFullYear()}`;
+        const isVerified = employee?.getVerify?.[formattedDate] || "";
+        return { date: formattedDate, value: isVerified };
+      }).reduce((acc, { date, value }) => {
+        acc[date] = value;
+        return acc;
+      }, {});
+
+      const allFieldsYes = Object.values(checkVerifiedAll).every(
+        (v) => v === "Yes"
+      );
+
+      // 7) AL + CL
+      const totalOfALCL =
+        parseFloat(employee?.empLeaveCount?.AL || 0) +
+          parseFloat(employee?.empLeaveCount?.CL || 0) || 0;
+
+      // 8) Timekeeper unique name
+      const timeKeeperName = [...new Set(employee?.timeKeeper || [])].filter(
+        (n) => n !== null
+      );
+      const uniqueTimeKeeperName = timeKeeperName.join(", ");
+
+      // return augmented employee
+      return {
+        ...employee,
+        __totalOT: totalOT,
+        __totalHours: totalHours,
+        __NormalDays: NormalDays,
+        __calculatedPHD: calculatedPHD,
+        __roundedTotalAbsentiesHrs: roundedTotalAbsentiesHrs,
+        __allFieldsYes: allFieldsYes,
+        __totalOfALCL: totalOfALCL,
+        __uniqueTimeKeeperName: uniqueTimeKeeperName,
+        __uiIndex: idx,
+      };
+    });
+  };
+
+  const handlePrint = (
+    allExcelSheetData,
+    dayCounts,
+    getStartDate,
+    formattedStartDate,
+    formattedEndDate,
+    location,
+    mode
+  ) => {
+    // "data" here is the same one you render (so it represents exactly what user sees)
+
+    const rowsForPrint = preparePrintRows(allExcelSheetData);
+
+    // Pass an object so PrintExcelSheet gets everything it needs to render identical UI
+    if (mode === "print") {
+      PrintExcelSheet({
+        rows: rowsForPrint,
+        dayCounts,
+        startDate: getStartDate,
+        formattedStartDate,
+        formattedEndDate,
+        location,
+      });
+    } else if (mode === "download") {
+      DownloadVSpdf({
+        rows: rowsForPrint,
+        dayCounts,
+        startDate: getStartDate,
+        formattedStartDate,
+        formattedEndDate,
+        location,
+        mode,
+      });
+    }
+  };
+
+  function sortByNameAscending(arr) {
+    return arr?.sort((a, b) => a?.name?.localeCompare(b?.name));
+  }
+
   // Pagination
-  const itemsPerPage = 10;
-  const safeData = allExcelSheetData || [];
+  const itemsPerPage = 3;
+  const safeData = sortByNameAscending(allExcelSheetData) || [];
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -78,7 +210,8 @@ export const ViewSummaryTable = ({
   const totalPages = Math.ceil(safeData.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  var data = currentData;
+  // var data = currentData;
+  var data = isDownloading ? safeData : currentData;
 
   return (
     <div className="bg-[#fafaf6] h-screen">
@@ -92,7 +225,9 @@ export const ViewSummaryTable = ({
                 setStartDate("");
                 setEndDate("");
                 setSelectedLocation("");
+                setSelectSapNoOrBadgeNo("");
                 setOffshoreType("");
+                setRefreshTrigger(0);
               }}
             >
               <FaArrowLeft />
@@ -104,11 +239,15 @@ export const ViewSummaryTable = ({
           <div
             className="flex space-x-3 shadow-md items-center rounded px-3  h-10 bg-[#FEF116]"
             onClick={() => {
-              PrintExcelSheet(
-                "downloadTable",
-                location,
+              const mode = "print";
+              handlePrint(
+                allExcelSheetData,
+                dayCounts,
+                getStartDate,
                 formattedStartDate,
-                formattedEndDate
+                formattedEndDate,
+                location,
+                mode
               );
             }}
           >
@@ -121,6 +260,8 @@ export const ViewSummaryTable = ({
           secondaryData={secondaryData}
           searchResult={searchResult}
           resetTableFunc={resetTableFunc}
+          empPIData={empPIData}
+          setRefreshTrigger={setRefreshTrigger}
           // setEmptyTableMess={setEmptyTableMess}
         />
         <div className="overflow-auto max-h-[60vh] table-container-scroll">
@@ -136,13 +277,13 @@ export const ViewSummaryTable = ({
               >
                 <th
                   className="border px-2 py-2 border-dark_grey min-w-[200px] max-w-[400px] bg-[#949393]"
-                  rowSpan="2"
+                  // rowSpan="2"
                 >
                   Employee Name
                 </th>
                 <th
                   className="border px-2 py-2 border-dark_grey bg-[#949393]"
-                  rowSpan="2"
+                  // rowSpan="2"
                 >
                   PROJECT
                 </th>
@@ -369,7 +510,7 @@ export const ViewSummaryTable = ({
                           const isChecked = Boolean(isVerified);
                           return (
                             <td
-                              className={`border px-2 py-1 border-dark_grey cursor-pointer
+                              className={`border px-2 py-1 border-dark_grey text-center cursor-pointer max-w-[70px] min-w-[70px] break-words whitespace-normal
                                ${
                                  isChecked
                                    ? "bg-[#f59a51] bg-opacity-50 z-0"
@@ -484,7 +625,7 @@ export const ViewSummaryTable = ({
                           const isChecked = Boolean(isVerified);
                           return (
                             <td
-                              className={`border px-2 py-1 border-dark_grey  ${
+                              className={`border px-2 py-1 border-dark_grey text-center ${
                                 isChecked
                                   ? "bg-[#f59a51] bg-opacity-50 z-0"
                                   : dayOfWeek === "Sunday"
@@ -561,7 +702,7 @@ export const ViewSummaryTable = ({
                           const formattedBruneiDateTime = `${day}/${month}/${year} ${time}`;
                           return (
                             <td
-                              className={`border px-2 py-2 border-dark_grey
+                              className={`border px-2 py-2 border-dark_grey text-center
                               ${
                                 isChecked
                                   ? "bg-[#f59a51] bg-opacity-50  z-0"
@@ -581,7 +722,7 @@ export const ViewSummaryTable = ({
                                     onChange={() => {}}
                                   />
                                   <br />
-                                  <span>{formattedBruneiDateTime || ""}</span>
+                                  {/* <span>{formattedBruneiDateTime || ""}</span> */}
                                 </>
                               )}
                             </td>
@@ -677,6 +818,13 @@ export const ViewSummaryTable = ({
                         : startDate &&
                           endDate &&
                           selectedLocation &&
+                          loading === false &&
+                          !selectSapNoOrBadgeNo
+                        ? "Search SAP No or Badge No to to display records."
+                        : startDate &&
+                          endDate &&
+                          selectedLocation &&
+                          selectSapNoOrBadgeNo &&
                           loading === true
                         ? "Processing your request... This may take a moment."
                         : emptyTableMess === true
@@ -709,14 +857,40 @@ export const ViewSummaryTable = ({
             <button
               className="flex items-center space-x-2 rounded px-4 py-2  bg-[#FEF116] shadow-md"
               onClick={() => {
-                toggleSticky();
-                DownloadExcelPDF(
-                  "downloadTable",
-                  location,
-                  formattedStartDate,
-                  formattedEndDate
-                );
-                setAdjustTheaderDownload(false);
+                // toggleSticky();
+                // DownloadExcelPDF(
+                //   "downloadTable",
+                //   location,
+                //   formattedStartDate,
+                //   formattedEndDate
+                // );
+                // setAdjustTheaderDownload(false);
+
+                // const mode = "download";
+                // handlePrint(
+                //   allExcelSheetData,
+                //   dayCounts,
+                //   getStartDate,
+                //   formattedStartDate,
+                //   formattedEndDate,
+                //   location,
+                //   mode
+                // );
+
+                setIsDownloading(true);
+
+                setTimeout(() => {
+                  DownloadExcelPDF(
+                    "downloadTable",
+                    location,
+                    formattedStartDate,
+                    formattedEndDate
+                  );
+
+                  // Reset states after download
+                  // setAdjustTheaderDownload(false);
+                  setIsDownloading(false);
+                }, 2000);
               }}
             >
               <span className="cursor-pointer text-dark_grey text_size_5">

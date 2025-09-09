@@ -95,19 +95,19 @@ export const TimeSheetsCRUDoperations = async ({
           await Promise.all(
             chunk.map(async (item) => {
               const response = await client.graphql({
-                query: updateTimeSheet,
+                query: createTimeSheet,
                 variables: {
                   input: item,
                 },
               });
 
-              if (response?.data?.updateTimeSheet) {
+              if (response?.data?.createTimeSheet) {
                 successCount++;
 
                 if (!successFlag) {
                   successFlag = true;
 
-                  const responseData = response.data.updateTimeSheet;
+                  const responseData = response.data.createTimeSheet;
 
                   const result = await MergeTableForNotification(responseData);
 
@@ -167,6 +167,7 @@ export const TimeSheetsCRUDoperations = async ({
             })
           );
         } catch (error) {
+          console.log("Error : ", error);
           setStoringMess(false);
 
           toggleSFAMessage(false);

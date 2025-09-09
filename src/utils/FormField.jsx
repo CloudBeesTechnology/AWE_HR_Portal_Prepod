@@ -27,10 +27,10 @@ export const FormField = ({
 
   useEffect(() => {
     if (value !== undefined) {
-      // Trim whitespace from the fetched value
+    
       const updatedValue = Array.isArray(value)
-        ? value.map((val) => val.trim()) // Trim each value in the array
-        : value.trim(); // Trim the string value
+        ? value.map((val) => val.trim()) 
+        : value.trim(); 
 
       setSelectedOption(updatedValue);
     }
@@ -74,7 +74,7 @@ export const FormField = ({
 
   return (
     <div className="form-group w-full">
-      <label className="block text_size_6">{label}</label>
+      <label className="block text_size_8">{label}</label>
       {type === "selectOption" ? (
         <select
           className="input-field select-custom"
@@ -134,7 +134,7 @@ export const FormField = ({
           value={value}
           className="input-field border"
           disabled={trackEmpID}
-          {...register(name)} // Connect to React Hook Form
+          {...register(name)}// Connect to React Hook Form
         />
       )}
 

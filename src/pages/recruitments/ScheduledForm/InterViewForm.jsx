@@ -5,11 +5,12 @@ import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterv
 import { SpinLogo } from "../../../utils/SpinLogo";
 
 export const InterviewForm = ({ candidate }) => {
-  const { IVSSDetails } = useContext(DataSupply);
+  const { IVSSDetails, loading } = useContext(DataSupply);
   const { interviewDetails } = UpdateInterviewData();
 
   // Initialize form state
   const [notification, setNotification] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
       date: "",
@@ -82,6 +83,7 @@ export const InterviewForm = ({ candidate }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitLoading(true);
 
     const selectedInterviewData = IVSSDetails.find(
       (data) => data.tempID === candidate?.tempID
@@ -90,6 +92,7 @@ export const InterviewForm = ({ candidate }) => {
     if (!selectedInterviewData) {
       // console.error("No interview data found for the selected candidate.");
       alert("No interview data found for the selected candidate.");
+      setSubmitLoading(false);
       return;
     }
 
@@ -98,6 +101,7 @@ export const InterviewForm = ({ candidate }) => {
     if (!interviewScheduleId) {
       // console.error("Interview schedule ID not found.");
       alert("Interview schedule ID not found.");
+      setSubmitLoading(false);
       return;
     }
 
@@ -133,8 +137,58 @@ export const InterviewForm = ({ candidate }) => {
     } catch (error) {
       // console.error("Error submitting interview details:", error);
       alert("Failed to update interview details. Please try again.");
+    } finally {
+      setSubmitLoading(false);
     }
   };
+
+  // Loading overlay component
+  const LoadingOverlay = () => (
+    <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    </div>
+  );
+
+  // Submit button with loading state
+  const SubmitButton = () => (
+    <button
+      type="submit"
+      disabled={submitLoading}
+      className={`py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow flex items-center justify-center ${
+        submitLoading ? "opacity-70 cursor-not-allowed" : ""
+      }`}
+    >
+      {submitLoading ? (
+        <>
+          <svg
+            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Submitting...
+        </>
+      ) : (
+        "Submit"
+      )}
+    </button>
+  );
 
   const interviewFields = [
     { field: "date", label: "Date", type: "date" },
@@ -146,7 +200,9 @@ export const InterviewForm = ({ candidate }) => {
   ];
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="relative">
+      {/* Loading overlay for data fetching */}
+      {loading && <LoadingOverlay />}
       <div className="p-4 grid grid-cols-2 gap-5">
         {interviewFields.map((input) => (
           <label key={input.field} className="block mb-4">
@@ -157,12 +213,14 @@ export const InterviewForm = ({ candidate }) => {
                 className="w-full border p-2 rounded mt-1"
                 value={formData.interview[input.field] || ""}
                 onChange={(e) => handleInputChange(input.field, e.target.value)}
+                disabled={loading || submitLoading}
               />
             ) : input.type === "textarea" ? (
               <textarea
                 className="w-full border p-2 rounded mt-1 h-[42px]"
                 value={formData.interview[input.field] || ""}
                 onChange={(e) => handleInputChange(input.field, e.target.value)}
+                disabled={loading || submitLoading}
               />
             ) : (
               <div className="flex items-center mt-1">
@@ -173,6 +231,7 @@ export const InterviewForm = ({ candidate }) => {
                   onChange={(e) =>
                     handleFileChange(input.field, e.target.files[0])
                   }
+                  disabled={loading || submitLoading}
                 />
                 <label
                   htmlFor={input.field}
@@ -187,12 +246,7 @@ export const InterviewForm = ({ candidate }) => {
         ))}
       </div>
       <div className="center">
-        <button
-          type="submit"
-          className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
-        >
-          Submit
-        </button>
+        <SubmitButton />
       </div>
       {notification && (
         <SpinLogo

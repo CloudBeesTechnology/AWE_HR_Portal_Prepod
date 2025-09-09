@@ -17,7 +17,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
   const { IVSSDetails } = useContext(DataSupply);
   const { loiDetails } = UpdateLoiData();
   const { interviewDetails } = UpdateInterviewData();
-  const { mergedInterviewData } = useFetchInterview();
+  const { mergedInterviewData, loading: interviewLoading } = useFetchInterview();
   const [notification, setNotification] = useState(false);
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
@@ -198,15 +198,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
         ? JSON.stringify(wrapUpload(uploadedLOI.loiFile))
         : formData.interview?.loiFile,
       tempID: candidate?.tempID,
-      updatedBy: JSON.stringify(loiOrderedUpdatedBy),
-    };
-
-    const interStatus = {
-      id: interviewScheduleStatusId,
-      department: formData.interview?.department,
-      otherDepartment: formData.interview?.otherDepartment,
-      status: formData.interview?.status,
-      updatedBy: JSON.stringify(intOrderedUpdatedBy),
+      createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
     };
 
     const createData = {
@@ -219,6 +211,12 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
         : formData.interview?.loiFile,
       tempID: candidate?.tempID,
       createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),
+    };
+
+    const interStatus = {
+      id: interviewScheduleStatusId,
+      status: formData.interview?.status,
+      updatedBy: JSON.stringify(intOrderedUpdatedBy),
     };
 
     try {
@@ -281,9 +279,20 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
   const requiredPermissions = ["Status"];
 
   const access = "Recruitment";
+  
+  // Loading overlay component
+  const LoadingOverlay = () => (
+    <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    </div>
+  );
 
   return (
-    <form>
+    <form className="relative">
+      {/* Loading overlay for data fetching */}
+      {interviewLoading && <LoadingOverlay />}
       <div className="grid grid-cols-2 gap-5 mt-5">
         <div>
           <label htmlFor="loiIssueDate">Date of Issue</label>
@@ -296,6 +305,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
             })}
             value={formData.interview.loiIssueDate}
             onChange={(e) => handleInputChange("loiIssueDate", e.target.value)}
+            disabled={interviewLoading}
           />
           {errors.loiIssueDate && (
             <p className="text-[red] text-xs">{errors.loiIssueDate.message}</p>
@@ -310,6 +320,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
             {...register("loiAcceptDate")}
             value={formData.interview.loiAcceptDate}
             onChange={(e) => handleInputChange("loiAcceptDate", e.target.value)}
+            disabled={interviewLoading}
           />
           {errors.loiAcceptDate && (
             <p className="text-[red] text-xs">{errors.loiAcceptDate.message}</p>
@@ -326,6 +337,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
             onChange={(e) =>
               handleInputChange("loiDeclineDate", e.target.value)
             }
+            disabled={interviewLoading}
           />
           {errors.loiDeclineDate && (
             <p className="text-[red] text-xs">
@@ -342,6 +354,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
             {...register("declineReason")}
             value={formData.interview.declineReason}
             onChange={(e) => handleInputChange("declineReason", e.target.value)}
+            disabled={interviewLoading}
           ></textarea>
           {errors.declineReason && (
             <p className="text-[red] text-xs">{errors.declineReason.message}</p>
@@ -355,6 +368,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
+            disabled={interviewLoading}
           >
             {statusOptions.map((status, index) => (
               <option key={index} value={status}>
@@ -381,6 +395,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
                 requiredPermissions={requiredPermissions}
                 access={access}
                 check={isUploadingString.loiFile}
+                disabled={interviewLoading}
               />
             </div>
           </div>
@@ -391,7 +406,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
         <button
           type="submit"
           className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
-          disabled={isLoading}
+          disabled={isLoading || interviewLoading}
           onClick={handleSubmitTwo}
         >
           {isLoading ? "Submitting..." : "Submit"}

@@ -46,11 +46,15 @@ export const SendDataToManager = async (
       const mergedData = empPersonalInfos
         .map((candidate) => {
           const interviewDetails = empWorkInfos.find(
-            (item) => item.empID === candidate.empID
+            (item) =>
+              String(item.empID)?.toUpperCase()?.trim() ===
+              String(candidate.empID)?.toUpperCase()?.trim()
           );
 
           const allUser = usersData.find(
-            (item) => item.empID === candidate.empID
+            (item) =>
+              String(item.empID)?.toUpperCase()?.trim() ===
+              String(candidate.empID)?.toUpperCase()?.trim()
           );
 
           if (!interviewDetails && !allUser) {
@@ -66,7 +70,10 @@ export const SendDataToManager = async (
         .filter((item) => item !== null);
 
       const filteredData = mergedData.filter(
-        (value) => value.empID === loginAuth && value.selectType === "Manager"
+        (value) =>
+          String(value.empID)?.toUpperCase()?.trim() ===
+            String(loginAuth)?.toUpperCase()?.trim() &&
+          value.selectType === "Manager"
       );
 
       return filteredData;
@@ -76,7 +83,10 @@ export const SendDataToManager = async (
 
     const finalOutput = filterPending?.filter((pendingItem) => {
       return getOneObject.some((manager) => {
-        return pendingItem.assignTo === manager.empBadgeNo;
+        return (
+          String(pendingItem.assignTo)?.toUpperCase()?.trim() ===
+          String(manager.empBadgeNo)?.toUpperCase()?.trim()
+        );
       });
     });
 

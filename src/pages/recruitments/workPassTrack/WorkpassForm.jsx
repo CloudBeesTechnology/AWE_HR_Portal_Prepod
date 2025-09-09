@@ -29,28 +29,38 @@ export const WorkpassForm = ({ candidate, onClose, onSave }) => {
         {/* <h2 className="mb-4 p-2 text-[14px] font-semibold shadow-md rounded-md bg-[#FBFCFF]">
           TEMP ID: {candidate?.tempID} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: {candidate?.name}
         </h2> */}
-        <div className="p-4 shadow-md bg-[#FBFCFF]">
-          <div className="flex gap-4 text-[13px] font-semibold">
-            <div>
-              <span className="font-semibold">TEMP ID:</span>{" "}
-              {candidate?.tempID}
+        <div className="p-2 border border-BColor bg-[#FBFCFF]">
+          <div className="flex justify-between gap-4 text-[13px] font-semibold">
+            <div className="text-center ">
+              <div className="underline">TEMP ID</div>
+              <div className="mt-1 font-normal">
+                {candidate?.tempID || "N/A"}
+              </div>
             </div>
-            <div>
-              <span className="font-semibold">Name:</span> {candidate?.name}
+
+            <div className="">
+              <div className="underline">Name</div>
+              <div className="mt-1 font-normal">{candidate?.name || "N/A"}</div>
             </div>
-            <div>
-              <span className="font-semibold">Contract Type:</span>{" "}
-              {candidate?.contractType}
+
+            <div className="">
+              <div className="underline">Contract Type</div>
+              <div className="mt-1 font-normal">
+                {candidate?.contractType || "N/A"}
+              </div>
             </div>
-            <div>
-              <span className="font-semibold">Employee Type:</span>{" "}
-              {candidate?.empType}
+
+            <div className="">
+              <div className="underline">Employee Type</div>
+              <div className="mt-1 font-normal">
+                {candidate?.empType || "N/A"}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Tab Container with Horizontal Scrolling */}
-        <article className="flex gap-5 text-black mt-5 overflow-x-auto leaveManagementTable">
+        <article className="flex gap-5 text-black mt-5 overflow-x-auto WPTable">
           {[
             "SAWP",
             "DOE",

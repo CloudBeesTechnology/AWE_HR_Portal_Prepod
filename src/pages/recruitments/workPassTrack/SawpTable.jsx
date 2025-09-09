@@ -4,8 +4,9 @@ import { ReviewForm } from "../ReviewForm";
 import { WorkpassForm } from "./WorkpassForm";
 import { DateFormat } from "../../../utils/DateFormat";
 import { Pagination } from "../../leaveManagement/Pagination";
+import { SkeletonRow } from "../components/SkeletonRow";
 
-export const SawpTable = ({ data, fileUpload, urlValue }) => {
+export const SawpTable = ({ data, fileUpload, urlValue, loading }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
@@ -45,8 +46,29 @@ export const SawpTable = ({ data, fileUpload, urlValue }) => {
   };
   return (
     <>
-      <div className="recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl">
-        {paginatedData && paginatedData.length > 0 ? (
+      <div
+        className={`recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full rounded-xl ${
+          loading ? "" : "overflow-y-auto"
+        }`}
+      >
+        {loading ? (
+          <table className="w-full rounded-lg">
+            <thead className="bg-[#939393] text-white sticky top-0">
+              <tr>
+                {heading.map((header, index) => (
+                  <th key={index} className="py-4 text-[15px] text-white">
+                    <div className="h-4 bg-gray-300 rounded animate-pulse w-3/4 mx-auto"></div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: rowsPerPage }).map((_, index) => (
+                <SkeletonRow key={index} />
+              ))}
+            </tbody>
+          </table>
+        ) : paginatedData && paginatedData.length > 0 ? (
           <table className=" w-full rounded-lg">
             <thead className="bg-[#939393] text-white sticky top-0">
               <tr>

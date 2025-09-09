@@ -62,8 +62,6 @@ export const ViewBLNGsheet = ({
   wholeData,
   ManagerData,
 }) => {
-  const cancelActionRef = useRef(false);
-  const showDuplicateAlertRef = useRef(false);
   const nav = useNavigate();
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
@@ -79,14 +77,11 @@ export const ViewBLNGsheet = ({
   const [successMess, setSuccessMess] = useState(null);
   const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
 
-  const [response, setResponse] = useState(null);
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
 
   const [showDuplicateAlert, setShowDuplicateAlert] = useState(false);
-  const [cancelAction, setCancelAction] = useState(false);
-  const [storePreSubmitData, setStorePreSubmitData] = useState(null);
 
   const [rejectTab, setRejectTab] = useState(false);
   const [editFormTitle, setEditFormTitle] = useState("");
@@ -96,6 +91,8 @@ export const ViewBLNGsheet = ({
   const [selectedOption, setSelectedOption] = useState("");
 
   const [changePopupMessage, setChangePopupMessage] = useState(null);
+  const [duplicateRecord, setDuplicateRecord] = useState([]);
+  const [dupFileName, setDupFileName] = useState("");
   const [popupMess, setPopupMess] = useState({});
 
   const [showConfirm, setShowConfirm] = useState(false);
@@ -172,10 +169,10 @@ export const ViewBLNGsheet = ({
 
                 const mergedDatas = empInfo
                   .map((empInf) => {
-                    const interviewDetails = sapNoRemoved.find(
+                    const interviewDetails = sapNoRemoved?.find(
                       (item) =>
-                        String(item?.empID).toUpperCase() ===
-                        String(empInf?.empID).toUpperCase()
+                        String(item?.empID)?.toUpperCase()?.trim() ===
+                        String(empInf?.empID)?.toUpperCase()?.trim()
                     );
 
                     if (!interviewDetails) {
@@ -189,11 +186,11 @@ export const ViewBLNGsheet = ({
                   })
                   .filter((item) => item !== null);
 
-                const mergedData = fetchedData.map((item) => {
+                const mergedData = fetchedData?.map((item) => {
                   const workInfoItem = mergedDatas.find(
                     (info) =>
-                      String(info?.sapNo).toUpperCase() ===
-                      String(item?.FID).toUpperCase()
+                      String(info?.sapNo)?.toUpperCase()?.trim() ===
+                      String(item?.FID)?.toUpperCase()?.trim()
                   );
 
                   return {
@@ -585,49 +582,95 @@ export const ViewBLNGsheet = ({
       selectedRows &&
       selectedRows.length > 0
     ) {
-      const result =
-        selectedRows &&
-        selectedRows.length > 0 &&
-        selectedRows.map((val, i) => {
-          return {
-            id: val.id,
-            fidNo: val?.FID || 0,
-            empName: val?.NAMEFLAST || "",
-            date: val?.ENTRANCEDATEUSED || "",
-            inTime: val?.ENTRANCEDATETIME || "",
-            outTime: val?.EXITDATETIME || "",
-            // day: val?.DAYDIFFERENCE || 0,
-            avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
-            totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-            aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val?.WORKINGHOURS || 0,
-            otTime: val?.OT || 0,
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-            fileType: "BLNG",
-            status: "Pending",
-            remarks: val?.REMARKS || "",
-            companyName: val?.LOCATION,
-          };
-        });
+      // const result =
+      //   selectedRows &&
+      //   selectedRows.length > 0 &&
+      //   selectedRows.map((val, i) => {
+      //     return {
+      // id: val.id,
+      // fidNo: val?.FID || 0,
+      // empName: val?.NAMEFLAST || "",
+      // date: val?.ENTRANCEDATEUSED || "",
+      // inTime: val?.ENTRANCEDATETIME || "",
+      // outTime: val?.EXITDATETIME || "",
+      // // day: val?.DAYDIFFERENCE || 0,
+      // avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+      // totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+      // aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+      // normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+      // actualWorkHrs: val?.WORKINGHOURS || 0,
+      // otTime: val?.OT || 0,
+      // empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+      // fileType: "BLNG",
+      // status: "Pending",
+      // remarks: val?.REMARKS || "",
+      // companyName: val?.LOCATION,
+      //     };
+      //   });
 
-      const finalResult = result.map((val) => {
-        return {
-          ...val,
+      // const finalResult = result.map((val) => {
+      //   return {
+      //     ...val,
+      // assignTo: managerData.mbadgeNo,
+      // assignBy: uploaderID,
+      // fromDate: managerData.mfromDate,
+      // untilDate: managerData.muntilDate,
+      //   };
+      // });
+
+      const finalResult = selectedRows?.flatMap((val) => {
+        const baseItem = {
+          id: val.id,
+          fileName: val.fileName,
+          fidNo: val?.FID || 0,
+          empName: val?.NAMEFLAST || "",
+          date: val?.ENTRANCEDATEUSED || "",
+          inTime: val?.ENTRANCEDATETIME || "",
+          outTime: val?.EXITDATETIME || "",
+          // day: val?.DAYDIFFERENCE || 0,
+          avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+          totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+          aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val?.WORKINGHOURS || 0,
+          otTime: val?.OT || 0,
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          fileType: "BLNG",
+          status: "Pending",
+          remarks: val?.REMARKS || "",
+          companyName: val?.LOCATION,
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
           fromDate: managerData.mfromDate,
           untilDate: managerData.muntilDate,
         };
+
+        // return one record per job
+        return (val.jobLocaWhrs || [])?.map((job) => ({
+          ...baseItem,
+          actualWorkHrs: job.WORKINGHRS,
+          otTime: job.OVERTIMEHRS,
+          companyName: job.LOCATION,
+          location: job.LOCATION,
+          tradeCode: job.JOBCODE,
+          empWorkInfo: [JSON.stringify({ ...job, id: 1 })], // each output has only one job
+        }));
       });
 
       let identifier = "updateStoredData";
-      const { filteredResults, deleteDuplicateData } =
+      const { filteredResults, deleteDuplicateData, duplicateData } =
         await UnlockVerifiedCellVS({
           finalResult,
           setLoadingMessForDelay,
           identifier,
         });
+
+      setDuplicateRecord(duplicateData);
+
+      if (duplicateData && duplicateData?.length > 0) {
+        setShowDuplicateAlert(true);
+        return false;
+      }
 
       if (
         (filteredResults && filteredResults.length > 0) ||
@@ -643,7 +686,6 @@ export const ViewBLNGsheet = ({
           finalResult,
           toggleSFAMessage,
           setStoringMess,
-
           Position,
           action,
           handleAssignManager,
@@ -771,42 +813,42 @@ export const ViewBLNGsheet = ({
       selectedRows &&
       selectedRows.length > 0
     ) {
-      const updatedRejectedItems =
-        selectedRows && selectedRows.length > 0
-          ? selectedRows.map((val) => {
-              return {
-                id: val.id,
-                // fileName: val.fileName,
-                fidNo: val?.FID || 0,
-                empName: val?.NAMEFLAST || "",
-                date: val?.ENTRANCEDATEUSED || "",
-                inTime: val?.ENTRANCEDATETIME || "",
-                outTime: val?.EXITDATETIME || "",
-                // day: val?.DAYDIFFERENCE || 0,
-                avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
-                totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-                aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
-                normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-                actualWorkHrs: val?.WORKINGHOURS || 0,
-                otTime: val?.OT || 0,
-                empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-
-                fileType: "BLNG",
-                status: "Pending",
-                companyName: val?.LOCATION,
-                remarks: val?.REMARKS || "",
-              };
-            })
-          : [];
-
-      const finalResult = updatedRejectedItems.map((val) => {
-        return {
-          ...val,
+      const finalResult = selectedRows?.flatMap((val) => {
+        const baseItem = {
+          id: val.id,
+          fidNo: val?.FID || 0,
+          empName: val?.NAMEFLAST || "",
+          date: val?.ENTRANCEDATEUSED || "",
+          inTime: val?.ENTRANCEDATETIME || "",
+          outTime: val?.EXITDATETIME || "",
+          // day: val?.DAYDIFFERENCE || 0,
+          avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+          totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+          aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val?.WORKINGHOURS || 0,
+          otTime: val?.OT || 0,
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          fileType: "BLNG",
+          status: "Pending",
+          remarks: val?.REMARKS || "",
+          companyName: val?.LOCATION,
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
           fromDate: managerData.mfromDate,
           untilDate: managerData.muntilDate,
         };
+
+        // return one record per job
+        return (val.jobLocaWhrs || [])?.map((job) => ({
+          ...baseItem,
+          actualWorkHrs: job.WORKINGHRS,
+          otTime: job.OVERTIMEHRS,
+          companyName: job.LOCATION,
+          location: job.LOCATION,
+          tradeCode: job.JOBCODE,
+          empWorkInfo: [JSON.stringify({ ...job, id: 1 })], // each output has only one job
+        }));
       });
       let action = "ResubmitRejectedItems";
       const notifiyCenterData = await TimeSheetsCRUDoperations({
@@ -853,20 +895,18 @@ export const ViewBLNGsheet = ({
   };
 
   useEffect(() => {
-    if (changePopupMessage && changePopupMessage.length > 0) {
+    if (duplicateRecord && duplicateRecord?.length > 0) {
+      const getFidNo = Array.isArray(duplicateRecord)
+        ? duplicateRecord[0]?.fidNo
+        : [];
+
+      setDupFileName(duplicateRecord[0]?.fileName);
       setPopupMess({
-        message:
-          "Some data in the uploaded Excel sheet has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.",
-        buttonName: "Save",
-      });
-    } else if (changePopupMessage && changePopupMessage.length === 0) {
-      setPopupMess({
-        message:
-          "All data in the uploaded Excel sheet has already been submitted by the Time Keeper.",
+        message: `The record for (SAP ID: ${getFidNo}) has already been submitted by the Time Keeper.`,
         buttonName: "OK",
       });
     }
-  }, [changePopupMessage]);
+  }, [duplicateRecord]);
 
   const checkBadgeNoOrNWHPD = async (data, decision) => {
     if (decision === "Allowed") return false;
@@ -896,8 +936,7 @@ export const ViewBLNGsheet = ({
 
       if (!workHrs || workHrs === "0" || workHrs === "N/A") {
         hasMissingField = true;
-        message =
-          "One or more records have missing 'Normal Working Hours Per Day'.";
+        message = `Normal working hours per day are missing for employee (FID No: ${fid}). Please verify the employee's SAP No in the 'Employee Info' table.`;
         // return true;
         break;
       }
@@ -963,19 +1002,8 @@ export const ViewBLNGsheet = ({
         finalResult,
         setLoadingMessForDelay,
         identifier,
-        setShowDuplicateAlert: (val) => {
-          showDuplicateAlertRef.current = val;
-          setShowDuplicateAlert(val); // for UI
-        },
-        setCancelAction: (val) => {
-          cancelActionRef.current = val;
-          setCancelAction(val); // for UI
-        },
       }
     );
-    setChangePopupMessage(filteredResults);
-
-    if (filteredResults.length === finalResult.length) setCancelAction(false);
 
     if (
       (filteredResults && filteredResults.length > 0) ||
@@ -984,7 +1012,8 @@ export const ViewBLNGsheet = ({
     ) {
       let finalResult = filteredResults;
       let action = "create";
-      setStorePreSubmitData({
+
+      await TimeSheetsCRUDoperations({
         finalResult,
         toggleSFAMessage,
         setStoringMess,
@@ -992,50 +1021,15 @@ export const ViewBLNGsheet = ({
         Position,
         action,
       });
+      setLoadingMessForDelay(false);
     } else {
       setLoadingMessForDelay(false);
     }
   };
 
-  const saveNonMatchesData = async ({ storePreSubmitData }) => {
-    const {
-      finalResult,
-      toggleSFAMessage,
-      setStoringMess,
-      setData,
-      Position,
-      action,
-    } = storePreSubmitData;
-
-    if (Array.isArray(finalResult) && finalResult.length === 0) return;
-
-    await TimeSheetsCRUDoperations({
-      finalResult,
-      toggleSFAMessage,
-      setStoringMess,
-      setData,
-      Position,
-      action,
-    });
-    setLoadingMessForDelay(false);
-    setStorePreSubmitData(null);
-  };
-
   const toggleForRemarkFunc = () => {
     setToggleForRemark(!toggleForRemark);
   };
-
-  useEffect(() => {
-    if (showDuplicateAlert || cancelAction) return;
-    if (
-      Array.isArray(storePreSubmitData?.finalResult) &&
-      storePreSubmitData?.finalResult.length > 0
-    ) {
-      saveNonMatchesData({
-        storePreSubmitData,
-      });
-    }
-  }, [showDuplicateAlert, cancelAction, storePreSubmitData]);
 
   const storeOnlySelectedItem = (data, action) => {
     if (action === "Approved") {
@@ -1257,7 +1251,7 @@ export const ViewBLNGsheet = ({
 
       if (Array.isArray(empAndWorkInfo)) {
         empAndWorkInfo.forEach((item) => {
-          const key = String(item?.sapNo).toUpperCase();
+          const key = String(item?.sapNo)?.toUpperCase()?.trim();
           empInfoMap.set(key, item);
         });
       }
@@ -1265,7 +1259,7 @@ export const ViewBLNGsheet = ({
       const addedNWHPD =
         Array.isArray(data) &&
         data.map((val) => {
-          const badgeKey = String(val?.FID).toUpperCase();
+          const badgeKey = String(val?.FID)?.toUpperCase()?.trim();
           const workInfoItem = empInfoMap.get(badgeKey);
 
           const lastWorkHour =
@@ -1297,9 +1291,11 @@ export const ViewBLNGsheet = ({
   const handleSelectItem = (option) => {
     setSelectedOption(option);
   };
-
-  const safeData = finalData || [];
-  const itemsPerPage = 1000;
+  const sortedByAlphabetical = finalData?.sort((a, b) =>
+    a?.NAMEFLAST?.localeCompare(b?.NAMEFLAST)
+  );
+  const safeData = sortedByAlphabetical || [];
+  const itemsPerPage = 700;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);
@@ -1491,7 +1487,12 @@ export const ViewBLNGsheet = ({
                               {rowData?.OT || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData?.REMARKS}
+                              <div
+                                className="truncate w-[100px]"
+                                title={rowData?.REMARKS}
+                              >
+                                {rowData?.REMARKS}
+                              </div>
                             </td>
 
                             {isStatusPending && (
@@ -1753,24 +1754,13 @@ export const ViewBLNGsheet = ({
       {showDuplicateAlert && popupMess ? (
         <PopupForDuplicateFileAlert
           onClose={() => {
-            showDuplicateAlertRef.current = false;
             setShowDuplicateAlert(false);
           }}
-          setCancelAction={(val) => {
-            cancelActionRef.current = val;
-            setCancelAction(val);
-            setCurrentStatus(null);
-          }}
-          fileNameForSuccessful={fileName}
+          fileNameForSuccessful={dupFileName}
           title={"Duplicate Detection"}
           message={popupMess.message}
           buttonName={popupMess.buttonName}
           popupIdentification="duplicateRecords"
-          onClearData={() => {
-            setCurrentStatus(null);
-            setData(null);
-            setExcelData(null);
-          }}
         />
       ) : (
         ""
@@ -1784,62 +1774,66 @@ export const ViewBLNGsheet = ({
       )}
 
       {/* <button
-  onClick={async () => {
-    try {
-      console.log("Fetching and Deleting BLNG Data...");
-      let nextToken = null;
-      let deleteCount = 0;  // 🟢 Counter to track deletions
+        onClick={async () => {
+          try {
+            console.log("Fetching and Deleting BLNG Data...");
+            let nextToken = null;
+            let deleteCount = 0; // 🟢 Counter to track deletions
 
-      do {
-        const filter = {
-          and: [{ fileType: { eq: "BLNG" } }],
-        };
+            do {
+              const filter = {
+                and: [{ fileType: { eq: "BLNG" } }],
+              };
 
-        const response = await client.graphql({
-          query: listTimeSheets,
-          variables: {
-            filter: filter,
-            nextToken: nextToken,
-            limit: 1000, // optional: ensure limit is large enough
-          },
-        });
-
-        const SBWdata = response?.data?.listTimeSheets?.items || [];
-        nextToken = response?.data?.listTimeSheets?.nextToken;
-
-        console.log(`Fetched ${SBWdata.length} BLNG items in this batch.`);
-
-        await Promise.all(
-          SBWdata.map(async (item) => {
-            try {
-              const deleteResponse = await client.graphql({
-                query: deleteTimeSheet,
-                variables: { input: { id: item.id } },
+              const response = await client.graphql({
+                query: listTimeSheets,
+                variables: {
+                  filter: filter,
+                  nextToken: nextToken,
+                  limit: 1000, // optional: ensure limit is large enough
+                },
               });
-              deleteCount++; // ✅ Increment counter
-              console.log(`Deleted item ID: ${item.id}`);
-            } catch (deleteError) {
-              console.error(
-                `Error deleting item with ID ${item.id}:`,
-                deleteError
+
+              const SBWdata = response?.data?.listTimeSheets?.items || [];
+              nextToken = response?.data?.listTimeSheets?.nextToken;
+
+              console.log(
+                `Fetched ${SBWdata.length} BLNG items in this batch.`
               );
-            }
-          })
-        );
 
-        console.log(`Batch deletion completed. Total deleted so far: ${deleteCount}`);
+              await Promise.all(
+                SBWdata.map(async (item) => {
+                  try {
+                    const deleteResponse = await client.graphql({
+                      query: deleteTimeSheet,
+                      variables: { input: { id: item.id } },
+                    });
+                    deleteCount++; // ✅ Increment counter
+                    console.log(`Deleted item ID: ${item.id}`);
+                  } catch (deleteError) {
+                    console.error(
+                      `Error deleting item with ID ${item.id}:`,
+                      deleteError
+                    );
+                  }
+                })
+              );
 
-      } while (nextToken);
+              console.log(
+                `Batch deletion completed. Total deleted so far: ${deleteCount}`
+              );
+            } while (nextToken);
 
-      console.log(`✅ All BLNG items deletion process completed. Total deleted: ${deleteCount}`);
-
-    } catch (fetchError) {
-      console.error("❌ Error in fetchDataAndDelete:", fetchError);
-    }
-  }}
->
-  Delete BLNG Data
-</button> */}
+            console.log(
+              `✅ All BLNG items deletion process completed. Total deleted: ${deleteCount}`
+            );
+          } catch (fetchError) {
+            console.error("❌ Error in fetchDataAndDelete:", fetchError);
+          }
+        }}
+      >
+        Delete BLNG Data
+      </button> */}
     </div>
   );
 };

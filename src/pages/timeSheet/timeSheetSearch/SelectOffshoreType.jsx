@@ -1,9 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 
 const SelectOffshoreType = ({ options, handleTypeSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState("");
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".dropdown-container")) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleSelect = (option) => {
     setSelected(option);
@@ -12,7 +25,7 @@ const SelectOffshoreType = ({ options, handleTypeSelect }) => {
   };
 
   return (
-    <div className="relative w-64">
+    <div className="relative w-64 dropdown-container">
       <div
         className={`flex justify-between items-center text_size_5 bg-white border border-lite_grey ${
           selected ? "text-dark_grey" : "text-medium_grey"

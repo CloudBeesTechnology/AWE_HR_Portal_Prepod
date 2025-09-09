@@ -35,14 +35,14 @@ export const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const displayedPages = getDisplayedPages();
 
   return (
-    <div className="flex justify-between gap-6 w-3/5 items-center">
+    <div className="flex justify-center gap-6 w-3/5 items-center">
    
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}  
-        className="flex items-center gap-2 border border-[#5A5858] text-sm text-dark_grey rounded-lg hover:bg-gray-200 px-5 py-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+        className="flex items-center gap-2 border border-[#5A5858] text-xs text-dark_grey rounded-lg hover:bg-gray-200 px-5 py-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
       >
-        <FaArrowLeft className="text-[16px]" />
+        <FaArrowLeft className="text-xs" />
         <span>Previous</span>
       </button>
 
@@ -50,7 +50,7 @@ export const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <button
           key={index}
           onClick={() => onPageChange(page)}
-          className={`w-8 h-8 p-4 flex items-center justify-center text-sm font-medium rounded-full ${currentPage === page ? 'bg-[indigo] shadow-md text-white' : 'bg-gray-200 text-dark_grey'}`}
+          className={`w-8 h-8 p-4 flex items-center justify-center text-xs font-medium rounded-full ${currentPage === page ? 'bg-[indigo] shadow-md text-white' : 'bg-gray-200 text-dark_grey'}`}
         >
           {page}
         </button>
@@ -59,10 +59,10 @@ export const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="flex items-center gap-2 border border-[#5A5858] text-sm text-dark_grey rounded-lg  px-5 py-2 "
+        className="flex items-center gap-2 border border-[#5A5858] text-xs text-dark_grey rounded-lg px-5 py-2 "
       >
         <span>Next</span>
-        <FaArrowRight className="text-[16px]" />
+        <FaArrowRight className="text-xs" />
       </button>
     </div>
   );

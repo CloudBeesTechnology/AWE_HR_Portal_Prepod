@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { RecDashdetails } from "./RecDashdetails";
-import usePermission from "../../hooks/usePermissionDashInside";
 import { useTempID } from "../../utils/TempIDContext";
+import usePermission from "../../hooks/usePermissionDashInside";
+
+const SkeletonCard = () => (
+  <div className="rounded-3xl w-[10rem] sm:w-[11.1rem] h-40 p-4 bg-white animate-pulse">
+    <div className="rounded-full my-4 w-16 h-16 flex justify-center items-center m-auto bg-lite_grey"></div>
+    <div className="h-4 bg-lite_grey rounded mt-4"></div>
+  </div>
+);
 
 export const RecruTiles = () => {
   useEffect(() => {
@@ -13,59 +20,63 @@ export const RecruTiles = () => {
   }, []);
   const navigate = useNavigate();
   const location = useLocation();
-  const { tempID, setTempID } = useTempID();
+  const { setTempID } = useTempID();
   const [selectedTile, setSelectedTile] = useState("");
   const recruitmentPermissions = usePermission("userID", "Recruitment");
+
+  const isLoading =
+    recruitmentPermissions === undefined || recruitmentPermissions.length === 0;
+
   useEffect(() => {
     if (location.pathname.includes("/applyemployreq")) {
       setSelectedTile("/Apply Employee Requisition");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/employreq")) {
       setSelectedTile("Employee Requisition");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/candidate")) {
       setSelectedTile("Candidate");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/localcandi")) {
       setSelectedTile("Local CV");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/nonloccandi")) {
       setSelectedTile("Non Local CV");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/status")) {
       setSelectedTile("Status");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     } else if (location.pathname.includes("/workpasstracking")) {
       setSelectedTile("WorkPass Tracking");
       setTempID(null);
-      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("applicantFormData");
       localStorage.removeItem("profileStore");
-      localStorage.removeItem('personalFormData');
-      localStorage.removeItem('educationFormData');
+      localStorage.removeItem("personalFormData");
+      localStorage.removeItem("educationFormData");
     }
   }, [location.pathname]);
 
@@ -78,33 +89,38 @@ export const RecruTiles = () => {
   );
   return (
     <section className="h-full bg-[#F5F6F1]">
-      <div className="flex flex-wrap justify-center sm:justify-evenly items-center gap-4 py-10 text-black">
-        {filteredCards.map((value, index) => (
-          <div
-            key={index}
-            onClick={() => handleTileClick(value.title, value.path)}
-            className={`${
-              value.bg
-            } rounded-3xl w-[10rem] sm:w-[11.1rem] h-40 p-4 cursor-pointer ${
-              selectedTile === value.title
-                ? "border-4 bg-white border-[#faf362]"
-                : ""
-            }`}
-          >
-            <div
-              className={`${value.bg1} rounded-full my-4 w-16 h-16 flex justify-center items-center m-auto`}
-            >
-              <img
-                className="w-[2.2rem] h-9 object-cover"
-                src={value.icons}
-                alt={`${index} Icon not found`}
-              />
-            </div>
-            <h5 className="text-[14px] font-semibold text-center">
-              {value.title}
-            </h5>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 justify-items-center py-10 text-black">
+        {isLoading
+          ? // Show 8 skeleton loaders while loading
+            Array.from({ length: 8 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))
+          : filteredCards.map((value, index) => (
+              <div
+                key={index}
+                onClick={() => handleTileClick(value.title, value.path)}
+                className={`${
+                  value.bg
+                } rounded-3xl w-[10rem] sm:w-[11.1rem] h-40 p-4 cursor-pointer ${
+                  selectedTile === value.title
+                    ? "border-4 bg-white border-[#faf362]"
+                    : ""
+                }`}
+              >
+                <div
+                  className={`${value.bg1} rounded-full my-4 w-16 h-16 flex justify-center items-center m-auto`}
+                >
+                  <img
+                    className="w-[2.2rem] h-9 object-cover"
+                    src={value.icons}
+                    alt={`${index} Icon not found`}
+                  />
+                </div>
+                <h5 className="text-[14px] font-semibold text-center">
+                  {value.title}
+                </h5>
+              </div>
+            ))}
       </div>
       <Outlet />
     </section>

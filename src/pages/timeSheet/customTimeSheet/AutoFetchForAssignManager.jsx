@@ -40,7 +40,9 @@ export const AutoFetchForAssignManager = () => {
         const mergedData = candidates
           .map((candidate) => {
             const interviewDetails = interviews.find(
-              (item) => item.empID === candidate.empID
+              (item) =>
+                String(item.empID)?.toUpperCase()?.trim() ===
+                String(candidate.empID)?.toUpperCase()?.trim()
             );
 
             if (!interviewDetails) {

@@ -2,6 +2,14 @@ import { useNavigate } from "react-router-dom";
 import { RecDashdetails } from "./RecDashdetails";
 import usePermission from "../../hooks/usePermissionDashInside";
 
+// Skeleton loader component
+const SkeletonCard = () => (
+  <div className="rounded-3xl w-[320px] h-50 p-4 bg-white border-4 border-lite_grey animate-pulse">
+    <div className="rounded-full my-8 w-24 h-24 center m-auto bg-lite_grey"></div>
+    <div className="h-5 bg-lite_grey rounded mt-4"></div>
+  </div>
+);
+
 export const RecruDash = () => {
   const navigate = useNavigate();
   const recruitmentPermissions = usePermission("userID", "Recruitment");
@@ -22,10 +30,13 @@ export const RecruDash = () => {
     } else if (title === "WorkPass Tracking") {
       navigate("/recrutiles/workpasstracking");
     } else if (title === "Hiring Job") {
-      navigate("/hiringJob");
+      navigate("/recrutiles/hiringJob");
     }
   };
   // console.log(recruitmentPermissions);
+
+  const isLoading =
+    recruitmentPermissions === undefined || recruitmentPermissions.length === 0;
 
   const filteredCards = RecDashdetails.filter((card) =>
     recruitmentPermissions.includes(card.title)
@@ -33,31 +44,32 @@ export const RecruDash = () => {
 
   return (
     <section className="min-h-screen p-10 bg-[#F5F6F1]">
-      <div
-        className={`screen-size flex ${
-          filteredCards.length <= 2 ? "justify-start" : "justify-evenly"
-        } items-center flex-wrap gap-10 text-black`}
-      >
-        {filteredCards.map((value, index) => (
-          <div
-            key={index}
-            onClick={() => handleTileClick(value.title)}
-            className={`${value.bg} rounded-3xl w-[320px] h-50 p-4 bg-white border-4 border-white cursor-pointer transition-all duration-50 hover:border-[#faf362] hover:border-4`}
-          >
-            <div
-              className={`${value.bg1} rounded-full my-8 w-24 h-24 center m-auto`}
-            >
-              <img
-                className="w-13 h-16 object-cover"
-                src={value.icons}
-                alt={`${index} Icon not found`}
-              />
-            </div>
-            <h5 className="text-[18px] font-semibold text-center">
-              {value.title}
-            </h5>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-6 justify-items-center py-10 text-black">
+        {isLoading
+          ? // Show 8 skeleton loaders while loading
+            Array.from({ length: 8 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))
+          : filteredCards.map((value, index) => (
+              <div
+                key={index}
+                onClick={() => handleTileClick(value.title)}
+                className={`${value.bg} rounded-3xl w-[320px] h-50 p-4 bg-white border-4 border-white cursor-pointer transition-all duration-50 hover:border-[#faf362] hover:border-4`}
+              >
+                <div
+                  className={`${value.bg1} rounded-full my-8 w-24 h-24 center m-auto`}
+                >
+                  <img
+                    className="w-13 h-16 object-cover"
+                    src={value.icons}
+                    alt={`${index} Icon not found`}
+                  />
+                </div>
+                <h5 className="text-[18px] font-semibold text-center">
+                  {value.title}
+                </h5>
+              </div>
+            ))}
       </div>
     </section>
   );

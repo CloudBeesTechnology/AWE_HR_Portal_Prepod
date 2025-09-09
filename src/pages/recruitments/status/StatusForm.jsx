@@ -11,7 +11,7 @@ import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
 
 export const StatusForm = ({ candidate, onClose, onSave }) => {
   const { formattedPermissions } = useDeleteAccess();
-  // const [activeTab, setActiveTab] = useState('Interview'); 
+  // const [activeTab, setActiveTab] = useState('Interview');
   const [show, setShow] = useState(0);
   return (
     <div className="fixed inset-0 bg-grey bg-opacity-80 z-50 center">
@@ -22,8 +22,35 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
         >
           <VscClose size={20} />
         </button>
-        <div className="p-4 shadow-md bg-[#FBFCFF]">
-          <div className="flex gap-4 text-[13px] font-semibold">
+         <div className="p-2 border border-BColor bg-[#FBFCFF]">
+          <div className="flex justify-between gap-4 text-[13px] font-semibold">
+            <div className="text-center ">
+              <div className="underline">TEMP ID</div>
+              <div className="mt-1 font-normal">
+                {candidate?.tempID || "N/A"}
+              </div>
+            </div>
+
+            <div className="">
+              <div className="underline">Name</div>
+              <div className="mt-1 font-normal">{candidate?.name || "N/A"}</div>
+            </div>
+
+            <div className="">
+              <div className="underline">Contract Type</div>
+              <div className="mt-1 font-normal">
+                {candidate?.contractType || "N/A"}
+              </div>
+            </div>
+
+            <div className="">
+              <div className="underline">Employee Type</div>
+              <div className="mt-1 font-normal">
+                {candidate?.empType || "N/A"}
+              </div>
+            </div>
+          </div>
+          {/* <div className="flex gap-4 text-[13px] font-semibold">
             <div>
               <span className="font-semibold">TEMP ID:</span>{" "}
               {candidate?.tempID}
@@ -39,10 +66,10 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
               <span className="font-semibold">Employee Type:</span>{" "}
               {candidate?.empType}
             </div>
-          </div>
+          </div> */}
         </div>
 
-        <article className="flex-1 flex gap-5 text-black mt-5">
+        <article className="flex-1 flex gap-5 text-black WPTable my-5">
           <h1
             className={`  px-3 py-1 rounded whitespace-nowrap  ${
               show === 0
@@ -113,18 +140,8 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
             </h6>
           )}
         </article>
-        {show === 0 && (
-          <InterviewForm
-            candidate={candidate}
-           
-          />
-        )}
-        {show === 1 && (
-          <CandidateForm
-            candidate={candidate}
-           
-          />
-        )}
+        {show === 0 && <InterviewForm candidate={candidate} />}
+        {show === 1 && <CandidateForm candidate={candidate} />}
         {show === 2 && (
           <LOIForm
             candidate={candidate}

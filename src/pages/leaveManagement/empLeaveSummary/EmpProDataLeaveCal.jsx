@@ -13,6 +13,9 @@ export const EmpProDataLeaveCal = ({
   const { DownloadExcelPDF } = LeaveSummaryDownload();
 
   const formaatedDate = (date) => {
+    if (!date) {
+      return;
+    }
     let firstDate = new Date(date);
     firstDate.setHours(0, 0, 0, 0);
 
@@ -104,9 +107,16 @@ export const EmpProDataLeaveCal = ({
 
     let getCurrentYear = currentDate.getFullYear();
 
+    const getSLEffectiveDate = new Date(
+      updateStatusSection?.empSickLeaveEffDate
+    );
+    getSLEffectiveDate.setHours(0, 0, 0, 0);
+
     const getALEffectiveDate = new Date(
       updateStatusSection?.empAnnualLeaveEffDate
     );
+    getALEffectiveDate.setHours(0, 0, 0, 0);
+
     const getALEffectiveDateYear = getALEffectiveDate?.getFullYear();
 
     let getFirstDateOfYear = `${getCurrentYear}-01-01`;
@@ -118,13 +128,17 @@ export const EmpProDataLeaveCal = ({
 
     if (isEmpFirstEffectiveDate) {
       dojOrSpeDate = updateStatusSection?.empAnnualLeaveEffDate;
-    } else {
+    } else if (
+      getALEffectiveDateYear !== getCurrentYear &&
+      currentDate >= getALEffectiveDate
+    ) {
       dojOrSpeDate = getFirstDateOfYear;
+    } else {
+      dojOrSpeDate = "";
     }
 
     let totalDays = getDaysFromTwoDates(
       dojOrSpeDate,
-
       currentDate.toLocaleDateString("en-CA")
     );
     let noOfDaysWorkedMinusUAL =
@@ -164,13 +178,33 @@ export const EmpProDataLeaveCal = ({
       (parseFloat(updateStatusSection?.annualLeave?.daysTaken) +
         parseFloat(updateStatusSection?.annualLeave?.waitingApproval));
 
+    const totalALLeaveCount =
+      currentDate >= getALEffectiveDate ? totalLeaveForAL.toFixed(1) : 0;
+
+    const remainingALLeaveCount =
+      currentDate >= getALEffectiveDate ? sumOfDTandWP.toFixed(1) : 0;
+
+    const currYearALEntitle =
+      currentDate >= getALEffectiveDate ? currentYearALEntitleBal : "0";
+
+    const isEligibleForSL = currentDate >= getSLEffectiveDate;
+
+    const SLTaken = updateStatusSection?.sickLeave?.totalLeave;
+    const SLRemaining = updateStatusSection?.sickLeave?.remainingLeave;
+
     const finalData = {
       ...updateStatusSection,
 
       annualLeave: {
         ...updateStatusSection.annualLeave,
-        totalLeave: totalLeaveForAL.toFixed(1),
-        remainingLeave: sumOfDTandWP.toFixed(1),
+        totalLeave: totalALLeaveCount,
+        remainingLeave: remainingALLeaveCount,
+      },
+
+      sickLeave: {
+        ...updateStatusSection.sickLeave,
+        totalLeave: isEligibleForSL ? SLTaken : 0,
+        remainingLeave: isEligibleForSL ? SLRemaining : 0,
       },
 
       dojOrSpecifiedDate: dojOrSpeDate,
@@ -184,15 +218,18 @@ export const EmpProDataLeaveCal = ({
         currentDate.toLocaleDateString("en-CA")
       ),
 
-      annualLeaveEntitleBal: currentYearALEntitleBal,
+      annualLeaveEntitleBal: currYearALEntitle,
 
-      noOfDaysWorkedUAL: noOfDaysWorkedMinusUAL.toFixed(1),
+      noOfDaysWorkedUAL: noOfDaysWorkedMinusUAL.toFixed(1) ?? "0",
 
       leaveEligibleForThisYear:
         parseFloat(updateStatusSection?.annualLeave?.totalLeave) -
         parseFloat(updateStatusSection?.annualLeaveBal),
 
-      isEligibleForAnnualLeave: sumOfDTandWP.toFixed(1) > 0 ? "Yes" : "No",
+      isEligibleForAnnualLeave:
+        sumOfDTandWP.toFixed(1) > 0 && currentDate > getALEffectiveDate
+          ? "Yes"
+          : "No",
     };
 
     setLeaveSummaryDetails(finalData);
@@ -284,27 +321,28 @@ export const EmpProDataLeaveCal = ({
                 {formaatedDate(leaveSummaryDetails?.doj) || "N/A"}
               </td> */}
               <td className="border  align-top text-center py-2" rowSpan="14">
-                {formaatedDate(leaveSummaryDetails?.dojOrSpecifiedDate) ||
-                  "N/A"}
+                {formaatedDate(leaveSummaryDetails?.dojOrSpecifiedDate) || "0"}
               </td>
               <td className="border  align-top text-center py-2" rowSpan="14">
-                {formaatedDate(leaveSummaryDetails?.leaveEntitleToday) || "N/A"}
+                {formaatedDate(leaveSummaryDetails?.leaveEntitleToday) || "0"}
               </td>
               <td className="border  align-top text-center py-2" rowSpan="14">
                 {isNaN(leaveSummaryDetails.noOfDaysWorked)
-                  ? "N/A"
+                  ? "0"
                   : leaveSummaryDetails?.noOfDaysWorked}
               </td>
               <td className="border  align-top text-center py-2" rowSpan="14">
-                {leaveSummaryDetails?.noOfDaysWorkedUAL || "N/A"}
+                {isNaN(leaveSummaryDetails?.noOfDaysWorkedUAL)
+                  ? "0"
+                  : leaveSummaryDetails?.noOfDaysWorkedUAL}
               </td>
               <td className="border  align-top text-center py-2" rowSpan="14">
                 {leaveSummaryDetails?.annualLeaveBal === 0
                   ? "0"
-                  : leaveSummaryDetails?.annualLeaveBal || "N/A"}
+                  : leaveSummaryDetails?.annualLeaveBal || "0"}
               </td>
-              <td className="border  align-top text-center py-2" rowSpan="14">
-                {leaveSummaryDetails?.annualLeaveEntitleBal || "N/A"}
+              <td className="border align-top text-center py-2" rowSpan="14 ">
+                {leaveSummaryDetails?.annualLeaveEntitleBal || "0"}
               </td>
 
               {/* Leave Type Placeholder */}

@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import AweLogo from "../../assets/logo/logo-with-name.svg";
 import { ScheduleInter } from "./Form/ScheduleInter";
-import { FaTimes, FaDownload } from "react-icons/fa";
+import {
+  FaTimes,
+  FaDownload,
+  FaTimesCircle,
+  FaCheckCircle,
+  FaCalendarAlt,
+} from "react-icons/fa";
 import {
   createInterviewSchedule,
   updateInterviewSchedule,
@@ -489,14 +495,14 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
         {documents?.map((document, index) => (
           <div
             key={index}
-            className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200"
+            className="bg-white rounded-lg shadow-md p-4 mb-4 border border-ash"
           >
             <div className="flex justify-center items-center">
               <button
                 onClick={() => linkToStorageFile(document.upload)}
-                className="text-dark_grey font-semibold text-sm"
+                className="text-dark_grey font-semibold text-xs"
               >
-                View Document
+                View document
               </button>
             </div>
 
@@ -596,20 +602,19 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
     return (
       <div className="py-4">
-        <h6 className="uppercase text_size_5 my-3">{categoryName}</h6>
+        <h6 className="uppercase text-sm text-dark_grey my-3">
+          {categoryName}
+        </h6>
         {documents.length > 0 ? (
           renderDocumentsUnderCategory(documents)
         ) : (
-          <p className="text-dark_grey font-semibold text-sm">
-            No documents available
-          </p>
+          <p className="text-ash font-light text-xs">No documents available</p>
         )}
       </div>
     );
   };
 
   // console.log("IMG",imageUrl);
-  
 
   return (
     <section>
@@ -625,9 +630,9 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
           </button>
 
           {/* Form Heading with Logo */}
-          <div className="flex items-center gap-20">
+          <div className="flex flex-col items-center justify-center space-y-2">
             <img src={AweLogo} alt="Logo" className="max-w-[180px] w-full" />
-            <h2 className="text-xl font-bold underline">
+            <h2 className="text-xl text-dark_grey font-bold text-center">
               Employee Application Review
             </h2>
           </div>
@@ -652,165 +657,226 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
             {/* Section One */}
             <div className="mt-6">
-              {[
-                {
-                  label: "Applying For The Position",
-                  value: candidate.position,
-                },
-                { label: "Type", value: candidate.empType },
-                { label: "Contract", value: candidate.contractType },
-                { label: "CV Received From", value: candidate.agent },
-                { label: "Name", value: candidate.name },
-                { label: "Chinese characters", value: candidate.chinese },
-                { label: "Gender", value: candidate.gender },
-                { label: "Date of Birth", value: DateFormat(candidate.dob) },
-                { label: "Age", value: candidate.age },
-                { label: "Email", value: candidate.email },
-                { label: "Marital Status", value: candidate.marital },
-                { label: "Country of Birth", value: candidate.cob },
-                { label: "Nationality", value: candidate.nationality },
-                { label: "Other Nationality", value: candidate.otherNation },
-                { label: "Race", value: candidate.race },
-                { label: "Other Race", value: candidate.otherRace },
-                { label: "Religion", value: candidate.religion },
-                { label: "Other Religion", value: candidate.otherReligion },
+              {/* Applicant Details Section */}
+              <div className="mb-6">
+                <h3 className="font-bold text-base text-ash leading-[100%] uppercase py-4">
+                  Applicant Details
+                </h3>
+                {[
+                  {
+                    label: "Applying For The Position",
+                    value: candidate.position,
+                  },
+                  { label: "Name", value: candidate.name },
+                  { label: "Gender", value: candidate.gender },
+                  { label: "Date of Birth", value: DateFormat(candidate.dob) },
+                  { label: "Age", value: candidate.age },
+                  { label: "Country of Birth", value: candidate.cob },
+                  { label: "Nationality", value: candidate.nationality },
+                  { label: "Other Nationality", value: candidate.otherNation },
+                  { label: "Marital Status", value: candidate.marital },
+                  { label: "Race", value: candidate.race },
+                  { label: "Other Race", value: candidate.otherRace },
+                  { label: "Religion", value: candidate.religion },
+                  { label: "Other Religion", value: candidate.otherReligion },
+                  { label: "Type", value: candidate.empType },
+                  { label: "Contract", value: candidate.contractType },
+                  { label: "CV Received From", value: candidate.agent },
+                  { label: "Chinese characters", value: candidate.chinese },
+                  { label: "Email", value: candidate.email },
+                ].map((item, index) => (
+                  <div key={index} className="center mb-4 leading-relaxed">
+                    <strong className="w-full max-w-[200px] text-sm font-normal">
+                      {item.label}
+                    </strong>
+                    <span className="w-[50px] text-center">:</span>
+                    <span className="w-full text-[12px] font-light">
+                      {item.value || "N/A"}
+                    </span>
+                  </div>
+                ))}
+              </div>
 
-                { label: "Contact Number", value: candidate.contactNo },
-                { label: "Alternate Number", value: candidate.alternateNo },
-                { label: "Present Address", value: candidate.presentAddress },
-                {
-                  label: "Permanent Address",
-                  value: candidate.permanentAddress,
-                },
-                { label: "Driving License Class", value: candidate.driveLic },
+              {/* Personal Details Section */}
+              <div className="mb-6">
+                <h3 className="font-bold text-base text-ash leading-[100%] uppercase py-4">
+                  Personal Details
+                </h3>
+                {[
+                  { label: "Brunei IC No.", value: candidate.bwnIcNo },
+                  { label: "Brunei IC Colour", value: candidate.bwnIcColour },
+                  {
+                    label: "Brunei IC Expiry",
+                    value: DateFormat(candidate.bwnIcExpiry),
+                  },
+                  { label: "Passport No.", value: candidate.ppNo },
+                  {
+                    label: "Passport Issued Date",
+                    value: DateFormat(candidate.ppIssued),
+                  },
+                  {
+                    label: "Passport Expiry Date",
+                    value: DateFormat(candidate.ppExpiry),
+                  },
+                  {
+                    label: "Passport Issued Destination",
+                    value: candidate.ppDestinate,
+                  },
+                  { label: "Contact Number", value: candidate.contactNo },
+                  { label: "Alternate Number", value: candidate.alternateNo },
+                  { label: "Present Address", value: candidate.presentAddress },
+                  {
+                    label: "Permanent Address",
+                    value: candidate.permanentAddress,
+                  },
+                  { label: "Driving License Class", value: candidate.driveLic },
+                  {
+                    label: "Language Proficiency",
+                    value: candidate.lang
+                      ? typeof candidate.lang === "string"
+                        ? candidate.lang.replace(/\[|\]/g, "")
+                        : candidate.lang.join(", ")
+                      : "N/A",
+                  },
+                  { label: "Other Language", value: candidate.otherLang },
+                ].map((item, index) => (
+                  <div key={index} className="center mb-4 leading-relaxed">
+                    <strong className="w-full max-w-[200px] text-sm font-normal">
+                      {item.label}
+                    </strong>
+                    <span className="w-[50px] text-center">:</span>
+                    <span className="w-full text-[12px] font-light">
+                      {item.value || "N/A"}
+                    </span>
+                  </div>
+                ))}
+              </div>
 
-                {
-                  label: "Language Proficiency",
-                  value: candidate.lang
-                    ? typeof candidate.lang === "string"
-                      ? candidate.lang.replace(/\[|\]/g, "")
-                      : candidate.lang.join(", ")
-                    : "N/A",
-                },
-                { label: "Other Language", value: candidate.otherLang },
-                { label: "Brunei IC No.", value: candidate.bwnIcNo },
-                { label: "Brunei IC Colour", value: candidate.bwnIcColour },
-                {
-                  label: "Brunei IC Expiry",
-                  value: DateFormat(candidate.bwnIcExpiry),
-                },
-                { label: "Passport No.", value: candidate.ppNo },
-                {
-                  label: "Passport Issued Date",
-                  value: DateFormat(candidate.ppIssued),
-                },
-                {
-                  label: "Passport Expiry Date",
-                  value: DateFormat(candidate.ppExpiry),
-                },
-                {
-                  label: "Passport Issued Destination",
-                  value: candidate.ppDestinate,
-                },
-
-                {
-                  label: "Brief Description of Present Duties",
-                  value: candyEducDeatils.desc,
-                },
-                {
-                  label:
-                    "Have you ever suffered from any disease or received treatment",
-                  value: candyEducDeatils.disease,
-                },
-                {
-                  label: "If yes, Details ",
-                  value: candyEducDeatils.diseaseDesc,
-                },
-                {
-                  label: "Were you ever an alcoholic or substance abuser",
-                  value: candyEducDeatils.liquor,
-                },
-                {
-                  label: "If yes, Details",
-                  value: candyEducDeatils.liquorDesc,
-                },
-                {
-                  label: "Have you ever been convicted of a crime",
-                  value: candyEducDeatils.crime,
-                },
-                {
-                  label: "If yes, Details",
-                  value: candyEducDeatils.crimeDesc,
-                },
-                {
-                  label: "Number of Years Experience",
-                  value: candyEducDeatils.noExperience,
-                },
-                {
-                  label: "Salary Expected",
-                  value: candyEducDeatils.salaryExpectation,
-                },
-                {
-                  label: "Termination Notice For Present Job",
-                  value: candyEducDeatils.noticePeriod,
-                },
-                {
-                  label:
-                    "Have you been interviewed for a position at this company before",
-                  value: candyEducDeatils.perIS,
-                },
-                {
-                  label: "If yes, Details",
-                  value: candyEducDeatils.perIDesc,
-                },
-                {
-                  label: "Any other information you wish to provide",
-                  value: candyEducDeatils.supportInfo,
-                },
-              ].map((item, index) => (
-                <div key={index} className="center  mb-4 leading-relaxed">
-                  <strong className="w-full max-w-[200px]">{item.label}</strong>
-                  <span className="w-[50px] text-center">:</span>
-                  <span className="w-full">{item.value || "N/A"}</span>
-                </div>
-              ))}
+              {/* Other Details Section */}
+              <div className="mb-6">
+                <h3 className="font-bold text-base text-ash leading-[100%] uppercase py-4">
+                  Other Details
+                </h3>
+                {[
+                  {
+                    label:
+                      "Have you ever suffered from any disease or received treatment",
+                    value: candyEducDeatils.disease,
+                  },
+                  {
+                    label: "Were you ever an alcoholic or substance abuser",
+                    value: candyEducDeatils.liquor,
+                  },
+                  {
+                    label: "Have you ever been convicted of a crime",
+                    value: candyEducDeatils.crime,
+                  },
+                  {
+                    label:
+                      "Have you been interviewed for a position at this company before",
+                    value: candyEducDeatils.perIS,
+                  },
+                  {
+                    label: "Salary Expected",
+                    value: candyEducDeatils.salaryExpectation,
+                  },
+                  {
+                    label: "Termination Notice For Present Job",
+                    value: candyEducDeatils.noticePeriod,
+                  },
+                  {
+                    label: "Brief Description of Present Duties",
+                    value: candyEducDeatils.desc,
+                  },
+                  {
+                    label: "If yes, Details ",
+                    value: candyEducDeatils.diseaseDesc,
+                  },
+                  {
+                    label: "If yes, Details",
+                    value: candyEducDeatils.liquorDesc,
+                  },
+                  {
+                    label: "If yes, Details",
+                    value: candyEducDeatils.crimeDesc,
+                  },
+                  {
+                    label: "Number of Years Experience",
+                    value: candyEducDeatils.noExperience,
+                  },
+                  {
+                    label: "If yes, Details",
+                    value: candyEducDeatils.perIDesc,
+                  },
+                  {
+                    label: "Any other information you wish to provide",
+                    value: candyEducDeatils.supportInfo,
+                  },
+                ].map((item, index) => (
+                  <div key={index} className="center mb-4 leading-relaxed">
+                    <strong className="w-full max-w-[200px] text-sm font-normal">
+                      {item.label}
+                    </strong>
+                    <span className="w-[50px] text-center">:</span>
+                    <span className="w-full text-[12px] font-light capitalize">
+                      {item.value || "N/A"}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Section Two (Family Details) */}
             {familyDetails?.length > 0 && (
               <div className="mt-6">
+                <h3 className="font-bold text-base text-ash text-center leading-[100%] uppercase py-4">
+                  Family details
+                </h3>
                 {familyDetails.map((item, idx) => (
-                  <div key={idx} className="mb-6 border rounded p-4">
-                    <h3 className="font-bold underline mb-4">
-                      Family Details {idx + 1}
+                  <div
+                    key={idx}
+                    className="mb-6 border border-lite_grey rounded-xl p-4"
+                  >
+                    <h3 className="font-lg text-base text-dark_grey leading-[100%] uppercase underline mb-4">
+                      {idx + 1}. Member
                     </h3>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Name</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Name
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.name || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Relationship</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Relationship
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.relationship || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Age</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Age
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.age || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Place of Occupation</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Place of Occupation
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.placeOfOccupation || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Occupation</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Occupation
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.occupation || "N/A"}
                       </span>
                     </div>
@@ -822,26 +888,38 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             {/* Education Details */}
             {eduDetails?.length > 0 && (
               <div className="mt-6">
+                <h3 className="font-bold text-base text-ash text-center leading-[100%] uppercase py-4">
+                  Education details
+                </h3>
                 {eduDetails.map((item, idx) => (
-                  <div key={idx} className="mb-6 border rounded p-4">
-                    <h3 className="font-bold underline mb-4">
-                      Education Details {idx + 1}
+                  <div
+                    key={idx}
+                    className="mb-6 border border-lite_grey rounded-xl p-4"
+                  >
+                    <h3 className="font-lg text-base text-dark_grey leading-[100%] uppercase underline mb-4">
+                      {idx + 1}.Education
                     </h3>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">University</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        University
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.university || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Degree</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Degree
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.degree || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">From - To</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        From - To
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.fromDate || "N/A"} -{" "}
                         {item.toDate || "N/A"}
                       </span>
@@ -854,39 +932,55 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             {/* Work Experience */}
             {workExperience?.length > 0 && (
               <div className="mt-6">
+                <h3 className="font-bold text-base text-ash text-center leading-[100%] uppercase py-4">
+                  Work Experience
+                </h3>
                 {workExperience.map((item, idx) => (
-                  <div key={idx} className="mb-6 border rounded p-4">
-                    <h3 className="font-bold underline mb-4">
-                      Work Experience {idx + 1}
+                  <div
+                    key={idx}
+                    className="mb-6 border border-lite_grey rounded-xl p-4"
+                  >
+                    <h3 className="font-lg text-base text-dark_grey leading-[100%] uppercase underline mb-4">
+                      {idx + 1}.Experience
                     </h3>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Company</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Company
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.name || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Position</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Position
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.position || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">From</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        From
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{DateFormat(item.from) || "N/A"} -{" "}
                         {DateFormat(item.to) || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Salary</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Salary
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.salary || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Reason For Leaving</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Reason For Leaving
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.reasonForLeaving || "N/A"}
                       </span>
                     </div>
@@ -897,32 +991,46 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
             {referees?.length > 0 && (
               <div className="mt-6">
+                <h3 className="font-bold text-base text-ash text-center leading-[100%] uppercase py-4">
+                  Referees details
+                </h3>
                 {referees.map((item, idx) => (
-                  <div key={idx} className="mb-6 border rounded p-4">
-                    <h3 className="font-bold underline mb-4">
-                      Referees Details {idx + 1}
+                  <div
+                    key={idx}
+                    className="mb-6 border border-lite_grey rounded-xl p-4"
+                  >
+                    <h3 className="font-lg text-base text-dark_grey leading-[100%] uppercase underline mb-4">
+                      {idx + 1}.Referees
                     </h3>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Name</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Name
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.name || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Address</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Address
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.address || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Phone Number</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Phone Number
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.phoneNumber || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Profession</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Profession
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.profession || "N/A"}
                       </span>
                     </div>
@@ -933,26 +1041,38 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
             {relatives?.length > 0 && (
               <div className="mt-6">
+                <h3 className="font-bold text-base text-ash text-center leading-[100%] uppercase py-4">
+                  Relatives Employed by the company Details
+                </h3>
                 {relatives.map((item, idx) => (
-                  <div key={idx} className="mb-6 border rounded p-4">
-                    <h3 className="font-bold underline mb-4">
-                      Relatives Employed by the company Details {idx + 1}
+                  <div
+                    key={idx}
+                    className="mb-6 border border-lite_grey rounded-xl p-4"
+                  >
+                    <h3 className="font-lg text-base text-dark_grey leading-[100%] uppercase underline mb-4">
+                      {idx + 1}.Relative
                     </h3>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Name</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Name
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.name || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Position Held</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Position Held
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.positionHeld || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Relationship</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Relationship
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.relationship || "N/A"}
                       </span>
                     </div>
@@ -963,38 +1083,54 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
             {emgDetails?.length > 0 && (
               <div className="mt-6">
+                <h3 className="font-bold text-base text-ash text-center leading-[100%] uppercase py-4">
+                  Emergency details
+                </h3>
                 {emgDetails.map((item, idx) => (
-                  <div key={idx} className="mb-6 border rounded p-4">
-                    <h3 className="font-bold underline mb-4">
-                      Emergency Details {idx + 1}
+                  <div
+                    key={idx}
+                    className="mb-6 border border-lite_grey rounded-xl p-4"
+                  >
+                    <h3 className="font-lg text-base text-dark_grey leading-[100%] uppercase underline mb-4">
+                      {idx + 1}.Emergency Contact
                     </h3>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Name</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Name
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.name || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Relationship</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Relationship
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.relationship || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Address</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Address
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.address || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Phone Number</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Phone Number
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.phoneNumber || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Blood Group</strong>
-                      <span className="w-full col-span-2">
+                      <strong className="w-full text-sm font-normal">
+                        Blood Group
+                      </strong>
+                      <span className="w-full text-xs font-light col-span-2">
                         : &nbsp;{item.bloodGroup || "N/A"}
                       </span>
                     </div>
@@ -1005,7 +1141,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             {/* Document categories */}
 
             <div className="mt-8">
-              <h6 className="uppercase text_size_5  my-3">
+              <h6 className="font-bold text-base text-ash leading-[100%] uppercase my-3">
                 Uploaded Documents:
               </h6>
               {renderDocumentCategory(
@@ -1016,14 +1152,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 [candyEducDeatils.uploadCertificate],
                 "Qualification Certificate"
               )}
-              {renderDocumentCategory(
-                [candyEducDeatils.uploadPp],
-                "Passport"
-              )}
-              {renderDocumentCategory(
-                [candyEducDeatils.uploadIc],
-                "IC"
-              )}
+              {renderDocumentCategory([candyEducDeatils.uploadPp], "Passport")}
+              {renderDocumentCategory([candyEducDeatils.uploadIc], "IC")}
             </div>
           </div>
 
@@ -1035,7 +1165,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 {!showDecisionButtons && (
                   <div className="flex justify-between space-x-4 py-12 px-14">
                     <button
-                      className="hover:bg-rejectHover bg-rejectRed text-white font-semibold shadow-xl rounded-md px-4 py-2 min-w-[140px] max-w-[140px]"
+                      className="hover:bg-rejectHover bg-rejectRed text-sm text-white font-lg shadow-xl px-4 py-2 min-w-[140px] max-w-[140px]"
                       onClick={() => {
                         handleRejected([candidate]);
                       }}
@@ -1045,14 +1175,14 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     </button>
 
                     <button
-                      className="hover:bg-[#3f4a54] bg-blue text-white  font-semibold shadow-xl rounded-md px-4 py-2"
+                      className="hover:bg-[#3f4a54] bg-blue text-white text-sm shadow-xl px-4 py-2"
                       onClick={handleScheduleInterview}
                     >
                       Schedule Interview
                     </button>
 
                     <button
-                      className="hover:bg-selectGreenHover bg-selectGreen text-white  font-semibold shadow-xl rounded-md px-4 py-2 min-w-[140px] max-w-[140px]"
+                      className="hover:bg-selectGreenHover bg-selectGreen text-white text-sm shadow-xl px-4 py-2 min-w-[140px] max-w-[140px]"
                       onClick={() => {
                         handleSelected([candidate]);
                       }}
@@ -1067,7 +1197,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 {showDecisionButtons && (
                   <div className="flex justify-between space-x-4 mt-4 py-12 px-36">
                     <button
-                      className="hover:bg-rejectHover bg-rejectRed  font-semibold shadow-xl rounded-md px-4 py-2 min-w-[140px] max-w-[140px]"
+                      className="hover:bg-rejectHover bg-rejectRed  font-semibold shadow-xl px-4 py-2 min-w-[140px] max-w-[140px]"
                       onClick={() => {
                         handleRejected([candidate]);
                       }}
@@ -1077,7 +1207,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     </button>
 
                     <button
-                      className="hover:bg-selectGreenHover bg-selectGreen  font-semibold shadow-xl rounded-md px-4 py-2 min-w-[140px] max-w-[140px]"
+                      className="hover:bg-selectGreenHover bg-selectGreen  font-semibold shadow-xl px-4 py-2 min-w-[140px] max-w-[140px]"
                       onClick={() => {
                         handleSelected([candidate]);
                       }}

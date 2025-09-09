@@ -50,8 +50,8 @@ export const useTableMergedData = () => {
                 .map((empInf) => {
                   const interviewDetails = sapNoRemoved.find(
                     (item) =>
-                      String(item?.empID).toUpperCase() ===
-                      String(empInf?.empID).toUpperCase()
+                      String(item?.empID)?.toUpperCase()?.trim() ===
+                      String(empInf?.empID)?.toUpperCase()?.trim()
                   );
 
                   if (!interviewDetails) {
@@ -83,6 +83,6 @@ export const useTableMergedData = () => {
       console.log("ERROR : ", err);
     }
   }, []);
-  
+
   return { empAndWorkInfo, leaveStatuses };
 };

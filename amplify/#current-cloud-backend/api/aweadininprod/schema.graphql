@@ -1,3 +1,9 @@
+type TimesheetDropdown @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  dropdownType: String
+  value: String
+}
+
 type ContractForm @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!

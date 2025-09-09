@@ -200,6 +200,23 @@ input:disabled {
   background: #f1f1f1;
 }
 
+.WPTable::-webkit-scrollbar {
+  width: 10px;
+  height: 6px;
+}
+
+.WPTable::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.WPTable::-webkit-scrollbar-thumb {
+  background: #d6cbcb80;
+}
+
+.WPTable::-webkit-scrollbar-thumb:hover {
+  background: #beb7b7;
+}
+
 .allEmployeeTable::-webkit-scrollbar {
   width: 8px;
   height: 8px;

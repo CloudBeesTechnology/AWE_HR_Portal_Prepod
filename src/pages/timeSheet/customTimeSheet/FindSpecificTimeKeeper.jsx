@@ -41,7 +41,9 @@ export const FindSpecificTimeKeeper = async (
       const mergedData = empPersonalInfos
         .map((candidate) => {
           const allUser = usersData.find(
-            (item) => item.empID === candidate.empID
+            (item) =>
+              String(item.empID)?.toUpperCase()?.trim() ===
+              String(candidate.empID)?.toUpperCase()?.trim()
           );
 
           if (!allUser) {
@@ -50,14 +52,16 @@ export const FindSpecificTimeKeeper = async (
 
           return {
             ...candidate,
-
             ...allUser,
           };
         })
         .filter((item) => item !== null);
 
       const filteredData = mergedData.filter(
-        (value) => value.empID === loginAuth && value.selectType !== "Manager"
+        (value) =>
+          String(value.empID)?.toUpperCase()?.trim() ===
+            String(loginAuth)?.toUpperCase()?.trim() &&
+          value.selectType !== "Manager"
       );
 
       return filteredData;
@@ -67,7 +71,10 @@ export const FindSpecificTimeKeeper = async (
 
     const finalOutput = filterPending?.filter((pendingItem) => {
       return getOneObject.some((manager) => {
-        return pendingItem.assignBy === manager.empID;
+        return (
+          String(pendingItem.assignBy)?.toUpperCase()?.trim() ===
+          String(manager.empID)?.toUpperCase()?.trim()
+        );
       });
     });
 

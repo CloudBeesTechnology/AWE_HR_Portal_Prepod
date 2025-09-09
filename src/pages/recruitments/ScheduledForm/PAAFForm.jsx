@@ -29,11 +29,13 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
   const { localMobilization } = LocalMobilization();
   const { IVSSDetails } = useContext(DataSupply);
   const { loiDetails } = UpdateLoiData();
-  const { mergedInterviewData } = useFetchInterview();
+  const { mergedInterviewData, loading: interviewLoading } =
+    useFetchInterview();
   const { interviewDetails } = UpdateInterviewData();
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -181,6 +183,7 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
 
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const selectedInterviewData = mergedInterviewData?.find(
       (data) => data.tempID === candidate?.tempID
@@ -259,6 +262,7 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
 
       setNotification(true);
     } catch (error) {
+      setLoading(false);
       // console.error("Error submitting interview details:", error);
       alert("Failed to update interview details. Please try again.");
     }
@@ -279,8 +283,19 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
 
   const access = "Recruitment";
 
+  // Loading overlay component
+  const LoadingOverlay = () => (
+    <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    </div>
+  );
+
   return (
-    <form onSubmit={handleSubmitTwo} className="p-5">
+    <form onSubmit={handleSubmitTwo} className="p-5 relative">
+      {/* Loading overlay for data fetching */}
+      {interviewLoading && <LoadingOverlay />}
       <div className="grid grid-cols-2 gap-5 mt-5">
         <div>
           <label htmlFor="paafApproveDate">Approval Date</label>
@@ -293,6 +308,7 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
             onChange={(e) =>
               handleInputChange("paafApproveDate", e.target.value)
             }
+            disabled={interviewLoading}
           />
         </div>
 
@@ -311,6 +327,7 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
               requiredPermissions={requiredPermissions}
               access={access}
               check={isUploadingString.paafFile}
+              disabled={interviewLoading}
             />
           </div>
         </div>
@@ -322,6 +339,7 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
+            disabled={interviewLoading}
           >
             {statusOptions.map((status, index) => (
               <option key={index} value={status}>
@@ -336,8 +354,9 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
         <button
           type="submit"
           className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
+          disabled={interviewLoading || loading}
         >
-          Submit
+          {loading ? "Submitting..." : "Submit"}
         </button>
       </div>
       {notification && (

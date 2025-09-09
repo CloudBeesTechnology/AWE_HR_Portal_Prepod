@@ -80,7 +80,7 @@ export const useFetchData = (
 
             allData = [...allData, ...fetchedData];
           } while (nextToken);
-         
+
           setConvertedStringToArrayObj(allData);
 
           if (allData.length === 0) {

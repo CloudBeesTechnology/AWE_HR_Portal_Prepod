@@ -139,23 +139,45 @@ export const UploadEditedHO = (
 
       const forStringDate = (inputData) => {
         try {
-          // Step 1: Assign missing DATEs based on BADGE
-          const updatedData = inputData.reduce((acc, curr) => {
-            // Clone the object to avoid mutation
-            const currentItem = { ...curr };
+          // // Step 1: Assign missing DATEs based on BADGE
+          // const updatedData = inputData.reduce((acc, curr) => {
+          //   // Clone the object to avoid mutation
+          //   const currentItem = { ...curr };
 
-            if (currentItem.IN && currentItem.OUT) {
-              // Find previous match by BADGE
-              const previous = [...acc]
-                .reverse()
-                .find((item) => item.BADGE === currentItem.BADGE && item.DATE);
-              if (previous) {
-                currentItem.DATE = previous.DATE;
-              }
+          //   if (currentItem.IN && currentItem.OUT) {
+          //     // Find previous match by BADGE
+          //     const previous = [...acc]
+          //       .reverse()
+          //       .find((item) => item.BADGE === currentItem.BADGE && item.DATE);
+          //     if (previous) {
+          //       currentItem.DATE = previous.DATE;
+          //     }
+          //   }
+
+          //   return [...acc, currentItem];
+          // }, []);
+
+          function excelSerialToDate(serial) {
+            // Excel epoch starts at 1900-01-01
+            const baseDate = new Date(1900, 0, serial - 1);
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const yyyy = baseDate.getFullYear();
+            const mm = String(baseDate.getMonth() + 1).padStart(2, "0");
+            const dd = String(baseDate.getDate()).padStart(2, "0");
+            const day = days[baseDate.getDay()];
+            return `${yyyy}/${mm}/${dd}(${day})`;
+          }
+
+          const updatedData = inputData?.map((item) => {
+            const currentItem = { ...item };
+
+            // If DATE is a number (Excel serial) → convert it
+            if (typeof currentItem.DATE === "number") {
+              currentItem.DATE = excelSerialToDate(currentItem.DATE);
             }
 
-            return [...acc, currentItem];
-          }, []);
+            return currentItem;
+          });
 
           // Helper to remove weekday (e.g., 5/6/2025(tue) → 5/6/2025)
           const getCleanedDate = (dateStr) => {
@@ -189,14 +211,16 @@ export const UploadEditedHO = (
           console.log("Error : ", err);
         }
       };
+
       const getDateFromPrevRow = forStringDate(updatedDataArray);
 
-      const finalData =
-        getDateFromPrevRow && getDateFromPrevRow.length > 0
-          ? getDateFromPrevRow
-          : updatedDataArray && updatedDataArray.length > 0
-          ? updatedDataArray
-          : [];
+      const finalData = getDateFromPrevRow;
+      // const finalData =
+      //   getDateFromPrevRow && getDateFromPrevRow.length > 0
+      //     ? getDateFromPrevRow
+      //     : updatedDataArray && updatedDataArray.length > 0
+      //     ? updatedDataArray
+      //     : [];
 
       function filterDataByDateFormat(data) {
         return data.filter((obj) => obj.IN && obj.OUT);

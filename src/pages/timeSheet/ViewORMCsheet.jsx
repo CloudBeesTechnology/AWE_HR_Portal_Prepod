@@ -49,9 +49,6 @@ export const ViewORMCsheet = ({
   wholeData,
   ManagerData,
 }) => {
-  const cancelActionRef = useRef(false);
-  const showDuplicateAlertRef = useRef(false);
-
   const nav = useNavigate();
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
   const [closePopup, setClosePopup] = useState(false);
@@ -69,8 +66,7 @@ export const ViewORMCsheet = ({
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const [showDuplicateAlert, setShowDuplicateAlert] = useState(false);
-  const [cancelAction, setCancelAction] = useState(false);
-  const [storePreSubmitData, setStorePreSubmitData] = useState(null);
+
   const [rejectTab, setRejectTab] = useState(false);
 
   const [editObject, setEditObject] = useState();
@@ -82,6 +78,8 @@ export const ViewORMCsheet = ({
   const [successMess, setSuccessMess] = useState(null);
   const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
   const [changePopupMessage, setChangePopupMessage] = useState(null);
+  const [duplicateRecord, setDuplicateRecord] = useState([]);
+  const [dupFileName, setDupFileName] = useState("");
   const [popupMess, setPopupMess] = useState({});
 
   const [showConfirm, setShowConfirm] = useState(false);
@@ -441,53 +439,99 @@ export const ViewORMCsheet = ({
       selectedRows &&
       selectedRows.length > 0
     ) {
-      const result =
-        selectedRows &&
-        selectedRows.length > 0 &&
-        selectedRows.map((val) => {
-          return {
-            id: val.id,
+      // const result =
+      //   selectedRows &&
+      //   selectedRows.length > 0 &&
+      //   selectedRows.map((val) => {
+      //     return {
+      // id: val.id,
 
-            empName: val.NAME || "",
-            empDept: val.DEPTDIV || "",
-            empBadgeNo: val.BADGE || "",
-            date: val.DATE || "",
-            inTime: val.IN || "",
-            outTime: val.OUT || "",
-            totalInOut: val.TOTALINOUT || "",
-            allDayHrs: val.ALLDAYMINHRS || "",
-            netMins: val.NETMINUTES || "",
-            totalHrs: val.TOTALHOURS || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val.WORKINGHOURS || "",
-            otTime: val.OT || "",
-            remarks: val.REMARKS || "",
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-            fileType: "ORMC",
-            status: "Pending",
-            companyName: val?.LOCATION,
-          };
-        });
+      // empName: val.NAME || "",
+      // empDept: val.DEPTDIV || "",
+      // empBadgeNo: val.BADGE || "",
+      // date: val.DATE || "",
+      // inTime: val.IN || "",
+      // outTime: val.OUT || "",
+      // totalInOut: val.TOTALINOUT || "",
+      // allDayHrs: val.ALLDAYMINHRS || "",
+      // netMins: val.NETMINUTES || "",
+      // totalHrs: val.TOTALHOURS || "",
+      // normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+      // actualWorkHrs: val.WORKINGHOURS || "",
+      // otTime: val.OT || "",
+      // remarks: val.REMARKS || "",
+      // empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+      // fileType: "ORMC",
+      // status: "Pending",
+      // companyName: val?.LOCATION,
+      //     };
+      //   });
 
       // const mergeData = [...result, managerData];
-      const finalResult = result.map((val) => {
-        return {
-          ...val,
+      // const finalResult = result.map((val) => {
+      //   return {
+      //     ...val,
+      // assignTo: managerData.mbadgeNo,
+      // assignBy: uploaderID,
+      // fromDate: managerData.mfromDate,
+      // untilDate: managerData.muntilDate,
+      //   };
+      // });
+
+      const finalResult = selectedRows?.flatMap((val) => {
+        const baseItem = {
+          id: val.id,
+          fileName: val.fileName,
+          empName: val.NAME || "",
+          empDept: val.DEPTDIV || "",
+          empBadgeNo: val.BADGE || "",
+          date: val.DATE || "",
+          inTime: val.IN || "",
+          outTime: val.OUT || "",
+          totalInOut: val.TOTALINOUT || "",
+          allDayHrs: val.ALLDAYMINHRS || "",
+          netMins: val.NETMINUTES || "",
+          totalHrs: val.TOTALHOURS || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val.WORKINGHOURS || "",
+          otTime: val.OT || "",
+          remarks: val.REMARKS || "",
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          fileType: "ORMC",
+          status: "Pending",
+          companyName: val?.LOCATION,
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
           fromDate: managerData.mfromDate,
           untilDate: managerData.muntilDate,
         };
+
+        // return one record per job
+        return (val.jobLocaWhrs || [])?.map((job) => ({
+          ...baseItem,
+          actualWorkHrs: job.WORKINGHRS,
+          otTime: job.OVERTIMEHRS,
+          companyName: job.LOCATION,
+          location: job.LOCATION,
+          tradeCode: job.JOBCODE,
+          empWorkInfo: [JSON.stringify({ ...job, id: 1 })], // each output has only one job
+        }));
       });
 
       let identifier = "updateStoredData";
-      const { filteredResults, deleteDuplicateData } =
+      const { filteredResults, deleteDuplicateData, duplicateData } =
         await UnlockVerifiedCellVS({
           finalResult,
           setLoadingMessForDelay,
           identifier,
         });
 
+      setDuplicateRecord(duplicateData);
+
+      if (duplicateData && duplicateData?.length > 0) {
+        setShowDuplicateAlert(true);
+        return false;
+      }
       if (
         (filteredResults && filteredResults.length > 0) ||
         (filteredResults && filteredResults.length === 0) ||
@@ -632,44 +676,45 @@ export const ViewORMCsheet = ({
       selectedRows &&
       selectedRows.length > 0
     ) {
-      const updatedRejectedItems =
-        selectedRows && selectedRows.length > 0
-          ? selectedRows.map((val) => {
-              return {
-                id: val.id,
-                // fileName: val.fileName,
-                empName: val.NAME || "",
-                empDept: val.DEPTDIV || "",
-                empBadgeNo: val.BADGE || "",
-                date: val.DATE || "",
-                inTime: val.IN || "",
-                outTime: val.OUT || "",
-                totalInOut: val.TOTALINOUT || "",
-                allDayHrs: val.ALLDAYMINHRS || "",
-                netMins: val.NETMINUTES || "",
-                totalHrs: val.TOTALHOURS || "",
-                normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-                actualWorkHrs: val.WORKINGHOURS || "",
-                otTime: val.OT || "",
-                remarks: val.REMARKS || "",
-                empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-                fileType: "ORMC",
-                status: "Pending",
-                companyName: val?.LOCATION,
-              };
-            })
-          : [];
-
-      const Result = updatedRejectedItems.map((val) => {
-        return {
-          ...val,
+      const finalResult = selectedRows?.flatMap((val) => {
+        const baseItem = {
+          id: val.id,
+          empName: val.NAME || "",
+          empDept: val.DEPTDIV || "",
+          empBadgeNo: val.BADGE || "",
+          date: val.DATE || "",
+          inTime: val.IN || "",
+          outTime: val.OUT || "",
+          totalInOut: val.TOTALINOUT || "",
+          allDayHrs: val.ALLDAYMINHRS || "",
+          netMins: val.NETMINUTES || "",
+          totalHrs: val.TOTALHOURS || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val.WORKINGHOURS || "",
+          otTime: val.OT || "",
+          remarks: val.REMARKS || "",
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          fileType: "ORMC",
+          status: "Pending",
+          companyName: val?.LOCATION,
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
           fromDate: managerData.mfromDate,
           untilDate: managerData.muntilDate,
         };
+
+        // return one record per job
+        return (val.jobLocaWhrs || [])?.map((job) => ({
+          ...baseItem,
+          actualWorkHrs: job.WORKINGHRS,
+          otTime: job.OVERTIMEHRS,
+          companyName: job.LOCATION,
+          location: job.LOCATION,
+          tradeCode: job.JOBCODE,
+          empWorkInfo: [JSON.stringify({ ...job, id: 1 })], // each output has only one job
+        }));
       });
-      let finalResult = Result;
+
       let action = "ResubmitRejectedItems";
       const notifiyCenterData = await TimeSheetsCRUDoperations({
         setNotification,
@@ -714,20 +759,18 @@ export const ViewORMCsheet = ({
   };
 
   useEffect(() => {
-    if (changePopupMessage && changePopupMessage.length > 0) {
+    if (duplicateRecord && duplicateRecord?.length > 0) {
+      const getBadgeNo = Array.isArray(duplicateRecord)
+        ? duplicateRecord[0]?.empBadgeNo
+        : [];
+
+      setDupFileName(duplicateRecord[0]?.fileName);
       setPopupMess({
-        message:
-          "Some data in the uploaded Excel sheet has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.",
-        buttonName: "Save",
-      });
-    } else if (changePopupMessage && changePopupMessage.length === 0) {
-      setPopupMess({
-        message:
-          "All data in the uploaded Excel sheet has already been submitted by the Time Keeper.",
+        message: `The record for (Badge ID: ${getBadgeNo}) has already been submitted by the Time Keeper.`,
         buttonName: "OK",
       });
     }
-  }, [changePopupMessage]);
+  }, [duplicateRecord]);
 
   const checkBadgeNoOrNWHPD = async (data, decision) => {
     if (decision === "Allowed") return false;
@@ -757,8 +800,7 @@ export const ViewORMCsheet = ({
 
       if (!workHrs || workHrs === "0" || workHrs === "N/A") {
         hasMissingField = true;
-        message =
-          "One or more records have missing 'Normal Working Hours Per Day'.";
+        message = `Normal working hours per day are missing for employee (BADGE No: ${badge}). Please verify the employee's BADGE No in the 'Employee Info' table.`;
         // return true;
         break;
       }
@@ -824,19 +866,8 @@ export const ViewORMCsheet = ({
         finalResult,
         setLoadingMessForDelay,
         identifier,
-        setShowDuplicateAlert: (val) => {
-          showDuplicateAlertRef.current = val;
-          setShowDuplicateAlert(val); // for UI
-        },
-        setCancelAction: (val) => {
-          cancelActionRef.current = val;
-          setCancelAction(val); // for UI
-        },
       }
     );
-    setChangePopupMessage(filteredResults);
-
-    if (filteredResults.length === finalResult.length) setCancelAction(false);
 
     if (
       (filteredResults && filteredResults.length > 0) ||
@@ -845,7 +876,8 @@ export const ViewORMCsheet = ({
     ) {
       let finalResult = filteredResults;
       let action = "create";
-      setStorePreSubmitData({
+
+      await TimeSheetsCRUDoperations({
         finalResult,
         toggleSFAMessage,
         setStoringMess,
@@ -853,50 +885,15 @@ export const ViewORMCsheet = ({
         Position,
         action,
       });
+      setLoadingMessForDelay(false);
     } else {
       setLoadingMessForDelay(false);
     }
   };
 
-  const saveNonMatchesData = async ({ storePreSubmitData }) => {
-    const {
-      finalResult,
-      toggleSFAMessage,
-      setStoringMess,
-      setData,
-      Position,
-      action,
-    } = storePreSubmitData;
-
-    if (Array.isArray(finalResult) && finalResult.length === 0) return;
-
-    await TimeSheetsCRUDoperations({
-      finalResult,
-      toggleSFAMessage,
-      setStoringMess,
-      setData,
-      Position,
-      action,
-    });
-    setLoadingMessForDelay(false);
-    setStorePreSubmitData(null);
-  };
-
   const toggleForRemarkFunc = () => {
     setToggleForRemark(!toggleForRemark);
   };
-
-  useEffect(() => {
-    if (showDuplicateAlert || cancelAction) return;
-    if (
-      Array.isArray(storePreSubmitData?.finalResult) &&
-      storePreSubmitData?.finalResult.length > 0
-    ) {
-      saveNonMatchesData({
-        storePreSubmitData,
-      });
-    }
-  }, [showDuplicateAlert, cancelAction, storePreSubmitData]);
 
   const storeOnlySelectedItem = (data, action) => {
     if (action === "Approved") {
@@ -1044,7 +1041,7 @@ export const ViewORMCsheet = ({
 
       if (Array.isArray(empAndWorkInfo)) {
         empAndWorkInfo.forEach((item) => {
-          empInfoMap.set(String(item.empBadgeNo).toUpperCase(), item);
+          empInfoMap.set(String(item.empBadgeNo)?.toUpperCase()?.trim(), item);
         });
       }
 
@@ -1052,7 +1049,7 @@ export const ViewORMCsheet = ({
       const addedNWHPD =
         Array.isArray(data) &&
         data.map((val) => {
-          const badgeKey = String(val.BADGE).toUpperCase();
+          const badgeKey = String(val.BADGE)?.toUpperCase()?.trim();
           const workInfoItem = empInfoMap.get(badgeKey);
 
           const lastWorkHour =
@@ -1085,8 +1082,11 @@ export const ViewORMCsheet = ({
     setSelectedOption(option);
   };
 
+  const sortedByAlphabetical = finalData?.sort((a, b) =>
+    a?.NAME?.localeCompare(b?.NAME)
+  );
   const itemsPerPage = 25;
-  const safeData = finalData || [];
+  const safeData = sortedByAlphabetical || [];
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -1279,7 +1279,12 @@ export const ViewORMCsheet = ({
                                 {m?.OT || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.REMARKS}
+                                <div
+                                  className="truncate w-[100px]"
+                                  title={m?.REMARKS}
+                                >
+                                  {m?.REMARKS}
+                                </div>
                               </td>
                               {isStatusPending && (
                                 <React.Fragment>
@@ -1544,24 +1549,13 @@ export const ViewORMCsheet = ({
       {showDuplicateAlert && popupMess ? (
         <PopupForDuplicateFileAlert
           onClose={() => {
-            showDuplicateAlertRef.current = false;
             setShowDuplicateAlert(false);
           }}
-          setCancelAction={(val) => {
-            cancelActionRef.current = val;
-            setCancelAction(val);
-            setCurrentStatus(null);
-          }}
-          fileNameForSuccessful={fileName}
+          fileNameForSuccessful={dupFileName}
           title={"Duplicate Detection"}
           message={popupMess.message}
           buttonName={popupMess.buttonName}
           popupIdentification="duplicateRecords"
-          onClearData={() => {
-            setCurrentStatus(null);
-            setData(null);
-            setExcelData(null);
-          }}
         />
       ) : (
         ""
