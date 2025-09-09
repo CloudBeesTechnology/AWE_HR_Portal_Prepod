@@ -11,7 +11,6 @@ export const SearchBoxForTimeSheet = ({
   searchIcon1,
   searchIcon2,
   border,
-  empPIData
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
@@ -26,18 +25,19 @@ export const SearchBoxForTimeSheet = ({
 
       const result = secondaryData.filter((emp) =>
         [
-          emp.no,
-          emp.NO,
-          emp.fidNo,
-          emp.FID,
-          emp.empBadgeNo,
-          emp.BADGE,
-          emp.sapNo,
-          emp.empID,
-          emp.EMPLOYEEID,
-          emp.NAME,
-          emp.empName,
-          emp.name,
+          emp?.no,
+          emp?.NO,
+          emp?.fidNo,
+          emp?.FID,
+          emp?.empBadgeNo,
+          emp?.BADGE,
+          emp?.sapNo,
+          emp?.empID,
+          emp?.EMPLOYEEID,
+          emp?.NAME,
+          emp?.empName,
+          emp?.NAMEFLAST,
+          emp?.name,
         ].some((field) => field?.toString().toUpperCase() === normalizedQuery)
       );
 
@@ -68,6 +68,7 @@ export const SearchBoxForTimeSheet = ({
           employee?.empID,
           employee?.NAME,
           employee?.empName,
+          employee?.NAMEFLAST,
           employee?.name,
         ].some((field) => field?.toString().toUpperCase().includes(query));
       });

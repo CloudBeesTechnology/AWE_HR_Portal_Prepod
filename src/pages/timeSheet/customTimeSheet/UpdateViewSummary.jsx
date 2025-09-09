@@ -1,18 +1,37 @@
 import { generateClient } from "@aws-amplify/api";
-import { listTimeSheets } from "../../../graphql/queries";
 import { createTimeSheet, updateTimeSheet } from "../../../graphql/mutations";
 
 const client = generateClient();
 
-export const UpdateViewSummary = async (object, updateGroupedData) => {
+export const UpdateViewSummary = async (object) => {
   try {
-    let resData = [];
-    let newresData = [];
-    let resDataForJobcode = [];
-    const convertToISODate = async (dateString) => {
-      const [day, month, year] = dateString.split("-");
-      const formattedMonth = parseInt(month, 10);
-      const formattedDay = parseInt(day, 10);
+    let finalResult = [];
+
+    // dd-mm-yyyy to yyyy-mm-dd
+    const convertToISODate = (dateString) => {
+      const [day, month, year] = dateString
+        ?.split(/[-/]/)
+        ?.map((p) => p.trim());
+      const formattedMonth = String(parseInt(month, 10)).padStart(2, "0");
+      const formattedDay = String(parseInt(day, 10)).padStart(2, "0");
+      return `${year}-${formattedMonth}-${formattedDay}`;
+    };
+
+    // mm/dd/yyyy to yyyy-mm-dd
+    const convertToDateFormat = (dateString) => {
+      const [day, month, year] = dateString
+        ?.split(/[-/]/)
+        ?.map((p) => p.trim());
+      const formattedMonth = String(parseInt(month, 10)).padStart(2, "0");
+      const formattedDay = String(parseInt(day, 10)).padStart(2, "0");
+      return `${year}-${formattedDay}-${formattedMonth}`;
+    };
+
+    // dd-mm-yyyy to mm/dd/yyyy
+    const handleDateFormat = (dateString) => {
+      const [day, month, year] = dateString.split("-")?.map((p) => p.trim());
+      const formattedMonth = String(parseInt(month, 10)).padStart(2, "0");
+      const formattedDay = String(parseInt(day, 10)).padStart(2, "0");
       return `${formattedMonth}/${formattedDay}/${year}`;
     };
 
@@ -21,347 +40,81 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
       empName: object?.empName,
       empBadgeNo: object?.badgeNo || "",
       sapNo: object?.sapNo || "",
-      date: await convertToISODate(object?.workingHrsKey || ""),
+      date: convertToISODate(object?.workingHrsKey || ""),
       jobcode: object?.jobcode || "",
       workingHrs: object?.workingHrs || "",
       location: object?.location || "",
       ot: object?.overtimeHrs || "",
       normalWorkHrs: String(object?.NWHPD) || "",
     };
-    const UpdateMethodForJobcode = async (finalData) => {
-      if (finalData) {
-        const { __typename, createdAt, updatedAt, ...validTimeSheet } =
-          finalData;
 
-        try {
-          const response = await client.graphql({
-            query: updateTimeSheet,
-            variables: { input: validTimeSheet },
-          });
-          const Responses = response?.data?.updateTimeSheet;
+    const groupedData = new Map();
+    const getFirstData = object?.data[0];
 
-          resDataForJobcode = [Responses] || [];
-          if (Responses) {
-            return true;
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    };
-    async function findMatchingObject(inputData) {
-      try {
-        if (
-          !inputData ||
-          !inputData.data ||
-          !Array.isArray(inputData.data) ||
-          !inputData.workingHrsKey
-        ) {
-          return [];
-        }
+    object?.data.forEach((item) => {
+      const key = convertToDateFormat(item.date);
+      groupedData.set(key, item);
+    });
 
-        const matchedObject = inputData?.data.find((item) => {
-          const dateObj = new Date(item?.date);
-          const day = dateObj?.getDate();
-          const month = dateObj?.getMonth() + 1; // Months are zero-based in JS
-          const year = dateObj?.getFullYear();
-          const formattedDate = `${day}-${month}-${year}`;
+    const handleUpdateMethod = async (updatedData, type) => {
+      const { __typename, createdAt, updatedAt, ...validTimeSheet } =
+        updatedData;
 
-          return formattedDate === inputData?.workingHrsKey;
-        });
-
-        if (!matchedObject) {
-          const addEmpWorkInfo = await unMatchedObject(
-            inputData,
-            inputData.grouped
-          );
-
-          if (addEmpWorkInfo) {
-            const convertEmpWorkInfo = {
-              ...addEmpWorkInfo,
-              empWorkInfo: [JSON.stringify(addEmpWorkInfo.empWorkInfo)],
-            };
-
-            const result = await UpdateMethodForJobcode(convertEmpWorkInfo);
-
-            return result;
-          } else {
-            return false;
-          }
-        } else if (matchedObject) {
-          return matchedObject;
-        }
-        // return await unMatchedObject(inputData, inputData.grouped);
-
-        // return matchedObject ? matchedObject : null;
-      } catch (err) {
-        console.log("error : ", err);
-        return null;
-      }
-    }
-
-    const dateFormatFunc = (date) => {
-      const dateObj = new Date(date);
-      const day = dateObj?.getDate();
-      const month = dateObj?.getMonth() + 1; // Months are zero-based in JS
-      const year = dateObj?.getFullYear();
-      return `${day}-${month}-${year}`;
-    };
-
-    const unMatchedObject = async (inputData, grouped) => {
-      const getEmpBadgeNo = inputData?.data[0].empBadgeNo;
-      const getFidNo = inputData?.data[0].fidNo;
-
-      const matchedEmp = grouped.find(
-        (emp) =>
-          (emp?.empBadgeNo &&
-            getEmpBadgeNo &&
-            String(emp?.empBadgeNo)?.toUpperCase()?.trim() ===
-              String(getEmpBadgeNo)?.toUpperCase()?.trim()) ||
-          (emp?.fidNo &&
-            getFidNo &&
-            String(emp?.fidNo)?.toUpperCase()?.trim() ===
-              String(getFidNo)?.toUpperCase()?.trim())
-      );
-
-      const filteredGroupData =
-        matchedEmp.data.find((record) => {
-          let formattedDate = dateFormatFunc(record.date);
-          return formattedDate === inputData?.workingHrsKey;
-        }) || null;
-
-      if (filteredGroupData) {
-        const updatedEmpWorkInfo = filteredGroupData.empWorkInfo.filter(
-          (info) => info.JOBCODE !== inputData?.jobcode
-        );
-
-        updatedEmpWorkInfo.push({
-          LOCATION: inputData?.location || "",
-          OVERTIMEHRS: inputData?.overtimeHrs || "",
-          JOBCODE: inputData?.jobcode || "",
-          WORKINGHRS: inputData?.workingHrs || "",
-          id: updatedEmpWorkInfo.length + 1,
-          verify: "Yes",
-        });
-
-        const addEmpWorkInfo = {
-          ...filteredGroupData,
-          empWorkInfo: updatedEmpWorkInfo,
-          status: "Verified",
-        };
-
-        if (addEmpWorkInfo && object) {
-          await updateGroupedData(addEmpWorkInfo, object);
-        }
-        return addEmpWorkInfo ? addEmpWorkInfo : null;
-      } else {
-        return null;
-      }
-    };
-
-    const MatchingObject = async (existingObj, outputData) => {
-      if (!existingObj?.grouped || !Array.isArray(existingObj.grouped)) {
-        return null;
-      }
-
-      const matchedEmp = existingObj.grouped.find(
-        (emp) =>
-          (emp?.empBadgeNo &&
-            outputData?.empBadgeNo &&
-            String(emp?.empBadgeNo)?.toUpperCase()?.trim() ===
-              String(outputData?.empBadgeNo)?.toUpperCase()?.trim()) ||
-          (emp?.fidNo &&
-            outputData?.fidNo &&
-            String(emp?.fidNo)?.toUpperCase()?.trim() ===
-              String(outputData?.fidNo)?.toUpperCase()?.trim())
-      );
-
-      if (!matchedEmp?.data || !Array.isArray(matchedEmp.data)) {
-        return null;
-      }
-
-      return (
-        matchedEmp.data.find((record) => record.date === outputData.date) ||
-        null
-      );
-    };
-
-    const findFileName =
-      object &&
-      object?.data?.find(
-        async (fi) => fi.fileName !== null || fi.fileName !== undefined
-      );
-
-    const findDepartment =
-      object &&
-      object?.data?.find(
-        async (fi) => fi.empDept !== null || fi.empDept !== undefined
-      );
-
-    let idCounter = 10;
-    const summaryCreateMethod = async () => {
-      const jobLocaWhrs = [
-        {
-          id: idCounter++,
-          JOBCODE: object?.jobcode || "",
-          LOCATION: object?.location || "",
-          WORKINGHRS: object?.workingHrs || "",
-          OVERTIMEHRS: object?.overtimeHrs || "",
-          verify: "Yes",
-        },
-      ];
-      const item = {
-        empName: object?.empName,
-        // fidNo: object?.sapNo || "",
-        [object.firstFileType === "Offshore" ||
-        object.firstFileType === "BLNG" ||
-        object.firstFileType === "Offshore's ORMC"
-          ? "fidNo"
-          : "empBadgeNo"]:
-          object.firstFileType === "Offshore" ||
-          object.firstFileType === "BLNG" ||
-          object.firstFileType === "Offshore's ORMC"
-            ? object?.sapNo || ""
-            : object?.badgeNo || "",
-        fileName: (await findFileName?.fileName) || "N/A",
-        empDept: (await findDepartment?.empDept) || "N/A",
-        date: await convertToISODate(object?.workingHrsKey || ""),
-        actualWorkHrs: object?.workingHrs || "",
-        companyName: object?.location || "",
-        otTime: object?.overtimeHrs || "",
-        normalWorkHrs: String(object?.NWHPD) || "",
-        empWorkInfo: [JSON.stringify(jobLocaWhrs)] || [],
-        fileType: object.firstFileType || "",
-        status: "Verified",
-        // verify: "Yes",
-      };
+      const typeOfMethod =
+        type === "update" ? updateTimeSheet : createTimeSheet;
 
       try {
         const response = await client.graphql({
-          query: createTimeSheet,
-          variables: { input: item },
+          query: typeOfMethod,
+          variables: { input: validTimeSheet },
         });
-        const Responses = response?.data?.createTimeSheet;
-        // console.log("Responses : ", Responses);
-        newresData = [Responses];
-      } catch (err) {
-        console.log("Error : ", err);
+        const keyName =
+          type === "update" ? "updateTimeSheet" : "createTimeSheet";
+        const Responses = response?.data?.[keyName];
+        return Responses;
+      } catch (error) {
+        console.log("ERROR : ", error);
       }
     };
 
-    const UpdateMethod = async (finalData) => {
-      if (finalData) {
-        const { __typename, createdAt, updatedAt, ...validTimeSheet } =
-          finalData;
+    // Suppose you already have groupedData (a Map with date as key)
+    const jobLocaWhrs = [
+      {
+        id: 1,
+        JOBCODE: object?.jobcode || "",
+        LOCATION: object?.location || "",
+        WORKINGHRS: object?.workingHrs || "",
+        OVERTIMEHRS: object?.overtimeHrs || "",
+        verify: "Yes",
+      },
+    ];
 
-        try {
-          const response = await client.graphql({
-            query: updateTimeSheet,
-            variables: { input: validTimeSheet },
-          });
-          const Responses = response?.data?.updateTimeSheet;
-          // console.log("Responses : ", Responses);
-          resData = [Responses];
-          if (Responses) {
-            return true;
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    };
+    if (groupedData.has(obj?.date)) {
+      const value = groupedData.get(obj?.date);
 
-    async function fetchEmployeeData(empDetails) {
-      const val = empDetails;
-      function extractNumber(input) {
-        const match = input?.match(/-?\d+(\.\d+)?/g);
-
-        return match ? match?.[match.length - 1] : null;
-      }
-
-      const assignUpdatedWorkHrs = async (val) => {
-        if (Array.isArray(val?.empWorkInfo)) {
-          const parsedEmpWorkInfo = val.empWorkInfo.map((info) =>
-            typeof info === "string" ? JSON.parse(info) : info
-          );
-          const processedWorkInfo = parsedEmpWorkInfo.flat();
-          const updatedWorkInfo = processedWorkInfo.map((info) => {
-            return {
-              ...info,
-              JOBCODE: obj.jobcode || "",
-              LOCATION: object?.location || "",
-              WORKINGHRS: extractNumber(obj.workingHrs) || "",
-              OVERTIMEHRS: obj.ot || "",
-              verify: "Yes",
-            };
-          });
-
-          return {
-            ...val,
-            verify: "Yes",
-            empWorkInfo: [JSON.stringify(updatedWorkInfo)],
-          };
-        }
+      const updatedData = {
+        ...value,
+        empWorkInfo: [JSON.stringify(jobLocaWhrs)],
+        status: "Verified",
       };
 
-      const insertUpdatedObject = async (updatedObject, seperatedData) => {
-        if (Array.isArray(updatedObject.empWorkInfo)) {
-          const parsedEmpWorkInfo = updatedObject.empWorkInfo.map((info) =>
-            typeof info === "string" ? JSON.parse(info) : info
-          );
-
-          const seperatedDataEmpWorkInfo = seperatedData.empWorkInfo.map(
-            (info) => (typeof info === "string" ? JSON.parse(info) : info)
-          );
-
-          const processedWorkInfo = parsedEmpWorkInfo.flat();
-
-          const updatedWorkInfo = seperatedDataEmpWorkInfo.map((info) => {
-            const matchingInfo = processedWorkInfo.find(
-              (seperatedInfo) => info.id === seperatedInfo.id
-            );
-
-            if (matchingInfo) {
-              return {
-                ...info,
-                JOBCODE: obj.jobcode || "",
-                LOCATION: object?.location || "",
-                WORKINGHRS: extractNumber(obj.workingHrs) || "",
-                OVERTIMEHRS: obj.ot || "",
-                verify: "Yes",
-              };
-            }
-            return info;
-          });
-
-          return {
-            ...seperatedData,
-            // verify: "Yes",
-            status: "Verified",
-            empWorkInfo: [JSON.stringify(updatedWorkInfo)],
-          };
-        }
+      const response = await handleUpdateMethod(updatedData, "update");
+      finalResult = { response: response, type: "update" };
+    } else {
+      const { id, ...rest } = getFirstData;
+      const createData = {
+        ...rest, // or spread `value` if you want from some base
+        date: handleDateFormat(object?.workingHrsKey),
+        empWorkInfo: [JSON.stringify(jobLocaWhrs)],
+        status: "Verified",
       };
 
-      const updatedObject = await assignUpdatedWorkHrs(val);
-
-      const seperatedData = await MatchingObject(object, updatedObject);
-
-      var finalData = await insertUpdatedObject(updatedObject, seperatedData);
-
-      await UpdateMethod(finalData);
+      const response = await handleUpdateMethod(createData, "create");
+      finalResult = { response: response, type: "create" };
     }
 
-    const empDetails = await findMatchingObject(object);
-
-    if (empDetails && empDetails !== true) {
-      await fetchEmployeeData(empDetails);
-    } else if (empDetails === false) {
-      await summaryCreateMethod();
-    }
-
-    return { resData, object, newresData, resDataForJobcode };
-  } catch (err) {
-    console.log("Error : ", err);
+    return { finalResult };
+  } catch (error) {
+    console.log("ERROR : ", error);
   }
 };
