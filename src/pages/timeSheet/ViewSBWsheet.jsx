@@ -1070,7 +1070,6 @@ export const ViewSBWsheet = ({
     setSelectedOption(option);
   };
 
-  
   const itemsPerPage = 25;
   const safeData = finalData || [];
 
@@ -1620,77 +1619,6 @@ export const ViewSBWsheet = ({
       >
         Delete Offshore Data
       </button> */}
-
-      {/* <button
-        className="px-4 py-2 rounded bg-primary text_size_5"
-        onClick={() => {
-          const fetchData = async () => {
-            let nextToken = null;
-            let allData = [];
-
-            // ✅ Using "or" filter for status
-            const filter = {
-              and: [
-                // {
-                //   or: [
-                //     { status: { eq: "Approved" } },
-                //     { status: { eq: "Verified" } },
-                //   ],
-                // },
-                { fileType: { eq: "SBW" } },
-                // { empBadgeNo: { eq: "1425A" } },
-              ].filter(Boolean),
-            };
-
-            try {
-              do {
-                const response = await client.graphql({
-                  query: listTimeSheets,
-                  variables: {
-                    filter,
-                    limit: 800,
-                    nextToken,
-                  },
-                });
-
-                const fetchedData = response?.data?.listTimeSheets?.items || [];
-                nextToken = response?.data?.listTimeSheets?.nextToken;
-
-                const validData = fetchedData.filter(
-                  (item) => item !== null && item !== undefined
-                );
-                allData = [...allData, ...validData];
-              } while (nextToken);
-
-              console.log("allData : ", allData);
-            } catch (error) {
-              console.log("Error : ", error);
-            }
-          };
-
-          fetchData();
-        }}
-      >
-        Filtered Data
-      </button> */}
-
-      {/* <button
-        className="px-3 py-1 rounded bg-primary text-dark_grey text_size_5 center"
-        onClick={async () => {
-          try {
-            const deleteResponse = await client.graphql({
-              query: deleteTimeSheet,
-              variables: {
-                input: { id: "9fa1c156-4373-4d7d-8652-6d3ca36a9465" },
-              },
-            });
-
-            console.log(`Deleted item ID: ${deleteResponse}`);
-          } catch (deleteError) {
-            console.error("ERROR", deleteError);
-          }
-        }}
-      >Delete By ID</button> */}
     </div>
   );
 };

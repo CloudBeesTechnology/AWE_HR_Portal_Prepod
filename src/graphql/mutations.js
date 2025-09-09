@@ -1,6 +1,51 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createTimesheetDropdown = /* GraphQL */ `
+  mutation CreateTimesheetDropdown(
+    $input: CreateTimesheetDropdownInput!
+    $condition: ModelTimesheetDropdownConditionInput
+  ) {
+    createTimesheetDropdown(input: $input, condition: $condition) {
+      id
+      dropdownType
+      value
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateTimesheetDropdown = /* GraphQL */ `
+  mutation UpdateTimesheetDropdown(
+    $input: UpdateTimesheetDropdownInput!
+    $condition: ModelTimesheetDropdownConditionInput
+  ) {
+    updateTimesheetDropdown(input: $input, condition: $condition) {
+      id
+      dropdownType
+      value
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteTimesheetDropdown = /* GraphQL */ `
+  mutation DeleteTimesheetDropdown(
+    $input: DeleteTimesheetDropdownInput!
+    $condition: ModelTimesheetDropdownConditionInput
+  ) {
+    deleteTimesheetDropdown(input: $input, condition: $condition) {
+      id
+      dropdownType
+      value
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createContractForm = /* GraphQL */ `
   mutation CreateContractForm(
     $input: CreateContractFormInput!

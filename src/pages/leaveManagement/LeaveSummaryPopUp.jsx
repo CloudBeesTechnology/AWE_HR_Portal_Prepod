@@ -679,10 +679,14 @@ export const LeaveSummaryPopUp = ({
         return acc;
       }, {});
 
-      const summary = result[empDetails.empID];
-      setLeaveSummary(summary);
+      const summary = result[empDetails.empID]
+      
+      console.log(summary,"summaryass");
+      setLeaveSummary(summary)
     };
-
+    
+    console.log("defgn");
+    
     fetchedData();
   }, [mergedData, startDate, endDate, empDetails]);
 
