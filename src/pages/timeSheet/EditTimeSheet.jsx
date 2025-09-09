@@ -5,7 +5,7 @@ import { FaRegSquareMinus } from "react-icons/fa6";
 import "../../../src/index.css";
 import img from "../../assets/logo/logo-with-name.svg";
 import { SearchDisplayForTimeSheet } from "./timeSheetSearch/SearchDisplayForTS";
-import { JOBCODES, LocationData } from "./customTimeSheet/JobcodeAndLocation";
+import { useFetchDropdownValue } from "./customTimeSheet/useFetchDropdownValue";
 
 export const EditTimeSheet = ({
   editObject,
@@ -31,6 +31,8 @@ export const EditTimeSheet = ({
   const [formData, setFormData] = useState({
     fieldObj,
   });
+
+  const { listOfJobcode, listOfLocation } = useFetchDropdownValue();
 
   useEffect(() => {
     if (editObject) {
@@ -817,7 +819,7 @@ export const EditTimeSheet = ({
                   >
                     <div className="w-fit">
                       <SearchDisplayForTimeSheet
-                        newFormData={JOBCODES}
+                        newFormData={listOfJobcode}
                         placeholder="Search Job Code"
                         rounded="rounded"
                         searchResult={searchResultForJOBCODE}
@@ -828,7 +830,7 @@ export const EditTimeSheet = ({
                     </div>
                     <div className="w-fit">
                       <SearchDisplayForTimeSheet
-                        newFormData={LocationData}
+                        newFormData={listOfLocation}
                         placeholder="Search Location"
                         rounded="rounded"
                         searchResult={searchResultForLocation}
