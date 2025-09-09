@@ -1,6 +1,7 @@
 import * as Yup from "yup";
 
 export const probationFormSchema = Yup.object({
+  extendDate:Yup.string().notRequired(),
   // empID: Yup.string().required("UserID is mandatory"),
   // adaptability: Yup.string().notRequired(),
   // additionalInfo: Yup.string().notRequired(),
@@ -9,7 +10,6 @@ export const probationFormSchema = Yup.object({
   // commitment: Yup.string().notRequired(),
   // communication: Yup.string().notRequired(),
   // deadline: Yup.string().notRequired(),
-  extendDate:Yup.string().notRequired(),
   // diligent: Yup.string().notRequired(),
   // extendProbED: Yup.string().notRequired(),
   // gmApproved: Yup.string().notRequired(),
@@ -31,7 +31,52 @@ export const probationFormSchema = Yup.object({
   // teamwork: Yup.string().notRequired(),
 });
 export const ContractFormSchema = Yup.object({
-  empID: Yup.string().required("UserID is mandatory"),
-  adaptability: Yup.string().notRequired(),
-
+  empID: Yup.string().required("Employee ID is required"),
+  // conAttn: Yup.string().notRequired(),
+  // depHead: Yup.string().when([], {
+  //   is: () => true,
+  //   then: (schema) => schema.required("Department Head is required"),
+  //   otherwise: (schema) => schema.notRequired(),
+  // }),
+  // hrManager: Yup.string().when([], {
+  //   is: () => true,
+  //   then: (schema) => schema.required("HR Manager is required"),
+  //   otherwise: (schema) => schema.notRequired(),
+  // }),
+  // genManager: Yup.string().when([], {
+  //   is: () => true,
+  //   then: (schema) => schema.required("General Manager is required"),
+  //   otherwise: (schema) => schema.notRequired(),
+  // }),
+  // remarks: Yup.string().notRequired(),
+  // remarkHr: Yup.string().notRequired(),
+  // remarkGm: Yup.string().notRequired(),
+  // renewalContract: Yup.string().notRequired(),
+  // managerDate: Yup.string().when([], {
+  //   is: () => true,
+  //   then: (schema) => schema.required("Manager Date is required"),
+  //   otherwise: (schema) => schema.notRequired(),
+  // }),
+  // hrmDate: Yup.string().when([], {
+  //   is: () => true,
+  //   then: (schema) => schema.required("HR Manager Date is required"),
+  //   otherwise: (schema) => schema.notRequired(),
+  // }),
+  // gmDate: Yup.string().when([], {
+  //   is: () => true,
+  //   then: (schema) => schema.required("General Manager Date is required"),
+  //   otherwise: (schema) => schema.notRequired(),
+  // }),
+  // extendedStatus: Yup.string().notRequired(),
+  // oldCED: Yup.string().notRequired(),
+  // hrSign: Yup.string().when([], {
+  //   is: () => true,
+  //   then: (schema) => schema.required("HR Signature is required"),
+  //   otherwise: (schema) => schema.notRequired(),
+  // }),
+  // hrDate: Yup.string().when([], {
+  //   is: () => true,
+  //   then: (schema) => schema.required("HR Date is required"),
+  //   otherwise: (schema) => schema.notRequired(),
+  // }),
 });
