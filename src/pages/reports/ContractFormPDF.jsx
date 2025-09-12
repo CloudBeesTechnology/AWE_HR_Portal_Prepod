@@ -68,7 +68,7 @@ export const ContractFormPDF = () => {
       renewalContract: "",
       hrSign: "",
       hrDate: "",
-    }
+    },
   });
 
   // Watch form values
@@ -212,9 +212,11 @@ export const ContractFormPDF = () => {
     managerData
   ) => {
     const subject = "Contract Verification by HRM";
-    const notifyMessageHR = `Your Employee Mr./Ms. ${empName || "Not mentioned"
-      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
-      }, has been verified by HRM.`;
+    const notifyMessageHR = `Your Employee Mr./Ms. ${
+      empName || "Not mentioned"
+    }'s contract period ending on ${
+      contractEndFormatted || "Not Mentioned"
+    }, has been verified by HRM.`;
 
     if (skillPool === null) {
       if (Array.isArray(managerData?.genManagerEmail)) {
@@ -223,8 +225,10 @@ export const ContractFormPDF = () => {
             subject,
             `<html>
           <body>
-            <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
-            }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+            <p>Your Employee Mr./Ms. ${
+              empName || "Not mentioned"
+            }'s contract period ending on ${
+              contractEndFormatted || "Not Mentioned"
             },
               <br/>
               has been verified by HRM.
@@ -251,8 +255,10 @@ export const ContractFormPDF = () => {
         subject,
         `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
-        }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${
+          empName || "Not mentioned"
+        }'s contract period ending on ${
+          contractEndFormatted || "Not Mentioned"
         },
           <br/>
          has been verified by HR Manager,
@@ -275,16 +281,20 @@ export const ContractFormPDF = () => {
     managerData
   ) => {
     const subject = "Contract Review by Manager";
-    const notifyMessageManager = `Your Employee Mr./Ms. ${empName || "Not mentioned"
-      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
-      }, has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.`;
+    const notifyMessageManager = `Your Employee Mr./Ms. ${
+      empName || "Not mentioned"
+    }'s contract period ending on ${
+      contractEndFormatted || "Not Mentioned"
+    }, has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.`;
 
     const result = await sendEmail(
       subject,
       `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
-      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${
+          empName || "Not mentioned"
+        }'s contract period ending on ${
+        contractEndFormatted || "Not Mentioned"
       },
           <br/>
           has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.
@@ -313,16 +323,20 @@ export const ContractFormPDF = () => {
     managerData
   ) => {
     const subject = "Contract Confirmation by General Manager";
-    const notifyMessageGM = `Your Employee Mr./Ms. ${empName || "Not mentioned"
-      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
-      }, has been confirmed by the GENERAL MANAGER.`;
+    const notifyMessageGM = `Your Employee Mr./Ms. ${
+      empName || "Not mentioned"
+    }'s contract period ending on ${
+      contractEndFormatted || "Not Mentioned"
+    }, has been confirmed by the GENERAL MANAGER.`;
 
     const result = await sendEmail(
       subject,
       `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
-      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${
+          empName || "Not mentioned"
+        }'s contract period ending on ${
+        contractEndFormatted || "Not Mentioned"
       },
           <br/>
           has been confirmed by the GENERAL MANAGER,
@@ -372,11 +386,11 @@ export const ContractFormPDF = () => {
 
       const contractEndFormatted =
         Array.isArray(WorkInfoRecord?.contractEnd) &&
-          WorkInfoRecord?.contractEnd?.length > 0
+        WorkInfoRecord?.contractEnd?.length > 0
           ? WorkInfoRecord.contractEnd[WorkInfoRecord.contractEnd.length - 1]
-            .split("-")
-            .reverse()
-            .join("/")
+              .split("-")
+              .reverse()
+              .join("/")
           : "Not mentioned";
 
       let renewalStatus = "";
@@ -434,26 +448,36 @@ export const ContractFormPDF = () => {
       const filledBy = {
         manager:
           // Check if depHead or managerDate were actually updated in this submission
-          (data.depHead && (!existingContractData?.depHead || existingContractData?.depHead !== data.depHead)) ||
-          (data.managerDate && (!existingContractData?.managerDate || existingContractData?.managerDate !== data.managerDate)),
+          (data.depHead &&
+            (!existingContractData?.depHead ||
+              existingContractData?.depHead !== data.depHead)) ||
+          (data.managerDate &&
+            (!existingContractData?.managerDate ||
+              existingContractData?.managerDate !== data.managerDate)),
         hrm:
           HRMPosition === "HR MANAGER" &&
-          (
-            (data.hrManager && (!existingContractData?.hrManager || existingContractData?.hrManager !== data.hrManager)) ||
-            (data.hrmDate && (!existingContractData?.hrmDate || existingContractData?.hrmDate !== data.hrmDate))
-          ),
+          ((data.hrManager &&
+            (!existingContractData?.hrManager ||
+              existingContractData?.hrManager !== data.hrManager)) ||
+            (data.hrmDate &&
+              (!existingContractData?.hrmDate ||
+                existingContractData?.hrmDate !== data.hrmDate))),
         gm:
           gmPosition === "GENERAL MANAGER" &&
-          (
-            (data.genManager && (!existingContractData?.genManager || existingContractData?.genManager !== data.genManager)) ||
-            (data.gmDate && (!existingContractData?.gmDate || existingContractData?.gmDate !== data.gmDate))
-          ),
+          ((data.genManager &&
+            (!existingContractData?.genManager ||
+              existingContractData?.genManager !== data.genManager)) ||
+            (data.gmDate &&
+              (!existingContractData?.gmDate ||
+                existingContractData?.gmDate !== data.gmDate))),
         hr:
           userType === "HR" &&
-          (
-            (data.hrSign && (!existingContractData?.hrSign || existingContractData?.hrSign !== data.hrSign)) ||
-            (data.hrDate && (!existingContractData?.hrDate || existingContractData?.hrDate !== data.hrDate))
-          ),
+          ((data.hrSign &&
+            (!existingContractData?.hrSign ||
+              existingContractData?.hrSign !== data.hrSign)) ||
+            (data.hrDate &&
+              (!existingContractData?.hrDate ||
+                existingContractData?.hrDate !== data.hrDate))),
       };
 
       // 🔹 Step 2: Notifications - only trigger when actual updates occur
@@ -468,7 +492,6 @@ export const ContractFormPDF = () => {
             managerData
           );
           // console.log("Manager Notification Result:", managerResult);
-
         } else if (
           userType === "Manager" &&
           gmPosition !== "GENERAL MANAGER" &&
@@ -632,7 +655,9 @@ export const ContractFormPDF = () => {
                 className="ml-2 border-b border-medium_grey focus:outline-none"
               />
               {errors.conAttn && (
-                <p className="text-red-500 text-xs mt-1">{errors.conAttn.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.conAttn.message}
+                </p>
               )}
             </div>
 
@@ -644,7 +669,9 @@ export const ContractFormPDF = () => {
                     <th className="border border-medium_grey p-1 py-4">
                       Employee Name
                     </th>
-                    <th className="border border-medium_grey p-1 py-4">Emp ID</th>
+                    <th className="border border-medium_grey p-1 py-4">
+                      Emp ID
+                    </th>
                     <th className="border border-medium_grey p-1 py-4">
                       Badge No.
                     </th>
@@ -712,8 +739,8 @@ export const ContractFormPDF = () => {
                         {employeeData?.oldCED?.trim()
                           ? employeeData.oldCED
                           : employeeData?.contractEndDate
-                            ? employeeData.contractEndDate
-                            : "N/A"}
+                          ? employeeData.contractEndDate
+                          : "N/A"}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {employeeData?.nlmsEmpApproval || "N/A"}
@@ -726,7 +753,9 @@ export const ContractFormPDF = () => {
                           rows={3}
                         />
                         {errors.renewalContract && (
-                          <p className="text-red-500 text-xs mt-1">{errors.renewalContract.message}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.renewalContract.message}
+                          </p>
                         )}
                       </td>
                     </tr>
@@ -748,14 +777,17 @@ export const ContractFormPDF = () => {
               <label className="text-sm block py-4">Manager Remarks:</label>
               <textarea
                 {...register("remarks")}
-                disabled={
-                  (userType !== "Manager" && gmPosition === "GENERAL MANAGER") ||
-                  HRMPosition !== "HR MANAGER"
-                }
+                // disabled={
+                //   (userType !== "Manager" && gmPosition === "GENERAL MANAGER") ||
+                //   HRMPosition !== "HR MANAGER"
+                // }
+                disabled={userType !== "Manager"}
                 className="w-full text-sm text-dark_grey  border border-medium_grey rounded-md outline-none placeholder-medium_grey disabled:cursor-not-allowed"
               />
               {errors.remarks && (
-                <p className="text-red-500 text-xs mt-1">{errors.remarks.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.remarks.message}
+                </p>
               )}
             </div>
             <div className="mt-4">
@@ -766,7 +798,9 @@ export const ContractFormPDF = () => {
                 className="w-full text-sm text-dark_grey  border border-medium_grey rounded-md outline-none placeholder-medium_grey disabled:cursor-not-allowed"
               />
               {errors.remarkHr && (
-                <p className="text-red-500 text-xs mt-1">{errors.remarkHr.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.remarkHr.message}
+                </p>
               )}
             </div>
             {skillPool === null && (
@@ -778,7 +812,9 @@ export const ContractFormPDF = () => {
                   className="w-full text-sm text-dark_grey  border border-medium_grey rounded-md outline-none placeholder-medium_grey disabled:cursor-not-allowed"
                 />
                 {errors.remarkGm && (
-                  <p className="text-red-500 text-xs mt-1">{errors.remarkGm.message}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.remarkGm.message}
+                  </p>
                 )}
               </div>
             )}
@@ -806,15 +842,18 @@ export const ContractFormPDF = () => {
                 <input
                   type="text"
                   {...register("depHead")}
-                  disabled={
-                    (userType !== "Manager" &&
-                      gmPosition === "GENERAL MANAGER") ||
-                    HRMPosition !== "HR MANAGER"
-                  }
+                  // disabled={
+                  //   (userType !== "Manager" &&
+                  //     gmPosition === "GENERAL MANAGER") ||
+                  //   HRMPosition !== "HR MANAGER"
+                  // }
+                  disabled={userType !== "Manager"}
                   className="border-b border-medium_grey w-56 print-width mx-auto outline-none text-center leading-loose"
                 />
                 {errors.depHead && (
-                  <p className="text-red-500 text-xs mt-1">{errors.depHead.message}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.depHead.message}
+                  </p>
                 )}
 
                 <p className="mt-3 text-sm">Department Head</p>
@@ -822,15 +861,18 @@ export const ContractFormPDF = () => {
                   <input
                     type="date"
                     {...register("managerDate")}
-                    disabled={
-                      (userType !== "Manager" &&
-                        gmPosition === "GENERAL MANAGER") ||
-                      HRMPosition !== "HR MANAGER"
-                    }
+                    // disabled={
+                    //   (userType !== "Manager" &&
+                    //     gmPosition === "GENERAL MANAGER") ||
+                    //   HRMPosition !== "HR MANAGER"
+                    // }
+                    disabled={userType !== "Manager"}
                     className="w-40 px-2 py-1 border border-medium_grey text-sm text-dark_grey rounded-md bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition duration-150 ease-in-out"
                   />
                   {errors.managerDate && (
-                    <p className="text-red-500 text-xs mt-1">{errors.managerDate.message}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.managerDate.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -844,7 +886,9 @@ export const ContractFormPDF = () => {
                   className="border-b border-medium_grey w-56 print-width mx-auto outline-none text-center leading-loose"
                 />
                 {errors.hrManager && (
-                  <p className="text-red-500 text-xs mt-1">{errors.hrManager.message}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.hrManager.message}
+                  </p>
                 )}
 
                 <p className="mt-3 text-sm">HRM</p>
@@ -856,7 +900,9 @@ export const ContractFormPDF = () => {
                     className="w-40 px-2 py-1 border border-medium_grey text-sm text-dark_grey rounded-md bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition duration-150 ease-in-out"
                   />
                   {errors.hrmDate && (
-                    <p className="text-red-500 text-xs mt-1">{errors.hrmDate.message}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.hrmDate.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -870,7 +916,9 @@ export const ContractFormPDF = () => {
                     className="border-b border-medium_grey w-56 print-width mx-auto outline-none text-center leading-loose"
                   />
                   {errors.genManager && (
-                    <p className="text-red-500 text-xs mt-1">{errors.genManager.message}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.genManager.message}
+                    </p>
                   )}
 
                   <p className="mt-3 text-sm">GM</p>
@@ -882,7 +930,9 @@ export const ContractFormPDF = () => {
                       className="w-40 px-2 py-1 border border-medium_grey text-sm text-dark_grey rounded-md bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition duration-150 ease-in-out"
                     />
                     {errors.gmDate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.gmDate.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.gmDate.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -896,7 +946,9 @@ export const ContractFormPDF = () => {
                   className="border-b border-medium_grey w-56 print-width mx-auto outline-none text-center leading-loose"
                 />
                 {errors.hrSign && (
-                  <p className="text-red-500 text-xs mt-1">{errors.hrSign.message}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.hrSign.message}
+                  </p>
                 )}
 
                 <p className="mt-3 text-sm">HR</p>
@@ -908,7 +960,9 @@ export const ContractFormPDF = () => {
                     className="w-40 px-2 py-1 border border-medium_grey text-sm text-dark_grey rounded-md bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition duration-150 ease-in-out"
                   />
                   {errors.hrDate && (
-                    <p className="text-red-500 text-xs mt-1">{errors.hrDate.message}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.hrDate.message}
+                    </p>
                   )}
                 </div>
               </div>
