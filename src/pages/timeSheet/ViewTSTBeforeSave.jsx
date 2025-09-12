@@ -34,7 +34,10 @@ import { Pagination } from "./timeSheetSearch/Pagination";
 import { AutoFetchForAssignManager } from "./customTimeSheet/AutoFetchForAssignManager";
 
 import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperations";
-import { deleteTimeSheet } from "../../graphql/mutations";
+import {
+  createTimesheetDropdown,
+  deleteTimeSheet,
+} from "../../graphql/mutations";
 import { useRowSelection } from "./customTimeSheet/useRowSelection";
 import { useNavigate } from "react-router-dom";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
@@ -1710,122 +1713,6 @@ export const ViewTSTBeforeSave = ({
           alertMessage={alertMessage}
         />
       )}
-
-      {/* <button
-        className="text_size_5 text-dark_grey px-3 py-2 rounded bg-yellow"
-        onClick={async () => {
-          try {
-            console.log("Fetching and Deleting BLNG Data...");
-            let nextToken = null;
-            let deleteCount = 0; // 🟢 Counter to track deletions
-
-            do {
-              const filter = {
-                and: [{ fileType: { eq: "Offshore" } }],
-              };
-
-              const response = await client.graphql({
-                query: listTimeSheets,
-                variables: {
-                  filter: filter,
-                  nextToken: nextToken,
-                  limit: 1000, // optional: ensure limit is large enough
-                },
-              });
-
-              const SBWdata = response?.data?.listTimeSheets?.items || [];
-              nextToken = response?.data?.listTimeSheets?.nextToken;
-
-              console.log(
-                `Fetched ${SBWdata.length} BLNG items in this batch.`
-              );
-
-              await Promise.all(
-                SBWdata.map(async (item) => {
-                  try {
-                    const deleteResponse = await client.graphql({
-                      query: deleteTimeSheet,
-                      variables: { input: { id: item.id } },
-                    });
-                    deleteCount++; // ✅ Increment counter
-                    console.log(`Deleted item ID: ${item.id}`);
-                  } catch (deleteError) {
-                    console.error(
-                      `Error deleting item with ID ${item.id}:`,
-                      deleteError
-                    );
-                  }
-                })
-              );
-
-              console.log(
-                `Batch deletion completed. Total deleted so far: ${deleteCount}`
-              );
-            } while (nextToken);
-
-            console.log(
-              `✅ All BLNG items deletion process completed. Total deleted: ${deleteCount}`
-            );
-          } catch (fetchError) {
-            console.error("❌ Error in fetchDataAndDelete:", fetchError);
-          }
-        }}
-      >
-        Delete Offshore Data
-      </button> */}
-
-      {/* <button
-              className="px-4 py-2 rounded bg-primary text_size_5"
-              onClick={() => {
-                const fetchData = async () => {
-                  let nextToken = null;
-                  let allData = [];
-      
-                  // ✅ Using "or" filter for status
-                  const filter = {
-                    and: [
-                      // {
-                      //   or: [
-                      //     { status: { eq: "Approved" } },
-                      //     { status: { eq: "Verified" } },
-                      //   ],
-                      // },
-                      { fileType: { eq: "Offshore" } },
-                      // { empBadgeNo: { eq: "1425A" } },
-                    ].filter(Boolean),
-                  };
-      
-                  try {
-                    do {
-                      const response = await client.graphql({
-                        query: listTimeSheets,
-                        variables: {
-                          filter,
-                          limit: 800,
-                          nextToken,
-                        },
-                      });
-      
-                      const fetchedData = response?.data?.listTimeSheets?.items || [];
-                      nextToken = response?.data?.listTimeSheets?.nextToken;
-      
-                      const validData = fetchedData.filter(
-                        (item) => item !== null && item !== undefined
-                      );
-                      allData = [...allData, ...validData];
-                    } while (nextToken);
-      
-                    console.log("allData : ", allData);
-                  } catch (error) {
-                    console.log("Error : ", error);
-                  }
-                };
-      
-                fetchData();
-              }}
-            >
-              Filtered Data
-          </button> */}
     </div>
   );
 };

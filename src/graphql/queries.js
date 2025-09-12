@@ -1,6 +1,42 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getTimesheetDropdown = /* GraphQL */ `
+  query GetTimesheetDropdown($id: ID!) {
+    getTimesheetDropdown(id: $id) {
+      id
+      dropdownType
+      value
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listTimesheetDropdowns = /* GraphQL */ `
+  query ListTimesheetDropdowns(
+    $filter: ModelTimesheetDropdownFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTimesheetDropdowns(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        dropdownType
+        value
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getContractForm = /* GraphQL */ `
   query GetContractForm($id: ID!) {
     getContractForm(id: $id) {

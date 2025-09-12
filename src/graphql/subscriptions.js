@@ -1,6 +1,48 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateTimesheetDropdown = /* GraphQL */ `
+  subscription OnCreateTimesheetDropdown(
+    $filter: ModelSubscriptionTimesheetDropdownFilterInput
+  ) {
+    onCreateTimesheetDropdown(filter: $filter) {
+      id
+      dropdownType
+      value
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateTimesheetDropdown = /* GraphQL */ `
+  subscription OnUpdateTimesheetDropdown(
+    $filter: ModelSubscriptionTimesheetDropdownFilterInput
+  ) {
+    onUpdateTimesheetDropdown(filter: $filter) {
+      id
+      dropdownType
+      value
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteTimesheetDropdown = /* GraphQL */ `
+  subscription OnDeleteTimesheetDropdown(
+    $filter: ModelSubscriptionTimesheetDropdownFilterInput
+  ) {
+    onDeleteTimesheetDropdown(filter: $filter) {
+      id
+      dropdownType
+      value
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateContractForm = /* GraphQL */ `
   subscription OnCreateContractForm(
     $filter: ModelSubscriptionContractFormFilterInput

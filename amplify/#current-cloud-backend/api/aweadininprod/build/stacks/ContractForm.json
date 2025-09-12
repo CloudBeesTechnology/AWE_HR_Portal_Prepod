@@ -43,19 +43,37 @@
     "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name": {
-      "Type": "String"
-    },
     "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
       "Type": "String"
     },
     "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
       "Type": "String"
     },
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownauth0FunctionQuerygetTimesheetDropdownauth0FunctionAppSyncFunctionDFEC1B4F63": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7": {
+      "Type": "String"
+    },
     "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
       "Type": "String"
     },
     "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationcreateTimesheetDropdowninit0FunctionMutationcreateTimesheetDropdowninit0FunctionAppSy67CFF9A4": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationcreateTimesheetDropdownauth0FunctionMutationcreateTimesheetDropdownauth0FunctionAppSyBCA0847E": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationupdateTimesheetDropdowninit0FunctionMutationupdateTimesheetDropdowninit0FunctionAppSy2480CAD9": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptiononCreateTimesheetDropdownauth0FunctionSubscriptiononCreateTimesheetDropdownauth0FCCBC55B9": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptionOnCreateTimesheetDropdownDataResolverFnSubscriptionOnCreateTimesheetDropdownDataR9FED0F60": {
       "Type": "String"
     }
   },
@@ -356,66 +374,6 @@
         "ContractFormIAMRole59D7987F"
       ]
     },
-    "QuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunctionC0DC4CCB": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "QuerygetContractFormauth0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Query.getContractForm.auth.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
-      }
-    },
-    "QuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunction374A4685": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "QuerygetContractFormpostAuth0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Query.getContractForm.postAuth.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
-      }
-    },
     "QueryGetContractFormDataResolverFnQueryGetContractFormDataResolverFnAppSyncFunctionB6955966": {
       "Type": "AWS::AppSync::FunctionConfiguration",
       "Properties": {
@@ -478,16 +436,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "QuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunctionC0DC4CCB",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownauth0FunctionQuerygetTimesheetDropdownauth0FunctionAppSyncFunctionDFEC1B4F63"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunction374A4685",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
               "Fn::GetAtt": [
@@ -595,16 +547,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "QuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunctionC0DC4CCB",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownauth0FunctionQuerygetTimesheetDropdownauth0FunctionAppSyncFunctionDFEC1B4F63"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunction374A4685",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
               "Fn::GetAtt": [
@@ -648,66 +594,6 @@
         },
         "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
         "TypeName": "Query"
-      }
-    },
-    "MutationcreateContractForminit0FunctionMutationcreateContractForminit0FunctionAppSyncFunctionE06C6474": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "MutationcreateContractForminit0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Mutation.createContractForm.init.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
-      }
-    },
-    "MutationcreateContractFormauth0FunctionMutationcreateContractFormauth0FunctionAppSyncFunction653C2DBB": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "MutationcreateContractFormauth0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Mutation.createContractForm.auth.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
       }
     },
     "MutationCreateContractFormDataResolverFnMutationCreateContractFormDataResolverFnAppSyncFunction16DA7747": {
@@ -772,22 +658,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "MutationcreateContractForminit0FunctionMutationcreateContractForminit0FunctionAppSyncFunctionE06C6474",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationcreateTimesheetDropdowninit0FunctionMutationcreateTimesheetDropdowninit0FunctionAppSy67CFF9A4"
             },
             {
-              "Fn::GetAtt": [
-                "MutationcreateContractFormauth0FunctionMutationcreateContractFormauth0FunctionAppSyncFunction653C2DBB",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationcreateTimesheetDropdownauth0FunctionMutationcreateTimesheetDropdownauth0FunctionAppSyBCA0847E"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunction374A4685",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
               "Fn::GetAtt": [
@@ -831,36 +708,6 @@
         },
         "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
         "TypeName": "Mutation"
-      }
-    },
-    "MutationupdateContractForminit0FunctionMutationupdateContractForminit0FunctionAppSyncFunction6A267E7D": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "MutationupdateContractForminit0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Mutation.updateContractForm.init.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
       }
     },
     "MutationupdateContractFormauth0FunctionMutationupdateContractFormauth0FunctionAppSyncFunction2AE934F4": {
@@ -976,10 +823,7 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "MutationupdateContractForminit0FunctionMutationupdateContractForminit0FunctionAppSyncFunction6A267E7D",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownMutationupdateTimesheetDropdowninit0FunctionMutationupdateTimesheetDropdowninit0FunctionAppSy2480CAD9"
             },
             {
               "Fn::GetAtt": [
@@ -988,10 +832,7 @@
               ]
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunction374A4685",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
               "Fn::GetAtt": [
@@ -1156,10 +997,7 @@
               ]
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunction374A4685",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
               "Fn::GetAtt": [
@@ -1205,81 +1043,6 @@
         "TypeName": "Mutation"
       }
     },
-    "SubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionEA0F6E40": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "SubscriptiononCreateContractFormauth0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Subscription.onCreateContractForm.auth.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
-      }
-    },
-    "SubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction60CB9676": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "SubscriptionOnCreateContractFormDataResolverFn",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Subscription.onCreateContractForm.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Subscription.onCreateContractForm.res.vtl"
-            ]
-          ]
-        }
-      }
-    },
     "SubscriptiononCreateContractFormResolver": {
       "Type": "AWS::AppSync::Resolver",
       "Properties": {
@@ -1291,22 +1054,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "SubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionEA0F6E40",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptiononCreateTimesheetDropdownauth0FunctionSubscriptiononCreateTimesheetDropdownauth0FCCBC55B9"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunction374A4685",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
-              "Fn::GetAtt": [
-                "SubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction60CB9676",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptionOnCreateTimesheetDropdownDataResolverFnSubscriptionOnCreateTimesheetDropdownDataR9FED0F60"
             }
           ]
         },
@@ -1353,22 +1107,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "SubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionEA0F6E40",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptiononCreateTimesheetDropdownauth0FunctionSubscriptiononCreateTimesheetDropdownauth0FCCBC55B9"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunction374A4685",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
-              "Fn::GetAtt": [
-                "SubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction60CB9676",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptionOnCreateTimesheetDropdownDataResolverFnSubscriptionOnCreateTimesheetDropdownDataR9FED0F60"
             }
           ]
         },
@@ -1415,22 +1160,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "SubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionEA0F6E40",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptiononCreateTimesheetDropdownauth0FunctionSubscriptiononCreateTimesheetDropdownauth0FCCBC55B9"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunction374A4685",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownQuerygetTimesheetDropdownpostAuth0FunctionQuerygetTimesheetDropdownpostAuth0FunctionAppSyncFu64F595E7"
             },
             {
-              "Fn::GetAtt": [
-                "SubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction60CB9676",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackTimesheetDropdownNestedStackTimesheetDropdownNestedStackResource6E2AADA0OutputstransformerrootstackTimesheetDropdownSubscriptionOnCreateTimesheetDropdownDataResolverFnSubscriptionOnCreateTimesheetDropdownDataR9FED0F60"
             }
           ]
         },
@@ -1529,62 +1265,6 @@
             ]
           ]
         }
-      }
-    },
-    "transformerrootstackContractFormQuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunction3913C484FunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "QuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunctionC0DC4CCB",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "QuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunction374A4685",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackContractFormMutationcreateContractForminit0FunctionMutationcreateContractForminit0FunctionAppSyncFunctionC8750CDCFunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "MutationcreateContractForminit0FunctionMutationcreateContractForminit0FunctionAppSyncFunctionE06C6474",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackContractFormMutationcreateContractFormauth0FunctionMutationcreateContractFormauth0FunctionAppSyncFunction5DEF2B7BFunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "MutationcreateContractFormauth0FunctionMutationcreateContractFormauth0FunctionAppSyncFunction653C2DBB",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackContractFormMutationupdateContractForminit0FunctionMutationupdateContractForminit0FunctionAppSyncFunctionA6BC10BDFunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "MutationupdateContractForminit0FunctionMutationupdateContractForminit0FunctionAppSyncFunction6A267E7D",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackContractFormSubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionE9F67D22FunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "SubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionEA0F6E40",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackContractFormSubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction43F916D1FunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "SubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction60CB9676",
-          "FunctionId"
-        ]
       }
     }
   }

@@ -2,7 +2,6 @@ import { useTempID } from "../../utils/TempIDContext";
 import {
   dummyHolidayList,
   dummyLeaveStatus,
-  LocationData,
 } from "./customTimeSheet/JobcodeAndLocation";
 import { generateClient } from "@aws-amplify/api";
 import { UpdateViewSummary } from "./customTimeSheet/UpdateViewSummary";
@@ -20,6 +19,7 @@ import { HoursMinuAbsentCal } from "./customTimeSheet/HoursMinuAbsentCal";
 import { useTableMergedData } from "./customTimeSheet/useTableMergedData";
 import { useGetTimeSheetData } from "./customTimeSheet/useGetTimeSheetData";
 import { DataSupply } from "../../utils/DataStoredContext";
+import { useFetchDropdownValue } from "./customTimeSheet/useFetchDropdownValue";
 
 export const ViewSummary = () => {
   const [data, setData] = useState(null);
@@ -49,6 +49,8 @@ export const ViewSummary = () => {
   } = useTempID();
 
   const { workHrsAbsentCal } = HoursMinuAbsentCal();
+
+  const { listOfLocation } = useFetchDropdownValue();
 
   const publicHoliday = GetHolidayList();
 
@@ -248,7 +250,7 @@ export const ViewSummary = () => {
       <ViewSummaryTable
         dayCounts={dayCounts}
         data={data}
-        LocationData={LocationData}
+        LocationData={listOfLocation}
         secondaryData={secondaryData}
         searchResult={searchResult}
         loading={loading}
