@@ -9,6 +9,7 @@ import { DataSupply } from "../../utils/DataStoredContext";
 import { UserDelete } from "../../services/deleteMethod/UserDelete";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../utils/DeletePopup";
+import { FiLoader } from "react-icons/fi";
 
 export const User = () => {
   useEffect(() => {
@@ -87,11 +88,14 @@ export const User = () => {
       try {
         const mergedData = userData
           .map((emp) => {
-            const EmpDetails = empPIData.find(
-              (user) => user.empID === emp.empID
+            const EmpDetails = empPIData?.find(
+              (user) => String(user.empID)?.trim() === String(emp.empID)?.trim()
             );
             const workInfoValue = workInfoData
-              ? workInfoData.find((work) => work.empID === emp.empID)
+              ? workInfoData?.find(
+                  (work) =>
+                    String(work.empID)?.trim() === String(emp.empID)?.trim()
+                )
               : {};
             if (!EmpDetails) return null;
 
@@ -149,20 +153,36 @@ export const User = () => {
     setdeletePopup(!deletePopup);
   };
   const handleDelete = async (data) => {
-    const deleteUserData = userData.find((item) => item.empID === data.empID);
+    const deleteUserData = userData?.find(
+      (item) => String(item.empID)?.trim() === String(data.empID)?.trim()
+    );
     // console.log(deleteUserData);
 
     await SubmitDeletedUser({ deleteUserData });
- 
-    setdeleteTitle1(
-      `${deleteUserData.empID} deleted successfully.`
-    );
+
+    setdeleteTitle1(`${deleteUserData.empID} deleted successfully.`);
     handleDeleteMsg();
   };
   const startIndex = (currentPage - 1) * rowsPerPage;
   const requiredPermissions = ["User"];
 
   const access = "User";
+
+  if (!userData || userData?.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[82vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          <div className="flex justify-between gap-2">
+            <p className="text-sm font-semibold">Loading </p>
+            <p>
+              <FiLoader className="animate-spin mt-[4px]" size={15} />
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section
       className=" flex justify-center px-10 py-20 bg-[#F8F8F8] min-h-screen relative"
@@ -253,7 +273,7 @@ export const User = () => {
                               >
                                 <RiEditLine />
                               </span>
-                            
+
                               {formattedPermissions?.deleteAccess?.[
                                 access
                               ]?.some((permission) =>
@@ -325,13 +345,10 @@ export const User = () => {
           <StatusPopUp setPopUp={setPopUp} />
         </div>
       )} */}
-      
-            {deletePopup && (
-              <DeletePopup
-                handleDeleteMsg={handleDeleteMsg}
-                title1={deleteTitle1}
-              />
-            )}
+
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
+      )}
     </section>
   );
 };

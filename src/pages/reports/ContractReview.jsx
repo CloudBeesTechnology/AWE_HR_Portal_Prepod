@@ -127,7 +127,7 @@ export const ContractReview = () => {
             item.extendedStatus === "hrmView" ||
             item.extendedStatus === "gmView"
           ) {
-          console.log(latestItemForEmp,"dfgh");
+          // console.log(latestItemForEmp,"dfgh");
           return null;
         }
 
@@ -201,7 +201,7 @@ export const ContractReview = () => {
         }
         // console.log(item.oldCED, "item.oldCED", item.empID);
         // console.log(item.oldCED ,formatDate(lastDate) ,"item.oldCED", item.empID);
-console.log(latestItemForEmp,"latestItemForEmp");
+// console.log(latestItemForEmp,"latestItemForEmp");
 
         return {
           lastDate: new Date(lastDate),

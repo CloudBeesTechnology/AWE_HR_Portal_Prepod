@@ -136,7 +136,7 @@ export const ContractPDF = ({ userID, userType }) => {
         } else {
           finalPosition = emp.position?.[emp.position.length - 1];
         }
-console.log(contract,"contract");
+// console.log(contract,"contract");
 
         return {
           empID: emp.empID,
@@ -196,7 +196,7 @@ console.log(contract,"contract");
 
         return getPriority(a) - getPriority(b);
       });
-      console.log(mergedData,"mergedData");
+      // console.log(mergedData,"mergedData");
       
     return mergedData;
   };

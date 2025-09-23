@@ -71,7 +71,7 @@ export const AddNewForm = () => {
   };
 
   const parsePermissions = (permissionsArray) => {
-    return permissionsArray.map((permissionStr) => {
+    return permissionsArray?.map((permissionStr) => {
       if (!permissionStr || permissionStr === "{}") return {};
 
       try {
@@ -87,7 +87,6 @@ export const AddNewForm = () => {
           .replace(/}"/g, "}"); // Remove accidental double quotes at object end
 
         // Debugging
-
         return JSON.parse(formattedStr); // Convert corrected string to object
       } catch (error) {
         console.error(
@@ -126,8 +125,9 @@ export const AddNewForm = () => {
   useEffect(() => {
     const mergedData = addData?.employeeValue
       .map((candidate) => {
-        const workDetails = workInfoDataDetails.find(
-          (item) => item.empID === candidate.empID
+        const workDetails = workInfoDataDetails?.find(
+          (item) =>
+            String(item?.empID)?.trim() === String(candidate?.empID)?.trim()
         );
         // const empDocsDetails = addData?.employeeDocsValue.find(
         //   (item) => item.empID === candidate.empID
@@ -202,16 +202,16 @@ export const AddNewForm = () => {
     //     console.log(data, "Data  checking");
     // console.log(dropDownVal,"setpermission");
     const today = new Date().toISOString().split("T")[0];
-    const userIDFind = localStorage.getItem("userID");
+    const userIDFind = localStorage.getItem("userID")?.toString()?.trim();
     try {
-      const desideCreateOrUpdate = userDataDetails.some((m) => {
-        return m.empID === data.empID;
+      const desideCreateOrUpdate = userDataDetails?.some((m) => {
+        return String(m?.empID)?.trim() === String(data?.empID)?.trim();
       });
       // console.log(desideCreateOrUpdate);
 
       const userIDs = await userDataDetails
-        .filter((m) => m.empID === data.empID)
-        .map((m) => m);
+        ?.filter((m) => String(m.empID)?.trim() === String(data.empID)?.trim())
+        ?.map((m) => m);
       const previousUpdatesUser = userIDs[0]?.updatedBy
         ? JSON.parse(userIDs[0]?.updatedBy)
         : [];

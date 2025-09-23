@@ -140,13 +140,13 @@ export const ContractFormPDF = () => {
               }));
               // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
             } else {
-              console.log("GM Info not found.");
+              // console.log("GM Info not found.");
             }
           });
 
           // console.log("GM Info:", gmInfo);
         } else {
-          console.log("No GENERAL MANAGER positions found.");
+          // console.log("No GENERAL MANAGER positions found.");
         }
       }
     }
