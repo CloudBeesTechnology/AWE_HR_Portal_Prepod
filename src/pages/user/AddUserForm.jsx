@@ -316,6 +316,8 @@ export const AddNewForm = () => {
           })
           .catch((err) => {
             alert(err);
+            console.log(err, "error signing up:");
+            
           });
       }
       reset();

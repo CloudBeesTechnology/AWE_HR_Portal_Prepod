@@ -406,8 +406,9 @@ export const ContractFormPDF = () => {
 
       if (
         userType === "Manager" &&
-        gmPosition !== "GENERAL MANAGER" &&
-        HRMPosition !== "HR MANAGER"
+        gmPosition !== "GENERAL MANAGER" 
+        //  &&
+        // HRMPosition !== "HR MANAGER"
       ) {
         renewalStatus = !isExtended && "hrmView";
       }
