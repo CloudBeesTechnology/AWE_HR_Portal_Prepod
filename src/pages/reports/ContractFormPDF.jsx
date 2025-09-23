@@ -140,13 +140,13 @@ export const ContractFormPDF = () => {
               }));
               // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
             } else {
-              console.log("GM Info not found.");
+              // console.log("GM Info not found.");
             }
           });
 
           // console.log("GM Info:", gmInfo);
         } else {
-          console.log("No GENERAL MANAGER positions found.");
+          // console.log("No GENERAL MANAGER positions found.");
         }
       }
     }
@@ -406,8 +406,9 @@ export const ContractFormPDF = () => {
 
       if (
         userType === "Manager" &&
-        gmPosition !== "GENERAL MANAGER" &&
-        HRMPosition !== "HR MANAGER"
+        gmPosition !== "GENERAL MANAGER" 
+        //  &&
+        // HRMPosition !== "HR MANAGER"
       ) {
         renewalStatus = !isExtended && "hrmView";
       }
