@@ -212,11 +212,9 @@ export const ContractFormPDF = () => {
     managerData
   ) => {
     const subject = "Contract Verification by HRM";
-    const notifyMessageHR = `Your Employee Mr./Ms. ${
-      empName || "Not mentioned"
-    }'s contract period ending on ${
-      contractEndFormatted || "Not Mentioned"
-    }, has been verified by HRM.`;
+    const notifyMessageHR = `Your Employee Mr./Ms. ${empName || "Not mentioned"
+      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+      }, has been verified by HRM.`;
 
     if (skillPool === null) {
       if (Array.isArray(managerData?.genManagerEmail)) {
@@ -225,10 +223,8 @@ export const ContractFormPDF = () => {
             subject,
             `<html>
           <body>
-            <p>Your Employee Mr./Ms. ${
-              empName || "Not mentioned"
-            }'s contract period ending on ${
-              contractEndFormatted || "Not Mentioned"
+            <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
+            }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
             },
               <br/>
               has been verified by HRM.
@@ -255,10 +251,8 @@ export const ContractFormPDF = () => {
         subject,
         `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${
-          empName || "Not mentioned"
-        }'s contract period ending on ${
-          contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
+        }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
         },
           <br/>
          has been verified by HR Manager,
@@ -281,20 +275,16 @@ export const ContractFormPDF = () => {
     managerData
   ) => {
     const subject = "Contract Review by Manager";
-    const notifyMessageManager = `Your Employee Mr./Ms. ${
-      empName || "Not mentioned"
-    }'s contract period ending on ${
-      contractEndFormatted || "Not Mentioned"
-    }, has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.`;
+    const notifyMessageManager = `Your Employee Mr./Ms. ${empName || "Not mentioned"
+      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+      }, has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.`;
 
     const result = await sendEmail(
       subject,
       `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${
-          empName || "Not mentioned"
-        }'s contract period ending on ${
-        contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
+      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
       },
           <br/>
           has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.
@@ -323,20 +313,16 @@ export const ContractFormPDF = () => {
     managerData
   ) => {
     const subject = "Contract Confirmation by General Manager";
-    const notifyMessageGM = `Your Employee Mr./Ms. ${
-      empName || "Not mentioned"
-    }'s contract period ending on ${
-      contractEndFormatted || "Not Mentioned"
-    }, has been confirmed by the GENERAL MANAGER.`;
+    const notifyMessageGM = `Your Employee Mr./Ms. ${empName || "Not mentioned"
+      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+      }, has been confirmed by the GENERAL MANAGER.`;
 
     const result = await sendEmail(
       subject,
       `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${
-          empName || "Not mentioned"
-        }'s contract period ending on ${
-        contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
+      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
       },
           <br/>
           has been confirmed by the GENERAL MANAGER,
@@ -386,32 +372,69 @@ export const ContractFormPDF = () => {
 
       const contractEndFormatted =
         Array.isArray(WorkInfoRecord?.contractEnd) &&
-        WorkInfoRecord?.contractEnd?.length > 0
+          WorkInfoRecord?.contractEnd?.length > 0
           ? WorkInfoRecord.contractEnd[WorkInfoRecord.contractEnd.length - 1]
-              .split("-")
-              .reverse()
-              .join("/")
+            .split("-")
+            .reverse()
+            .join("/")
           : "Not mentioned";
 
       let renewalStatus = "";
-      if (HRMPosition === "HR MANAGER") {
-        renewalStatus = !isExtended && "gmView";
-      }
-      if (gmPosition === "GENERAL MANAGER") {
-        renewalStatus = !isExtended && "noExtended";
-      }
-      if (userType === "HR") {
-        renewalStatus = isExtended && "extended";
-      }
-
+      // ✅ Case: HR MANAGER first fills as Manager (depHead) → go to HRM stage
       if (
         userType === "Manager" &&
-        gmPosition !== "GENERAL MANAGER" 
-        //  &&
-        // HRMPosition !== "HR MANAGER"
+        HRMPosition === "HR MANAGER" &&
+        data.depHead &&
+        !data.hrManager // only depHead signed
       ) {
         renewalStatus = !isExtended && "hrmView";
       }
+
+      // ✅ Case: HR MANAGER now signs as HRM → next stage GM
+      else if (
+        HRMPosition === "HR MANAGER" &&
+        data.hrManager // HRM has signed
+      ) {
+        renewalStatus = !isExtended && "gmView";
+      }
+
+      // ✅ Case: General Manager
+      else if (gmPosition === "GENERAL MANAGER") {
+        renewalStatus = !isExtended && "noExtended";
+      }
+
+      // ✅ Case: HR
+      else if (userType === "HR") {
+        renewalStatus = isExtended && "extended";
+      }
+
+      // ✅ Case: Regular Manager (not GM, not HRM)
+      else if (
+        userType === "Manager" &&
+        gmPosition !== "GENERAL MANAGER" &&
+        HRMPosition !== "HR MANAGER"
+      ) {
+        renewalStatus = !isExtended && "hrmView";
+      }
+
+      // if (HRMPosition === "HR MANAGER") {
+      //   renewalStatus = !isExtended && "gmView";
+      // }
+      // if (gmPosition === "GENERAL MANAGER") {
+      //   renewalStatus = !isExtended && "noExtended";
+      // }
+      // if (userType === "HR") {
+      //   renewalStatus = isExtended && "extended";
+      // }
+
+      // if (
+      //   userType === "Manager" &&
+      //   gmPosition !== "GENERAL MANAGER" 
+      //   //  &&
+      //   // HRMPosition !== "HR MANAGER"
+      // ) {
+      //   renewalStatus = !isExtended && "hrmView";
+      // }
       //created form
       const formPayload = {
         empID: employeeData?.empID,
@@ -740,8 +763,8 @@ export const ContractFormPDF = () => {
                         {employeeData?.oldCED?.trim()
                           ? employeeData.oldCED
                           : employeeData?.contractEndDate
-                          ? employeeData.contractEndDate
-                          : "N/A"}
+                            ? employeeData.contractEndDate
+                            : "N/A"}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {employeeData?.nlmsEmpApproval || "N/A"}

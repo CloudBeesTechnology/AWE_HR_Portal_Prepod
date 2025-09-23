@@ -10,7 +10,7 @@ export const ContractReview = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { allData, title } = location.state || {};
-  const { contractForms } = useContext(DataSupply);
+  const { contractForms, loading: dataLoading } = useContext(DataSupply); // Get loading state from context
   const [tableBody, setTableBody] = useState([]);
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
@@ -37,8 +37,6 @@ export const ContractReview = () => {
     "LD Expiry",
     userType !== "SuperAdmin" && "Status",
   ].filter(Boolean);
-
-
 
   const formatDate = (date, type) => {
     if (Array.isArray(date)) {
@@ -109,25 +107,18 @@ export const ContractReview = () => {
         if (contractEndDates.length === 0) return null;
 
         const lastDate = contractEndDates[contractEndDates.length - 1];
-
         //latestContractform data
-        
-       const latestItemForEmp =
-  contractForms && contractForms.length > 0
-    ? contractForms
-        .filter((cf) => cf.empID === item.empID)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]
-    : null;
+        const latestItemForEmp = contractForms
+          .filter((cf) => cf.empID === item.empID)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
 
-          
-          if (
-            !lastDate ||
-            (latestItemForEmp?.depHead && latestItemForEmp.hrManager === "") ||
-            (item.contStatus && item.extendedStatus === "noExtended") ||
-            item.extendedStatus === "hrmView" ||
-            item.extendedStatus === "gmView"
-          ) {
-          // console.log(latestItemForEmp,"dfgh");
+        if (
+          !lastDate ||
+          (latestItemForEmp?.depHead && latestItemForEmp.hrManager === "") ||
+          (item.contStatus && item.extendedStatus === "noExtended") ||
+          item.extendedStatus === "hrmView" ||
+          item.extendedStatus === "gmView"
+        ) {
           return null;
         }
 
@@ -201,7 +192,6 @@ export const ContractReview = () => {
         }
         // console.log(item.oldCED, "item.oldCED", item.empID);
         // console.log(item.oldCED ,formatDate(lastDate) ,"item.oldCED", item.empID);
-// console.log(latestItemForEmp,"latestItemForEmp");
 
         return {
           lastDate: new Date(lastDate),
@@ -265,23 +255,18 @@ export const ContractReview = () => {
     // Final mapped result without the date object
     return sortedData;
   };
-
-useEffect(() => {
-  // Only run when both allData and contractForms are available
-  if (allData && contractForms && contractForms.length > 0) {
-    const mergedData = contractExpiryMergedData(
-      allData,
-      userType,
-      gmPosition,
-      userID,
-      HRMPosition,
-      contractForms // pass contractForms explicitly
-    );
-    setTableBody(mergedData);
-  }
-}, [allData, contractForms, userType, gmPosition, userID, HRMPosition]);
-
-
+  useEffect(() => {
+    if (allData) {
+      const mergedData = contractExpiryMergedData(
+        allData,
+        userType,
+        gmPosition,
+        userID,
+        HRMPosition
+      );
+      setTableBody(mergedData);
+    }
+  }, [allData, userType, gmPosition, userID, HRMPosition]);
 
   const handleViewDetails = (personData) => {
     const employeeHistory = contractForms.filter(
@@ -458,6 +443,7 @@ useEffect(() => {
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
         isFiltered={isDateFiltered}
+        loading={dataLoading} // Pass the loading prop
       />
 
       {selectedPerson && (
