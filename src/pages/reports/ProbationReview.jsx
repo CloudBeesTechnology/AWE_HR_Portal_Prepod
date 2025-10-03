@@ -18,6 +18,7 @@ export const ProbationReview = () => {
   const [extenFlag, setExtenFlag] = useState([]);
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [isDateFiltered, setIsDateFiltered] = useState(false);
+  const [loading, setLoading] = useState(!allData); // Add loading state
   const [tableHead] = useState(
     [
       "Emp ID",
@@ -288,15 +289,24 @@ export const ProbationReview = () => {
   };
 
   useEffect(() => {
-    const mergedData = probationReviewMergedData(
-      allData,
-      userType,
-      gmPosition,
-      userID,
-      HRMPosition
-    );
-    setTableBody(mergedData);
-    setOriginalTableBody(mergedData);
+    if (allData) {
+      setLoading(true); // Set loading to true while processing data
+      // Use setTimeout to simulate processing delay for better UX
+      const timer = setTimeout(() => {
+        const mergedData = probationReviewMergedData(
+          allData,
+          userType,
+          gmPosition,
+          userID,
+          HRMPosition
+        );
+        setTableBody(mergedData);
+        setOriginalTableBody(mergedData);
+        setLoading(false); // Set loading to false when data processing is complete
+      }, 100); // Small delay to show the loading state
+      
+      return () => clearTimeout(timer);
+    }
   }, [allData, userType, gmPosition, userID, HRMPosition]);
 
   const handleViewDetails = (personData) => {
@@ -388,6 +398,7 @@ export const ProbationReview = () => {
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
         isFiltered={isDateFiltered}
+        loading={loading} // Pass the loading prop
       />
 
       {selectedPerson && (

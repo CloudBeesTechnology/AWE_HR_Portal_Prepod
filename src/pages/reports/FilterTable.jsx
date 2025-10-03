@@ -17,12 +17,84 @@ export const FilterTable = ({
   endDate,
   testDate,
   setTestDate,
+  loading, // Add loading prop
 }) => {
   const { dropDownVal } = useContext(DataSupply);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 30;
+
+  // Render skeleton loader when loading is true
+  if (loading) {
+    // Determine number of columns based on tableHead or use default
+    const columnCount = (tableHead && tableHead.length > 0) ? tableHead.length : 5;
+    
+    return (
+      <div className="w-full px-7 bg-[#F5F6F1CC] animate-pulse">
+        {/* Header skeleton */}
+        <div className="w-full flex items-center justify-between gap-5 py-4">
+          <div className="">
+            <div className="h-8 bg-BColor rounded w-[200px] mx-auto"></div>
+          </div>
+          
+          <div className="">
+            <div className="h-8 bg-BColor rounded w-[200px] mx-auto"></div>
+          </div>
+          
+          <div className="">
+            <div className="h-8 bg-BColor rounded w-[200px] mx-auto"></div>
+          </div>
+        </div>
+        
+        {/* Filters skeleton */}
+       
+        
+        {/* Table skeleton */}
+        <div className="w-full overflow-x-auto overflow-y-auto h-[500px] shadow-lg mb-5">
+          <table className="border-collapse w-full">
+            <thead className="w-full sticky top-0">
+              <tr className="bg-[#939393] rounded-sm">
+                <th className="px-6 py-5 text-[15px]">
+                  <div className="h-4 bg-BColor rounded w-3/4 mx-auto"></div>
+                </th>
+                {Array.from({ length: columnCount }).map((_, idx) => (
+                  <th key={idx} className="px-6 py-5 text-[15px] w-full">
+                    <div className="h-4 bg-BColor rounded w-3/4"></div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white">
+              {Array.from({ length: 10 }).map((_, rowIndex) => (
+                <tr key={rowIndex} className="text-sm border-b-2 border-[#CECECE] min-[40px]">
+                  <td className="font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2">
+                    <div className="h-4 bg-BColor rounded w-1/2 mx-auto"></div>
+                  </td>
+                  {Array.from({ length: columnCount }).map((_, colIndex) => (
+                    <td key={colIndex} className="h-[60px] font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2">
+                      <div className="h-4 bg-BColor rounded w-3/4 mx-auto"></div>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Pagination skeleton */}
+        <div className="flex justify-center w-full my-5">
+          <div className="flex justify-center gap-6 w-3/5 items-center">
+            <div className="flex justify-center gap-4 my-4">
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className="w-8 h-8 bg-BColor rounded-full"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const departmentOptions = dropDownVal[0]?.departmentDD?.map((item) => ({
     value: item
@@ -443,7 +515,7 @@ export const FilterTable = ({
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="flex items-center gap-2 border border-[#5A5858] text-sm text-dark_grey rounded-lg hover:bg-gray-200 px-5 py-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                className="flex items-center gap-2 border border-[#5A5858] text-sm text-dark_grey rounded-lg hover:bg-gray-200 px-5 py-2 disabled:bg-BColor disabled:cursor-not-allowed transition-colors duration-200"
               >
                 <FaArrowLeft className="text-[16px]" />
                 <span>Previous</span>

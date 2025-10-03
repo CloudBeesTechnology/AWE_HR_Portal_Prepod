@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { FilterTable } from "./FilterTable";
 import { useLocation } from "react-router-dom";
 import { DateFormat } from "../../utils/DateFormat";
+import { DataSupply } from "../../utils/DataStoredContext";
 
 export const EmpPE = () => {
   const location = useLocation();
   const { allData, title } = location.state || {};
+  const { loading: dataLoading } = useContext(DataSupply); // Get loading state from context
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [isDateFiltered, setIsDateFiltered] = useState(false);
@@ -201,6 +203,7 @@ export const EmpPE = () => {
         endDate={endDate}
         handleDate={handleDate}
         isFiltered={isDateFiltered}
+        loading={dataLoading} // Pass the loading prop
       />
     </div>
   );

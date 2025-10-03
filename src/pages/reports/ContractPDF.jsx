@@ -7,7 +7,7 @@ import { useTempID } from "../../utils/TempIDContext";
 import { DataSupply } from "../../utils/DataStoredContext";
 
 export const ContractPDF = ({ userID, userType }) => {
-  const { contractForms } = useContext(DataSupply);
+   const { contractForms, loading: dataLoading } = useContext(DataSupply); 
   const navigate = useNavigate();
   const location = useLocation();
   const { gmPosition, HRMPosition } = useTempID();
@@ -136,6 +136,7 @@ export const ContractPDF = ({ userID, userType }) => {
         } else {
           finalPosition = emp.position?.[emp.position.length - 1];
         }
+// console.log(contract,"contract");
 
         return {
           empID: emp.empID,
@@ -195,6 +196,8 @@ export const ContractPDF = ({ userID, userType }) => {
 
         return getPriority(a) - getPriority(b);
       });
+      // console.log(mergedData,"mergedData");
+      
     return mergedData;
   };
 
@@ -376,6 +379,7 @@ export const ContractPDF = ({ userID, userType }) => {
         allData={allData}
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
+        loading={dataLoading}
       />
 
       {selectedPerson && (

@@ -359,14 +359,6 @@ export const ProbationPDF = ({ userID, userType }) => {
     setTableBody(filtered);
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[82vh]">
-        <p className="text-sm font-semibold">Loading...</p>
-      </div>
-    );
-  }
-
   return (
     <div>
       <FilterTable
@@ -377,6 +369,7 @@ export const ProbationPDF = ({ userID, userType }) => {
         endDate={endDate}
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
+        loading={loading} // Pass the loading prop
       />
 
       {selectedPerson && (
