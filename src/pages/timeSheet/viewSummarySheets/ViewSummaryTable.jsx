@@ -13,6 +13,7 @@ import { Pagination } from "../timeSheetSearch/Pagination";
 import { HoursMinuAbsentCal } from "../customTimeSheet/HoursMinuAbsentCal";
 import { DownloadVSpdf } from "../timeSheetSearch/DownloadVSpdf";
 import { DownloadExcelPDF } from "../timeSheetSearch/DownloadExcelPDF";
+import { DownloadExcelPDFData } from "../timeSheetSearch/DownloadExcelPDFData";
 
 export const ViewSummaryTable = ({
   dayCounts,
@@ -198,6 +199,8 @@ export const ViewSummaryTable = ({
   function sortByNameAscending(arr) {
     return arr?.sort((a, b) => a?.name?.localeCompare(b?.name));
   }
+
+  
 
   // Pagination
   const itemsPerPage = 3;
@@ -856,41 +859,24 @@ export const ViewSummaryTable = ({
           <div className="flex-1 flex justify-center">
             <button
               className="flex items-center space-x-2 rounded px-4 py-2  bg-[#FEF116] shadow-md"
-              onClick={() => {
-                // toggleSticky();
-                // DownloadExcelPDF(
-                //   "downloadTable",
-                //   location,
-                //   formattedStartDate,
-                //   formattedEndDate
-                // );
-                // setAdjustTheaderDownload(false);
-
-                // const mode = "download";
-                // handlePrint(
-                //   allExcelSheetData,
-                //   dayCounts,
-                //   getStartDate,
-                //   formattedStartDate,
-                //   formattedEndDate,
-                //   location,
-                //   mode
-                // );
-
-                setIsDownloading(true);
-
-                setTimeout(() => {
-                  DownloadExcelPDF(
-                    "downloadTable",
-                    location,
+              onClick={async () => {
+                try {
+                  await DownloadExcelPDFData(
+                    allExcelSheetData,
+                    dayCounts,
+                    getStartDate,
                     formattedStartDate,
-                    formattedEndDate
-                  );
+                    formattedEndDate,
+                    location,
+                    calculateTotalWorkingHours,
+                    calculateTotalAbsence,
+                    getStartDate
 
-                  // Reset states after download
-                  // setAdjustTheaderDownload(false);
-                  setIsDownloading(false);
-                }, 2000);
+                  );
+                } catch (error) {
+                  console.error("Download failed:", error);
+                  alert("Download failed. Please try again.");
+                }
               }}
             >
               <span className="cursor-pointer text-dark_grey text_size_5">
