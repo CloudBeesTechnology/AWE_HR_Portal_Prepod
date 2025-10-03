@@ -367,7 +367,7 @@ export const SearchDisplayForTimeSheet = ({
   return (
     <div className="relative dropdown-container">
       <div
-        className={`py-2 w-full text_size_5 border text-dark_grey bg-white border-lite_grey ${rounded} flex items-center px-2 gap-2`}
+        className={`${identify === "viewSummary" ? "py-1.5" : "py-2"} w-full text_size_5 border text-dark_grey bg-white border-lite_grey ${rounded} flex items-center px-2 gap-2`}
       >
         <input
           type="text"
@@ -388,7 +388,7 @@ export const SearchDisplayForTimeSheet = ({
         </div>
         <div
           className={`text-dark_grey cursor-pointer mb-1${
-            identify === "viewSummary" ? "text-[20px]" : "text-1xl"
+            identify === "viewSummary" ? "text-[20px] center" : "text-1xl"
           }`}
           onClick={() => {
             if (identify === "viewSummary") {

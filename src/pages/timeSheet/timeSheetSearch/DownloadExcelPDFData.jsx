@@ -15,7 +15,10 @@ export const DownloadExcelPDFData = async (
   location,
   calculateTotalWorkingHours,
   calculateTotalAbsence,
-  getStartDate
+  getStartDate,
+  // Add progress callback parameter
+  onProgress = () => {},
+  setShowDownloadModal
 ) => {
   try {
     console.log(
@@ -23,6 +26,11 @@ export const DownloadExcelPDFData = async (
         allExcelSheetData?.length || 0
       } employees...`
     );
+
+    // Report initial progress
+    onProgress(25, "Preparing data...");
+
+   
 
     // Prepare data for PDF generation (same logic as preparePrintRows)
     const rowsForPDF = preparePrintRows(
@@ -34,6 +42,8 @@ export const DownloadExcelPDFData = async (
       getStartDate
     );
 
+    onProgress(30, "Data prepared, generating PDF...");
+
     console.log("rowsForPDF : ", rowsForPDF);
     // Generate PDF with the prepared data
     await generateTimesheetPDFData(
@@ -42,7 +52,9 @@ export const DownloadExcelPDFData = async (
       startDate,
       formattedStartDate,
       formattedEndDate,
-      location
+      location,
+      onProgress,
+      setShowDownloadModal
     );
   } catch (error) {
     console.error("❌ Error generating PDF:", error);
@@ -270,7 +282,10 @@ const generateTimesheetPDFData = async (
   startDate,
   formattedStartDate,
   formattedEndDate,
-  location
+  location,
+  // Add progress callback parameter
+  onProgress = () => {},
+  setShowDownloadModal
 ) => {
   try {
     const doc = new jsPDF({
@@ -284,6 +299,7 @@ const generateTimesheetPDFData = async (
     const chunkSize = 30; // Larger chunk size for better performance
 
     if (isLargeDataset) {
+      onProgress(40, "Processing large dataset...");
       await generateLargeTimesheetPDFData(
         doc,
         rows,
@@ -292,9 +308,12 @@ const generateTimesheetPDFData = async (
         formattedStartDate,
         formattedEndDate,
         location,
-        chunkSize
+        chunkSize,
+        onProgress,
+        setShowDownloadModal
       );
     } else {
+      onProgress(40, "Processing standard dataset...");
       await generateStandardTimesheetPDFData(
         doc,
         rows,
@@ -302,7 +321,9 @@ const generateTimesheetPDFData = async (
         startDate,
         formattedStartDate,
         formattedEndDate,
-        location
+        location,
+        onProgress,
+        setShowDownloadModal
       );
     }
   } catch (error) {
@@ -320,15 +341,24 @@ const generateLargeTimesheetPDFData = async (
   formattedStartDate,
   formattedEndDate,
   location,
-  chunkSize
+  chunkSize,
+  // Add progress callback parameter
+  onProgress = () => {},
+  setShowDownloadModal
 ) => {
   try {
     console.log(`[🔄] Processing large dataset with ${rows.length} rows...`);
 
+    onProgress(50, "Building table headers...");
     const headers = buildTableHeaders(dayCounts, startDate);
+    onProgress(50, "Building table headers...");
+
     const body = buildTableBody(rows, dayCounts, startDate);
+    onProgress(70, "Building table body...");
+
     const grandTotals = calculateGrandTotalsFromRows(rows);
     const columnStyles = getColumnStyles(dayCounts);
+    onProgress(80, "Calculating totals...");
 
     // Add header on first page and get the height
     const headerHeight = addPDFHeader(
@@ -381,10 +411,16 @@ const generateLargeTimesheetPDFData = async (
       },
     });
 
+    onProgress(90, "Saving PDF...");
     doc.save(
       `TIMESHEET SUMMARY - ${location} DIVISION FOR THE PERIOD ${formattedStartDate} TO ${formattedEndDate}.pdf`
     );
+    onProgress(100, "Download complete!");
     console.log("[✅] Large PDF generated successfully.");
+
+    setTimeout(() => {
+      setShowDownloadModal(true);
+    }, 2000);
   } catch (error) {
     console.error("❌ Error generating large PDF:", error);
     throw error;
@@ -399,14 +435,22 @@ const generateStandardTimesheetPDFData = async (
   startDate,
   formattedStartDate,
   formattedEndDate,
-  location
+  location,
+  // Add progress callback parameter
+  onProgress = () => {},
+  setShowDownloadModal
 ) => {
   try {
     const headers = buildTableHeaders(dayCounts, startDate);
+    onProgress(50, "Building table headers...");
+
     const body = buildTableBody(rows, dayCounts, startDate);
+    onProgress(70, "Building table body...");
+
     const grandTotals = calculateGrandTotalsFromRows(rows);
     const columnStyles = getColumnStyles(dayCounts);
     const footRow = createFooterRow(dayCounts, grandTotals);
+    onProgress(80, "Calculating totals...");
 
     const currentY = addPDFHeader(
       doc,
@@ -451,10 +495,16 @@ const generateStandardTimesheetPDFData = async (
       },
     });
 
+    onProgress(90, "Saving PDF...");
     doc.save(
       `TIMESHEET SUMMARY - ${location} DIVISION FOR THE PERIOD ${formattedStartDate} TO ${formattedEndDate}.pdf`
     );
+    onProgress(100, "Download complete!");
     console.log("[✅] PDF generated successfully.");
+
+    setTimeout(() => {
+      setShowDownloadModal(true);
+    }, 2000);
   } catch (error) {
     console.error("❌ Error generating PDF:", error);
     throw error;
