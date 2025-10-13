@@ -50,7 +50,7 @@ export const LMTable = () => {
           return items.managerEmpID === userID;
         } else if (
           (userType === "SuperAdmin" || userType === "HR") &&
-          items?.empStatus !== "Cancelled"
+          items?.empStatus !== "Cancelled" && items.managerStatus ==="Pending"
         ) {
           return true;
         }
