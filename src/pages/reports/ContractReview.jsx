@@ -140,8 +140,6 @@ export const ContractReview = () => {
         // Access control
         if (HRMPosition === "HR MANAGER" || userType === "HR") {
           // allow
-        } else if (gmPosition === "GENERAL MANAGER") {
-          return null;
         } else if (userType === "Manager" && lastManager !== userID) {
           return null;
         } else if (userType === "HR" && HRMPosition !== "HR MANAGER") {
