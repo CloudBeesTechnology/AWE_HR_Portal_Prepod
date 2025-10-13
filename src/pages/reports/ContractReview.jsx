@@ -505,60 +505,6 @@ export const ContractReview = () => {
               </span>
             </p>
             {/* selectedPerson.genManager && */}
-            {historyData.length > 0 && (
-              <div className="mt-10">
-                <h5 className="text-xl font-semibold text-center mb-5">
-                  Contract Extension History
-                </h5>
-                <div className=" center">
-                  <div className="py-7 max-w-[350px] w-full center shadow-[2px_2px_8px_rgba(0,0,0,0.3)] rounded-md">
-                    <table className="border ">
-                      <thead className="border ">
-                        <tr className="bg-medium_grey  text-white  border">
-                          <th className="border px-3 py-2">No of Time</th>
-                          <th className="border px-3 py-2">Date</th>
-                          <th className="border px-3 py-2">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="text-sm">
-                        {historyData
-                          .sort(
-                            (a, b) =>
-                              new Date(b.createdAt) - new Date(a.createdAt)
-                          )
-                          .map((val, idx) => {
-                            return (
-                              <tr key={idx}>
-                                {(val.genManager ||
-                                  val.genManager.trim() !== "") && (
-                                  <th className="border px-3 py-2 text-dark_grey">
-                                    {idx + 1}
-                                  </th>
-                                )}
-                                {(val.genManager ||
-                                  val.genManager.trim() !== "") && (
-                                  <>
-                                    <th className="border px-3 py-2 text-dark_grey">
-                                      {val.oldCED}
-                                    </th>
-                                    <th
-                                      className="border px-3 py-2 text-blue underline cursor-pointer"
-                                      onClick={() => handleNavigate(val.id)}
-                                    >
-                                      View
-                                    </th>
-                                  </>
-                                )}
-                              </tr>
-                            );
-                          })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div className="flex justify-evenly items-center p-3 mt-10">
               <button className="primary_btn" onClick={() => handleNavigate()}>
                 Go to Contract Form

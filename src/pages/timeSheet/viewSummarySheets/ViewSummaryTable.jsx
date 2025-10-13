@@ -13,6 +13,8 @@ import { Pagination } from "../timeSheetSearch/Pagination";
 import { HoursMinuAbsentCal } from "../customTimeSheet/HoursMinuAbsentCal";
 import { DownloadVSpdf } from "../timeSheetSearch/DownloadVSpdf";
 import { DownloadExcelPDF } from "../timeSheetSearch/DownloadExcelPDF";
+import { DownloadExcelPDFData } from "../timeSheetSearch/DownloadExcelPDFData";
+import { DownloadProgressModal } from "../ModelForSuccessMess/DownloadProgressModal";
 
 export const ViewSummaryTable = ({
   dayCounts,
@@ -33,7 +35,15 @@ export const ViewSummaryTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [adjustTheaderDownload, setAdjustTheaderDownload] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-
+  // Add state for download progress modal
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [downloadMessage, setDownloadMessage] = useState(
+    "Preparing download..."
+  );
+  const [VSMessage, setVSMessage] = useState(
+    "Processing your request... This may take a moment."
+  );
   const {
     selectedLocation,
     setSelectedLocation,
@@ -78,6 +88,21 @@ export const ViewSummaryTable = ({
     setCurrentPage(1);
   }, [selectedLocation, startDate, endDate, refreshTrigger]);
 
+  useEffect(() => {
+    if (
+      startDate &&
+      endDate &&
+      selectedLocation &&
+      selectSapNoOrBadgeNo &&
+      loading === false
+    ) {
+      setTimeout(() => {
+        setVSMessage(
+          "Unable to process your request. Kindly refresh and select valid dates and location."
+        );
+      }, 50000);
+    }
+  }, [startDate, endDate, selectedLocation, selectSapNoOrBadgeNo, loading]);
   const preparePrintRows = (rows = []) => {
     return (rows || []).map((employee, idx) => {
       // 1) Total OT (same logic as in your render)
@@ -195,6 +220,12 @@ export const ViewSummaryTable = ({
     }
   };
 
+  // Add function to simulate progress updates
+  const updateDownloadProgress = (progress, message) => {
+    setDownloadProgress(progress);
+    setDownloadMessage(message);
+  };
+
   function sortByNameAscending(arr) {
     return arr?.sort((a, b) => a?.name?.localeCompare(b?.name));
   }
@@ -211,10 +242,18 @@ export const ViewSummaryTable = ({
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   // var data = currentData;
-  var data = isDownloading ? safeData : currentData;
+  var data = currentData;
 
   return (
     <div className="bg-[#fafaf6] h-screen">
+      {/* Add the download progress modal */}
+
+      <DownloadProgressModal
+        isOpen={showDownloadModal}
+        progress={downloadProgress}
+        message={downloadMessage}
+        setShowDownloadModal={setShowDownloadModal}
+      />
       <div className="screen-size p-4">
         <header className="my-5 flex justify-between">
           <div className="flex items-center ">
@@ -829,7 +868,7 @@ export const ViewSummaryTable = ({
                         ? "Processing your request... This may take a moment."
                         : emptyTableMess === true
                         ? "No records available. Try selecting different dates or locations."
-                        : "Unable to process your request. Kindly refresh and select valid dates and location."}
+                        : VSMessage}
                     </p>
                   </td>
                 </tr>
@@ -856,41 +895,38 @@ export const ViewSummaryTable = ({
           <div className="flex-1 flex justify-center">
             <button
               className="flex items-center space-x-2 rounded px-4 py-2  bg-[#FEF116] shadow-md"
-              onClick={() => {
-                // toggleSticky();
-                // DownloadExcelPDF(
-                //   "downloadTable",
-                //   location,
-                //   formattedStartDate,
-                //   formattedEndDate
-                // );
-                // setAdjustTheaderDownload(false);
+              onClick={async () => {
+                try {
+                  // Show the download modal
+                  setShowDownloadModal(true);
+                  setDownloadProgress(25);
+                  setDownloadMessage("Preparing download...");
 
-                // const mode = "download";
-                // handlePrint(
-                //   allExcelSheetData,
-                //   dayCounts,
-                //   getStartDate,
-                //   formattedStartDate,
-                //   formattedEndDate,
-                //   location,
-                //   mode
-                // );
-
-                setIsDownloading(true);
-
-                setTimeout(() => {
-                  DownloadExcelPDF(
-                    "downloadTable",
-                    location,
-                    formattedStartDate,
-                    formattedEndDate
-                  );
-
-                  // Reset states after download
-                  // setAdjustTheaderDownload(false);
-                  setIsDownloading(false);
-                }, 2000);
+                  setTimeout(async () => {
+                    await DownloadExcelPDFData(
+                      allExcelSheetData,
+                      dayCounts,
+                      getStartDate,
+                      formattedStartDate,
+                      formattedEndDate,
+                      location,
+                      calculateTotalWorkingHours,
+                      calculateTotalAbsence,
+                      getStartDate,
+                      // Add progress callback
+                      (progress, message) => {
+                        setDownloadProgress(progress);
+                        setDownloadMessage(message);
+                      },
+                      setShowDownloadModal
+                    );
+                  }, 5000);
+                } catch (error) {
+                  console.error("Download failed:", error);
+                  // Hide modal on error
+                  setShowDownloadModal(false);
+                  alert("Download failed. Please try again.");
+                }
               }}
             >
               <span className="cursor-pointer text-dark_grey text_size_5">
