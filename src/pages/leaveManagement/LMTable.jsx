@@ -40,17 +40,17 @@ export const LMTable = () => {
   useEffect(() => {
     let filteredData = mergedData
       .filter((items) => {
-        if (userType === "Supervisor" && items?.empStatus !== "Cancelled" && items.managerStatus ==="Pending") {
+        if (userType === "Supervisor" && items?.empStatus !== "Cancelled" ) {
           return items.supervisorEmpID === userID;
         } else if (
           userType === "Manager" &&
           (items.supervisorStatus === "Approved" || !items.supervisorEmpID) &&
-          items?.empStatus !== "Cancelled"&& items.managerStatus ==="Pending"
+          items?.empStatus !== "Cancelled"
         ) {
           return items.managerEmpID === userID;
         } else if (
           (userType === "SuperAdmin" || userType === "HR") &&
-          items?.empStatus !== "Cancelled" && items.managerStatus ==="Pending"
+          items?.empStatus !== "Cancelled" 
         ) {
           return true;
         }
