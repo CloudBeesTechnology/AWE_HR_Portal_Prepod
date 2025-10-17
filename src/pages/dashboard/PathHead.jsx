@@ -20,7 +20,7 @@ export const PathHead = () => {
     try {
       const candidates = [...empPIData, ...IDData];
 
-      setMergeData(candidates);
+      // setMergeData(candidates);
 
       const bruneian = candidates.filter((item) => {
         const contractTypeArray = item?.contractType;
