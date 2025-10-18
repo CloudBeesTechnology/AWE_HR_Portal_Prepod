@@ -57,6 +57,8 @@ export const ContractReview = () => {
   };
 
   const contractExpiryMergedData = (data) => {
+    console.log(data,"data");
+  
     const today = new Date();
     const startOfNextMonth = new Date(
       today.getFullYear(),
@@ -124,8 +126,6 @@ export const ContractReview = () => {
         }
         
         const contractEnd = new Date(lastDate);
-        if(item.empID === "8651") console.log(item,"itemsff");
-        
 
         if (
           !(
@@ -439,74 +439,232 @@ export const ContractReview = () => {
 
 //     setFilteredData(filtered);
 //   };
+// const handleDate = (e, type) => {
+//   const value = e.target.value;
+
+//   // Update state
+//   if (type === "startDate") setStartDate(value);
+//   if (type === "endDate") setEndDate(value);
+
+//   // Use latest input value or state
+//   let start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
+//   let end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+
+//   // Normalize dates (ignore time)
+//   if (start) start.setHours(0, 0, 0, 0);
+//   if (end) end.setHours(23, 59, 59, 999);
+
+//   const filtered = allData
+//     .filter(item => {
+//       // Ignore terminated or resigned employees
+//       const lastWorkStatus = item.workStatus?.[item.workStatus.length - 1];
+//       if (!lastWorkStatus || ["TERMINATION", "RESIGNATION"].includes(lastWorkStatus.toUpperCase())) return false;
+
+//       // If contractEnd exists, filter by date
+//       const expiryArray = item.contractEnd || [];
+//       if (expiryArray.length === 0) return false;
+//       // console.log(item.empID==="4820" ?? item,"item");
+      
+//       const expiryDate = new Date(expiryArray[expiryArray.length - 1]);
+//       if (isNaN(expiryDate.getTime())) return false;
+      
+//       expiryDate.setHours(0, 0, 0, 0); // normalize
+      
+//       if (start && expiryDate < start) return false;
+//       if (end && expiryDate > end) return false;
+
+//       return true;
+//     })
+//     .map(item => {
+      
+//       const contractEndDates = item.contractEnd || [];
+//       const lastDate = contractEndDates[contractEndDates.length - 1];
+//       const contractStartDates = item.contractStart || [];
+//       const startDateVal = contractStartDates[contractStartDates.length - 1];
+
+//       const today = new Date();
+//       const positionRevDate = item.positionRevDate?.[item.positionRevDate.length - 1];
+//       const positionRev = item.positionRev?.[item.positionRev.length - 1];
+//       const upgradePosition = item.upgradePosition?.[item.upgradePosition.length - 1];
+//       const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
+
+//       let finalPosition;
+
+//       const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
+//       const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+
+//       if (revDateObj && upgradeDateObj) {
+//         if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
+//           finalPosition = item.position?.[item.position.length - 1];
+//         } else if (revDateObj > upgradeDateObj) {
+//           finalPosition = today >= revDateObj ? positionRev : today >= upgradeDateObj ? upgradePosition : item.position?.[item.position.length - 1];
+//         } else {
+//           finalPosition = today >= upgradeDateObj ? upgradePosition : today >= revDateObj ? positionRev : item.position?.[item.position.length - 1];
+//         }
+//       } else if (revDateObj && !upgradeDateObj) {
+//         finalPosition = today >= revDateObj ? positionRev : item.position?.[item.position.length - 1];
+//       } else if (upgradeDateObj && !revDateObj) {
+//         finalPosition = today >= upgradeDateObj ? upgradePosition : item.position?.[item.position.length - 1];
+//       } else {
+//         finalPosition = item.position?.[item.position.length - 1];
+//       }
+
+//       return {
+//         lastDate: new Date(lastDate),
+//         empID: item.empID,
+//         empBadgeNo: item.empBadgeNo,
+//         name: item.name,
+//         nationality: item.nationality,
+//         dateOfJoin: formatDate(item.doj),
+//         department: Array.isArray(item.department) ? item.department[item.department.length - 1] : "-",
+//         otherDepartment: Array.isArray(item.otherDepartment) ? item.otherDepartment[item.otherDepartment.length - 1] : "-",
+//         position: finalPosition,
+//         otherPosition: Array.isArray(item.otherPosition) ? item.otherPosition[item.otherPosition.length - 1] : "-",
+//         contractStartDate: formatDate(startDateVal),
+//         contractEndDate: formatDate(lastDate),
+//         oldCED: item.oldCED === formatDate(lastDate) ? item.oldCED : formatDate(lastDate),
+//         nlmsEmpApproval: Array.isArray(item.nlmsEmpValid) ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1]) : "-",
+//         ...(HRMPosition === "HR MANAGER" || userType === "HR" ? { status: item.hrManager ? "Approved" : "Pending" } : {}),
+//         ...(userType === "Manager" ? { status: item.depHead ? "Approved" : "Pending" } : {}),
+//         ...(gmPosition === "GENERAL MANAGER" ? { status: item.genManager ? "Approved" : "Pending" } : {}),
+//       };
+//     })
+//     .sort((a, b) => new Date(a.lastDate) - new Date(b.lastDate))
+//     .map(({ lastDate, ...rest }) => rest);
+// // console.log(filtered,"filtered");
+
+//   // Set filtered state
+//   if (start || end) {
+//     setIsDateFiltered(filtered.length === 0);
+//   } else {
+//     setIsDateFiltered(false);
+//   }
+
+//   setFilteredData(filtered);
+// };
+
 const handleDate = (e, type) => {
   const value = e.target.value;
 
   // Update state
-  if (type === "startDate") setStartDate(value);
-  if (type === "endDate") setEndDate(value);
+ if (type === "startDate") {
+  setStartDate(value);
+  sessionStorage.setItem("startDate", value);
+}
+if (type === "endDate") {
+  setEndDate(value);
+  sessionStorage.setItem("endDate", value);
+}
 
+  
   // Use latest input value or state
   let start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
   let end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
 
-  // Normalize dates (ignore time)
+
   if (start) start.setHours(0, 0, 0, 0);
   if (end) end.setHours(23, 59, 59, 999);
 
-  const filtered = allData
-    .filter(item => {
-      // Ignore terminated or resigned employees
-      const lastWorkStatus = item.workStatus?.[item.workStatus.length - 1];
-      if (!lastWorkStatus || ["TERMINATION", "RESIGNATION"].includes(lastWorkStatus.toUpperCase())) return false;
+  const empIDsToIgnore = new Set(
+    contractForms
+      .filter((item) => item.extendedStatus === "noExtended")
+      .map((item) => item.empID)
+  );
 
-      // If contractEnd exists, filter by date
-      const expiryArray = item.contractEnd || [];
-      if (expiryArray.length === 0) return false;
-      // console.log(item.empID==="4820" ?? item,"item");
+  const filtered = allData
+    ?.filter((item) => {
+      if (empIDsToIgnore.has(item.empID)) return false;
+
+      const lastWorkStatus = item.workStatus?.at(-1);
+      if (["TERMINATION", "RESIGNATION"].includes(lastWorkStatus?.toUpperCase())) return false;
+
+      const contractEndDates = item.contractEnd || [];
+      if (contractEndDates.length === 0) return false;
+
+      const lastDate = new Date(contractEndDates.at(-1));
+      if (isNaN(lastDate)) return false;
+
+      // Skip based on extendedStatus conditions
+      const latestItemForEmp = contractForms
+        .filter((cf) => cf.empID === item.empID)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+
+      if (
+        (latestItemForEmp?.depHead && latestItemForEmp.hrManager === "") ||
+        (item.contStatus && item.extendedStatus === "noExtended") ||
+        item.extendedStatus === "hrmView" ||
+        item.extendedStatus === "gmView"
+      ) {
+        return false;
+      }
+
+      // ✅ Date range filter
+      if (start && lastDate < start) return false;
+      if (end && lastDate > end) return false;
+
+      // Access control
+      const lastManager = item.manager?.at(-1);
+     
       
-      const expiryDate = new Date(expiryArray[expiryArray.length - 1]);
-      if (isNaN(expiryDate.getTime())) return false;
-      
-      expiryDate.setHours(0, 0, 0, 0); // normalize
-      
-      if (start && expiryDate < start) return false;
-      if (end && expiryDate > end) return false;
 
       return true;
     })
-    .map(item => {
-      
+    .map((item) => {
+      // console.log(item,"item");
       const contractEndDates = item.contractEnd || [];
-      const lastDate = contractEndDates[contractEndDates.length - 1];
+      const lastDate = contractEndDates.at(-1);
       const contractStartDates = item.contractStart || [];
-      const startDateVal = contractStartDates[contractStartDates.length - 1];
+      const startDateVal = contractStartDates.at(-1);
 
+      // Position logic
       const today = new Date();
-      const positionRevDate = item.positionRevDate?.[item.positionRevDate.length - 1];
-      const positionRev = item.positionRev?.[item.positionRev.length - 1];
-      const upgradePosition = item.upgradePosition?.[item.upgradePosition.length - 1];
-      const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
+      const positionRevDate = item.positionRevDate?.at(-1);
+      const positionRev = item.positionRev?.at(-1);
+      const upgradePosition = item.upgradePosition?.at(-1);
+      const upgradeDate = item.upgradeDate?.at(-1);
 
       let finalPosition;
-
       const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
       const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
 
       if (revDateObj && upgradeDateObj) {
         if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
-          finalPosition = item.position?.[item.position.length - 1];
+          finalPosition = item.position?.at(-1);
         } else if (revDateObj > upgradeDateObj) {
-          finalPosition = today >= revDateObj ? positionRev : today >= upgradeDateObj ? upgradePosition : item.position?.[item.position.length - 1];
+          finalPosition = today >= revDateObj ? positionRev : today >= upgradeDateObj ? upgradePosition : item.position?.at(-1);
         } else {
-          finalPosition = today >= upgradeDateObj ? upgradePosition : today >= revDateObj ? positionRev : item.position?.[item.position.length - 1];
+          finalPosition = today >= upgradeDateObj ? upgradePosition : today >= revDateObj ? positionRev : item.position?.at(-1);
         }
       } else if (revDateObj && !upgradeDateObj) {
-        finalPosition = today >= revDateObj ? positionRev : item.position?.[item.position.length - 1];
+        finalPosition = today >= revDateObj ? positionRev : item.position?.at(-1);
       } else if (upgradeDateObj && !revDateObj) {
-        finalPosition = today >= upgradeDateObj ? upgradePosition : item.position?.[item.position.length - 1];
+        finalPosition = today >= upgradeDateObj ? upgradePosition : item.position?.at(-1);
       } else {
-        finalPosition = item.position?.[item.position.length - 1];
+        finalPosition = item.position?.at(-1);
+      }
+
+      // Find latest contract form for status
+      const latestItemForEmp = contractForms
+        .filter((cf) => cf.empID === item.empID)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+
+      // Determine approval status
+      let status = "Pending";
+      if (HRMPosition === "HR MANAGER" || userType === "HR") {
+        status =
+          latestItemForEmp?.hrManager && latestItemForEmp.oldCED === formatDate(lastDate)
+            ? "Approved"
+            : "Pending";
+      } else if (userType === "Manager") {
+        status =
+          latestItemForEmp?.depHead && latestItemForEmp.oldCED === formatDate(lastDate)
+            ? "Approved"
+            : "Pending";
+      } else if (gmPosition === "GENERAL MANAGER") {
+        status =
+          latestItemForEmp?.genManager && latestItemForEmp.oldCED === formatDate(lastDate)
+            ? "Approved"
+            : "Pending";
       }
 
       return {
@@ -516,26 +674,23 @@ const handleDate = (e, type) => {
         name: item.name,
         nationality: item.nationality,
         dateOfJoin: formatDate(item.doj),
-        department: Array.isArray(item.department) ? item.department[item.department.length - 1] : "-",
-        otherDepartment: Array.isArray(item.otherDepartment) ? item.otherDepartment[item.otherDepartment.length - 1] : "-",
+        department: item.department?.at(-1),
+        otherDepartment: item.otherDepartment?.at(-1),
         position: finalPosition,
-        otherPosition: Array.isArray(item.otherPosition) ? item.otherPosition[item.otherPosition.length - 1] : "-",
+        otherPosition: item.otherPosition?.at(-1),
         contractStartDate: formatDate(startDateVal),
         contractEndDate: formatDate(lastDate),
         oldCED: item.oldCED === formatDate(lastDate) ? item.oldCED : formatDate(lastDate),
-        nlmsEmpApproval: Array.isArray(item.nlmsEmpValid) ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1]) : "-",
-        ...(HRMPosition === "HR MANAGER" || userType === "HR" ? { status: item.hrManager ? "Approved" : "Pending" } : {}),
-        ...(userType === "Manager" ? { status: item.depHead ? "Approved" : "Pending" } : {}),
-        ...(gmPosition === "GENERAL MANAGER" ? { status: item.genManager ? "Approved" : "Pending" } : {}),
+        nlmsEmpApproval: formatDate(item.nlmsEmpValid?.at(-1)) || null,
+        status,
       };
     })
+    .filter((val) => val.status === "Pending")
     .sort((a, b) => new Date(a.lastDate) - new Date(b.lastDate))
     .map(({ lastDate, ...rest }) => rest);
-// console.log(filtered,"filtered");
 
-  // Set filtered state
   if (start || end) {
-    setIsDateFiltered(filtered.length === 0);
+    setIsDateFiltered(filtered?.length === 0);
   } else {
     setIsDateFiltered(false);
   }
@@ -543,10 +698,30 @@ const handleDate = (e, type) => {
   setFilteredData(filtered);
 };
 
+useEffect(() => {
+  const storedStart = sessionStorage.getItem("startDate");
+  const storedEnd = sessionStorage.getItem("endDate");
+console.log(storedStart,"storedStart");
+
+  if (storedStart) setStartDate(storedStart);
+
+  if (storedEnd) setEndDate(storedEnd);
+}, []);
+
+useEffect(() => {
+  if (location.pathname === "/report") {
+    sessionStorage.removeItem("startDate");
+    sessionStorage.removeItem("endDate");
+    setStartDate("");
+    setEndDate("");
+  }
+}, [location.pathname]);
+
+
   return (
     <div>
       <FilterTable
-        tableBody={filteredData.length ? filteredData : tableBody}
+        tableBody={filteredData?.length ? filteredData : tableBody}
         tableHead={tableHead}
         title={title}
         startDate={startDate}

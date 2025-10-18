@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "jspdf-autotable"; // Ensure this is imported
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { downloadPDF } from "../../utils/DownloadPDF";
 import { ContractForm } from "../../services/createMethod/CreateContract";
 import { DataSupply } from "../../utils/DataStoredContext";
@@ -70,7 +70,7 @@ export const ContractFormPDF = () => {
       hrDate: "",
     },
   });
-
+const navigate = useNavigate();
   // Watch form values
   const formData = watch();
 
@@ -636,9 +636,10 @@ export const ContractFormPDF = () => {
           </style>
           <section className="flex items-center pt-4 ">
             <Link
-              to="/reports"
+              // to="/contractReview"
               id="left-button"
               className="no-print left-button text-xl text-start w-[50px] text-grey"
+                onClick={() => navigate(-1)}
             >
               <FaArrowLeft />
             </Link>
@@ -722,13 +723,13 @@ export const ContractFormPDF = () => {
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {employeeData?.position === "OTHER"
-                          ? employeeData.otherPosition
-                          : employeeData.position || "N/A"}
+                          ? employeeData?.otherPosition
+                          : employeeData?.position || "N/A"}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {employeeData?.department === "OTHER"
-                          ? employeeData.otherDepartment
-                          : employeeData.department || "N/A"}
+                          ? employeeData?.otherDepartment
+                          : employeeData?.department || "N/A"}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {employeeData?.nationality || "N/A"}
