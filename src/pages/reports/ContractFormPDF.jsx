@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "jspdf-autotable"; // Ensure this is imported
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { downloadPDF } from "../../utils/DownloadPDF";
 import { ContractForm } from "../../services/createMethod/CreateContract";
 import { DataSupply } from "../../utils/DataStoredContext";
@@ -38,7 +38,7 @@ export const ContractFormPDF = () => {
     managerEmpID: "",
     managerOfficialMail: "",
     managerName: "",
-    hrEmail: "Hr-notification@adininworks.com",
+    hrEmail: "hariharanofficial2812@gmail.com",
     genManagerEmail: [],
     skilledAndUnskilled: null,
   });
@@ -70,7 +70,7 @@ export const ContractFormPDF = () => {
       hrDate: "",
     },
   });
-
+  const navigate = useNavigate();
   // Watch form values
   const formData = watch();
 
@@ -212,11 +212,9 @@ export const ContractFormPDF = () => {
     managerData
   ) => {
     const subject = "Contract Verification by HRM";
-    const notifyMessageHR = `Your Employee Mr./Ms. ${
-      empName || "Not mentioned"
-    }'s contract period ending on ${
-      contractEndFormatted || "Not Mentioned"
-    }, has been verified by HRM.`;
+    const notifyMessageHR = `Your Employee Mr./Ms. ${empName || "Not mentioned"
+      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+      }, has been verified by HRM.`;
 
     if (skillPool === null) {
       if (Array.isArray(managerData?.genManagerEmail)) {
@@ -225,10 +223,8 @@ export const ContractFormPDF = () => {
             subject,
             `<html>
           <body>
-            <p>Your Employee Mr./Ms. ${
-              empName || "Not mentioned"
-            }'s contract period ending on ${
-              contractEndFormatted || "Not Mentioned"
+            <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
+            }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
             },
               <br/>
               has been verified by HRM.
@@ -255,10 +251,8 @@ export const ContractFormPDF = () => {
         subject,
         `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${
-          empName || "Not mentioned"
-        }'s contract period ending on ${
-          contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
+        }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
         },
           <br/>
          has been verified by HR Manager,
@@ -281,20 +275,16 @@ export const ContractFormPDF = () => {
     managerData
   ) => {
     const subject = "Contract Review by Manager";
-    const notifyMessageManager = `Your Employee Mr./Ms. ${
-      empName || "Not mentioned"
-    }'s contract period ending on ${
-      contractEndFormatted || "Not Mentioned"
-    }, has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.`;
+    const notifyMessageManager = `Your Employee Mr./Ms. ${empName || "Not mentioned"
+      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+      }, has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.`;
 
     const result = await sendEmail(
       subject,
       `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${
-          empName || "Not mentioned"
-        }'s contract period ending on ${
-        contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
+      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
       },
           <br/>
           has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.
@@ -323,20 +313,16 @@ export const ContractFormPDF = () => {
     managerData
   ) => {
     const subject = "Contract Confirmation by General Manager";
-    const notifyMessageGM = `Your Employee Mr./Ms. ${
-      empName || "Not mentioned"
-    }'s contract period ending on ${
-      contractEndFormatted || "Not Mentioned"
-    }, has been confirmed by the GENERAL MANAGER.`;
+    const notifyMessageGM = `Your Employee Mr./Ms. ${empName || "Not mentioned"
+      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+      }, has been confirmed by the GENERAL MANAGER.`;
 
     const result = await sendEmail(
       subject,
       `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${
-          empName || "Not mentioned"
-        }'s contract period ending on ${
-        contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
+      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
       },
           <br/>
           has been confirmed by the GENERAL MANAGER,
@@ -389,11 +375,11 @@ export const ContractFormPDF = () => {
 
       const contractEndFormatted =
         Array.isArray(WorkInfoRecord?.contractEnd) &&
-        WorkInfoRecord?.contractEnd?.length > 0
+          WorkInfoRecord?.contractEnd?.length > 0
           ? WorkInfoRecord.contractEnd[WorkInfoRecord.contractEnd.length - 1]
-              .split("-")
-              .reverse()
-              .join("/")
+            .split("-")
+            .reverse()
+            .join("/")
           : "Not mentioned";
 
       // 🔹 Determine renewalStatus
@@ -483,6 +469,7 @@ export const ContractFormPDF = () => {
             (data.gmDate &&
               (!existingContractData?.gmDate ||
                 existingContractData?.gmDate !== data.gmDate))),
+
         hr:
           userType === "HR" &&
           ((data.hrSign &&
@@ -490,7 +477,20 @@ export const ContractFormPDF = () => {
               existingContractData?.hrSign !== data.hrSign)) ||
             (data.hrDate &&
               (!existingContractData?.hrDate ||
-                existingContractData?.hrDate !== data.hrDate))),
+                existingContractData?.hrDate !== data.hrDate)) ||
+            (data.extendedStatus &&
+              (!existingContractData?.extendedStatus ||
+                existingContractData?.extendedStatus !== data.extendedStatus))),
+
+
+        // hr:
+        //   userType === "HR" &&
+        //   ((data.hrSign &&
+        //     (!existingContractData?.hrSign ||
+        //       existingContractData?.hrSign !== data.hrSign)) ||
+        //     (data.hrDate &&
+        //       (!existingContractData?.hrDate ||
+        //         existingContractData?.hrDate !== data.hrDate))),
       };
 
       // 🔹 Notifications
@@ -549,6 +549,8 @@ export const ContractFormPDF = () => {
         GMResult === "success" ||
         HRSignResult === "success";
 
+      console.log("Notification Result:", notificationRes);
+
       if (notificationRes) {
         setShowTitle(
           selectedData
@@ -558,6 +560,8 @@ export const ContractFormPDF = () => {
         setNotification(true);
       }
     } catch (err) {
+      console.log("err", err);
+
       setShowTitle("Error occurred during submission");
       setNotification(true);
     } finally {
@@ -636,9 +640,17 @@ export const ContractFormPDF = () => {
           </style>
           <section className="flex items-center pt-4 ">
             <Link
-              to="/reports"
+              // to="/contractReview"
               id="left-button"
               className="no-print left-button text-xl text-start w-[50px] text-grey"
+              onClick={() => {
+                // Mark that we're navigating back from contract form
+                sessionStorage.setItem('contractReview_visited', 'true');
+
+                // Preserve dates when navigating back
+                // Note: The dates should already be in localStorage from ContractReview
+                navigate(-1);
+              }}
             >
               <FaArrowLeft />
             </Link>
@@ -722,13 +734,13 @@ export const ContractFormPDF = () => {
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {employeeData?.position === "OTHER"
-                          ? employeeData.otherPosition
-                          : employeeData.position || "N/A"}
+                          ? employeeData?.otherPosition
+                          : employeeData?.position || "N/A"}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {employeeData?.department === "OTHER"
-                          ? employeeData.otherDepartment
-                          : employeeData.department || "N/A"}
+                          ? employeeData?.otherDepartment
+                          : employeeData?.department || "N/A"}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {employeeData?.nationality || "N/A"}
@@ -743,8 +755,8 @@ export const ContractFormPDF = () => {
                         {employeeData?.oldCED?.trim()
                           ? employeeData.oldCED
                           : employeeData?.contractEndDate
-                          ? employeeData.contractEndDate
-                          : "N/A"}
+                            ? employeeData.contractEndDate
+                            : "N/A"}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {employeeData?.nlmsEmpApproval || "N/A"}

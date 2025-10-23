@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { IoSearch } from "react-icons/io5";
@@ -15,10 +15,10 @@ export const FilterTable = ({
   handleDate,
   startDate,
   endDate,
-  testDate,
-  setTestDate,
-  loading, // Add loading prop
+  loading,
+  userType
 }) => {
+  const navigate = useNavigate();
   const { dropDownVal } = useContext(DataSupply);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -29,7 +29,7 @@ export const FilterTable = ({
   if (loading) {
     // Determine number of columns based on tableHead or use default
     const columnCount = (tableHead && tableHead.length > 0) ? tableHead.length : 5;
-    
+
     return (
       <div className="w-full px-7 bg-[#F5F6F1CC] animate-pulse">
         {/* Header skeleton */}
@@ -37,19 +37,19 @@ export const FilterTable = ({
           <div className="">
             <div className="h-8 bg-BColor rounded w-[200px] mx-auto"></div>
           </div>
-          
+
           <div className="">
             <div className="h-8 bg-BColor rounded w-[200px] mx-auto"></div>
           </div>
-          
+
           <div className="">
             <div className="h-8 bg-BColor rounded w-[200px] mx-auto"></div>
           </div>
         </div>
-        
+
         {/* Filters skeleton */}
-       
-        
+
+
         {/* Table skeleton */}
         <div className="w-full overflow-x-auto overflow-y-auto h-[500px] shadow-lg mb-5">
           <table className="border-collapse w-full">
@@ -81,7 +81,7 @@ export const FilterTable = ({
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination skeleton */}
         <div className="flex justify-center w-full my-5">
           <div className="flex justify-center gap-6 w-3/5 items-center">
@@ -110,9 +110,9 @@ export const FilterTable = ({
   // Step 1: Filter by department
   let filteredTableBody = selectedDepartment
     ? tableBody?.filter(
-        (row) =>
-          row?.department?.toUpperCase() === selectedDepartment?.toUpperCase()
-      )
+      (row) =>
+        row?.department?.toUpperCase() === selectedDepartment?.toUpperCase()
+    )
     : tableBody;
 
   // Step 2: Apply search filter on department-filtered data
@@ -217,8 +217,8 @@ export const FilterTable = ({
               ? value.join(", ")
               : "N/A"
             : (value ?? "") !== ""
-            ? value
-            : "N/A";
+              ? value
+              : "N/A";
         }
       }
       return processedRow;
@@ -312,9 +312,27 @@ export const FilterTable = ({
   return (
     <div className="w-full px-7 bg-[#F5F6F1CC]">
       <div className="w-full flex items-center justify-between gap-5 ">
-        <Link to="/reports" className="text-xl flex-1 text-grey ">
+        <button
+          onClick={() => {
+            // Preserve dates in localStorage when navigating back
+            if (startDate) {
+              localStorage.setItem("contractReview_startDate", startDate);
+            } else {
+              localStorage.removeItem("contractReview_startDate");
+            }
+
+            if (endDate) {
+              localStorage.setItem("contractReview_endDate", endDate);
+            } else {
+              localStorage.removeItem("contractReview_endDate");
+            }
+
+            navigate("/reports");
+          }}
+          className="text-xl flex-1 text-grey"
+        >
           <FaArrowLeft />
-        </Link>
+        </button>
 
         <div className="flex-1">
           <h1 className="text-xl flex  font-bold center my-10 uppercase ">
@@ -349,6 +367,7 @@ export const FilterTable = ({
                 <input
                   id="start-date"
                   type="date"
+                  value={startDate || ""}
                   onChange={(e) => handleDate(e, "startDate")}
                   className="outline-none text-grey border rounded-md p-2"
                 />
@@ -364,6 +383,7 @@ export const FilterTable = ({
                 <input
                   id="end-date"
                   type="date"
+                  value={endDate || ""}
                   onChange={(e) => handleDate(e, "endDate")}
                   className="outline-none text-grey border rounded-md p-2"
                 />
@@ -438,58 +458,69 @@ export const FilterTable = ({
                 {currentItems.map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
-                    className={`text-sm border-b-2 border-[#CECECE] min-[40px] ${
-                      isClickableRow ? "hover:bg-gray-100 cursor-pointer" : ""
-                    }`}
+                    className={`text-sm border-b-2 border-[#CECECE] min-[40px] ${isClickableRow ? "hover:bg-gray-100 cursor-pointer" : ""
+                      }`}
                     onClick={() => isClickableRow && handleViewDetails(row)}
                   >
                     <td className="font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2">
                       {(currentPage - 1) * itemsPerPage + rowIndex + 1}
                     </td>
+
                     {Object.entries(row)
-                      .filter(
-                        ([key]) =>
-                          key !== "probExtendStatus" &&
-                          key !== "prevProbExDate" &&
-                          key !== "probCreatedAt" &&
-                          key !== "empInfoId" &&
-                          key !== "probID" &&
-                          key !== "workInfoId" &&
-                          key !== "headStatus" &&
-                          key !== "hrmStatus" &&
-                          key !== "gmStatus" &&
-                          key !== "contractEndDate" &&
-                          key !== "matchedID"
-                      )
+                      .filter(([key]) => {
+                        // Exclude unwanted fields
+                        if (
+                          [
+                            "probExtendStatus",
+                            "prevProbExDate",
+                            "probCreatedAt",
+                            "empInfoId",
+                            "probID",
+                            "workInfoId",
+                            "headStatus",
+                            "hrmStatus",
+                            "gmStatus",
+                            "contractEndDate",
+                            "matchedID",
+                          ].includes(key)
+                        ) {
+                          return false;
+                        }
+
+                        // If SuperAdmin, also exclude "status"
+                        if (userType === "SuperAdmin" && key === "status") {
+                          return false;
+                        }
+
+                        return true;
+                      })
                       .map(([key, col], colIndex) => {
-                        const isExpired =
-                          key === "expAndValid" && col === "EXPIRED";
+                        const isExpired = key === "expAndValid" && col === "EXPIRED";
                         const displayValue =
                           col == null
                             ? "N/A"
                             : Array.isArray(col)
-                            ? `${col[col.length - 1]}`
-                            : `${col}`;
+                              ? `${col[col.length - 1]}`
+                              : `${col}`;
+
                         return (
                           <td
                             key={colIndex}
-                            className={`h-[60px] font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2 ${
-                              isExpired ? "text-[red]" : ""
-                            } ${
-                              key === "status"
+                            className={`h-[60px] font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2 ${isExpired ? "text-[red]" : ""
+                              } ${key === "status"
                                 ? col?.toLowerCase() === "approved"
                                   ? "text-[#339933]"
                                   : col?.toLowerCase() === "reject"
-                                  ? "text-[red]"
-                                  : col?.toLowerCase() === "pending"
-                                  ? "text-[#E8A317]"
-                                  : col?.toLowerCase() === "extended"
-                                  ? "text-[#339933]"
-                                  : col?.toLowerCase() === "not extended"
-                                  ? "text-[#E8A317]"
-                                  : ""
+                                    ? "text-[red]"
+                                    : col?.toLowerCase() === "pending"
+                                      ? "text-[#E8A317]"
+                                      : col?.toLowerCase() === "extended"
+                                        ? "text-[#339933]"
+                                        : col?.toLowerCase() === "not extended"
+                                          ? "text-[#E8A317]"
+                                          : ""
                                 : ""
-                            }`}
+                              }`}
                           >
                             {displayValue}
                           </td>
@@ -524,11 +555,10 @@ export const FilterTable = ({
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`w-8 h-8 p-4 flex items-center justify-center text-sm font-medium rounded-full ${
-                    currentPage === page
-                      ? "bg-[indigo] shadow-md text-white"
-                      : "bg-gray-200 text-dark_grey"
-                  }`}
+                  className={`w-8 h-8 p-4 flex items-center justify-center text-sm font-medium rounded-full ${currentPage === page
+                    ? "bg-[indigo] shadow-md text-white"
+                    : "bg-gray-200 text-dark_grey"
+                    }`}
                 >
                   {page}
                 </button>

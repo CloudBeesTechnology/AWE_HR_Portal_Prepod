@@ -138,7 +138,9 @@ export const ContractReview = () => {
         const lastManager = item.manager?.[item.manager.length - 1] || null;
 
         // Access control
-        if (HRMPosition === "HR MANAGER" || userType === "HR") {
+        if (userType === "SuperAdmin") {
+          // allow
+        } else if (HRMPosition === "HR MANAGER" || userType === "HR") {
           // allow
         } else if (userType === "Manager" && lastManager !== userID) {
           return null;
@@ -170,16 +172,16 @@ export const ContractReview = () => {
               today >= revDateObj
                 ? positionRev
                 : today >= upgradeDateObj
-                ? upgradePosition
-                : item.position?.[item.position.length - 1];
+                  ? upgradePosition
+                  : item.position?.[item.position.length - 1];
           } else if (upgradeDateObj > revDateObj) {
             // finalPosition = today >= upgradeDateObj && upgradePosition;
             finalPosition =
               today >= upgradeDateObj
                 ? upgradePosition
                 : today >= revDateObj
-                ? positionRev
-                : item.position?.[item.position.length - 1];
+                  ? positionRev
+                  : item.position?.[item.position.length - 1];
           }
         } else if (revDateObj && !upgradeDateObj) {
           finalPosition = today >= revDateObj && positionRev;
@@ -215,31 +217,38 @@ export const ContractReview = () => {
             : null,
           ...(HRMPosition === "HR MANAGER"
             ? {
-                status:
-                  latestItemForEmp?.hrManager &&
+              status:
+                latestItemForEmp?.hrManager &&
                   latestItemForEmp.oldCED === formatDate(lastDate)
-                    ? "Approved"
-                    : "Pending",
-              }
+                  ? "Approved"
+                  : "Pending",
+            }
             : {}),
           ...(userType === "Manager" && {
             status:
               latestItemForEmp?.depHead &&
-              latestItemForEmp?.oldCED === formatDate(lastDate)
+                latestItemForEmp?.oldCED === formatDate(lastDate)
                 ? "Approved"
                 : "Pending",
           }),
           ...(gmPosition === "GENERAL MANAGER" && {
             status:
               latestItemForEmp?.genManager &&
-              latestItemForEmp.oldCED === formatDate(lastDate)
+                latestItemForEmp.oldCED === formatDate(lastDate)
                 ? "Approved"
                 : "Pending",
           }),
           ...(userType === "HR" && {
             status:
               latestItemForEmp?.hrSign &&
-              latestItemForEmp.oldCED === formatDate(lastDate)
+                latestItemForEmp.oldCED === formatDate(lastDate)
+                ? "Approved"
+                : "Pending",
+          }),
+          ...(userType === "SuperAdmin" && {
+            status:
+              latestItemForEmp?.depHead &&
+                latestItemForEmp?.oldCED === formatDate(lastDate)
                 ? "Approved"
                 : "Pending",
           }),
@@ -253,6 +262,7 @@ export const ContractReview = () => {
     // Final mapped result without the date object
     return sortedData;
   };
+
   useEffect(() => {
     if (allData) {
       const mergedData = contractExpiryMergedData(
@@ -280,99 +290,132 @@ export const ContractReview = () => {
   const handleNavigate = (id) => {
     closeModal();
     if (selectedPerson) {
+      // Preserve dates when navigating to contract form
+      if (startDate) {
+        localStorage.setItem("contractReview_startDate", startDate);
+      } else {
+        localStorage.removeItem("contractReview_startDate");
+      }
+      
+      if (endDate) {
+        localStorage.setItem("contractReview_endDate", endDate);
+      } else {
+        localStorage.removeItem("contractReview_endDate");
+      }
+      
       navigate("/contractForms", {
         state: { employeeData: selectedPerson, matchedID: id ?? null },
       });
     }
   };
-  const handleDate = (e, type) => {
-    const value = e.target.value;
 
-    if (type === "startDate") setStartDate(value);
-    if (type === "endDate") setEndDate(value);
+  const applyDateFilter = (startValue, endValue) => {
+    // Use provided values or state values
+    const start = startValue ? new Date(startValue) : startDate ? new Date(startDate) : null;
+    const end = endValue ? new Date(endValue) : endDate ? new Date(endDate) : null;
 
-    const start =
-      type === "startDate"
-        ? new Date(value)
-        : startDate
-        ? new Date(startDate)
-        : null;
-    const end =
-      type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+    if (start) start.setHours(0, 0, 0, 0);
+    if (end) end.setHours(23, 59, 59, 999);
+
+    const empIDsToIgnore = new Set(
+      contractForms
+        .filter((item) => item.extendedStatus === "noExtended")
+        .map((item) => item.empID)
+    );
 
     const filtered = allData
-      .filter((item) => {
-        if (!Array.isArray(item.workStatus) || item.workStatus.length === 0) {
-          return false;
-        }
+      ?.filter((item) => {
+        if (empIDsToIgnore.has(item.empID)) return false;
 
-        const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+        const lastWorkStatus = item.workStatus?.at(-1);
+        if (["TERMINATION", "RESIGNATION"].includes(lastWorkStatus?.toUpperCase())) return false;
+
+        const contractEndDates = item.contractEnd || [];
+        if (contractEndDates.length === 0) return false;
+
+        const lastDate = new Date(contractEndDates.at(-1));
+        if (isNaN(lastDate)) return false;
+
+        // Skip based on extendedStatus conditions
+        const latestItemForEmp = contractForms
+          .filter((cf) => cf.empID === item.empID)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
 
         if (
-          lastWorkStatus?.toUpperCase() === "TERMINATION" ||
-          lastWorkStatus?.toUpperCase() === "RESIGNATION"
+          (latestItemForEmp?.depHead && latestItemForEmp.hrManager === "") ||
+          (item.contStatus && item.extendedStatus === "noExtended") ||
+          item.extendedStatus === "hrmView" ||
+          item.extendedStatus === "gmView"
         ) {
           return false;
         }
 
-        if (!item.contStatus) {
-          const expiryArray = item.contractEnd || [];
-          const expiryDate = expiryArray.length
-            ? new Date(expiryArray[expiryArray.length - 1])
-            : null;
+        // ✅ Date range filter
+        // Handle case where start or end might be empty strings
+        if (start && !isNaN(start.getTime()) && lastDate < start) return false;
+        if (end && !isNaN(end.getTime()) && lastDate > end) return false;
 
-          if (!expiryDate || isNaN(expiryDate.getTime())) return false;
+        // Access control
+        const lastManager = item.manager?.at(-1);
 
-          if (start && end) return expiryDate >= start && expiryDate <= end;
-          if (start) return expiryDate >= start;
-          if (end) return expiryDate <= end;
-
-          return true;
-        }
-        return false;
+        return true;
       })
       .map((item) => {
+        // console.log(item,"item");
         const contractEndDates = item.contractEnd || [];
-        const lastDate = contractEndDates[contractEndDates.length - 1];
+        const lastDate = contractEndDates.at(-1);
         const contractStartDates = item.contractStart || [];
-        const startDate = contractStartDates[contractStartDates.length - 1];
+        const startDateVal = contractStartDates.at(-1);
 
+        // Position logic
         const today = new Date();
-        const positionRevDate =
-          item.positionRevDate?.[item.positionRevDate.length - 1];
-        const positionRev = item.positionRev?.[item.positionRev.length - 1];
-        const upgradePosition =
-          item.upgradePosition?.[item.upgradePosition.length - 1];
-        const upgradeDate = item.upgradeDate?.[item.upgradeDate.length - 1];
-        let finalPosition;
+        const positionRevDate = item.positionRevDate?.at(-1);
+        const positionRev = item.positionRev?.at(-1);
+        const upgradePosition = item.upgradePosition?.at(-1);
+        const upgradeDate = item.upgradeDate?.at(-1);
 
-        // Convert to dates for comparison (ensure dates are valid before comparing)
+        let finalPosition;
         const revDateObj = positionRevDate ? new Date(positionRevDate) : null;
         const upgradeDateObj = upgradeDate ? new Date(upgradeDate) : null;
+
         if (revDateObj && upgradeDateObj) {
           if (revDateObj.toDateString() === upgradeDateObj.toDateString()) {
-            finalPosition = item.position?.[item.position.length - 1];
+            finalPosition = item.position?.at(-1);
           } else if (revDateObj > upgradeDateObj) {
-            finalPosition =
-              today >= revDateObj
-                ? positionRev
-                : today >= upgradeDateObj
-                ? upgradePosition
-                : item.position?.[item.position.length - 1];
-          } else if (upgradeDateObj > revDateObj) {
-            finalPosition =
-              today >= upgradeDateObj
-                ? upgradePosition
-                : today >= revDateObj
-                ? positionRev
-                : item.position?.[item.position.length - 1];
+            finalPosition = today >= revDateObj ? positionRev : today >= upgradeDateObj ? upgradePosition : item.position?.at(-1);
+          } else {
+            finalPosition = today >= upgradeDateObj ? upgradePosition : today >= revDateObj ? positionRev : item.position?.at(-1);
           }
         } else if (revDateObj && !upgradeDateObj) {
-          finalPosition = today >= revDateObj && positionRev;
+          finalPosition = today >= revDateObj ? positionRev : item.position?.at(-1);
         } else if (upgradeDateObj && !revDateObj) {
-          finalPosition = today >= upgradeDateObj && upgradePosition;
+          finalPosition = today >= upgradeDateObj ? upgradePosition : item.position?.at(-1);
         } else {
-          finalPosition = item.position?.[item.position.length - 1];
+          finalPosition = item.position?.at(-1);
+        }
+
+        // Find latest contract form for status
+        const latestItemForEmp = contractForms
+          .filter((cf) => cf.empID === item.empID)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+
+        // Determine approval status
+        let status = "Pending";
+        if (HRMPosition === "HR MANAGER" || userType === "HR") {
+          status =
+            latestItemForEmp?.hrManager && latestItemForEmp.oldCED === formatDate(lastDate)
+              ? "Approved"
+              : "Pending";
+        } else if (userType === "Manager") {
+          status =
+            latestItemForEmp?.depHead && latestItemForEmp.oldCED === formatDate(lastDate)
+              ? "Approved"
+              : "Pending";
+        } else if (gmPosition === "GENERAL MANAGER") {
+          status =
+            latestItemForEmp?.genManager && latestItemForEmp.oldCED === formatDate(lastDate)
+              ? "Approved"
+              : "Pending";
         }
 
         return {
@@ -382,53 +425,98 @@ export const ContractReview = () => {
           name: item.name,
           nationality: item.nationality,
           dateOfJoin: formatDate(item.doj),
-          department:
-            Array.isArray(item.department) &&
-            item.department[item.department.length - 1],
-          otherDepartment:
-            Array.isArray(item.otherDepartment) &&
-            item.otherDepartment[item.otherDepartment.length - 1],
+          department: item.department?.at(-1),
+          otherDepartment: item.otherDepartment?.at(-1),
           position: finalPosition,
-          otherPosition:
-            Array.isArray(item.otherPosition) &&
-            item.otherPosition[item.otherPosition.length - 1],
-          contractStartDate: formatDate(startDate),
+          otherPosition: item.otherPosition?.at(-1),
+          contractStartDate: formatDate(startDateVal),
           contractEndDate: formatDate(lastDate),
-          oldCED:
-            item.oldCED === formatDate(lastDate)
-              ? item.oldCED
-              : formatDate(lastDate),
-          nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
-            ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
-            : "-",
-          ...(HRMPosition === "HR MANAGER" || userType === "HR"
-            ? { status: item.hrManager ? "Approved" : "Pending" }
-            : {}),
-
-          ...(userType === "Manager" && {
-            status: item.depHead ? "Approved" : "Pending",
-          }),
-
-          ...(gmPosition === "GENERAL MANAGER" && {
-            status: item.genManager ? "Approved" : "Pending",
-          }),
+          oldCED: item.oldCED === formatDate(lastDate) ? item.oldCED : formatDate(lastDate),
+          nlmsEmpApproval: formatDate(item.nlmsEmpValid?.at(-1)) || null,
+          status,
         };
       })
-      .sort((a, b) => a.lastDate - b.lastDate)
+      .filter((val) => val.status === "Pending")
+      .sort((a, b) => new Date(a.lastDate) - new Date(b.lastDate))
       .map(({ lastDate, ...rest }) => rest);
 
     if (start || end) {
-      if (filtered.length === 0) {
-        setIsDateFiltered(true);
-      } else {
-        setIsDateFiltered(false);
-      }
+      setIsDateFiltered(filtered?.length === 0);
     } else {
       setIsDateFiltered(false);
     }
 
     setFilteredData(filtered);
+    return filtered;
   };
+
+  const handleDate = (e, type) => {
+    const value = e.target.value;
+
+    // Update state
+    if (type === "startDate") {
+      setStartDate(value);
+      if (value) {
+        localStorage.setItem("contractReview_startDate", value);
+      } else {
+        localStorage.removeItem("contractReview_startDate");
+      }
+    }
+    if (type === "endDate") {
+      setEndDate(value);
+      if (value) {
+        localStorage.setItem("contractReview_endDate", value);
+      } else {
+        localStorage.removeItem("contractReview_endDate");
+      }
+    }
+
+    // Apply filter with current values
+    applyDateFilter(
+      type === "startDate" ? value : startDate || null,
+      type === "endDate" ? value : endDate || null
+    );
+  };
+
+  // Handle date persistence - runs once on mount
+  useEffect(() => {
+    // Always try to restore dates from localStorage on component mount
+    const storedStart = localStorage.getItem("contractReview_startDate");
+    const storedEnd = localStorage.getItem("contractReview_endDate");
+
+    if (storedStart) {
+      setStartDate(storedStart);
+    }
+
+    if (storedEnd) {
+      setEndDate(storedEnd);
+    }
+  }, []);
+
+  // Apply filters when data or dates change
+  useEffect(() => {
+    if (allData) {
+      // Apply filter if we have dates in state
+      if (startDate || endDate) {
+        applyDateFilter(startDate, endDate);
+      } else {
+        // No dates, show all data
+        setFilteredData([]);
+        setIsDateFiltered(false);
+      }
+    }
+  }, [allData, startDate, endDate]);
+
+  // Clear dates when component unmounts (navigating away to different routes)
+  useEffect(() => {
+    return () => {
+      // Only clear if we're not navigating to contractForms
+      if (!window.location.pathname.includes('/contractForms')) {
+        localStorage.removeItem("contractReview_startDate");
+        localStorage.removeItem("contractReview_endDate");
+      }
+    };
+  }, []);
 
   return (
     <div>
@@ -442,6 +530,9 @@ export const ContractReview = () => {
         handleViewDetails={handleViewDetails}
         isFiltered={isDateFiltered}
         loading={dataLoading} // Pass the loading prop
+        userType={userType}
+        setStartDate={setStartDate}
+        setEndDate={setEndDate}
       />
 
       {selectedPerson && (
