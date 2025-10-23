@@ -555,12 +555,10 @@ if (type === "endDate") {
   setEndDate(value);
   sessionStorage.setItem("endDate", value);
 }
-
   
   // Use latest input value or state
   let start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
   let end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-
 
   if (start) start.setHours(0, 0, 0, 0);
   if (end) end.setHours(23, 59, 59, 999);
@@ -572,7 +570,7 @@ if (type === "endDate") {
   );
 
   const filtered = allData
-    ?.filter((item) => {
+  ?.filter((item) => {
       if (empIDsToIgnore.has(item.empID)) return false;
 
       const lastWorkStatus = item.workStatus?.at(-1);
@@ -604,12 +602,10 @@ if (type === "endDate") {
 
       // Access control
       const lastManager = item.manager?.at(-1);
-     
-      
-
       return true;
     })
-    .map((item) => {
+   ?.map((item) => {
+    
       // console.log(item,"item");
       const contractEndDates = item.contractEnd || [];
       const lastDate = contractEndDates.at(-1);
@@ -684,28 +680,36 @@ if (type === "endDate") {
         nlmsEmpApproval: formatDate(item.nlmsEmpValid?.at(-1)) || null,
         status,
       };
+
     })
     .filter((val) => val.status === "Pending")
     .sort((a, b) => new Date(a.lastDate) - new Date(b.lastDate))
     .map(({ lastDate, ...rest }) => rest);
 
   if (start || end) {
+
     setIsDateFiltered(filtered?.length === 0);
+
   } else {
+
     setIsDateFiltered(false);
+
   }
 
   setFilteredData(filtered);
 };
 
 useEffect(() => {
+
   const storedStart = sessionStorage.getItem("startDate");
   const storedEnd = sessionStorage.getItem("endDate");
-console.log(storedStart,"storedStart");
+  
+  console.log(storedStart,"storedStart");
 
   if (storedStart) setStartDate(storedStart);
 
   if (storedEnd) setEndDate(storedEnd);
+
 }, []);
 
 useEffect(() => {
@@ -717,9 +721,10 @@ useEffect(() => {
   }
 }, [location.pathname]);
 
-
   return (
+
     <div>
+
       <FilterTable
         tableBody={filteredData?.length ? filteredData : tableBody}
         tableHead={tableHead}
@@ -801,6 +806,8 @@ useEffect(() => {
           </div>
         </div>
       )}
+
     </div>
+
   );
 };
