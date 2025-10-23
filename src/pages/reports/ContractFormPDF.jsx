@@ -38,7 +38,7 @@ export const ContractFormPDF = () => {
     managerEmpID: "",
     managerOfficialMail: "",
     managerName: "",
-    hrEmail: "hariharanofficial2812@gmail.com",
+    hrEmail: "Hr-notification@adininworks.com",
     genManagerEmail: [],
     skilledAndUnskilled: null,
   });
@@ -554,8 +554,8 @@ export const ContractFormPDF = () => {
       if (notificationRes) {
         setShowTitle(
           selectedData
-            ? "Contract Form Updated Successfully"
-            : "Contract Form Created Successfully"
+            ? "Contract form updated successfully"
+            : "Contract form created successfully"
         );
         setNotification(true);
       }
@@ -640,6 +640,7 @@ export const ContractFormPDF = () => {
           </style>
           <section className="flex items-center pt-4 ">
             <Link
+              // to="/contractReview"
               // to="/contractReview"
               id="left-button"
               className="no-print left-button text-xl text-start w-[50px] text-grey"

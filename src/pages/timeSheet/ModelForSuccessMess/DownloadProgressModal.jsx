@@ -30,11 +30,23 @@ export const DownloadProgressModal = ({
         </h3>
 
         <div className="mb-4">
-          <div className="w-full bg-medium_grey rounded-full h-6 flex items-center justify-start p-0.5">
+          <div class="w-full bg-grey/80 rounded-full h-6 p-0.5 shadow-inner overflow-hidden">
+            {/* <!-- Filled Progress --> */}
             <div
-              className="bg-primary h-5 rounded-full transition-all duration-300"
+              class={`relative h-5 bg-gradient-to-r ${
+                progress === 100
+                  ? "from-primary/100 to-primary/100"
+                  : "from-primary/100 to-primary/30 bg-white"
+              }  rounded-full overflow-hidden transition-[width] duration-700 ease-in-out`}
               style={{ width: `${progress}%` }}
-            ></div>
+            >
+              {/* <!-- Shimmer highlight inside filled part --> */}
+              {progress < 100 ? (
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent  from-primary/100 to-primary/10 to-transparent animate-[shimmer_1.8s_linear_infinite] rounded-full "></div>
+              ) : (
+                ""
+              )}
+            </div>
           </div>
           <div className="flex justify-between items-center text_size_5">
             <p className="text-dark_grey">{message}</p>

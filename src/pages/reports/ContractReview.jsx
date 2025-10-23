@@ -57,6 +57,8 @@ export const ContractReview = () => {
   };
 
   const contractExpiryMergedData = (data) => {
+    console.log(data,"data");
+  
     const today = new Date();
     const startOfNextMonth = new Date(
       today.getFullYear(),
@@ -88,11 +90,12 @@ export const ContractReview = () => {
     // Step 2: Convert map back to array
     const latestContractForms = Array.from(latestFormsMap.values());
 
+
     const sortedData = data
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .map((item) => {
         if (empIDsToIgnore.has(item.empID)) return null;
-
+        
         // Filter out terminated/resigned
         const workStatus = item.workStatus || [];
         const lastWorkStatus = workStatus[workStatus.length - 1];
@@ -102,16 +105,16 @@ export const ContractReview = () => {
         ) {
           return null;
         }
-
+        
         const contractEndDates = item.contractEnd || [];
         if (contractEndDates.length === 0) return null;
-
+        
         const lastDate = contractEndDates[contractEndDates.length - 1];
         //latestContractform data
         const latestItemForEmp = contractForms
-          .filter((cf) => cf.empID === item.empID)
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
-
+        .filter((cf) => cf.empID === item.empID)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+        
         if (
           !lastDate ||
           (latestItemForEmp?.depHead && latestItemForEmp.hrManager === "") ||
@@ -121,8 +124,9 @@ export const ContractReview = () => {
         ) {
           return null;
         }
-
+        
         const contractEnd = new Date(lastDate);
+
         if (
           !(
             contractEnd >= startOfNextMonth &&
@@ -192,6 +196,7 @@ export const ContractReview = () => {
         }
         // console.log(item.oldCED, "item.oldCED", item.empID);
         // console.log(item.oldCED ,formatDate(lastDate) ,"item.oldCED", item.empID);
+
 
         return {
           lastDate: new Date(lastDate),
@@ -519,9 +524,11 @@ export const ContractReview = () => {
   }, []);
 
   return (
+
     <div>
+
       <FilterTable
-        tableBody={filteredData.length ? filteredData : tableBody}
+        tableBody={filteredData?.length ? filteredData : tableBody}
         tableHead={tableHead}
         title={title}
         startDate={startDate}
@@ -604,6 +611,8 @@ export const ContractReview = () => {
           </div>
         </div>
       )}
+
     </div>
+
   );
 };

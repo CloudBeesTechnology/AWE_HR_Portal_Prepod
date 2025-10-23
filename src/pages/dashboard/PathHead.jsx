@@ -7,67 +7,75 @@ import { Link } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
 
 export const PathHead = () => {
-  const { empPIData, IDData } = useContext(DataSupply);
-
-  const [mergeData, setMergeData] = useState([]);
+  const { empPIData, terminateData } = useContext(DataSupply);
   const [bruneianCount, setBruneianCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [LPACount, setLPACount] = useState(0);
   const [SAWPCount, setSAWPCount] = useState(0);
 
   // Function to merge and calculate counts
-  const calculateCounts = () => {
-    try {
-      const candidates = [...empPIData, ...IDData];
+ const calculateCounts = () => {
+  try {
+    // 🧩 Merge empPIData + terminateData using empId
+   const mergedData = empPIData
+          .map((emp) => {
+            const terminateInfo = terminateData
+              ? terminateData.find((item) => item.empID === emp.empID)
+              : {};
 
-      setMergeData(candidates);
+            return {
+              ...emp,
+              ...terminateInfo,
+            };
+          })
+          .filter(Boolean);
+  //  console.log(mergedData);
+   
+    // 🔢 Count employees by contract type
+    const bruneianCount = countByContractType(mergedData, "LOCAL");
+    const lpaCount = countByContractType(mergedData, "LPA");
+    const sawpCount = countByContractType(mergedData, "SAWP");
+// console.log(lpaCount,"lpaCount");
+// console.log(sawpCount,"sawpCount");
+// console.log(bruneianCount,"bruneianCount");
 
-      const bruneian = candidates.filter((item) => {
-        const contractTypeArray = item?.contractType;
-        const lastContractType =
-          Array.isArray(contractTypeArray) && contractTypeArray.length > 0
-            ? contractTypeArray[contractTypeArray.length - 1]
-            : null;
+    // // 🧾 Update states
+    setBruneianCount(bruneianCount);
+    setLPACount(lpaCount);
+    setSAWPCount(sawpCount);
+    setTotalCount(bruneianCount + lpaCount + sawpCount);
 
-        return lastContractType?.toUpperCase() === "LOCAL";
-      }).length;
+    // console.log("Counts =>", { bruneianCount, lpaCount, sawpCount });
+  } catch (err) {
+    console.error("Error calculating counts:", err.message);
+  }
+};
 
-      setBruneianCount(bruneian);
 
-      // Calculate LPA count
-      const LPA = candidates.filter((item) => {
-        const contractTypeArray = item?.contractType;
-        const lastContractType =
-          Array.isArray(contractTypeArray) && contractTypeArray.length > 0
-            ? contractTypeArray[contractTypeArray.length - 1]
-            : null;
+const countByContractType = (data, type) =>
+  data.filter((item) => {
+    const rawType = item?.contractType?.at(-1) ?? "";
+    const lastType = rawType.replace(/["\[\]]/g, "").trim().toUpperCase();
 
-        return lastContractType?.toUpperCase() === "LPA";
-      }).length;
-      setLPACount(LPA);
+    const termDateStr = (item?.termiDate ?? "").trim();
+    const resignDateStr = (item?.resignDate ?? "").trim();
 
-      // Calculate SAWP count
-      const SAWP = candidates.filter((item) => {
-        const contractTypeArray = item?.contractType;
-        const lastContractType =
-          Array.isArray(contractTypeArray) && contractTypeArray.length > 0
-            ? contractTypeArray[contractTypeArray.length - 1]
-            : null;
+    const today = new Date();
 
-        return lastContractType?.toUpperCase() === "SAWP";
-      }).length;
-      setSAWPCount(SAWP);
+    const termDate = termDateStr ? new Date(termDateStr) : null;
+    const resignDate = resignDateStr ? new Date(resignDateStr) : null;
 
-      // Total count
-      setTotalCount(bruneian + LPA + SAWP);
-    } catch (err) {
-      // console.error("Error calculating counts:", err.message);
+    // ✅ Ignore if terminated/resigned today or before, for all contract types
+    if ((termDate && termDate <= today) || (resignDate && resignDate <= today)) {
+      return false;
     }
-  };
 
-  useEffect(() => {
-    calculateCounts();
-  }, []);
+    return lastType === type.toUpperCase();
+  }).length;
+
+useEffect(() => {
+  calculateCounts();
+}, [empPIData, terminateData]);
 
   return (
     <div>
