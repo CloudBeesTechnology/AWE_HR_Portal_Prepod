@@ -120,7 +120,9 @@ export const ContractReview = () => {
           (latestItemForEmp?.depHead && latestItemForEmp.hrManager === "") ||
           (item.contStatus && item.extendedStatus === "noExtended") ||
           item.extendedStatus === "hrmView" ||
-          item.extendedStatus === "gmView"
+          item.extendedStatus === "gmView" || 
+            // For extended contracts, skip if oldCED equals contract end date
+          (item.extendedStatus === "extended" && item.oldCED === formatDate(lastDate))
         ) {
           return null;
         }
@@ -350,7 +352,9 @@ export const ContractReview = () => {
           (latestItemForEmp?.depHead && latestItemForEmp.hrManager === "") ||
           (item.contStatus && item.extendedStatus === "noExtended") ||
           item.extendedStatus === "hrmView" ||
-          item.extendedStatus === "gmView"
+          item.extendedStatus === "gmView" ||
+          // For extended contracts, skip if oldCED equals contract end date
+          (item.extendedStatus === "extended" && item.oldCED === formatDate(lastDate))
         ) {
           return false;
         }
