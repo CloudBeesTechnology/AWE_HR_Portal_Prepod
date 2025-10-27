@@ -33,6 +33,7 @@ export const ContractFormPDF = () => {
   const [contractData, setContractData] = useState([]);
 
   const contractEndDateStr = employeeData?.contractEndDate;
+// console.log(employeeData,"employeeData");
 
   const [managerData, setManagerData] = useState({
     managerEmpID: "",
@@ -42,7 +43,8 @@ export const ContractFormPDF = () => {
     genManagerEmail: [],
     skilledAndUnskilled: null,
   });
-
+const [oldCEDDate,setOldCEDDate]=useState("");
+const [oldCSDDate,setOldCSDDate]=useState("");
   const {
     register,
     handleSubmit,
@@ -157,6 +159,9 @@ export const ContractFormPDF = () => {
   useEffect(() => {
     if (contractForms.length > 0) {
       const contractValue = contractForms.filter((val) => val.id === matchedID);
+      // console.log(contractValue,"contract");
+      setOldCEDDate(contractValue[0]?.oldCED||"");
+      setOldCSDDate(contractValue[0]?.oldCSD||"");
       const contractData = contractValue.find(
         (data) => data.empID === employeeData?.empID
       );
@@ -753,8 +758,8 @@ export const ContractFormPDF = () => {
                         {employeeData?.contractStartDate || "N/A"}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
-                        {employeeData?.oldCED?.trim()
-                          ? employeeData.oldCED
+                        {oldCEDDate
+                          ? oldCEDDate
                           : employeeData?.contractEndDate
                             ? employeeData.contractEndDate
                             : "N/A"}

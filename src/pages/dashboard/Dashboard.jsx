@@ -4,7 +4,7 @@ import { PathHead } from "./PathHead";
 import { RecentNotify } from "./RecentNotify";
 import { NewJoineeTable } from "./NewJoineeTable";
 import { BirthdayReminder } from "./BirthdayReminder";
-import { UserProgress } from "./UserProgress ";
+import { UserProgress } from "./UserProgress";
 import usePermission from "../../hooks/usePermissionDashInside";
 import { DataSupply } from "../../utils/DataStoredContext";
 
