@@ -198,7 +198,9 @@ export const FilterTable = ({
       "hrmStatus",
       "gmStatus",
       "matchedID",
+      "oldCSD",
       "oldCED",
+      "skillPool",
       "probID",
       "probCreatedAt",
       "probExtendStatus",
@@ -211,6 +213,8 @@ export const FilterTable = ({
         const formattedKey = formatKey(key);
         if (key === "contractEndDate") {
           processedRow[formattedKey] = row.oldCED || "N/A"; // ✅ Use oldCED here
+        }  else if (key === "contractStartDate") {
+          processedRow[formattedKey] = row.oldCSD || "N/A"; // ✅ Use oldCSD here
         } else {
           processedRow[formattedKey] = Array.isArray(value)
             ? value.length > 0
@@ -480,8 +484,10 @@ export const FilterTable = ({
                             "headStatus",
                             "hrmStatus",
                             "gmStatus",
+                            "contractStartDate",
                             "contractEndDate",
                             "matchedID",
+                            "skillPool"
                           ].includes(key)
                         ) {
                           return false;

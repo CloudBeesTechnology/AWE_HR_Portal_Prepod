@@ -25,6 +25,7 @@ type ContractForm @aws_iam @aws_api_key {
   oldCED: String
   hrSign: String
   hrDate: String
+  oldCSD: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -1528,6 +1529,7 @@ input ModelContractFormFilterInput {
   oldCED: ModelStringInput
   hrSign: ModelStringInput
   hrDate: ModelStringInput
+  oldCSD: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelContractFormFilterInput]
@@ -1553,6 +1555,7 @@ input ModelContractFormConditionInput {
   oldCED: ModelStringInput
   hrSign: ModelStringInput
   hrDate: ModelStringInput
+  oldCSD: ModelStringInput
   and: [ModelContractFormConditionInput]
   or: [ModelContractFormConditionInput]
   not: ModelContractFormConditionInput
@@ -1579,6 +1582,7 @@ input CreateContractFormInput {
   oldCED: String
   hrSign: String
   hrDate: String
+  oldCSD: String
 }
 
 input UpdateContractFormInput {
@@ -1600,6 +1604,7 @@ input UpdateContractFormInput {
   oldCED: String
   hrSign: String
   hrDate: String
+  oldCSD: String
 }
 
 input DeleteContractFormInput {
@@ -1625,6 +1630,7 @@ input ModelSubscriptionContractFormFilterInput {
   oldCED: ModelSubscriptionStringInput
   hrSign: ModelSubscriptionStringInput
   hrDate: ModelSubscriptionStringInput
+  oldCSD: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionContractFormFilterInput]

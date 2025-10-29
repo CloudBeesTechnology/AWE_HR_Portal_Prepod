@@ -46,6 +46,7 @@ export default function ContractFormCreateForm(props) {
     oldCED: "",
     hrSign: "",
     hrDate: "",
+    oldCSD: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [conAttn, setConAttn] = React.useState(initialValues.conAttn);
@@ -70,6 +71,7 @@ export default function ContractFormCreateForm(props) {
   const [oldCED, setOldCED] = React.useState(initialValues.oldCED);
   const [hrSign, setHrSign] = React.useState(initialValues.hrSign);
   const [hrDate, setHrDate] = React.useState(initialValues.hrDate);
+  const [oldCSD, setOldCSD] = React.useState(initialValues.oldCSD);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -89,6 +91,7 @@ export default function ContractFormCreateForm(props) {
     setOldCED(initialValues.oldCED);
     setHrSign(initialValues.hrSign);
     setHrDate(initialValues.hrDate);
+    setOldCSD(initialValues.oldCSD);
     setErrors({});
   };
   const validations = {
@@ -109,6 +112,7 @@ export default function ContractFormCreateForm(props) {
     oldCED: [],
     hrSign: [],
     hrDate: [],
+    oldCSD: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -153,6 +157,7 @@ export default function ContractFormCreateForm(props) {
           oldCED,
           hrSign,
           hrDate,
+          oldCSD,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -232,6 +237,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -272,6 +278,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.conAttn ?? value;
@@ -312,6 +319,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.depHead ?? value;
@@ -352,6 +360,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.hrManager ?? value;
@@ -392,6 +401,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.genManager ?? value;
@@ -432,6 +442,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.remarks ?? value;
@@ -472,6 +483,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.contStatus ?? value;
@@ -512,6 +524,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.remarkHr ?? value;
@@ -552,6 +565,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.remarkGm ?? value;
@@ -592,6 +606,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.renewalContract ?? value;
@@ -632,6 +647,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.managerDate ?? value;
@@ -672,6 +688,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.hrmDate ?? value;
@@ -712,6 +729,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.gmDate ?? value;
@@ -752,6 +770,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.extendedStatus ?? value;
@@ -792,6 +811,7 @@ export default function ContractFormCreateForm(props) {
               oldCED: value,
               hrSign,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.oldCED ?? value;
@@ -832,6 +852,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign: value,
               hrDate,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.hrSign ?? value;
@@ -872,6 +893,7 @@ export default function ContractFormCreateForm(props) {
               oldCED,
               hrSign,
               hrDate: value,
+              oldCSD,
             };
             const result = onChange(modelFields);
             value = result?.hrDate ?? value;
@@ -885,6 +907,47 @@ export default function ContractFormCreateForm(props) {
         errorMessage={errors.hrDate?.errorMessage}
         hasError={errors.hrDate?.hasError}
         {...getOverrideProps(overrides, "hrDate")}
+      ></TextField>
+      <TextField
+        label="Old csd"
+        isRequired={false}
+        isReadOnly={false}
+        value={oldCSD}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
+              managerDate,
+              hrmDate,
+              gmDate,
+              extendedStatus,
+              oldCED,
+              hrSign,
+              hrDate,
+              oldCSD: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.oldCSD ?? value;
+          }
+          if (errors.oldCSD?.hasError) {
+            runValidationTasks("oldCSD", value);
+          }
+          setOldCSD(value);
+        }}
+        onBlur={() => runValidationTasks("oldCSD", oldCSD)}
+        errorMessage={errors.oldCSD?.errorMessage}
+        hasError={errors.oldCSD?.hasError}
+        {...getOverrideProps(overrides, "oldCSD")}
       ></TextField>
       <Flex
         justifyContent="space-between"

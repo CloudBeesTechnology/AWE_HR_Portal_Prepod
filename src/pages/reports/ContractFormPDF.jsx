@@ -436,7 +436,7 @@ const [oldCSDDate,setOldCSDDate]=useState("");
         extendedStatus: renewalStatus,
         renewalContract: data.renewalContract,
         contStatus: true,
-        ...(renewalStatus === "hrmView" && { oldCED: contractEndDateStr }),
+        ...(renewalStatus === "hrmView" && { oldCED: contractEndDateStr, oldCSD: employeeData?.contractStartDate, }),
       };
 
       const existingContractData = contractData;
@@ -755,7 +755,11 @@ const [oldCSDDate,setOldCSDDate]=useState("");
                         {employeeData?.dateOfJoin}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
-                        {employeeData?.contractStartDate || "N/A"}
+                        {oldCSDDate
+                          ? oldCSDDate
+                          : employeeData?.contractStartDate
+                          ? employeeData?.contractStartDate
+                          : "N/A"}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {oldCEDDate

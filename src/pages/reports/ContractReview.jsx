@@ -57,7 +57,7 @@ export const ContractReview = () => {
   };
 
   const contractExpiryMergedData = (data) => {
-    console.log(data,"data");
+    // console.log(data,"data");
   
     const today = new Date();
     const startOfNextMonth = new Date(
@@ -215,6 +215,10 @@ export const ContractReview = () => {
           otherPosition: item.otherPosition?.[item.otherPosition.length - 1],
           contractStartDate: formatDate(startDate),
           contractEndDate: formatDate(lastDate),
+           oldCSD:
+            item.oldCSD === formatDate(startDate)
+              ? item.oldCSD
+              : formatDate(startDate),
           oldCED:
             item.oldCED === formatDate(lastDate)
               ? item.oldCED
@@ -440,6 +444,7 @@ export const ContractReview = () => {
           otherPosition: item.otherPosition?.at(-1),
           contractStartDate: formatDate(startDateVal),
           contractEndDate: formatDate(lastDate),
+          oldCSD: item.oldCSD === formatDate(startDateVal) ? item.oldCSD : formatDate(startDateVal),
           oldCED: item.oldCED === formatDate(lastDate) ? item.oldCED : formatDate(lastDate),
           nlmsEmpApproval: formatDate(item.nlmsEmpValid?.at(-1)) || null,
           status,
@@ -524,6 +529,19 @@ export const ContractReview = () => {
         localStorage.removeItem("contractReview_startDate");
         localStorage.removeItem("contractReview_endDate");
       }
+    };
+  }, []);
+    // Add a cleanup effect to clear dates on refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      localStorage.removeItem("contractReview_startDate");
+      localStorage.removeItem("contractReview_endDate");
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
 

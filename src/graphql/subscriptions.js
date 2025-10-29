@@ -66,6 +66,7 @@ export const onCreateContractForm = /* GraphQL */ `
       oldCED
       hrSign
       hrDate
+      oldCSD
       createdAt
       updatedAt
       __typename
@@ -95,6 +96,7 @@ export const onUpdateContractForm = /* GraphQL */ `
       oldCED
       hrSign
       hrDate
+      oldCSD
       createdAt
       updatedAt
       __typename
@@ -124,6 +126,7 @@ export const onDeleteContractForm = /* GraphQL */ `
       oldCED
       hrSign
       hrDate
+      oldCSD
       createdAt
       updatedAt
       __typename

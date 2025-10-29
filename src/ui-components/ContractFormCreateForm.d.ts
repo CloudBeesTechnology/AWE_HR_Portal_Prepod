@@ -39,6 +39,7 @@ export declare type ContractFormCreateFormInputValues = {
     oldCED?: string;
     hrSign?: string;
     hrDate?: string;
+    oldCSD?: string;
 };
 export declare type ContractFormCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -58,6 +59,7 @@ export declare type ContractFormCreateFormValidationValues = {
     oldCED?: ValidationFunction<string>;
     hrSign?: ValidationFunction<string>;
     hrDate?: ValidationFunction<string>;
+    oldCSD?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ContractFormCreateFormOverridesProps = {
@@ -79,6 +81,7 @@ export declare type ContractFormCreateFormOverridesProps = {
     oldCED?: PrimitiveOverrideProps<TextFieldProps>;
     hrSign?: PrimitiveOverrideProps<TextFieldProps>;
     hrDate?: PrimitiveOverrideProps<TextFieldProps>;
+    oldCSD?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type ContractFormCreateFormProps = React.PropsWithChildren<{
     overrides?: ContractFormCreateFormOverridesProps | undefined | null;

@@ -7,7 +7,7 @@ import { useTempID } from "../../utils/TempIDContext";
 import { DataSupply } from "../../utils/DataStoredContext";
 
 export const ContractPDF = ({ userID, userType }) => {
-   const { contractForms, loading: dataLoading } = useContext(DataSupply); 
+  const { contractForms, loading: dataLoading } = useContext(DataSupply);
   const navigate = useNavigate();
   const location = useLocation();
   const { gmPosition, HRMPosition } = useTempID();
@@ -18,6 +18,7 @@ export const ContractPDF = ({ userID, userType }) => {
   const [endDate, setEndDate] = useState("");
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [historyData, setHistoryData] = useState([]);
+  // const [skillPool, setskillPool] = useState("");
   const [tableHead] = useState(
     [
       "Emp ID",
@@ -82,7 +83,9 @@ export const ContractPDF = ({ userID, userType }) => {
         }
 
         const skillPool = emp?.skillPool ? emp?.skillPool.toUpperCase() : "";
-
+        
+        // console.log(skillPool,"checkingpool");
+        
         const contractEndDates = emp.contractEnd || [];
         const lastDate = contractEndDates[contractEndDates.length - 1];
         const isContractActive = lastDate && emp.contStatus === true;
@@ -134,7 +137,7 @@ export const ContractPDF = ({ userID, userType }) => {
         } else {
           finalPosition = emp.position?.[emp.position.length - 1];
         }
-// console.log(contract,"contract");
+        // console.log(contract,"contract");
 
         return {
           empID: emp.empID,
@@ -154,6 +157,7 @@ export const ContractPDF = ({ userID, userType }) => {
             emp.otherPosition[emp.otherPosition.length - 1],
           contractStartDate: formatDate(startDate),
           contractEndDate: formatDate(lastDate),
+          oldCSD: contract.oldCSD,
           oldCED: formatDate(contract.oldCED),
           nlmsEmpApproval: Array.isArray(emp.nlmsEmpValid)
             ? formatDate(emp.nlmsEmpValid[emp.nlmsEmpValid.length - 1])
@@ -161,6 +165,7 @@ export const ContractPDF = ({ userID, userType }) => {
           headStatus: contract.depHead,
           hrmStatus: contract.hrManager,
           gmStatus: contract.genManager,
+          skillPool: skillPool,
           matchedID: contract.id,
           ...(userType === "Manager" &&
             gmPosition !== "GENERAL MANAGER" &&
@@ -194,8 +199,8 @@ export const ContractPDF = ({ userID, userType }) => {
 
         return getPriority(a) - getPriority(b);
       });
-      // console.log(mergedData,"mergedData");
-      
+    // console.log(mergedData,"mergedData");
+
     return mergedData;
   };
 
@@ -213,28 +218,51 @@ export const ContractPDF = ({ userID, userType }) => {
     }
   }, [allData, contractForms, userType, gmPosition, userID, HRMPosition]);
 
-
-
   const handleViewDetails = (personData) => {
+    // const employeeHistory = contractForms.filter(
+    //   (val) =>
+    //     (val.empID === personData.empID && val.genManager.trim() !== "") 
+    // );
+  
+  //   setHistoryData(employeeHistory);
+  //   console.log(personData);
 
-    const employeeHistory = contractForms.filter(
-      (val) => val.empID === personData.empID && val.genManager.trim() !== ""
+  //   setSelectedPerson(personData);
+  // };
+  const employeeHistory = contractForms
+  .filter((val) => {
+    const emp = allData.find((d) => d.empID === val.empID);
+    if (!emp) return false;
+
+    const isSameEmployee = val.empID === personData.empID;
+    const hasGenManager = val.genManager?.trim() !== "";
+    const hasHrManager = val.hrManager?.trim() !== "";
+    const skillPool = emp?.skillPool ? emp.skillPool.toUpperCase() : "";
+const hasSkillPool = skillPool === "SKILLED" || skillPool === "UNSKILLED"
+    return (
+      isSameEmployee &&
+      (hasGenManager ||
+        (val.genManager?.trim() === "" && hasSkillPool && hasHrManager)) 
     );
-    setHistoryData(employeeHistory);
-console.log(personData);
+  })
+  .map((val) => {
+    const emp = allData.find((d) => d.empID === val.empID);
+    const skillPool = emp?.skillPool ? emp.skillPool.toUpperCase() : "";
+    return { ...val, skillPool }; // ✅ attach skillPool to each history record
+  });
 
-    setSelectedPerson(personData);
-  };
+setHistoryData(employeeHistory);
+setSelectedPerson(personData);
+  }
 
   const closeModal = () => {
     setSelectedPerson(null);
   };
 
   const handleNavigate = (id) => {
-    
     closeModal();
     if (selectedPerson) {
-      console.log(selectedPerson,"select");
+      console.log(selectedPerson, "select");
       navigate("/contractForms", {
         state: { employeeData: selectedPerson, matchedID: id },
       });
@@ -244,7 +272,7 @@ console.log(personData);
   return (
     <div>
       <FilterTable
-        tableBody={filteredData.length ? filteredData : tableBody}
+        tableBody={filteredData?.length ? filteredData : tableBody}
         startDate={startDate}
         endDate={endDate}
         tableHead={tableHead}
@@ -333,6 +361,37 @@ console.log(personData);
                       </thead>
                       <tbody className="text-sm">
                         {historyData.map((val, idx) => {
+                          console.log(val, "dfghjk");
+
+                          const hasGenManager = val.genManager?.trim() !== "";
+                          const hasHrManager = val.hrManager?.trim() !== "";
+const hasSkillPool =val?.skillPool?.toUpperCase() === "SKILLED" || val?.skillPool?.toUpperCase() === "UNSKILLED"
+                          const showRow =
+                           hasGenManager ||
+                            (val.genManager?.trim() === "" &&
+                             hasSkillPool && hasHrManager);
+
+                          return (
+                            showRow && (
+                              <tr key={idx}>
+                                <th className="border px-3 py-2 text-dark_grey">
+                                  {idx + 1}
+                                </th>
+                                <th className="border px-3 py-2 text-dark_grey">
+                                  {formatDate(val.oldCED)}
+                                </th>
+                                <th
+                                  className="border px-3 py-2 text-blue underline cursor-pointer"
+                                  onClick={() => handleNavigate(val.id)}
+                                >
+                                  View
+                                </th>
+                              </tr>
+                            )
+                          );
+                        })}
+
+                        {/* {historyData.map((val, idx) => {
                           return (
                             <tr key={idx}>
                               {(val.genManager ||
@@ -358,14 +417,14 @@ console.log(personData);
                               )}
                             </tr>
                           );
-                        })}
+                        })} */}
                       </tbody>
                     </table>
                   </div>
                 </div>
               </div>
             )}
-            {!selectedPerson.gmStatus && (
+            {/* {!selectedPerson.gmStatus && (
               <div className="flex justify-evenly items-center p-3 mt-10">
                 <button
                   className="primary_btn"
@@ -378,7 +437,44 @@ console.log(personData);
                   Go to Contract Form
                 </button>
               </div>
-            )}
+            )} */}
+            {(() => {
+              const hasHrManager = selectedPerson.hrmStatus?.trim() !== "";
+              const gmApproved = !!selectedPerson.gmStatus;
+              console.log(selectedPerson,"sele");
+              
+              const hasSkillPool =selectedPerson?.skillPool?.toUpperCase() === "SKILLED" || selectedPerson?.skillPool?.toUpperCase() === "UNSKILLED"
+              console.log(hasHrManager, "manager");
+              console.log(gmApproved, "GM");
+              console.log(hasSkillPool, "skillpool",selectedPerson.skillPool);
+
+              let showSection = false;
+
+              if (hasSkillPool && hasHrManager) {
+                // Case 1: SkillPool has a value (SKILLED / UNSKILLED)
+                showSection = false; // show only if HRM not filled
+              } else {
+                // Case 2: SkillPool empty
+                showSection = !gmApproved; // show only if GM not approved yet
+              }
+
+              return (
+                showSection && (
+                  <div className="flex justify-evenly items-center p-3 mt-10">
+                    <button
+                      className="primary_btn"
+                      onClick={() =>
+                        selectedPerson.gmStatus
+                          ? handleNavigate()
+                          : handleNavigate(selectedPerson.matchedID)
+                      }
+                    >
+                      Go to Contract Form
+                    </button>
+                  </div>
+                )
+              );
+            })()}
           </div>
         </div>
       )}

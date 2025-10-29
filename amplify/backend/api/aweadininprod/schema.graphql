@@ -23,6 +23,7 @@ type ContractForm @model @auth(rules: [{allow: public}]) {
   oldCED: String
   hrSign: String
   hrDate: String
+  oldCSD: String
 }
 
 type KeyValueStore @model @auth(rules: [{allow: public}]) {

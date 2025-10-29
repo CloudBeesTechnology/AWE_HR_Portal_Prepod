@@ -58,6 +58,7 @@ export const getContractForm = /* GraphQL */ `
       oldCED
       hrSign
       hrDate
+      oldCSD
       createdAt
       updatedAt
       __typename
@@ -90,6 +91,7 @@ export const listContractForms = /* GraphQL */ `
         oldCED
         hrSign
         hrDate
+        oldCSD
         createdAt
         updatedAt
         __typename
