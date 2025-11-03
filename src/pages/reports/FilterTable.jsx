@@ -24,6 +24,7 @@ export const FilterTable = ({
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 30;
+console.log(tableBody.length,"filtertable");
 
   // Render skeleton loader when loading is true
   if (loading) {
@@ -185,125 +186,225 @@ export const FilterTable = ({
     setCurrentPage(1);
   };
 
-  const downloadExcel = () => {
-    const formatKey = (key) => {
-      return key
-        .replace(/([A-Z])/g, " $1")
-        .replace(/([a-z])([A-Z])/g, "$1 $2")
-        .replace(/_/g, " ")
-        .toUpperCase();
-    };
-    const excludeKeys = [
-      "headStatus",
-      "hrmStatus",
-      "gmStatus",
-      "matchedID",
-      "oldCSD",
-      "oldCED",
-      "skillPool",
-      "probID",
-      "probCreatedAt",
-      "probExtendStatus",
-      "prevProbExDate",
-    ];
-    const processedData = filteredTableBody.map((row) => {
-      const processedRow = {};
-      for (const [key, value] of Object.entries(row)) {
-        if (excludeKeys.includes(key)) continue;
-        const formattedKey = formatKey(key);
-        if (key === "contractEndDate") {
-          processedRow[formattedKey] = row.oldCED || "N/A"; // ✅ Use oldCED here
-        }  else if (key === "contractStartDate") {
-          processedRow[formattedKey] = row.oldCSD || "N/A"; // ✅ Use oldCSD here
-        } else {
-          processedRow[formattedKey] = Array.isArray(value)
-            ? value.length > 0
-              ? value.join(", ")
-              : "N/A"
-            : (value ?? "") !== ""
-              ? value
-              : "N/A";
-        }
-      }
-      return processedRow;
-    });
 
-    // Create a workbook and worksheet with a dynamic sheet name based on the title prop
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet(title);
+  // const downloadExcel = () => {
+  //   const formatKey = (key) => {
+  //     return key
+  //       .replace(/([A-Z])/g, " $1")
+  //       .replace(/([a-z])([A-Z])/g, "$1 $2")
+  //       .replace(/_/g, " ")
+  //       .toUpperCase();
+  //   };
+  //   const excludeKeys = [
+  //     "headStatus",
+  //     "hrmStatus",
+  //     "gmStatus",
+  //     "matchedID",
+  //     "oldCSD",
+  //     "oldCED",
+  //     "skillPool",
+  //     "probID",
+  //     "probCreatedAt",
+  //     "probExtendStatus",
+  //     "prevProbExDate",
+  //   ];
+  //   const processedData = filteredTableBody.map((row) => {
+  //     const processedRow = {};
+  //     for (const [key, value] of Object.entries(row)) {
+  //       if (excludeKeys.includes(key)) continue;
+  //       const formattedKey = formatKey(key);
+  //       if (key === "contractEndDate") {
+  //         processedRow[formattedKey] = row.oldCED || "N/A"; // ✅ Use oldCED here
+  //       }  else if (key === "contractStartDate") {
+  //         processedRow[formattedKey] = row.oldCSD || "N/A"; // ✅ Use oldCSD here
+  //       } else {
+  //         processedRow[formattedKey] = Array.isArray(value)
+  //           ? value.length > 0
+  //             ? value.join(", ")
+  //             : "N/A"
+  //           : (value ?? "") !== ""
+  //             ? value
+  //             : "N/A";
+  //       }
+  //     }
+  //     return processedRow;
+  //   });
+  //   // Create a workbook and worksheet with a dynamic sheet name based on the title prop
+  //   const workbook = new ExcelJS.Workbook();
+  //   const worksheet = workbook.addWorksheet(title);
+    
+  //   // Add the title as the first row (merged cell spanning all columns)
+  //   const headerRow = worksheet.addRow([title]);
+  //   headerRow.font = { bold: true, size: 16 };
+  //   headerRow.alignment = { horizontal: "center", vertical: "middle" };
+    
+  //   worksheet.mergeCells(1, 1, 1, Object.keys(processedData[0]).length);
+    
+  //   const dateRow = [];
+  //   if (startDate) {
+  //     dateRow.push(`Start Date: ${DateFormat(startDate)}`);
+  //   } else {
+  //     dateRow.push("Start Date: Not Provided");
+  //   }
+    
+  //   if (endDate) {
+  //     dateRow.push(`End Date: ${DateFormat(endDate)}`);
+  //   } else {
+  //     dateRow.push("End Date: Not Provided");
+  //   }
+    
+  //   console.log(processedData.length,"dsfghjk");
+  //   console.log(dateRow.length,"dateRow");
+  //   worksheet.addRow(dateRow);
+  //   worksheet.addRow([]);
 
-    // Add the title as the first row (merged cell spanning all columns)
-    const headerRow = worksheet.addRow([title]);
-    headerRow.font = { bold: true, size: 16 };
-    headerRow.alignment = { horizontal: "center", vertical: "middle" };
+  //   // Add header row with formatted keys
+  //   const tableHeader = Object.keys(processedData[0]).map(formatKey);
+  //   worksheet.addRow(tableHeader);
 
-    worksheet.mergeCells(1, 1, 1, Object.keys(processedData[0]).length);
+  //   // Add data rows
+  //   processedData.forEach((row) => {
+  //     worksheet.addRow(Object.values(row));
+  //   });
 
-    const dateRow = [];
-    if (startDate) {
-      dateRow.push(`Start Date: ${DateFormat(startDate)}`);
-    } else {
-      dateRow.push("Start Date: Not Provided");
-    }
+  //   const header = worksheet.getRow(4);
+  //   header.eachCell((cell) => {
+  //     cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  //     cell.fill = {
+  //       type: "pattern",
+  //       pattern: "solid",
+  //       fgColor: { argb: "FF808080" },
+  //     };
+  //     cell.alignment = {
+  //       horizontal: "center",
+  //       vertical: "middle",
+  //       wrapText: true,
+  //     };
+  //   });
 
-    if (endDate) {
-      dateRow.push(`End Date: ${DateFormat(endDate)}`);
-    } else {
-      dateRow.push("End Date: Not Provided");
-    }
+  //   // Apply styles for all data rows
+  //   worksheet.eachRow((row, rowIndex) => {
+  //     row.eachCell((cell) => {
+  //       cell.alignment = { wrapText: true, vertical: "top" };
+  //     });
+  //   });
 
-    worksheet.addRow(dateRow);
-    worksheet.addRow([]);
+  //   // Auto-size columns based on content length
+  //   worksheet.columns.forEach((column) => {
+  //     let maxLength = 0;
+  //     column.eachCell({ includeEmpty: true }, (cell) => {
+  //       const value = cell.value ? cell.value.toString() : "";
+  //       maxLength = Math.max(maxLength, value.length);
+  //     });
+  //     column.width = maxLength + 2;
+  //   });
 
-    // Add header row with formatted keys
-    const tableHeader = Object.keys(processedData[0]).map(formatKey);
-    worksheet.addRow(tableHeader);
-
-    // Add data rows
-    processedData.forEach((row) => {
-      worksheet.addRow(Object.values(row));
-    });
-
-    const header = worksheet.getRow(4);
-    header.eachCell((cell) => {
-      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FF808080" },
-      };
-      cell.alignment = {
-        horizontal: "center",
-        vertical: "middle",
-        wrapText: true,
-      };
-    });
-
-    // Apply styles for all data rows
-    worksheet.eachRow((row, rowIndex) => {
-      row.eachCell((cell) => {
-        cell.alignment = { wrapText: true, vertical: "top" };
-      });
-    });
-
-    // Auto-size columns based on content length
-    worksheet.columns.forEach((column) => {
-      let maxLength = 0;
-      column.eachCell({ includeEmpty: true }, (cell) => {
-        const value = cell.value ? cell.value.toString() : "";
-        maxLength = Math.max(maxLength, value.length);
-      });
-      column.width = maxLength + 2;
-    });
-
-    // Generate and download the Excel file
-    workbook.xlsx.writeBuffer().then((buffer) => {
-      const blob = new Blob([buffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(blob, `${title}.xlsx`);
-    });
+  //   // Generate and download the Excel file
+  //   workbook.xlsx.writeBuffer().then((buffer) => {
+  //     const blob = new Blob([buffer], {
+  //       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  //     });
+  //     saveAs(blob, `${title}.xlsx`);
+  //   });
+  // };
+const downloadExcel = () => {
+  const formatKey = (key) => {
+    return key
+      .replace(/([A-Z])/g, " $1")
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/_/g, " ")
+      .toUpperCase();
   };
+
+  const excludeKeys = [
+    "headStatus", "hrmStatus", "gmStatus", "matchedID", "oldCSD", "oldCED",
+    "skillPool", "probID", "probCreatedAt", "probExtendStatus", "prevProbExDate",
+  ];
+
+  // ✅ Prepare data
+  const processedData = filteredTableBody.map((row) => {
+    const processedRow = {};
+    for (const [key, value] of Object.entries(row)) {
+      if (excludeKeys.includes(key)) continue;
+      const formattedKey = formatKey(key);
+      if (key === "contractEndDate") {
+        processedRow[formattedKey] = row.oldCED || "N/A";
+      } else if (key === "contractStartDate") {
+        processedRow[formattedKey] = row.oldCSD || "N/A";
+      } else {
+        processedRow[formattedKey] = Array.isArray(value)
+          ? value.length > 0
+            ? value.join(", ")
+            : "N/A"
+          : (value ?? "") !== ""
+            ? value
+            : "N/A";
+      }
+    }
+    return processedRow;
+  });
+
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet(title);
+
+  // ✅ Title row (Row 1)
+  const headerRow = worksheet.addRow([title]);
+  headerRow.font = { bold: true, size: 16 };
+  headerRow.alignment = { horizontal: "center", vertical: "middle" };
+  worksheet.mergeCells(1, 1, 1, Object.keys(processedData[0]).length);
+
+  // ✅ Date row (Row 2)
+  const dateRow = [];
+  dateRow.push(startDate ? `Start Date: ${DateFormat(startDate)}` : "Start Date: Not Provided");
+  dateRow.push(endDate ? `End Date: ${DateFormat(endDate)}` : "End Date: Not Provided");
+  worksheet.addRow(dateRow);
+
+  // ✅ Empty spacer (Row 3)
+  worksheet.addRow([]);
+
+  // ✅ Header row (Row 4)
+  const tableHeader = Object.keys(processedData[0]).map(formatKey);
+  const headerExcelRow = worksheet.addRow(tableHeader);
+  headerExcelRow.eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF808080" },
+    };
+    cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+  });
+
+  // ✅ Data rows start right after header (Row 5 onwards)
+  processedData.forEach((row) => {
+    worksheet.addRow(Object.values(row));
+  });
+
+  // ✅ Auto-size columns
+  worksheet.columns.forEach((column) => {
+    let maxLength = 0;
+    column.eachCell({ includeEmpty: true }, (cell) => {
+      const value = cell.value ? cell.value.toString() : "";
+      maxLength = Math.max(maxLength, value.length);
+    });
+    column.width = maxLength + 2;
+  });
+
+  // ✅ Wrap text for all cells
+  worksheet.eachRow((row, rowIndex) => {
+    row.eachCell((cell) => {
+      cell.alignment = { wrapText: true, vertical: "top" };
+    });
+  });
+
+  // ✅ Export
+  workbook.xlsx.writeBuffer().then((buffer) => {
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, `${title}.xlsx`);
+  });
+};
 
   const isClickableRow = [
     "Probation Review",
