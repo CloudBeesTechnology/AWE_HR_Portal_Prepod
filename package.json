@@ -44,6 +44,7 @@
     "react-scroll": "^1.9.0",
     "react-to-print": "^2.15.1",
     "sheetjs-style": "^0.15.8",
+    "streamsaver": "^2.0.6",
     "tailwind-scrollbar-hide": "^1.1.7",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5",

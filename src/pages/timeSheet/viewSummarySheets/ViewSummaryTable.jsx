@@ -100,7 +100,7 @@ export const ViewSummaryTable = ({
         setVSMessage(
           "Unable to process your request. Kindly refresh and select valid dates and location."
         );
-      }, 50000);
+      }, 3000000);
     }
   }, [startDate, endDate, selectedLocation, selectSapNoOrBadgeNo, loading]);
   const preparePrintRows = (rows = []) => {
@@ -899,28 +899,26 @@ export const ViewSummaryTable = ({
                 try {
                   // Show the download modal
                   setShowDownloadModal(true);
-                  setDownloadProgress(25);
+                  setDownloadProgress(10);
                   setDownloadMessage("Preparing download...");
 
-                  setTimeout(async () => {
-                    await DownloadExcelPDFData(
-                      allExcelSheetData,
-                      dayCounts,
-                      getStartDate,
-                      formattedStartDate,
-                      formattedEndDate,
-                      location,
-                      calculateTotalWorkingHours,
-                      calculateTotalAbsence,
-                      getStartDate,
-                      // Add progress callback
-                      (progress, message) => {
-                        setDownloadProgress(progress);
-                        setDownloadMessage(message);
-                      },
-                      setShowDownloadModal
-                    );
-                  }, 5000);
+                  await DownloadExcelPDFData(
+                    allExcelSheetData,
+                    dayCounts,
+                    getStartDate,
+                    formattedStartDate,
+                    formattedEndDate,
+                    location,
+                    calculateTotalWorkingHours,
+                    calculateTotalAbsence,
+                    getStartDate,
+                    // Add progress callback
+                    (progress, message) => {
+                      setDownloadProgress(progress);
+                      setDownloadMessage(message);
+                    },
+                    setShowDownloadModal
+                  );
                 } catch (error) {
                   console.error("Download failed:", error);
                   // Hide modal on error

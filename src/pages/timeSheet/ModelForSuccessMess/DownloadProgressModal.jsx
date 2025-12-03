@@ -30,10 +30,10 @@ export const DownloadProgressModal = ({
         </h3>
 
         <div className="mb-4">
-          <div class="w-full bg-grey/80 rounded-full h-6 p-0.5 shadow-inner overflow-hidden">
+          <div className="w-full bg-grey/80 rounded-full h-6 p-0.5 shadow-inner overflow-hidden">
             {/* <!-- Filled Progress --> */}
             <div
-              class={`relative h-5 bg-gradient-to-r ${
+              className={`relative h-5 bg-gradient-to-r ${
                 progress === 100
                   ? "from-primary/100 to-primary/100"
                   : "from-primary/100 to-primary/30 bg-white"
@@ -42,7 +42,7 @@ export const DownloadProgressModal = ({
             >
               {/* <!-- Shimmer highlight inside filled part --> */}
               {progress < 100 ? (
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent  from-primary/100 to-primary/10 to-transparent animate-[shimmer_1.8s_linear_infinite] rounded-full "></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent  from-primary/100 to-primary/10 to-transparent animate-[shimmer_1.8s_linear_infinite] rounded-full "></div>
               ) : (
                 ""
               )}
