@@ -185,7 +185,7 @@ export const ViewSummaryTable = ({
   };
 
   const handlePrint = (
-    allExcelSheetData,
+    allExcelDatas,
     dayCounts,
     getStartDate,
     formattedStartDate,
@@ -195,7 +195,7 @@ export const ViewSummaryTable = ({
   ) => {
     // "data" here is the same one you render (so it represents exactly what user sees)
 
-    const rowsForPrint = preparePrintRows(allExcelSheetData);
+    const rowsForPrint = preparePrintRows(allExcelDatas);
 
     // Pass an object so PrintExcelSheet gets everything it needs to render identical UI
     if (mode === "print") {
@@ -230,9 +230,113 @@ export const ViewSummaryTable = ({
     return arr?.sort((a, b) => a?.name?.localeCompare(b?.name));
   }
 
+  function dedupePreferVerified(
+    group,
+    excelType = ["Offshore", "Offshore's ORMC", "BLNG"]
+  ) {
+    // allow comma-separated entries inside excelType items
+    const types = excelType.flatMap((t) =>
+      String(t || "")
+        .split(",")
+        .map((s) => s.trim())
+    );
+
+    const toISO = (dateStr) => {
+      if (!dateStr && dateStr !== 0) return "";
+      const d = new Date(dateStr);
+      if (isNaN(d)) return "";
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    };
+
+    const isVerified = (s) =>
+      String(s || "")
+        .trim()
+        .toLowerCase() === "verified";
+
+    const rows = Array.isArray(group?.data) ? group.data : [];
+
+    const { map } = rows.reduce(
+      (acc, r) => {
+        const fileType = String(r?.fileType || "").trim();
+        const useFid = types.includes(fileType);
+        const idPart = String(
+          useFid ? r?.fidNo || "" : r?.empBadgeNo || ""
+        ).trim();
+
+        const tradePart = String(r?.tradeCode || "")
+          .trim()
+          .toLowerCase();
+        const compPart = String(r?.companyName || "")
+          .trim()
+          .toLowerCase();
+        const datePart = toISO(r?.date);
+
+        const key = [idPart, tradePart, compPart, datePart].join("|");
+
+        if (!acc.set.has(key)) {
+          acc.set.add(key);
+          acc.map.set(key, r);
+          return acc;
+        }
+
+        const existing = acc.map.get(key);
+        // if existing is already Verified, keep it
+        if (isVerified(existing?.status)) return acc;
+        // if new row is Verified, replace existing
+        if (isVerified(r?.status)) acc.map.set(key, r);
+        // otherwise keep the first (existing)
+        return acc;
+      },
+      { map: new Map(), set: new Set() }
+    );
+
+    return Array.from(map.values());
+  }
+
+  const excelType = ["Offshore", "Offshore's ORMC", "BLNG"];
+  function normalizeToKey(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d)) return "";
+    const dd = String(d.getDate()).padStart(1, "0");
+    const mm = String(d.getMonth() + 1).padStart(1, "0");
+    const yyyy = d.getFullYear();
+    return `${dd}-${mm}-${yyyy}`; // your getVerify key format
+  }
+
+  const allExcelDatas = allExcelSheetData?.map((val) => {
+    // 1. Remove duplicates
+    const removeDuplicate = dedupePreferVerified(val, excelType);
+
+    // 2. Create a lookup only for VERIFIED dates
+    const verifiedDateSet = new Set(
+      removeDuplicate
+        .filter((d) => d.status === "Verified")
+        .map((d) => normalizeToKey(d.date))
+    );
+
+    // 3. Update getVerify
+    const updatedGetVerify = { ...val.getVerify };
+
+    Object.keys(updatedGetVerify).forEach((key) => {
+      if (verifiedDateSet.has(key)) {
+        updatedGetVerify[key] = "Yes";
+      }
+    });
+
+    return {
+      ...val,
+      data: removeDuplicate,
+      getVerify: updatedGetVerify,
+    };
+  });
+
   // Pagination
   const itemsPerPage = 3;
-  const safeData = sortByNameAscending(allExcelSheetData) || [];
+  const safeData = sortByNameAscending(allExcelDatas) || [];
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -280,7 +384,7 @@ export const ViewSummaryTable = ({
             onClick={() => {
               const mode = "print";
               handlePrint(
-                allExcelSheetData,
+                allExcelDatas,
                 dayCounts,
                 getStartDate,
                 formattedStartDate,
@@ -903,7 +1007,7 @@ export const ViewSummaryTable = ({
                   setDownloadMessage("Preparing download...");
 
                   await DownloadExcelPDFData(
-                    allExcelSheetData,
+                    allExcelDatas,
                     dayCounts,
                     getStartDate,
                     formattedStartDate,

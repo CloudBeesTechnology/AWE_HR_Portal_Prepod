@@ -379,6 +379,57 @@ export const ApplyVSFunction = ({
           return Object.values(result);
         };
 
+        // const generateDateList = (
+        //   fromDate,
+        //   toDate,
+        //   workHrs,
+        //   abbreviation,
+        //   isHalfDay
+        // ) => {
+        //   const start = new Date(fromDate);
+        //   const end = new Date(toDate);
+        //   let existHalfDay = [];
+        //   const listDate = {};
+        //   const NWHPD =
+        //     Array.isArray(workHrs) && workHrs?.length > 0
+        //       ? workHrs[workHrs?.length - 1]
+        //       : workHrs || 0;
+        //   const devidedNWHPD = parseFloat(NWHPD) / 2;
+
+        //   while (start <= end) {
+        //     const dayStr = `${start.getDate()}-${
+        //       start.getMonth() + 1
+        //     }-${start.getFullYear()}`;
+        //     if (isHalfDay) {
+        //       existHalfDay?.push({
+        //         dayStr: `H${abbreviation}${devidedNWHPD}`,
+        //       });
+        //     }
+        //     if (isHalfDay) {
+        //       const keysArray = existHalfDay?.map((obj) => Object.keys(obj)[0]);
+        //       existHalfDay.forEach((obj) => {
+        //         Object.keys(obj).forEach((key) => {
+        //           // console.log("Key:", key, "Value:", obj[key]);
+
+        //           listDate[dayStr] = keysArray?.includes(key)
+        //             ? `${obj[key]} / H${abbreviation}${devidedNWHPD}`
+        //             : `H${abbreviation}${devidedNWHPD}`;
+        //         });
+        //       });
+        //     } else {
+        //       listDate[dayStr] = abbreviation;
+        //     }
+
+        //     // listDate[dayStr] = isHalfDay
+        //     //   ? `H${abbreviation}${devidedNWHPD}`
+        //     //   : abbreviation;
+        //     start.setDate(start.getDate() + 1);
+        //   }
+
+        //   return listDate;
+        // };
+
+        const existHalfDayMap = new Map();
         const generateDateList = (
           fromDate,
           toDate,
@@ -388,27 +439,53 @@ export const ApplyVSFunction = ({
         ) => {
           const start = new Date(fromDate);
           const end = new Date(toDate);
+
+          // store final result
           const listDate = {};
+
+          // determine NWHPD value (last value of array or single value or 0)
           const NWHPD =
-            Array.isArray(workHrs) && workHrs?.length > 0
-              ? workHrs[workHrs?.length - 1]
+            Array.isArray(workHrs) && workHrs.length > 0
+              ? workHrs[workHrs.length - 1]
               : workHrs || 0;
+
           const devidedNWHPD = parseFloat(NWHPD) / 2;
+
+          // map for tracking half-day entries per day (fast lookup & combine)
 
           while (start <= end) {
             const dayStr = `${start.getDate()}-${
               start.getMonth() + 1
             }-${start.getFullYear()}`;
-            listDate[dayStr] = isHalfDay
-              ? `H${abbreviation}${devidedNWHPD}`
-              : abbreviation;
+
+            if (isHalfDay) {
+              const halfVal = `H${abbreviation}${devidedNWHPD}`;
+
+              if (existHalfDayMap.has(dayStr)) {
+                // combine if an entry already exists for that date
+                const prev = existHalfDayMap.get(dayStr);
+                const combined = `${prev} / ${halfVal}`;
+                existHalfDayMap.set(dayStr, combined);
+                listDate[dayStr] = combined;
+              } else {
+                // first half-day for this date
+                existHalfDayMap.set(dayStr, halfVal);
+                listDate[dayStr] = halfVal;
+              }
+            } else {
+              listDate[dayStr] = abbreviation;
+            }
+
+            // advance date (mutates start)
             start.setDate(start.getDate() + 1);
           }
 
           return listDate;
         };
 
+        
         const leaveCount_ = transformData(filteredData);
+        
 
         const holidayDates = publicHoliday?.CompanyHolidays2025.flatMap(
           (holiday) => holiday.dates || [holiday.date]
@@ -551,6 +628,8 @@ export const ApplyVSFunction = ({
                 }
               });
             }
+
+            
 
             const recognizeFileType = ["Offshore", "Offshore's ORMC"]?.includes(
               identifyFileType
@@ -794,6 +873,8 @@ export const ApplyVSFunction = ({
               };
         });
 
+        
+
         const updateFieldBasedOnConditions = async (inputData) => {
           const keysToCount = ["OFF", "PH", "PHD", "A"];
 
@@ -860,7 +941,21 @@ export const ApplyVSFunction = ({
               for (const date in data.workingHrs) {
                 const value = data.workingHrs[date];
 
-                if (value?.startsWith("HAL")) {
+                if (value?.includes("/")) {
+                  const [first, second] = value?.split("/")?.map((v) => v?.trim());
+
+                  // FIRST HALF-DAY
+                  if (first.startsWith("HAL")) newLeaveCount.AL += 0.5;
+                  if (first.startsWith("HCL")) newLeaveCount.CL += 0.5;
+                  if (first.startsWith("HSL")) newLeaveCount.SL += 0.5;
+                  if (first.startsWith("HUAL")) newLeaveCount.UAL += 0.5;
+
+                  // SECOND HALF-DAY
+                  if (second.startsWith("HAL")) newLeaveCount.AL += 0.5;
+                  if (second.startsWith("HCL")) newLeaveCount.CL += 0.5;
+                  if (second.startsWith("HSL")) newLeaveCount.SL += 0.5;
+                  if (second.startsWith("HUAL")) newLeaveCount.UAL += 0.5;
+                } else if (value?.startsWith("HAL")) {
                   newLeaveCount.AL += 0.5;
                 } else if (value === "AL") {
                   newLeaveCount.AL += 1;

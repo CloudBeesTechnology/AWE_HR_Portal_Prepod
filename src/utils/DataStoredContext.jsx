@@ -131,7 +131,7 @@ const DataStoredContext = ({ children }) => {
           { query: listGroupHandS, key: "groupHSData" },
           { query: listTravelIns, key: "travelInsData" },
           { query: listPersonalAccidents, key: "personalAcciData" },
-          { query: listCandIToEMPS, key: "candyToEmp" }
+          { query: listCandIToEMPS, key: "candyToEmp" },
         ];
         const responses = await Promise.all(
           queries.map(async ({ query, key }) => {
@@ -145,14 +145,12 @@ const DataStoredContext = ({ children }) => {
                   variables: { limit: 100, nextToken },
                 })
                 .catch((error) => {
-
                   return { data: { items: [] } };
                 });
 
               const items =
                 response?.data?.[Object.keys(response.data)[0]]?.items || [];
               allItems = [...allItems, ...items];
-
 
               nextToken =
                 response?.data?.[Object.keys(response.data)[0]]?.nextToken;
@@ -167,11 +165,9 @@ const DataStoredContext = ({ children }) => {
         }, {});
 
         setDataState((prevState) => ({ ...prevState, ...newData }));
-
       } catch (error) {
         console.error("Data Fetch Error:", error);
-      }
-       finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -179,9 +175,10 @@ const DataStoredContext = ({ children }) => {
     fetchData();
   }, []);
 
-
   return (
-    <DataSupply.Provider value={{...dataState, loading}}>{children}</DataSupply.Provider>
+    <DataSupply.Provider value={{ ...dataState, loading }}>
+      {children}
+    </DataSupply.Provider>
   );
 };
 

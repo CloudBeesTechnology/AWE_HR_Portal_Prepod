@@ -59,6 +59,37 @@ export const ViewSummary = () => {
   const ProcessedDataFunc = async (data) => {
     setData(data);
     setSecondaryData(data);
+
+    // let count = 0;
+
+    // data?.forEach((fil) => {
+    //   fil.empWorkInfo?.forEach((item) => {
+    //     count += Number(item.WORKINGHRS) || 0;
+    //   });
+    // });
+
+    // console.log("count :", count);
+
+    // const isWithinDateRange = (dateStr, start, end) => {
+    //   if (!dateStr) return false;
+
+    //   const date = new Date(dateStr);
+    //   const startDate = new Date(start);
+    //   const endDate = new Date(end);
+
+    //   return date >= startDate && date <= endDate;
+    // };
+
+    // const testingResult = data?.filter((fil) => {
+    //   return (
+    //     fil.sapNo === "1776883" &&
+    //     fil.jobcode === "BLNG" &&
+    //     fil.location === "BLNG-PROJ" &&
+    //     isWithinDateRange(fil.date, "10-21-2025", "11-20-2025")
+    //   );
+    // });
+
+    // console.log("testingResult : ", testingResult);
   };
 
   const { allData } = useGetTimeSheetData();

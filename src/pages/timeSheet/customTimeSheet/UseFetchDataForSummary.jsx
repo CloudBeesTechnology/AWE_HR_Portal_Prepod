@@ -182,7 +182,7 @@ export const UseFetchDataForSummary = (
     allData,
     selectSapNoOrBadgeNo,
     refreshTrigger,
-  ]);
+  ]);    
 
   return {
     convertedStringToArrayObj,
