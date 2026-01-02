@@ -483,11 +483,9 @@ export const ApplyVSFunction = ({
           return listDate;
         };
 
-        
         const leaveCount_ = transformData(filteredData);
-        
 
-        const holidayDates = publicHoliday?.CompanyHolidays2025.flatMap(
+        const holidayDates = publicHoliday?.CompanyHolidays.flatMap(
           (holiday) => holiday.dates || [holiday.date]
         );
 
@@ -628,8 +626,6 @@ export const ApplyVSFunction = ({
                 }
               });
             }
-
-            
 
             const recognizeFileType = ["Offshore", "Offshore's ORMC"]?.includes(
               identifyFileType
@@ -873,8 +869,6 @@ export const ApplyVSFunction = ({
               };
         });
 
-        
-
         const updateFieldBasedOnConditions = async (inputData) => {
           const keysToCount = ["OFF", "PH", "PHD", "A"];
 
@@ -942,7 +936,9 @@ export const ApplyVSFunction = ({
                 const value = data.workingHrs[date];
 
                 if (value?.includes("/")) {
-                  const [first, second] = value?.split("/")?.map((v) => v?.trim());
+                  const [first, second] = value
+                    ?.split("/")
+                    ?.map((v) => v?.trim());
 
                   // FIRST HALF-DAY
                   if (first.startsWith("HAL")) newLeaveCount.AL += 0.5;
