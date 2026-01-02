@@ -9,8 +9,8 @@ import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 import { FiLoader } from "react-icons/fi";
 import useSeperateLeaves from "../../hooks/useSeperateLeaves";
 import { useLeaveSummaryFuncs } from "../../hooks/useLeaveSummaryFuncs";
-import { usePublicHolidayList } from "../../hooks/usePublicHolidayList";
 import useLeaveSummaryCal2 from "../../hooks/useLeaveSummaryCal2";
+import { usePublicHolidayList } from "../../hooks/usePublicHolidayList";
 
 export const EmpLeaveBalance = () => {
   const { mergedData, userType, loading } = useOutletContext();
@@ -30,6 +30,7 @@ export const EmpLeaveBalance = () => {
 
   const { handleSeperateLeaves } = useSeperateLeaves();
   const { publicHoliday } = usePublicHolidayList();
+
   const { convertToFormattedHolidays } = useLeaveSummaryFuncs();
   const { filterOnshoreOffshorePHbasis } = useLeaveSummaryCal2();
 
@@ -53,6 +54,8 @@ export const EmpLeaveBalance = () => {
     // );
 
     const { formattedPHList } = convertToFormattedHolidays({ publicHoliday });
+    console.log("publicHoliday : ", publicHoliday);
+    console.log("formattedPHList : ", formattedPHList);
     const { isOffshoreOrOnshoreEmp } = filterOnshoreOffshorePHbasis({
       formattedPHList,
       seperatedLeaves,

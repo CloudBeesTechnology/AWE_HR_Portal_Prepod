@@ -17,7 +17,7 @@ export const usePublicHolidayList = () => {
       })
       .then((data) => {
         setPublicHoliday(data);
-
+        console.log("data : ", data);
         setLoading(false);
       })
       .catch((error) => {
@@ -26,5 +26,5 @@ export const usePublicHolidayList = () => {
       });
   }, []);
 
-  return { publicHoliday }
+  return { publicHoliday };
 };
