@@ -28,7 +28,7 @@ export const useLeaveSummaryFuncs = () => {
       };
     };
 
-    const formattedPHList = publicHoliday?.CompanyHolidays2025?.map((item) => {
+    const formattedPHList = publicHoliday?.CompanyHolidays?.map((item) => {
       let dateList = [];
 
       if (item.date) {

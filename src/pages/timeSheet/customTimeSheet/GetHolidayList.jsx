@@ -6,9 +6,8 @@ export const GetHolidayList = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-   
     fetch(
-      "https://commonfiles.s3.ap-southeast-1.amazonaws.com/Leave+Details/CompanyHolidays2025.json"
+      "https://commonfiles.s3.ap-southeast-1.amazonaws.com/Leave+Details/CompanyHolidays.json"
     )
       .then((response) => {
         if (!response.ok) {
@@ -18,10 +17,10 @@ export const GetHolidayList = () => {
       })
       .then((data) => {
         setHolidays(data);
-      
+
         setLoading(false);
       })
-      .catch((error) => { 
+      .catch((error) => {
         setError(error);
         setLoading(false);
       });

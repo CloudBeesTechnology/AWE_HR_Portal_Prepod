@@ -13,7 +13,12 @@ import { usePublicHolidayList } from "../../hooks/usePublicHolidayList";
 import useLeaveSummaryCal2 from "../../hooks/useLeaveSummaryCal2";
 
 export const EmpLeaveBalance = () => {
-  const { mergedData, userType, loading } = useOutletContext();
+  const {
+    mergedDataForProData: mergedData,
+    empInfoUnmatchedData,
+    userType,
+    loading,
+  } = useOutletContext();
 
   //  handleLeaveCount,
   //       renderLeaveData
@@ -66,8 +71,8 @@ export const EmpLeaveBalance = () => {
         ? isOffshoreOrOnshoreEmp?.flatMap((val) => val?.seperatedLeaves)
         : [];
 
-    setMergedLeaveData(finalLeaveData);
-  }, [mergedData, publicHoliday, userType]);
+    setMergedLeaveData([...finalLeaveData, ...empInfoUnmatchedData]);
+  }, [mergedData, publicHoliday, userType, empInfoUnmatchedData]);
 
   // mergedData, userType
   useEffect(() => {

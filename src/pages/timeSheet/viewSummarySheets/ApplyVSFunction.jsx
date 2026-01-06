@@ -487,7 +487,7 @@ export const ApplyVSFunction = ({
         const leaveCount_ = transformData(filteredData);
         
 
-        const holidayDates = publicHoliday?.CompanyHolidays2025.flatMap(
+        const holidayDates = publicHoliday?.CompanyHolidays.flatMap(
           (holiday) => holiday.dates || [holiday.date]
         );
 

@@ -18,6 +18,8 @@ const client = generateClient();
 
 export const useLeaveManage = () => {
   const [data, setData] = useState({
+    empInfoUnmatchedData: [],
+    mergedDataForProData: [],
     mergedData: [],
     ticketMerged: [],
     personalDetails: [],
@@ -135,8 +137,73 @@ export const useLeaveManage = () => {
         acc[item.empID] = item;
         return acc;
       }, {});
+
+      const mergedEmpPersonalInfo = allEmpPersonalInfos?.map((empInfoData) => {
+        const empInfo = empInfoMap[empInfoData.empID] || {};
+        const workInfo = workInfoMap[empInfoData.empID] || {};
+        const leaveDetails = leaveDetailsMap[empInfoData.empID] || {};
+
+        return {
+          ...empInfoData,
+          ...leaveDetails,
+          empID: empInfoData.empID,
+          empName: empInfo.name,
+          empBadgeNo: empInfo.empBadgeNo,
+          gender: empInfo.gender,
+          empOfficialEmail: empInfo.officialEmail,
+          doj: workInfo.doj,
+          position: workInfo.position || "",
+          department: workInfo.department || "",
+          workHrs: workInfo?.workHrs || [],
+          workMonth: workInfo?.workMonth || [],
+          workWeek: workInfo?.workWeek || [],
+          compassionateLeave: leaveDetails.compasLeave || 0,
+          annualLeave: leaveDetails.annualLeave || 0,
+          sickLeave: leaveDetails.sickLeave || 0,
+          maternityLeave: leaveDetails.materLeave || 0,
+          paternityLeave: leaveDetails.paterLeave || 0,
+          hospitalLeave: leaveDetails.hospLeave || 0,
+          marriageLeave: leaveDetails.mrageLeave || 0,
+          empPervAnnualLeaveBal: leaveDetails.pervAnnualLeaveBal || 0,
+          leaveDetailsCreatedAt: leaveDetails.createdAt,
+          leaveDetailsUpdatedAt: leaveDetails.updatedAt,
+          empsickLeaveTaken: leaveDetails.sickLeaveTaken,
+
+          empSickLeaveDate: leaveDetails.sickLeaveDate,
+
+          empAnnualLeaveDate: leaveDetails?.annualLeaveDate,
+
+          // LeaveStatus
+          leaveStatusCreatedAt: "",
+          leaveStatusReceivedDate: "",
+          leaveDays: "",
+          // leaveType: leaveStatus.leaveType,
+          supervisorName: "",
+          supervisorEmpID: "",
+          supervisorStatus: "",
+          supervisorDate: "",
+          supervisorRemarks: "",
+          managerName: "",
+          managerEmpID: "",
+          managerStatus: "",
+          managerDate: "",
+          managerRemarks: "",
+          empStatus: "",
+          reason: "",
+          medicalCertificate: "",
+          empLeaveType: "",
+          empLeaveStartDate: "",
+          empLeaveEndDate: "",
+
+          empLeaveSelectedFrom: "",
+          empLeaveSelectedTo: "",
+
+          empLeaveUpdatedAt: "",
+        };
+      });
+
       // Merge leave status data
-      const mergedLeaveData = allLeaveStatuses.map((leaveStatus) => {
+      const mergedLeaveDataList = allLeaveStatuses.map((leaveStatus) => {
         const empInfo = empInfoMap[leaveStatus.empID] || {};
         const workInfo = workInfoMap[leaveStatus.empID] || {};
 
@@ -202,6 +269,19 @@ export const useLeaveManage = () => {
         };
       });
 
+      const empInfoUnmatchedData = mergedEmpPersonalInfo.filter((empInfo) => {
+        const getLeaveData = mergedLeaveDataList.find(
+          (leave) =>
+            String(leave.empID)?.toUpperCase()?.trim() ===
+            String(empInfo.empID)?.toUpperCase()?.trim()
+        );
+        if (!getLeaveData) {
+          return empInfo;
+        }
+      });
+
+      const mergedLeaveData = [...mergedLeaveDataList, ...empInfoUnmatchedData];
+
       // Merge ticket request data
       const mergedTicketData = allTicketRequests.map((ticket) => {
         const empInfo = empInfoMap[ticket.empID] || {};
@@ -239,7 +319,9 @@ export const useLeaveManage = () => {
       });
 
       setData({
-        mergedData: mergedLeaveData,
+        empInfoUnmatchedData: empInfoUnmatchedData,
+        mergedDataForProData: mergedLeaveData,
+        mergedData: mergedLeaveDataList,
         ticketMerged: mergedTicketData,
         personalDetails: allEmpPersonalInfos,
       });

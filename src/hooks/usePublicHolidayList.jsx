@@ -7,7 +7,7 @@ export const usePublicHolidayList = () => {
 
   useEffect(() => {
     fetch(
-      "https://commonfiles.s3.ap-southeast-1.amazonaws.com/Leave+Details/CompanyHolidays2025.json"
+      "https://commonfiles.s3.ap-southeast-1.amazonaws.com/Leave+Details/CompanyHolidays.json"
     )
       .then((response) => {
         if (!response.ok) {
@@ -26,5 +26,5 @@ export const usePublicHolidayList = () => {
       });
   }, []);
 
-  return { publicHoliday }
+  return { publicHoliday };
 };

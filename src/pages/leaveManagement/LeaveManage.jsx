@@ -5,7 +5,6 @@ import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { DateFormat } from "../../utils/DateFormat";
 import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
 
-
 export const LeaveManage = () => {
   const [source, setSource] = useState(null);
   const [toggleClick, setToggleClick] = useState(false);
@@ -15,16 +14,18 @@ export const LeaveManage = () => {
   const [userID, setUserID] = useState("");
 
   const {
+    mergedDataForProData,
+    empInfoUnmatchedData,
     mergedData,
     handleDeleteLeaveStatus,
     handleUpdateLeaveStatus,
     ticketMerged,
     statusUpdate,
-    loading
+    loading,
   } = useLeaveManage();
 
   // console.log("All leave status",ticketMerged);
-  
+
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     setUserID(userID);
@@ -33,8 +34,8 @@ export const LeaveManage = () => {
   }, []);
 
   const { personalInfo } = useEmployeePersonalInfo(userID);
-// console.log(mergedData);
- 
+  // console.log(mergedData);
+
   const handleClickForToggle = () => {
     setToggleClick(!toggleClick);
   };
@@ -42,20 +43,20 @@ export const LeaveManage = () => {
   const handleViewClick = (data, source) => {
     setSource(source);
     if (source === "LM") {
-      setSelectedLeaveData(data); 
-      setSelectedTicketData(null); 
+      setSelectedLeaveData(data);
+      setSelectedTicketData(null);
     } else if (source === "Tickets") {
       // console.log(data);
 
-      setSelectedTicketData(data); 
-      setSelectedLeaveData(null); 
+      setSelectedTicketData(data);
+      setSelectedLeaveData(null);
     }
     setToggleClick(true);
   };
 
   const handleUpdate = async (empID, newStatus, remark) => {
     try {
-      await handleUpdateLeaveStatus(empID, { status: newStatus, remark }); 
+      await handleUpdateLeaveStatus(empID, { status: newStatus, remark });
       setSelectedLeaveData(null);
       setToggleClick(false);
       // console.log("Update successful for:", empID);
@@ -64,36 +65,35 @@ export const LeaveManage = () => {
     }
   };
 
-// console.log(data);
+  // console.log(data);
 
   return (
     <section className="py-20 px-10">
       <div className="screen-size">
-   
         <section className="center w-full ">
           <Outlet
             context={{
               handleClickForToggle,
-              ticketMerged,    
+              ticketMerged,
               handleViewClick,
               handleDeleteLeaveStatus,
-              personalInfo,    
+              personalInfo,
               userType,
               userID,
               statusUpdate,
               mergedData,
-              loading
-            }} 
+              mergedDataForProData,
+              empInfoUnmatchedData,
+              loading,
+            }}
           />
         </section>
-
-     
       </div>
       {toggleClick && (selectedLeaveData || selectedTicketData) && (
         <ViewForm
           handleClickForToggle={handleClickForToggle}
-          leaveData={selectedLeaveData} 
-          ticketData={selectedTicketData} 
+          leaveData={selectedLeaveData}
+          ticketData={selectedTicketData}
           source={source}
           formatDate={DateFormat}
           onUpdate={handleUpdate}
