@@ -57,7 +57,7 @@ export const EmpLeaveBalance = () => {
     // const seperatedLeaves = seperatedLeavess?.filter(
     //   (val) => val.empID === "2045"
     // );
-
+    
     const { formattedPHList } = convertToFormattedHolidays({ publicHoliday });
     const { isOffshoreOrOnshoreEmp } = filterOnshoreOffshorePHbasis({
       formattedPHList,

@@ -4,10 +4,11 @@ export const usePublicHolidayList = () => {
   const [publicHoliday, setPublicHoliday] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const getCurrentYear = new Date().getFullYear();
 
   useEffect(() => {
     fetch(
-      "https://commonfiles.s3.ap-southeast-1.amazonaws.com/Leave+Details/CompanyHolidays.json"
+      `https://commonfiles.s3.ap-southeast-1.amazonaws.com/Leave+Details/CompanyHolidays_${getCurrentYear}.json`
     )
       .then((response) => {
         if (!response.ok) {

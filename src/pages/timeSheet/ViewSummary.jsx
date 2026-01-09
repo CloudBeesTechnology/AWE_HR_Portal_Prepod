@@ -13,13 +13,13 @@ import { ViewSummaryTable } from "./viewSummarySheets/ViewSummaryTable";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { GetHolidayList } from "./customTimeSheet/GetHolidayList";
 import { HoursMinuAbsentCal } from "./customTimeSheet/HoursMinuAbsentCal";
 
 import { useTableMergedData } from "./customTimeSheet/useTableMergedData";
 import { useGetTimeSheetData } from "./customTimeSheet/useGetTimeSheetData";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { useFetchDropdownValue } from "./customTimeSheet/useFetchDropdownValue";
+import { useGetPublicHolidays } from "./customTimeSheet/useGetPublicHolidays";
 
 export const ViewSummary = () => {
   const [data, setData] = useState(null);
@@ -52,9 +52,14 @@ export const ViewSummary = () => {
 
   const { listOfLocation } = useFetchDropdownValue();
 
-  const publicHoliday = GetHolidayList();
+  const { companyHolidayList, handlePublicHoliday } = useGetPublicHolidays();
 
   const { empAndWorkInfo: mergedData, leaveStatuses } = useTableMergedData();
+
+  useEffect(() => {
+    if (!startDate || !endDate) return;
+    handlePublicHoliday({ startDate, endDate });
+  }, [startDate, endDate]);
 
   const ProcessedDataFunc = async (data) => {
     setData(data);
@@ -270,7 +275,7 @@ export const ViewSummary = () => {
       <ApplyVSFunction
         convertedStringToArrayObj={convertedStringToArrayObj}
         ProcessedDataFunc={ProcessedDataFunc}
-        publicHoliday={publicHoliday}
+        companyHolidayList={companyHolidayList}
         dummyLeaveStatus={dummyLeaveStatus}
         dayCounts={dayCounts}
         mergedData={mergedData}

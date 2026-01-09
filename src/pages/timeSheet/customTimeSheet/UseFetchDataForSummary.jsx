@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 
 export const UseFetchDataForSummary = (
@@ -182,7 +181,7 @@ export const UseFetchDataForSummary = (
     allData,
     selectSapNoOrBadgeNo,
     refreshTrigger,
-  ]);    
+  ]);
 
   return {
     convertedStringToArrayObj,

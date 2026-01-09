@@ -47,26 +47,26 @@ export const useLeaveSummaryFuncs = () => {
   }
 
   function getSelectedMonthName(startDateStr, endDateStr) {
-  const startDate = new Date(startDateStr);
-  const endDate = new Date(endDateStr);
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
 
-  const startMonth = startDate.toLocaleString('default', { month: 'short' });
-  const endMonth = endDate.toLocaleString('default', { month: 'short' });
+    const startMonth = startDate.toLocaleString("default", { month: "short" });
+    const endMonth = endDate.toLocaleString("default", { month: "short" });
 
-  const startYear = startDate.getFullYear();
-  const endYear = endDate.getFullYear();
+    const startYear = startDate.getFullYear();
+    const endYear = endDate.getFullYear();
 
-  const getStartMonth = startDate.getMonth();
-  const getEndMonth = endDate.getMonth();
+    const getStartMonth = startDate.getMonth();
+    const getEndMonth = endDate.getMonth();
 
-  if (startYear === endYear && getStartMonth === getEndMonth) {
-    return `${startMonth} ${startYear}`;
-  } else if (startYear === endYear) {
-    return `${startMonth} - ${endMonth} ${startYear}`;
-  } else {
-    return `${startMonth} ${startYear} - ${endMonth} ${endYear}`;
+    if (startYear === endYear && getStartMonth === getEndMonth) {
+      return `${startMonth} ${startYear}`;
+    } else if (startYear === endYear) {
+      return `${startMonth} - ${endMonth} ${startYear}`;
+    } else {
+      return `${startMonth} ${startYear} - ${endMonth} ${endYear}`;
+    }
   }
-}
 
   return { convertToFormattedHolidays, getSelectedMonthName };
 };

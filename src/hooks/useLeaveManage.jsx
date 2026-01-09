@@ -202,6 +202,11 @@ export const useLeaveManage = () => {
         };
       });
 
+      const filteredLeaves = allLeaveStatuses?.filter(
+        (val) => val.empID === "7681"
+      );
+      console.log("filteredLeaves : ", filteredLeaves);
+
       // Merge leave status data
       const mergedLeaveDataList = allLeaveStatuses.map((leaveStatus) => {
         const empInfo = empInfoMap[leaveStatus.empID] || {};

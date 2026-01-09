@@ -12,6 +12,7 @@ import "jspdf-autotable";
 
 import { useTempID } from "../../../utils/TempIDContext";
 import { GetViewSummaryUpdater } from "../customTimeSheet/GetViewSummaryUpdater";
+import { useHandleDateFormat } from "../customTimeSheet/useHandleDateFormat";
 
 // const client = generateClient();
 
@@ -19,14 +20,16 @@ export const ApplyVSFunction = ({
   convertedStringToArrayObj,
   ProcessedDataFunc,
   publicHoliday,
+  prevYearHolidays,
   dummyLeaveStatus,
   dayCounts,
   mergedData,
   leaveStatuses,
   empPIData,
+  companyHolidayList,
 }) => {
   const { getStartDate, getEndDate } = useTempID();
-
+  const { handleDateFormat } = useHandleDateFormat({ leaveStatuses });
   const identifyFileType = convertedStringToArrayObj?.[0]?.fileType;
 
   try {
@@ -105,7 +108,8 @@ export const ApplyVSFunction = ({
           }
         });
 
-        const leaveStatusData = leaveStatuses;
+        const leaveStatusData = handleDateFormat();
+        // const leaveStatusData = leaveStatuses;
 
         // const leaveStatusData = dummyLeaveStatus;
 
@@ -235,7 +239,9 @@ export const ApplyVSFunction = ({
 
         const merged = mergedData.flatMap((val) => {
           const matches = approvedLeaveStatus.filter(
-            (so) => String(val.empID) === String(so.empID)
+            (so) =>
+              String(val.empID)?.toUpperCase()?.trim() ===
+              String(so.empID)?.toUpperCase()?.trim()
           );
 
           if (matches.length > 0) {
@@ -263,16 +269,16 @@ export const ApplyVSFunction = ({
                 String(emp.fidNo)?.toUpperCase()?.trim();
 
             if (empBadgeNoMatch || sapNoMatch) {
-              return emp.data.some((entry) => {
-                const leaveDate = new Date(leave.toDate);
-                const empDate = new Date(entry.date);
+              // return emp.data.some((entry) => {
+              // const leaveDate = new Date(leave.toDate);
+              // const empDate = new Date(entry.date);
 
-                return (
-                  leaveDate.getFullYear() === empDate.getFullYear()
-                  //  &&
-                  // leaveDate.getMonth() === empDate.getMonth()
-                );
-              });
+              return leave;
+
+              // leaveDate.getFullYear() === empDate.getFullYear()
+              //  &&
+              // leaveDate.getMonth() === empDate.getMonth()
+              // });
             }
             return false;
           });
@@ -485,7 +491,8 @@ export const ApplyVSFunction = ({
 
         const leaveCount_ = transformData(filteredData);
 
-        const holidayDates = publicHoliday?.CompanyHolidays.flatMap(
+        // const holidayDates = []
+        const holidayDates = companyHolidayList?.flatMap(
           (holiday) => holiday.dates || [holiday.date]
         );
 
