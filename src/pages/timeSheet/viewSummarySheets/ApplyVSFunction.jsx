@@ -192,7 +192,7 @@ export const ApplyVSFunction = ({
                   const YearKey = `${dateObj.getFullYear()}`;
 
                   // const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}-${monthYearKey}`;
-                  const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}-${YearKey}`;
+                  const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}`;
 
                   if (!groupedData.has(key)) {
                     groupedData.set(key, {
