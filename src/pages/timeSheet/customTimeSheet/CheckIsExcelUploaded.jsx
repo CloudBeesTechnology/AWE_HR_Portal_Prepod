@@ -12,6 +12,11 @@ export const CheckIsExcelUploaded = async ({
   const fetchData = async () => {
     let nextToken = null;
 
+    // Calculate date from 40 days ago
+    const fortyDaysAgo = new Date();
+    fortyDaysAgo.setDate(fortyDaysAgo.getDate() - 32);
+    const fortyDaysAgoISO = fortyDaysAgo.toISOString();
+
     try {
       do {
         const response = await client.graphql({
@@ -19,6 +24,11 @@ export const CheckIsExcelUploaded = async ({
           variables: {
             limit: 800,
             nextToken,
+            filter: {
+              createdAt: {
+                ge: fortyDaysAgoISO
+              }
+            }
           },
         });
 

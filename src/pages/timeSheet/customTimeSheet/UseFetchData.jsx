@@ -28,36 +28,17 @@ export const useFetchData = (
           let allData = [];
           let fetchedData = [];
 
+          // Calculate date from 40 days ago
+          const fortyDaysAgo = new Date();
+          fortyDaysAgo.setDate(fortyDaysAgo.getDate() - 32);
+          const fortyDaysAgoISO = fortyDaysAgo.toISOString();
+
+          // Date filter only
           const filter = {
-            and:
-              cardName === "Manager"
-                ? [
-                    { status: { eq: "Pending" } },
-                    { fileType: { eq: titleName } },
-                  ]
-                : cardName === "viewTimeSheet"
-                ? [{ fileType: { eq: titleName } }]
-                : cardName === "viewSummary"
-                ? [
-                    { status: { eq: "Approved" } },
-                    { fileType: { eq: titleName } },
-                  ]
-                : cardName === "rejectedItems"
-                ? [
-                    { status: { eq: "Rejected" } },
-                    { fileType: { eq: titleName } },
-                  ]
-                : cardName === "Unsubmitted"
-                ? [
-                    { status: { eq: "Unsubmitted" } },
-                    { fileType: { eq: titleName } },
-                  ]
-                : [
-                    { status: { eq: "nothing" } },
-                    { fileType: { eq: titleName } },
-                  ],
+            createdAt: { ge: fortyDaysAgoISO }
           };
-          // Fetch data in a paginated manner
+
+          // Fetch data in a paginated manner with date filter
           do {
             const response = await client.graphql({
               query: listTimeSheets,
@@ -81,14 +62,44 @@ export const useFetchData = (
             allData = [...allData, ...fetchedData];
           } while (nextToken);
 
-          setConvertedStringToArrayObj(allData);
+          // Apply cardName filter locally
+          let filteredData = allData;
+          
+          if (cardName === "Manager") {
+            filteredData = allData.filter(
+              item => item.status === "Pending" && item.fileType === titleName
+            );
+          } else if (cardName === "viewTimeSheet") {
+            filteredData = allData.filter(
+              item => item.fileType === titleName
+            );
+          } else if (cardName === "viewSummary") {
+            filteredData = allData.filter(
+              item => item.status === "Approved" && item.fileType === titleName
+            );
+          } else if (cardName === "rejectedItems") {
+            filteredData = allData.filter(
+              item => item.status === "Rejected" && item.fileType === titleName
+            );
+          } else if (cardName === "Unsubmitted") {
+            filteredData = allData.filter(
+              item => item.status === "Unsubmitted" && item.fileType === titleName
+            );
+          } else {
+            filteredData = allData.filter(
+              item => item.status === "nothing" && item.fileType === titleName
+            );
+          }
 
-          if (allData.length === 0) {
+          setConvertedStringToArrayObj(filteredData);
+
+          if (filteredData.length === 0) {
             setMessage?.("No data available");
           } else {
             setMessage?.("");
           }
         } catch (error) {
+          console.error("Error fetching data:", error);
         } finally {
           setLoading?.(false);
         }
@@ -102,7 +113,6 @@ export const useFetchData = (
     return { convertedStringToArrayObj, getPosition, loading };
   } catch (err) {
     setLoading?.(false);
-
     setMessage("An error occurred. Please try again.");
   }
 };

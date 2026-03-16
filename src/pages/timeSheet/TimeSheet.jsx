@@ -143,10 +143,9 @@ export const TimeSheet = () => {
                   className="shadow-lg border border-grey bg-white my-5 h-36 max-w-48 w-full rounded-xl flex flex-col items-center justify-center text-center gap-3 p-5 animate-pulse"
                 >
                   <div className="w-full max-w-[60px]">
-                    <div className="w-full h-12 bg-grey rounded-md"></div>
+                    <div className="w-full h-14 bg-grey rounded-full"></div>
                   </div>
-                  <div className="w-20 h-3 bg-grey rounded"></div>
-                  <div className="w-20 h-3 bg-grey rounded"></div>
+                  <div className="w-28 h-3 bg-grey rounded"></div>
                 </div>
               ))}
             </div>
@@ -159,11 +158,11 @@ export const TimeSheet = () => {
                   key={i}
                   className="shadow-lg border border-grey bg-white my-5 h-36 max-w-48 w-full rounded-xl flex flex-col items-center justify-center text-center gap-3 p-5 animate-pulse"
                 >
-                  <div className="w-full max-w-[60px]">
-                    <div className="w-full h-12 bg-grey rounded-md"></div>
+                  <div className="w-full max-w-[60px] ">
+                    <div className="w-full h-14 bg-grey rounded-full"></div>
                   </div>
-                  <div className="w-20 h-3 bg-grey rounded"></div>
-                  <div className="w-20 h-3 bg-grey rounded"></div>
+                  <div className="w-28 h-3 bg-grey rounded"></div>
+                 
                 </div>
               ))}
             </div>

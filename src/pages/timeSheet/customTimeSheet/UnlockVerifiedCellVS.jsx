@@ -22,10 +22,24 @@ export const UnlockVerifiedCellVS = async ({
   // Step 1️⃣: Fetch all data at once (with pagination)
   try {
     let nextToken = null;
+    
+    // Calculate date from 30 days ago
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 32);
+    const thirtyDaysAgoISO = thirtyDaysAgo.toISOString();
+    
     do {
       const response = await client.graphql({
         query: listTimeSheets,
-        variables: { limit: 800, nextToken },
+        variables: { 
+          limit: 800, 
+          nextToken,
+          filter: {
+            createdAt: {
+              ge: thirtyDaysAgoISO
+            }
+          }
+        },
       });
 
       const responseData = response?.data?.listTimeSheets?.items || [];

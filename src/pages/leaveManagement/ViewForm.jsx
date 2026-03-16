@@ -17,15 +17,21 @@ export const ViewForm = ({
   userType,
   personalInfo,
 }) => {
-  const { empPIData } = useContext(DataSupply);
+  const { empPIData, setFetchTableData } = useContext(DataSupply);
   const { gmPosition, gmMail, GMEmpID, HRMPosition, hrManagerMail } =
     useTempID();
   const [remark, setRemark] = useState("");
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState("");
   const [path, setPath] = useState("");
-  const { handleUpdateLeaveStatus, handleUpdateTicketRequest } =
-    useLeaveManage();
+
+  useEffect(() => {
+    setFetchTableData(["empPIData"]);
+  }, []);
+  const { storedData, isLoading } = useContext(DataSupply);
+  const { handleUpdateLeaveStatus, handleUpdateTicketRequest } = useLeaveManage(
+    { storedData, isLoading },
+  );
   const { createNotification } = useCreateNotification();
 
   const managerName = empPIData.find((val) => {
@@ -43,30 +49,30 @@ export const ViewForm = ({
     return status === "Rejected"
       ? "text-[red]"
       : status === "Approved"
-      ? "text-[#339933]"
-      : status === "Pending"
-      ? "text-[#E8A317]"
-      : "text-[#E8A317]";
+        ? "text-[#339933]"
+        : status === "Pending"
+          ? "text-[#E8A317]"
+          : "text-[#E8A317]";
   };
 
   const getHrStatusClass = (status) => {
     return status === "Not Eligible"
       ? "text-[red]"
       : status === "Verified"
-      ? "text-[#339933]"
-      : status === "Pending"
-      ? "text-[#E8A317]"
-      : "text-[#E8A317]";
+        ? "text-[#339933]"
+        : status === "Pending"
+          ? "text-[#E8A317]"
+          : "text-[#E8A317]";
   };
 
   const getGmStatusClass = (status) => {
     return status === "Rejected"
       ? "text-[red]"
       : status === "Approved"
-      ? "text-[#339933]"
-      : status === "Pending"
-      ? "text-[#E8A317]"
-      : "text-[#E8A317]";
+        ? "text-[#339933]"
+        : status === "Pending"
+          ? "text-[#E8A317]"
+          : "text-[#E8A317]";
   };
 
   const GM = "GENERAL MANAGER";
@@ -101,21 +107,21 @@ export const ViewForm = ({
           ? isValidDateFormat(leaveData.empLeaveSelectedFrom) &&
             isValidDateFormat(leaveData.empLeaveSelectedTo)
             ? `${DateFormat(
-                leaveData.empLeaveSelectedFrom
+                leaveData.empLeaveSelectedFrom,
               )} to ${DateFormat(leaveData.empLeaveSelectedTo)}`
             : `${leaveData.empLeaveSelectedFrom} to ${leaveData.empLeaveSelectedTo}`
           : leaveData.empLeaveStartDate && leaveData.empLeaveEndDate
-          ? `${DateFormat(leaveData.empLeaveStartDate)} to ${DateFormat(
-              leaveData.empLeaveEndDate
-            )}`
-          : "N/A";
+            ? `${DateFormat(leaveData.empLeaveStartDate)} to ${DateFormat(
+                leaveData.empLeaveEndDate,
+              )}`
+            : "N/A";
 
       handleUpdateLeaveStatus(leaveData.id, updateData)
         .then(() => {
           setNotificationText(
             `Leave ${status} by ${personalInfo.name} on ${DateFormat(
-              currentDate
-            )}`
+              currentDate,
+            )}`,
           );
 
           if (
@@ -136,14 +142,14 @@ export const ViewForm = ({
                         Dear ${leaveData.empName || "Not mentioned"}, <br />
                         Your ${leaveData.empLeaveType} request for the period 
                         ${leavePeriod} has been ${status} by Manager, ${
-                    managerName.name || "Not mentioned"
-                  }.
+                          managerName.name || "Not mentioned"
+                        }.
                       </p>
                        <p>Click here <a href="https://employee.adininworks.co">employee.adininworks.co</a> to view the status.</p>
                     </body>
                   </html>`,
                   "leave_no-reply@adininworks.com",
-                  leaveData.empOfficialEmail
+                  leaveData.empOfficialEmail,
                 );
                 // alert("Email sent successfully to Employee");
 
@@ -156,16 +162,16 @@ export const ViewForm = ({
                         Your Employee Mr/Ms. ${
                           leaveData.empName || "Not mentioned"
                         }'s, ${
-                    leaveData.empLeaveType
-                  } request for the period ${leavePeriod} has been ${status} by Manager, ${
-                    managerName.name || "Not mentioned"
-                  }.
+                          leaveData.empLeaveType
+                        } request for the period ${leavePeriod} has been ${status} by Manager, ${
+                          managerName.name || "Not mentioned"
+                        }.
                       </p>
                       <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
                     </body>
                   </html>`,
                   "leave_no-reply@adininworks.com",
-                  "hr-notification@adininworks.com"
+                  "hr-notification@adininworks.com",
                 );
                 // alert("Email sent successfully to HR");
                 //____________________________________________________________ Employee got notification_______________________________________________________________________________________
@@ -221,17 +227,17 @@ export const ViewForm = ({
                           Your Employee Mr/Ms. ${
                             leaveData.empName || "Not mentioned"
                           }'s, ${
-                      leaveData.empLeaveType
-                    } request for the period   ${leavePeriod}, 
+                            leaveData.empLeaveType
+                          } request for the period   ${leavePeriod}, 
                           which has been ${status} by Supervisor, ${
-                      supervisorName.name || "Not mentioned"
-                    }.
+                            supervisorName.name || "Not mentioned"
+                          }.
                         </p>
                         <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the status.</p>
                       </body>
                     </html>`,
                     "leave_no-reply@adininworks.com",
-                    FindingEmail[0].officialEmail
+                    FindingEmail[0].officialEmail,
                   );
                   // alert("Email sent successfully to Manager");
                   //____________________________________________________________ HR got email_______________________________________________________________________________________
@@ -243,16 +249,16 @@ export const ViewForm = ({
                           Your Employee Mr/Ms. ${
                             leaveData.empName || "Not mentioned"
                           }'s, ${
-                      leaveData.empLeaveType
-                    } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
-                      supervisorName.name || "Not mentioned"
-                    }.
+                            leaveData.empLeaveType
+                          } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
+                            supervisorName.name || "Not mentioned"
+                          }.
                         </p>
                         <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
                       </body>
                     </html>`,
                     "leave_no-reply@adininworks.com",
-                    "hr-notification@adininworks.com"
+                    "hr-notification@adininworks.com",
                   );
                   // alert("Email sent successfully to HR");
                   //____________________________________________________________ manager got notification_______________________________________________________________________________________
@@ -288,16 +294,16 @@ export const ViewForm = ({
                           Your Employee Mr/Ms. ${
                             leaveData.empName || "Not mentioned"
                           }'s, ${
-                      leaveData.empLeaveType
-                    } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
-                      supervisorName.name || "Not mentioned"
-                    }.
+                            leaveData.empLeaveType
+                          } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
+                            supervisorName.name || "Not mentioned"
+                          }.
                         </p>
                         <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
                       </body>
                     </html>`,
                     "leave_no-reply@adininworks.com",
-                    "hr-notification@adininworks.com"
+                    "hr-notification@adininworks.com",
                   );
                   // alert("Email sent successfully to HR");
                   //____________________________________________________________ Manager got email_______________________________________________________________________________________
@@ -309,17 +315,17 @@ export const ViewForm = ({
                           Your Employee Mr/Ms. ${
                             leaveData.empName || "Not mentioned"
                           }'s, ${
-                      leaveData.empLeaveType
-                    } request for the period ${leavePeriod}, 
+                            leaveData.empLeaveType
+                          } request for the period ${leavePeriod}, 
                           which has been ${status} by Supervisor, ${
-                      supervisorName.name || "Not mentioned"
-                    }.
+                            supervisorName.name || "Not mentioned"
+                          }.
                         </p>
                         <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the status.</p>
                       </body>
                     </html>`,
                     "leave_no-reply@adininworks.com",
-                    FindingEmail[0].officialEmail
+                    FindingEmail[0].officialEmail,
                   );
                   // alert("Email sent successfully to Manager");
                   //____________________________________________________________ Employee got email_______________________________________________________________________________________
@@ -331,16 +337,16 @@ export const ViewForm = ({
                         Dear ${
                           leaveData.empName || "Not mention"
                         }, <br /> Your ${
-                      leaveData.empLeaveType
-                    } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
-                      supervisorName.name || "Not mention"
-                    }. 
+                          leaveData.empLeaveType
+                        } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
+                          supervisorName.name || "Not mention"
+                        }. 
                      </p>
                       <p>Click here <a href="https://employee.adininworks.co">employee.adininworks.co</a> to view the status.</p>
                      </body>
                      </html>`,
                     "leave_no-reply@adininworks.com",
-                    leaveData.empOfficialEmail
+                    leaveData.empOfficialEmail,
                   );
                   // alert("Email sent successfully to Employee");
                   //____________________________________________________________ Manager got notification_______________________________________________________________________________________
@@ -409,16 +415,16 @@ export const ViewForm = ({
                       Your Employee Mr/Ms. ${
                         leaveData.empName || "Not mentioned"
                       }'s ${
-                    leaveData.empLeaveType
-                  } request for the period ${leavePeriod} has been ${status} by Manager, ${
-                    managerName.name || "Not mentioned"
-                  }.
+                        leaveData.empLeaveType
+                      } request for the period ${leavePeriod} has been ${status} by Manager, ${
+                        managerName.name || "Not mentioned"
+                      }.
                     </p>
                  <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
                  </body>
                </html>`,
                   "leave_no-reply@adininworks.com",
-                  FindingEmail[0].officialEmail
+                  FindingEmail[0].officialEmail,
                 );
                 // alert("Email sent successfully to Supervisor");
                 //____________________________________________________________ Employee got email_______________________________________________________________________________________
@@ -430,16 +436,16 @@ export const ViewForm = ({
                        Dear ${
                          leaveData.empName || "Not mention"
                        }, <br /> Your ${
-                    leaveData.empLeaveType
-                  } request for the period ${leavePeriod} has been ${status} by Manager, ${
-                    managerName.name || "Not mention"
-                  }. 
+                         leaveData.empLeaveType
+                       } request for the period ${leavePeriod} has been ${status} by Manager, ${
+                         managerName.name || "Not mention"
+                       }. 
                     </p>
                     <p>Click here <a href="https://employee.adininworks.co">employee.adininworks.co</a> to view the status.</p>
                    </body>
                  </html>`,
                   "leave_no-reply@adininworks.com",
-                  leaveData.empOfficialEmail
+                  leaveData.empOfficialEmail,
                 );
                 // alert("Email sent successfully to Employee");
                 //____________________________________________________________ HR got email_______________________________________________________________________________________
@@ -451,16 +457,16 @@ export const ViewForm = ({
                           Your Employee Mr/Ms. ${
                             leaveData.empName || "Not mentioned"
                           }'s ${
-                    leaveData.empLeaveType
-                  } request for the period ${leavePeriod} has been ${status} by Manager, ${
-                    managerName.name || "Not mentioned"
-                  }.
+                            leaveData.empLeaveType
+                          } request for the period ${leavePeriod} has been ${status} by Manager, ${
+                            managerName.name || "Not mentioned"
+                          }.
                        </p>
                        <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
                      </body>
                  </html>`,
                   "leave_no-reply@adininworks.com",
-                  "hr-notification@adininworks.com"
+                  "hr-notification@adininworks.com",
                 );
                 // alert("Email sent successfully to HR");
                 // Create notification for Employeee
@@ -542,42 +548,50 @@ export const ViewForm = ({
         .then(async () => {
           setNotificationText(
             `Ticket request ${status} by ${personalInfo.name} on ${DateFormat(
-              currentDate
-            )}`
+              currentDate,
+            )}`,
           );
           const managerEmpID =
             ticketData.managerEmpID[ticketData.managerEmpID.length - 1];
 
           const findingManagerEmail = empPIData.find(
-            (val) => val.empID === managerEmpID
+            (val) => val.empID === managerEmpID,
           );
 
           if (HRMPosition === HRM && status === "Verified") {
-         
             //GM send email
             if (gmMail && Array.isArray(gmMail)) {
               for (const email of gmMail) {
-            await sendEmail(
-              `Ticket Request  ${
-                status === "Verified" ? "verified" : "marked as not eligible"
-              }`,
-              `Your employee  ${
-                ticketData.empName || "Not mention"
-              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
-                status === "Verified" ? "verified" : "marked as not eligible"
-              } by HR Manager ${personalInfo.name || "Not mention"}.
+                await sendEmail(
+                  `Ticket Request  ${
+                    status === "Verified"
+                      ? "verified"
+                      : "marked as not eligible"
+                  }`,
+                  `Your employee  ${
+                    ticketData.empName || "Not mention"
+                  } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                    status === "Verified"
+                      ? "verified"
+                      : "marked as not eligible"
+                  } by HR Manager ${personalInfo.name || "Not mention"}.
               <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
                `,
-              "hr_no-reply@adininworks.com",
-              email
-            );
-          }
-        } else {
-          console.log("Invalid email list");
-        }
+                  "hr_no-reply@adininworks.com",
+                  email,
+                );
+              }
+            } else {
+              console.log("Invalid email list");
+            }
             // console.log("gmemail", gmMail);
 
-            if (gmMail && Array.isArray(gmMail) && GMEmpID && Array.isArray(GMEmpID)) {
+            if (
+              gmMail &&
+              Array.isArray(gmMail) &&
+              GMEmpID &&
+              Array.isArray(GMEmpID)
+            ) {
               for (let i = 0; i < gmMail.length; i++) {
                 await createNotification({
                   empID: ticketData.empID,
@@ -585,11 +599,13 @@ export const ViewForm = ({
                   message: `Your employee ${
                     ticketData.empName || "Not mentioned"
                   }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
-                    status === "Verified" ? "verified" : "marked as not eligible"
+                    status === "Verified"
+                      ? "verified"
+                      : "marked as not eligible"
                   } by HR Manager ${personalInfo.name}`,
                   senderEmail: "hr_no-reply@adininworks.com",
-                  receipentEmail: gmMail[i], 
-                  receipentEmpID: GMEmpID[i], 
+                  receipentEmail: gmMail[i],
+                  receipentEmpID: GMEmpID[i],
                   status: "Unread",
                 });
               }
@@ -597,7 +613,6 @@ export const ViewForm = ({
               console.log("Invalid GM email or Employee ID list");
             }
           } else if (HRMPosition === HRM && status === "Not Eligible") {
-
             await sendEmail(
               `Ticket Request  ${
                 status === "Verified" ? "verified" : "marked as not eligible"
@@ -610,7 +625,7 @@ export const ViewForm = ({
                 personalInfo.name || "Not mention"
               }. <p>View at : <a href="https://employee.adininworks.co">employee.adininworks.co</a></p> `,
               "hr_no-reply@adininworks.com",
-              ticketData.empOfficialEmail
+              ticketData.empOfficialEmail,
             );
             // console.log("emp email", ticketData.empOfficialEmail);
 
@@ -627,7 +642,7 @@ export const ViewForm = ({
               <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
               `,
               "hr_no-reply@adininworks.com",
-              findingManagerEmail.officialEmail
+              findingManagerEmail.officialEmail,
             );
             // console.log("manageremail", findingManagerEmail.officialEmail);
 
@@ -660,10 +675,7 @@ export const ViewForm = ({
               receipentEmpID: ticketData.managerEmpID,
               status: "Unread",
             });
-
-          } 
-          
-          else if (gmPosition === "GENERAL MANAGER") {
+          } else if (gmPosition === "GENERAL MANAGER") {
             //employee email
             await sendEmail(
               `Ticket Request ${status}`,
@@ -673,7 +685,7 @@ export const ViewForm = ({
                 personalInfo.name || "Not mention"
               }. <p>View at : <a href="https://employee.adininworks.co">employee.adininworks.co</a></p> `,
               "hr_no-reply@adininworks.com",
-              ticketData.empOfficialEmail
+              ticketData.empOfficialEmail,
             );
 
             // console.log("empemail", ticketData.empOfficialEmail);
@@ -689,7 +701,7 @@ export const ViewForm = ({
                 <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
               `,
               "hr_no-reply@adininworks.com",
-              findingManagerEmail.officialEmail
+              findingManagerEmail.officialEmail,
             );
 
             // console.log("manager", findingManagerEmail.officialEmail);
@@ -706,13 +718,13 @@ export const ViewForm = ({
                     personalInfo.name || "Not mention"
                   }.<p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>`,
                   "hr_no-reply@adininworks.com",
-                  email
+                  email,
                 );
               }
             } else {
               console.log("Invalid email list");
             }
-            
+
             // await sendEmail(
             //   `Ticket Request ${status}`,
             //   `Your employee  ${
@@ -791,8 +803,7 @@ export const ViewForm = ({
     const isPending = managerStatus === "Pending";
     const isApproved = supervisorStatus === "Approved";
     const isSupervisor = userType === "Supervisor";
-    const isNotSuperAdminOrHR =
-      userType !== "SuperAdmin" && userType !== "HR";
+    const isNotSuperAdminOrHR = userType !== "SuperAdmin" && userType !== "HR";
 
     // Case 1: Supervisor approved, Manager pending, Supervisor not SuperAdmin/HR
     if (
@@ -802,7 +813,6 @@ export const ViewForm = ({
       isSupervisor &&
       isNotSuperAdminOrHR
     ) {
-      
       return (
         <div className="center w-full">
           {/* <button
@@ -952,15 +962,15 @@ export const ViewForm = ({
                         ? isValidDateFormat(leaveData.empLeaveSelectedFrom) &&
                           isValidDateFormat(leaveData.empLeaveSelectedTo)
                           ? `${DateFormat(
-                              leaveData.empLeaveSelectedFrom
+                              leaveData.empLeaveSelectedFrom,
                             )} to ${DateFormat(leaveData.empLeaveSelectedTo)}`
                           : `${leaveData.empLeaveSelectedFrom} to ${leaveData.empLeaveSelectedTo}`
                         : leaveData.empLeaveStartDate &&
-                          leaveData.empLeaveEndDate
-                        ? `${DateFormat(
-                            leaveData.empLeaveStartDate
-                          )} to ${DateFormat(leaveData.empLeaveEndDate)}`
-                        : "N/A",
+                            leaveData.empLeaveEndDate
+                          ? `${DateFormat(
+                              leaveData.empLeaveStartDate,
+                            )} to ${DateFormat(leaveData.empLeaveEndDate)}`
+                          : "N/A",
                   },
 
                   // Helper function to check if the date is in yyyy/m/d format
@@ -1050,7 +1060,7 @@ export const ViewForm = ({
                             </td>
                             <td
                               className={`text-center font-bold p-2 ${getStatusClass(
-                                leaveData.supervisorStatus
+                                leaveData.supervisorStatus,
                               )}`}
                             >
                               {leaveData.supervisorStatus}
@@ -1067,7 +1077,7 @@ export const ViewForm = ({
                             </td>
                             <td
                               className={`text-center font-bold p-2 ${getStatusClass(
-                                leaveData.managerStatus
+                                leaveData.managerStatus,
                               )}`}
                             >
                               {leaveData.managerStatus}
@@ -1100,7 +1110,7 @@ export const ViewForm = ({
                         </td>
                         <td
                           className={`text-center font-bold p-2 ${getStatusClass(
-                            leaveData.supervisorStatus
+                            leaveData.supervisorStatus,
                           )}`}
                         >
                           {leaveData.supervisorStatus}
@@ -1118,7 +1128,7 @@ export const ViewForm = ({
                           </td>
                           <td
                             className={`text-center font-bold p-2 ${getStatusClass(
-                              leaveData.managerStatus
+                              leaveData.managerStatus,
                             )}`}
                           >
                             {leaveData.managerStatus}
@@ -1155,7 +1165,7 @@ export const ViewForm = ({
                             </td>
                             <td
                               className={`text-center font-bold p-2 ${getStatusClass(
-                                leaveData.supervisorStatus
+                                leaveData.supervisorStatus,
                               )}`}
                             >
                               {leaveData.supervisorStatus}
@@ -1174,7 +1184,7 @@ export const ViewForm = ({
                             </td>
                             <td
                               className={`text-center font-bold p-2 ${getStatusClass(
-                                leaveData.managerStatus
+                                leaveData.managerStatus,
                               )}`}
                             >
                               {leaveData.managerStatus}
@@ -1239,8 +1249,8 @@ export const ViewForm = ({
                         ? `${DateFormat(ticketData.empDepartureDate)}`
                         : `${ticketData.empDepartureDate}`
                       : ticketData.departureDate
-                      ? `${DateFormat(ticketData.departureDate)}`
-                      : "N/A",
+                        ? `${DateFormat(ticketData.departureDate)}`
+                        : "N/A",
                   },
                   {
                     label: "Arrival Date",
@@ -1249,8 +1259,8 @@ export const ViewForm = ({
                         ? `${DateFormat(ticketData.empArrivalDate)}`
                         : `${ticketData.empArrivalDate}`
                       : ticketData.arrivalDate
-                      ? `${DateFormat(ticketData.arrivalDate)}`
-                      : "N/A",
+                        ? `${DateFormat(ticketData.arrivalDate)}`
+                        : "N/A",
                   },
                   {
                     label: "Employee Remarks",
@@ -1292,7 +1302,7 @@ export const ViewForm = ({
                           </td>
                           <td
                             className={`text-center font-bold p-2 ${getHrStatusClass(
-                              ticketData.hrStatus
+                              ticketData.hrStatus,
                             )}`}
                           >
                             {ticketData.hrStatus}
@@ -1311,7 +1321,7 @@ export const ViewForm = ({
                             </td>
                             <td
                               className={`text-center font-bold p-2 ${getGmStatusClass(
-                                ticketData.gmStatus
+                                ticketData.gmStatus,
                               )}`}
                             >
                               {ticketData.gmStatus}

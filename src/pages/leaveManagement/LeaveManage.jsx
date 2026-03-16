@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { ViewForm } from "./ViewForm";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { DateFormat } from "../../utils/DateFormat";
 import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
+import { DataSupply } from "../../utils/DataStoredContext";
+import { FiLoader } from "react-icons/fi";
 
 export const LeaveManage = () => {
   const [source, setSource] = useState(null);
@@ -12,6 +14,8 @@ export const LeaveManage = () => {
   const [selectedTicketData, setSelectedTicketData] = useState(null);
   const [userType, setUserType] = useState("");
   const [userID, setUserID] = useState("");
+
+  const { storedData, isLoading } = useContext(DataSupply);
 
   const {
     mergedDataForProData,
@@ -22,7 +26,7 @@ export const LeaveManage = () => {
     ticketMerged,
     statusUpdate,
     loading,
-  } = useLeaveManage();
+  } = useLeaveManage({ storedData, isLoading });
 
   // console.log("All leave status",ticketMerged);
 
@@ -65,7 +69,27 @@ export const LeaveManage = () => {
     }
   };
 
-  // console.log(data);
+  const requiredFields = [
+    "empLeaveStatusData",
+    "empPIData",
+    "leaveDetailsData",
+    "ticketData",
+    "workInfoData",
+  ];
+  if (requiredFields.some((field) => !storedData?.[field]?.length)) {
+    return (
+      <div className="flex items-center justify-center h-[82vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          <div className="flex justify-between gap-2">
+            <p className="text-sm font-semibold">Loading </p>
+            <p>
+              <FiLoader className="animate-spin mt-[4px]" size={15} />
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="py-20 px-10">

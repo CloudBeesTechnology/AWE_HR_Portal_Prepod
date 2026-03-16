@@ -5,18 +5,29 @@ import { listTimeSheets } from "../../../graphql/queries";
 export const useGetTimeSheetData = () => {
   const client = generateClient();
   const [allData, setAllData] = useState([]);
+  
   useEffect(() => {
     const fetchAllData = async () => {
       let nextToken = null;
       let allData = [];
 
-      // Fetch all data without filters
+      // Calculate date from 30 days ago
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 32);
+      const thirtyDaysAgoISO = thirtyDaysAgo.toISOString();
+
+      // Fetch all data with filter
       do {
         const response = await client.graphql({
           query: listTimeSheets,
           variables: {
             limit: 1000,
             nextToken,
+            filter: {
+              createdAt: {
+                ge: thirtyDaysAgoISO // greater than or equal to 30 days ago
+              }
+            }
           },
         });
 
@@ -27,9 +38,10 @@ export const useGetTimeSheetData = () => {
           if (item) allData.push(item);
         }
       } while (nextToken);
-
+console.log("allData : ",allData.length);
       setAllData(allData);
     };
+    
     fetchAllData();
   }, []);
 

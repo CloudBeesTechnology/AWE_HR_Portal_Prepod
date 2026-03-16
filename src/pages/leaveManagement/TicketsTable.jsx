@@ -1,7 +1,7 @@
 import { useOutletContext } from "react-router-dom";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { Searchbox } from "../../utils/Searchbox";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IoSearch } from "react-icons/io5";
 import { Pagination } from "./Pagination";
 import { Filter } from "./Filter";
@@ -9,9 +9,11 @@ import { NavigateLM } from "./NavigateLM";
 import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 import { FiLoader } from "react-icons/fi";
 import { useTempID } from "../../utils/TempIDContext";
+import { DataSupply } from "../../utils/DataStoredContext";
 
 export const TicketsTable = () => {
-  const { handleViewClick, handleClickForToggle, userType } = useOutletContext();
+  const { handleViewClick, handleClickForToggle, userType } =
+    useOutletContext();
   const [searchResults, setSearchResults] = useState([]);
   const [secondartyData, setSecondartyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -21,7 +23,8 @@ export const TicketsTable = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const { gmPosition, HRMPosition } = useTempID();
-  const { ticketMerged, loading } = useLeaveManage();
+  const { storedData, isLoading } = useContext(DataSupply);
+  const { ticketMerged, loading } = useLeaveManage({ storedData, isLoading });
 
   const [filters, setFilters] = useState({
     date: "",
@@ -74,7 +77,7 @@ export const TicketsTable = () => {
         datesToCheck.forEach((d) => d.setHours(0, 0, 0, 0));
 
         const matches = datesToCheck.some(
-          (date) => date.getTime() === selectedDateLocal.getTime()
+          (date) => date.getTime() === selectedDateLocal.getTime(),
         );
         if (matches) dateMatches = true;
         return matches;
@@ -94,7 +97,7 @@ export const TicketsTable = () => {
     // ✅ 4. GM-specific logic
     if (gmPosition === GM) {
       filteredResults = filteredResults.filter(
-        (item) => item.hrStatus === "Verified"
+        (item) => item.hrStatus === "Verified",
       );
     }
 
@@ -131,7 +134,10 @@ export const TicketsTable = () => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-    const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+    const paginatedData = filteredData.slice(
+      startIndex,
+      startIndex + rowsPerPage,
+    );
     setData(paginatedData);
   }, [currentPage, rowsPerPage, filteredData]);
 
@@ -146,7 +152,7 @@ export const TicketsTable = () => {
 
     if (gmPosition === "GENERAL MANAGER") {
       const filterGMData = sortedData.filter(
-        (item) => item.hrStatus === "Verified" && item.hrStatus !== "Pending"
+        (item) => item.hrStatus === "Verified" && item.hrStatus !== "Pending",
       );
       setSecondartyData(filterGMData);
       setData(filterGMData);
@@ -230,7 +236,9 @@ export const TicketsTable = () => {
   return (
     <section className="w-full">
       <div className="flex justify-between flex-wrap mb-5">
-        <div><NavigateLM userType={userType} /></div>
+        <div>
+          <NavigateLM userType={userType} />
+        </div>
         <div className="flex  flex-wrap items-center gap-2">
           <Searchbox
             allEmpDetails={secondartyData}
@@ -269,7 +277,9 @@ export const TicketsTable = () => {
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
               <tr className="px-6">
                 {heading.map((header, index) => (
-                  <th key={index} className="py-5 text-[15px] text-white">{header}</th>
+                  <th key={index} className="py-5 text-[15px] text-white">
+                    {header}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -277,50 +287,88 @@ export const TicketsTable = () => {
               {data.map((item, index) => {
                 const displayIndex = startIndex + index + 1;
                 return (
-                  <tr key={index} className="text-center text-sm border-b-2 bg-white border-[#C7BCBC] text-[#303030] hover:bg-medium_blue">
-                    <td className="border-b-2 border-[#CECECE] py-5">{displayIndex}</td>
-                    <td className="border-b-2 border-[#CECECE] py-5">{item?.empID}</td>
-                    <td className="border-b-2 border-[#CECECE] py-5">{capitalizedLetter(item?.empName) || "N/A"}</td>
+                  <tr
+                    key={index}
+                    className="text-center text-sm border-b-2 bg-white border-[#C7BCBC] text-[#303030] hover:bg-medium_blue"
+                  >
                     <td className="border-b-2 border-[#CECECE] py-5">
-                      {Array.isArray(item.department) ? capitalizedLetter(item.department[item.department.length - 1]) || "N/A" : "N/A"}
+                      {displayIndex}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
-                      {Array.isArray(item.position) ? capitalizedLetter(item.position[item.position.length - 1]) || "N/A" : "N/A"}
+                      {item?.empID}
                     </td>
-                    <td className="border-b-2 border-[#CECECE] py-5">{DateFormat(item.createdAt)}</td>
-                    <td className="border-b-2 border-[#CECECE] py-5">{item.empDepartureDate || DateFormat(item.departureDate) || "N/A"}</td>
-                    <td className="border-b-2 border-[#CECECE] py-5">{item.empArrivalDate || DateFormat(item.arrivalDate) || "N/A"}</td>
+                    <td className="border-b-2 border-[#CECECE] py-5">
+                      {capitalizedLetter(item?.empName) || "N/A"}
+                    </td>
+                    <td className="border-b-2 border-[#CECECE] py-5">
+                      {Array.isArray(item.department)
+                        ? capitalizedLetter(
+                            item.department[item.department.length - 1],
+                          ) || "N/A"
+                        : "N/A"}
+                    </td>
+                    <td className="border-b-2 border-[#CECECE] py-5">
+                      {Array.isArray(item.position)
+                        ? capitalizedLetter(
+                            item.position[item.position.length - 1],
+                          ) || "N/A"
+                        : "N/A"}
+                    </td>
+                    <td className="border-b-2 border-[#CECECE] py-5">
+                      {DateFormat(item.createdAt)}
+                    </td>
+                    <td className="border-b-2 border-[#CECECE] py-5">
+                      {item.empDepartureDate ||
+                        DateFormat(item.departureDate) ||
+                        "N/A"}
+                    </td>
+                    <td className="border-b-2 border-[#CECECE] py-5">
+                      {item.empArrivalDate ||
+                        DateFormat(item.arrivalDate) ||
+                        "N/A"}
+                    </td>
                     <td className="border-b-2 border-[#CECECE] cursor-pointer py-5">
-                      <span className="border-b-2 text-[blue]" onClick={() => { handleClickForToggle(); handleViewClick(item, "Tickets"); }}>
+                      <span
+                        className="border-b-2 text-[blue]"
+                        onClick={() => {
+                          handleClickForToggle();
+                          handleViewClick(item, "Tickets");
+                        }}
+                      >
                         View
                       </span>
                     </td>
                     {userType !== "SuperAdmin" && !gmPosition && (
-                      <td className={`border-b-2 border-[#CECECE] py-5 ${
-                        item.hrStatus === "Not Eligible"
-                          ? "text-[red]"
-                          : item.hrStatus === "Verified"
-                          ? "text-[#339933]"
-                          : item.hrStatus === "Pending"
-                          ? "text-[#E8A317]"
-                          : ""
-                      }`}>
+                      <td
+                        className={`border-b-2 border-[#CECECE] py-5 ${
+                          item.hrStatus === "Not Eligible"
+                            ? "text-[red]"
+                            : item.hrStatus === "Verified"
+                              ? "text-[#339933]"
+                              : item.hrStatus === "Pending"
+                                ? "text-[#E8A317]"
+                                : ""
+                        }`}
+                      >
                         {item.hrStatus}
                       </td>
                     )}
-                    {userType !== "SuperAdmin" && gmPosition === "GENERAL MANAGER" && (
-                      <td className={`border-b-2 border-[#CECECE] py-5 ${
-                        item.gmStatus === "Rejected"
-                          ? "text-[red]"
-                          : item.gmStatus === "Approved"
-                          ? "text-[#339933]"
-                          : item.gmStatus === "Pending"
-                          ? "text-[#E8A317]"
-                          : ""
-                      }`}>
-                        {item.gmStatus || "Pending"}
-                      </td>
-                    )}
+                    {userType !== "SuperAdmin" &&
+                      gmPosition === "GENERAL MANAGER" && (
+                        <td
+                          className={`border-b-2 border-[#CECECE] py-5 ${
+                            item.gmStatus === "Rejected"
+                              ? "text-[red]"
+                              : item.gmStatus === "Approved"
+                                ? "text-[#339933]"
+                                : item.gmStatus === "Pending"
+                                  ? "text-[#E8A317]"
+                                  : ""
+                          }`}
+                        >
+                          {item.gmStatus || "Pending"}
+                        </td>
+                      )}
                   </tr>
                 );
               })}
@@ -332,8 +380,8 @@ export const TicketsTable = () => {
               {filters.status !== "All"
                 ? `No tickets found with status "${filters.status}".`
                 : errorState.dateError
-                ? "No tickets found for the selected date."
-                : "No tickets available."}
+                  ? "No tickets found for the selected date."
+                  : "No tickets available."}
             </p>
           </div>
         )}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useMemo } from "react";
 import { Pagination } from "./Pagination";
 import { getUrl } from "@aws-amplify/storage";
 import { useOutletContext } from "react-router-dom";
@@ -20,7 +20,7 @@ export const LMTable = () => {
     loading,
   } = useOutletContext();
 
-  const { empPIData } = useContext(DataSupply);
+  const { empPIData, setFetchTableData } = useContext(DataSupply);
   const [lastUploadUrl, setPPLastUP] = useState("");
   const [matchData, setMatchData] = useState([]);
   const [secondartyData, setSecondartyData] = useState([]);
@@ -35,12 +35,15 @@ export const LMTable = () => {
     noResults: false,
   });
 
-  console.log("SEARCH",searchResults);
-  
   useEffect(() => {
-    let filteredData = mergedData
+    setFetchTableData(["empPIData"]);
+  }, []);
+
+  // Memoize the filtered and sorted data to prevent unnecessary recalculations
+  const processedData = useMemo(() => {
+    return mergedData
       .filter((items) => {
-        if (userType === "Supervisor" && items?.empStatus !== "Cancelled" ) {
+        if (userType === "Supervisor" && items?.empStatus !== "Cancelled") {
           return items.supervisorEmpID === userID;
         } else if (
           userType === "Manager" &&
@@ -50,7 +53,7 @@ export const LMTable = () => {
           return items.managerEmpID === userID;
         } else if (
           (userType === "SuperAdmin" || userType === "HR") &&
-          items?.empStatus !== "Cancelled" 
+          items?.empStatus !== "Cancelled"
         ) {
           return true;
         }
@@ -113,8 +116,12 @@ export const LMTable = () => {
 
         return new Date(dateB) - new Date(dateA);
       });
+  }, [mergedData, userType, userID]);
 
-    // Step 2: Apply status filter
+  useEffect(() => {
+    let filteredData = [...processedData];
+    
+    // Apply status filter
     if (filterStatus !== "All") {
       filteredData = filteredData.filter((item) => {
         const status =
@@ -155,7 +162,7 @@ export const LMTable = () => {
 
     setSecondartyData(filteredData);
     setMatchData(filteredData);
-  }, [mergedData, userType, userID, filterStatus, selectedDate]);
+  }, [processedData, filterStatus, selectedDate, userType]);
 
   // Logic to get the URL of the uploaded file
 

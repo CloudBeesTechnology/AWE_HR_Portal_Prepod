@@ -31,36 +31,17 @@ export const useFetchDataForVT = (
             let allData = [];
             let fetchedData = [];
 
+            // Calculate date from 40 days ago
+            const fortyDaysAgo = new Date();
+            fortyDaysAgo.setDate(fortyDaysAgo.getDate() - 40);
+            const fortyDaysAgoISO = fortyDaysAgo.toISOString();
+
+            // Date filter only
             const filter = {
-              and:
-                cardName === "Manager"
-                  ? [
-                      { status: { eq: "Pending" } },
-                      { fileType: { eq: titleName } },
-                    ]
-                  : cardName === "viewTimeSheet"
-                  ? [{ fileType: { eq: titleName } }]
-                  : cardName === "viewSummary"
-                  ? [
-                      { status: { eq: "Approved" } },
-                      { fileType: { eq: titleName } },
-                    ]
-                  : cardName === "rejectedItems"
-                  ? [
-                      { status: { eq: "Rejected" } },
-                      { fileType: { eq: titleName } },
-                    ]
-                  : cardName === "Unsubmitted"
-                  ? [
-                      { status: { eq: "Unsubmitted" } },
-                      { fileType: { eq: titleName } },
-                    ]
-                  : [
-                      { status: { eq: "nothing" } },
-                      { fileType: { eq: titleName } },
-                    ],
+              createdAt: { ge: fortyDaysAgoISO }
             };
-            // Fetch data in a paginated manner
+
+            // Fetch data in a paginated manner with date filter
             do {
               const response = await client.graphql({
                 query: listTimeSheets,
@@ -84,18 +65,47 @@ export const useFetchDataForVT = (
               allData = [...allData, ...fetchedData];
             } while (nextToken);
 
-            // if (allData.length === 0) {
+            // Apply cardName filter locally
+            let filteredData = allData;
+            
+            if (cardName === "Manager") {
+              filteredData = allData.filter(
+                item => item.status === "Pending" && item.fileType === titleName
+              );
+            } else if (cardName === "viewTimeSheet") {
+              filteredData = allData.filter(
+                item => item.fileType === titleName
+              );
+            } else if (cardName === "viewSummary") {
+              filteredData = allData.filter(
+                item => item.status === "Approved" && item.fileType === titleName
+              );
+            } else if (cardName === "rejectedItems") {
+              filteredData = allData.filter(
+                item => item.status === "Rejected" && item.fileType === titleName
+              );
+            } else if (cardName === "Unsubmitted") {
+              filteredData = allData.filter(
+                item => item.status === "Unsubmitted" && item.fileType === titleName
+              );
+            } else {
+              filteredData = allData.filter(
+                item => item.status === "nothing" && item.fileType === titleName
+              );
+            }
+
+            // if (filteredData.length === 0) {
             //   // setMessage?.("No data available");
             //   setLoading(null);
             //   setEmptyTableMess(null);
             // }
 
-            if (allData.length > 0) {
+            if (filteredData.length > 0) {
               // setMessage?.("");
-              setConvertedStringToArrayObj(allData);
+              setConvertedStringToArrayObj(filteredData);
               setLoading(null);
               setEmptyTableMess(null);
-            } else if (allData.length === 0) {
+            } else if (filteredData.length === 0) {
               setConvertedStringToArrayObj(false);
               setLoading(false);
               setEmptyTableMess(false);

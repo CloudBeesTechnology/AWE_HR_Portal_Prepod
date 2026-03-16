@@ -32,7 +32,7 @@ export const ViewSummary = () => {
   // const [leaveStatuses, setLeaveStatuses] = useState([]);
   // const [resultOfWHrsAbsCal, setResultOfWHrsAbsCal] = useState("");
 
-  const { empPIData } = useContext(DataSupply);
+  const { empPIData, setFetchTableData } = useContext(DataSupply);
 
   const {
     startDate,
@@ -113,8 +113,12 @@ export const ViewSummary = () => {
     offshoreType,
     allData,
     selectSapNoOrBadgeNo,
-    refreshTrigger
+    refreshTrigger,
   );
+
+  useEffect(() => {
+    setFetchTableData(["empPIData"]);
+  }, []);
 
   useEffect(() => {
     if (startDate) {

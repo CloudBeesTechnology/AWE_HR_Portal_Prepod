@@ -18,20 +18,32 @@ export const useFetchDataTwo = (titleName, cardName) => {
       let nextToken = null;
       let allData = [];
 
+      // Calculate date from 40 days ago
+      const fortyDaysAgo = new Date();
+      fortyDaysAgo.setDate(fortyDaysAgo.getDate() - 32);
+      const fortyDaysAgoISO = fortyDaysAgo.toISOString();
+
+      // Create base filter based on cardName
+      const baseFilter = [
+        cardName === "Manager"
+          ? { status: { eq: "Pending" } }
+          : cardName === "viewTimeSheet"
+          ? { fileType: { eq: titleName } }
+          : cardName === "viewSummary"
+          ? { status: { eq: "Approved" }, fileType: { eq: titleName } }
+          : cardName === "rejectedItems"
+          ? { status: { eq: "Rejected" }, fileType: { eq: titleName } }
+          : cardName === "All"
+          ? { status: { eq: "All" }, fileType: { eq: titleName } }
+          : { status: { eq: "nothing" }, fileType: { eq: titleName } },
+      ].filter(Boolean);
+
+      // Add date filter to the existing filter
       const filter = {
         and: [
-          cardName === "Manager"
-            ? { status: { eq: "Pending" } }
-            : cardName === "viewTimeSheet"
-            ? { fileType: { eq: titleName } }
-            : cardName === "viewSummary"
-            ? { status: { eq: "Approved" }, fileType: { eq: titleName } }
-            : cardName === "rejectedItems"
-            ? { status: { eq: "Rejected" }, fileType: { eq: titleName } }
-            : cardName === "All"
-            ? { status: { eq: "All" }, fileType: { eq: titleName } }
-            : { status: { eq: "nothing" }, fileType: { eq: titleName } },
-        ].filter(Boolean),
+          { createdAt: { ge: fortyDaysAgoISO } },
+          ...baseFilter
+        ]
       };
 
       try {
@@ -59,6 +71,8 @@ export const useFetchDataTwo = (titleName, cardName) => {
         } else {
           setFinalData(allData);
         }
+
+        console.log(allData);
       } catch (error) {
         setFinalData([]);
       } finally {
