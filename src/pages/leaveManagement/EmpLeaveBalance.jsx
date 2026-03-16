@@ -9,11 +9,16 @@ import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 import { FiLoader } from "react-icons/fi";
 import useSeperateLeaves from "../../hooks/useSeperateLeaves";
 import { useLeaveSummaryFuncs } from "../../hooks/useLeaveSummaryFuncs";
-import { usePublicHolidayList } from "../../hooks/usePublicHolidayList";
 import useLeaveSummaryCal2 from "../../hooks/useLeaveSummaryCal2";
+import { usePublicHolidayList } from "../../hooks/usePublicHolidayList";
 
 export const EmpLeaveBalance = () => {
-  const { mergedData, userType, loading } = useOutletContext();
+  const {
+    mergedDataForProData: mergedData,
+    empInfoUnmatchedData,
+    userType,
+    loading,
+  } = useOutletContext();
 
   //  handleLeaveCount,
   //       renderLeaveData
@@ -30,6 +35,7 @@ export const EmpLeaveBalance = () => {
 
   const { handleSeperateLeaves } = useSeperateLeaves();
   const { publicHoliday } = usePublicHolidayList();
+
   const { convertToFormattedHolidays } = useLeaveSummaryFuncs();
   const { filterOnshoreOffshorePHbasis } = useLeaveSummaryCal2();
 
@@ -51,9 +57,7 @@ export const EmpLeaveBalance = () => {
     // const seperatedLeaves = seperatedLeavess?.filter(
     //   (val) => val.empID === "2045"
     // );
-
-    // console.log("seperatedLeaves : ", seperatedLeaves);
-
+    
     const { formattedPHList } = convertToFormattedHolidays({ publicHoliday });
     const { isOffshoreOrOnshoreEmp } = filterOnshoreOffshorePHbasis({
       formattedPHList,
@@ -66,8 +70,8 @@ export const EmpLeaveBalance = () => {
         ? isOffshoreOrOnshoreEmp?.flatMap((val) => val?.seperatedLeaves)
         : [];
 
-    setMergedLeaveData(finalLeaveData);
-  }, [mergedData, publicHoliday, userType]);
+    setMergedLeaveData([...finalLeaveData, ...empInfoUnmatchedData]);
+  }, [mergedData, publicHoliday, userType, empInfoUnmatchedData]);
 
   // mergedData, userType
   useEffect(() => {
@@ -147,7 +151,6 @@ export const EmpLeaveBalance = () => {
     const dataToPaginate =
       searchResults.length > 0 ? searchResults : secondartyData;
 
-    console.log("secondartyData : ", secondartyData.length);
     if (dataToPaginate.length === 0) {
       setFilteredData([]);
       return;

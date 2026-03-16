@@ -26,6 +26,7 @@ export const ApplyVSFunction = ({
   mergedData,
   leaveStatuses,
   empPIData,
+  companyHolidayList,
 }) => {
   const { getStartDate, getEndDate } = useTempID();
   const { handleDateFormat } = useHandleDateFormat({ leaveStatuses });
@@ -191,7 +192,7 @@ export const ApplyVSFunction = ({
                   const YearKey = `${dateObj.getFullYear()}`;
 
                   // const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}-${monthYearKey}`;
-                  const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}-${YearKey}`;
+                  const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}`;
 
                   if (!groupedData.has(key)) {
                     groupedData.set(key, {
@@ -268,16 +269,16 @@ export const ApplyVSFunction = ({
                 String(emp.fidNo)?.toUpperCase()?.trim();
 
             if (empBadgeNoMatch || sapNoMatch) {
-              return emp.data.some((entry) => {
-                const leaveDate = new Date(leave.toDate);
-                const empDate = new Date(entry.date);
+              // return emp.data.some((entry) => {
+              // const leaveDate = new Date(leave.toDate);
+              // const empDate = new Date(entry.date);
 
-                return leave;
+              return leave;
 
-                // return leaveDate.getFullYear() === empDate.getFullYear();
-                //  &&
-                // leaveDate.getMonth() === empDate.getMonth()
-              });
+              // leaveDate.getFullYear() === empDate.getFullYear()
+              //  &&
+              // leaveDate.getMonth() === empDate.getMonth()
+              // });
             }
             return false;
           });
@@ -490,18 +491,10 @@ export const ApplyVSFunction = ({
 
         const leaveCount_ = transformData(filteredData);
 
-        const currentYearHolidayDates = publicHoliday?.CompanyHolidays.flatMap(
+        // const holidayDates = []
+        const holidayDates = companyHolidayList?.flatMap(
           (holiday) => holiday.dates || [holiday.date]
         );
-
-        const prevYearHolidayDates = prevYearHolidays?.CompanyHolidays.flatMap(
-          (holiday) => holiday.dates || [holiday.date]
-        );
-
-        const holidayDates = [
-          ...prevYearHolidayDates,
-          ...currentYearHolidayDates,
-        ];
 
         const formattedHolidayDates = holidayDates?.map((dateStr) => {
           const parts = dateStr.split(",")[1].trim();

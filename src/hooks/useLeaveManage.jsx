@@ -712,6 +712,8 @@ const client = generateClient();
 
 export const useLeaveManage = ({ storedData, isLoading }) => {
   const [data, setData] = useState({
+    empInfoUnmatchedData: [],
+    mergedDataForProData: [],
     mergedData: [],
     ticketMerged: [],
     personalDetails: [],
@@ -845,7 +847,9 @@ export const useLeaveManage = ({ storedData, isLoading }) => {
       });
 
       setData({
-        mergedData: mergedLeaveData,
+        empInfoUnmatchedData: empInfoUnmatchedData,
+        mergedDataForProData: mergedLeaveData,
+        mergedData: mergedLeaveDataList,
         ticketMerged: mergedTicketData,
         personalDetails: allEmpPersonalInfos,
       });

@@ -1,11 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { ViewForm } from "./ViewForm";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { DateFormat } from "../../utils/DateFormat";
 import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
-import { DataSupply } from "../../utils/DataStoredContext";
-import { TestALBalanceUpdate2 } from "./empLeaveSummary/TestALBalanceUpdate2";
 
 export const LeaveManage = () => {
   const [source, setSource] = useState(null);
@@ -15,15 +13,16 @@ export const LeaveManage = () => {
   const [userType, setUserType] = useState("");
   const [userID, setUserID] = useState("");
 
-  const { storedData, isLoading } = useContext(DataSupply);
   const {
+    mergedDataForProData,
+    empInfoUnmatchedData,
     mergedData,
     handleDeleteLeaveStatus,
     handleUpdateLeaveStatus,
     ticketMerged,
     statusUpdate,
     loading,
-  } = useLeaveManage({ storedData, isLoading });
+  } = useLeaveManage();
 
   // console.log("All leave status",ticketMerged);
 
@@ -83,6 +82,8 @@ export const LeaveManage = () => {
               userID,
               statusUpdate,
               mergedData,
+              mergedDataForProData,
+              empInfoUnmatchedData,
               loading,
             }}
           />
@@ -101,8 +102,6 @@ export const LeaveManage = () => {
           personalInfo={personalInfo}
         />
       )}
-
-      <TestALBalanceUpdate2 storedData={storedData} isLoading={isLoading} />
     </section>
   );
 };

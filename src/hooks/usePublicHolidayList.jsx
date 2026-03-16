@@ -4,6 +4,7 @@ export const usePublicHolidayList = () => {
   const [publicHoliday, setPublicHoliday] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const getCurrentYear = new Date().getFullYear();
 
   useEffect(() => {
     fetch(
@@ -17,7 +18,6 @@ export const usePublicHolidayList = () => {
       })
       .then((data) => {
         setPublicHoliday(data);
-
         setLoading(false);
       })
       .catch((error) => {
@@ -26,5 +26,5 @@ export const usePublicHolidayList = () => {
       });
   }, []);
 
-  return { publicHoliday }
+  return { publicHoliday };
 };
