@@ -1,9 +1,8 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { LuFilter } from "react-icons/lu";
 import { WorkpassForm } from "./WorkpassForm";
 import { SawpTable } from "./SawpTable";
-import { DataSupply } from "../../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 import { DoeTable } from "./DoeTable";
 import { NlmsTable } from "./NlmsTable";
@@ -14,6 +13,7 @@ import { ImmigrationTable } from "./ImmigrationTable";
 import { AirTKtTable } from "./AirTKtTable";
 import { NonLocalMobTable } from "./NonLocalMobTable";
 import { IoSearch } from "react-icons/io5";
+import { useRecruitmentsData } from "../../../context/recruitments/RecruitmentsContext";
 
 export const WorkpassTracking = () => {
   const [data, setData] = useState([]);
@@ -30,8 +30,15 @@ export const WorkpassTracking = () => {
   const [candidateTypeDropdownOpen, setCandidateTypeDropdownOpen] =
     useState(false);
   const [urlValue, setURLValue] = useState("");
-  const { WPTrackings, empPDData, IVSSDetails, educDetailsData, localMobiliz, loading } =
-    useContext(DataSupply);
+
+  const {
+    WPTrackings,
+    empPDData,
+    IVSSDetails,
+    educDetailsData,
+    localMobiliz,
+    loading,
+  } = useRecruitmentsData();
 
   // Process and merge data
   useEffect(() => {
@@ -126,14 +133,21 @@ export const WorkpassTracking = () => {
           if (opt === "LPA") {
             return (
               candidate.contractType === "LPA" &&
-              (candidate.empType === "Onshore" || candidate.empType === "Offshore")
+              (candidate.empType === "Onshore" ||
+                candidate.empType === "Offshore")
             );
           }
           if (opt === "OnShore") {
-            return candidate.empType === "Onshore" && candidate.contractType !== "SAWP";
+            return (
+              candidate.empType === "Onshore" &&
+              candidate.contractType !== "SAWP"
+            );
           }
           if (opt === "OffShore") {
-            return candidate.empType === "Offshore" && candidate.contractType !== "SAWP";
+            return (
+              candidate.empType === "Offshore" &&
+              candidate.contractType !== "SAWP"
+            );
           }
           return true;
         });
@@ -141,14 +155,13 @@ export const WorkpassTracking = () => {
     }
 
     setFilteredData(filtered);
-     setIsFilterBoxOpen(false);
+    setIsFilterBoxOpen(false);
   }, [searchTerm, selectedFilters, selectedCandidateType, data]);
 
   const toggleFilterBox = (event) => {
     event?.stopPropagation();
     setIsFilterBoxOpen((prevState) => !prevState);
   };
-
 
   const filterBySearchTerm = (data) => {
     if (!searchTerm) return data;

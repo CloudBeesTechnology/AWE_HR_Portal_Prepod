@@ -29,7 +29,8 @@ export const DependentInsurance = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-  const { depInsuranceData, dropDownVal } = useContext(DataSupply);
+  const { depInsuranceData, dropDownVal, setFetchTableData } =
+    useContext(DataSupply);
   const { SubmitMPData } = DependInsDataFun();
   const { UpdateDIData } = UpdateDepInsDataFun();
   const [deletePopup, setdeletePopup] = useState(false);
@@ -71,6 +72,10 @@ export const DependentInsurance = () => {
   const [depInsurance, setDepInsurance] = useState(inputFields);
   const [showTitle, setShowTitle] = useState("");
   const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    setFetchTableData(["depInsuranceData", "dropDownVal"]);
+  }, []);
 
   const requiredPermissions = ["Insurance"];
 
@@ -369,7 +374,7 @@ export const DependentInsurance = () => {
 
   const onSubmit = async (data) => {
     try {
-      const checkingDITable = depInsuranceData.find(
+      const checkingDITable = depInsuranceData?.find(
         (match) => match.empID === data.empID
       );
       const today = new Date().toISOString().split("T")[0];

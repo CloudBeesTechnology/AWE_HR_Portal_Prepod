@@ -8,16 +8,17 @@ import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../utils/SpinLogo";
-import { DataSupply } from "../../../utils/DataStoredContext";
+// import { DataSupply } from "../../../utils/DataStoredContext";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadLOI } from "../deleteDocsRecruit/DeleteUploadLOI";
 import { DeletePopup } from "../../../utils/DeletePopup";
-export const LOIForm = ({ candidate, formattedPermissions }) => {
+export const LOIForm = ({ candidate, formattedPermissions, IVSSDetails }) => {
   const { localMobilization, isLoading, error } = LocalMobilization();
-  const { IVSSDetails } = useContext(DataSupply);
+  // const { IVSSDetails, setFetchTableData } = useContext(DataSupply);
   const { loiDetails } = UpdateLoiData();
   const { interviewDetails } = UpdateInterviewData();
-  const { mergedInterviewData, loading: interviewLoading } = useFetchInterview();
+  const { mergedInterviewData, loading: interviewLoading } =
+    useFetchInterview();
   const [notification, setNotification] = useState(false);
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
@@ -51,6 +52,10 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
 
   const EMPID = localStorage.getItem("userID");
   const TODAY = new Date().toISOString().split("T")[0];
+
+  // useEffect(() => {
+  //   setFetchTableData(["IVSSDetails"]);
+  // }, []);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -279,7 +284,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
   const requiredPermissions = ["Status"];
 
   const access = "Recruitment";
-  
+
   // Loading overlay component
   const LoadingOverlay = () => (
     <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">

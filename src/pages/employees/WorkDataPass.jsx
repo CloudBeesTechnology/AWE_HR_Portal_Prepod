@@ -1,8 +1,15 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { DataSupply } from "../../utils/DataStoredContext";
 
 export const WorkDataPass = () => {
-  const { dropDownVal } = useContext(DataSupply);
+  const { dropDownVal, setFetchTableData } = useContext(DataSupply);
+
+  useEffect(() => {
+      setFetchTableData([
+       "dropDownVal"
+      ]);
+    }, []);
+
   // console.log(dropDownVal);
   const resignNotifConfDD = dropDownVal[0]?.resignNotifConfDD.map((item) => ({
     value: item,

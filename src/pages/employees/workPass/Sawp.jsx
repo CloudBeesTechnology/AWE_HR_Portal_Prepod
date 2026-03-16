@@ -18,7 +18,7 @@ export const Sawp = () => {
   const { formattedPermissions } = useDeleteAccess();
   const { searchResultData } = useOutletContext();
   const { SubmitMPData } = SawpDataFun();
-  const { SawpDetails } = useContext(DataSupply);
+  const { SawpDetails, setFetchTableData } = useContext(DataSupply);
   const { SawpUpdateFun } = SawpUpdate();
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
@@ -52,6 +52,10 @@ export const Sawp = () => {
       sawpEmpLtrReci: [],
     },
   });
+
+  useEffect(() => {
+    setFetchTableData(["SawpDetails"]);
+  }, []);
 
   const contractTypes = watch("sawpEmpLtrReq");
   const contractTypes1 = watch("sawpEmpLtrReci");
@@ -89,7 +93,7 @@ export const Sawp = () => {
       ...prev,
       [label]: value,
     }));
-    console.log(value);
+    
   };
 
   const handleFileChange = async (e, label) => {

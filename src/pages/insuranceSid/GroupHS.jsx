@@ -31,7 +31,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 export const GroupHS = () => {
-  const { empPIData, groupHSData } = useContext(DataSupply);
+  const { empPIData, groupHSData, setFetchTableData } = useContext(DataSupply);
   const client = generateClient();
   const [isUploading, setIsUploading] = useState({
     groupHSUpload: false,
@@ -67,10 +67,14 @@ export const GroupHS = () => {
     resolver: yupResolver(GroupHSSchema),
   });
 
+  useEffect(() => {
+    setFetchTableData(["empPIData", "groupHSData"]);
+  }, []);
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0"); 
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
@@ -81,7 +85,7 @@ export const GroupHS = () => {
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      setPPLastUP(result.url.href); 
+      setPPLastUP(result.url.href);
       setViewingDocument(pathUrl);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
@@ -208,7 +212,6 @@ export const GroupHS = () => {
   const onSubmit = async (data) => {
     // console.log("data121", data);
     try {
-      
       const today = new Date().toISOString().split("T")[0];
       const checkingDITable = groupHSData?.find(
         (match) => match?.id === searchResultData?.id
@@ -217,8 +220,13 @@ export const GroupHS = () => {
       // console.log(checkingDITable);
 
       if (checkingDITable) {
-        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
-        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+        const previous = checkingDITable.updatedBy
+          ? JSON.parse(checkingDITable.updatedBy)
+          : [];
+        const updatedBy = JSON.stringify([
+          ...previous,
+          { userID: userType, date: today },
+        ]);
         // Update case: Prepare the update data and perform the update
         const updatedGHSValue = {
           ...data,
@@ -555,7 +563,7 @@ export const GroupHS = () => {
       </>
     );
   };
-  
+
   const renderDocumentCategory = (uploadArray, categoryName) => {
     const documents =
       uploadArray.length > 0 ? parseDocuments(uploadArray[0]) : [];
@@ -1222,7 +1230,7 @@ export const GroupHS = () => {
 //             <div
 //               key={index}
 //               className="px-4 max-w-[220px] bg-lite_skyBlue rounded-lg hover:shadow-sm transition-shadow border border-lite_grey"
-              
+
 //             >
 //               <div className="flex items-center gap-3" >
 //                 <span className="text-lg text-black">

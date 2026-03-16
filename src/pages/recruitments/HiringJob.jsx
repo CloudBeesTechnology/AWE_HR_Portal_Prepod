@@ -1,9 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { DataSupply } from "../../utils/DataStoredContext";
+
 import { FaArrowLeft } from "react-icons/fa";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { Pagination } from "../leaveManagement/Pagination";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 
 export const HiringJob = () => {
   useEffect(() => {
@@ -12,7 +13,7 @@ export const HiringJob = () => {
       behavior: "smooth",
     });
   }, []);
-  const { hiringData } = useContext(DataSupply);
+  const { hiringData } = useRecruitmentsData();
   const { formattedPermissions } = useDeleteAccess();
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);

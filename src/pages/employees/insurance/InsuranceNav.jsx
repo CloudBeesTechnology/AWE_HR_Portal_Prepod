@@ -12,6 +12,7 @@ export const InsuranceNav = () => {
     workInfoData,
     IDData,
     depInsuranceData,
+    setFetchTableData,
   } = useContext(DataSupply);
   // console.log(depInsuranceData);
 
@@ -22,6 +23,16 @@ export const InsuranceNav = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    setFetchTableData([
+      "empPIData",
+      "EmpInsuranceData",
+      "workInfoData",
+      "IDData",
+      "depInsuranceData",
+    ]);
+  }, []);
 
   useEffect(() => {
     window.scrollTo({
@@ -62,7 +73,7 @@ export const InsuranceNav = () => {
     };
 
     fetchData();
-  }, [empPIData, EmpInsuranceData, workInfoData, IDData]);
+  }, [empPIData, EmpInsuranceData, workInfoData, IDData, depInsuranceData]);
 
   const handleNext = () => {
     switch (activeNavTab) {
@@ -99,7 +110,6 @@ export const InsuranceNav = () => {
   const searchResult = (result) => {
     // console.log(result);
     setSearchResultData(result);
-    
   };
   const depInsuDataFunc = (result) => {
     setDepInsuData(result);

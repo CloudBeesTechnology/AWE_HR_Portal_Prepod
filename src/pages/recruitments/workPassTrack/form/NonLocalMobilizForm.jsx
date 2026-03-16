@@ -9,17 +9,17 @@ import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPT
 import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../../utils/SpinLogo";
-import { DataSupply } from "../../../../utils/DataStoredContext";
+// import { DataSupply } from "../../../../utils/DataStoredContext";
 import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadNonLocal } from "../deleteUpload/DeleteUploadNonLocal";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
 import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
 
-export const NonLocalMobilizForm = ({ candidate }) => {
+export const NonLocalMobilizForm = ({ candidate, IVSSDetails }) => {
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules, loading: interviewLoading } = useFetchCandy();
-  const { IVSSDetails } = useContext(DataSupply);
+  // const { IVSSDetails } = useContext(DataSupply);
   const { createWPTrackingHandler } = useCreateWPTracking();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { interviewDetails } = UpdateInterviewData();
@@ -99,7 +99,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
         });
       }
     }
-  }, [interviewSchedules, candidate.tempID]);
+  }, [interviewSchedules, candidate.tempID, IVSSDetails]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {

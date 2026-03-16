@@ -14,10 +14,10 @@ import { DeleteUploadAirTicket } from "../deleteUpload/DeleteUploadAirTicket";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
 import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
-import { DataSupply } from "../../../../utils/DataStoredContext";
+// import { DataSupply } from "../../../../utils/DataStoredContext";
 
-export const AirTktForm = ({ candidate }) => {
-  const { IVSSDetails } = useContext(DataSupply);
+export const AirTktForm = ({ candidate, IVSSDetails }) => {
+  // const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules, loading: interviewLoading } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
@@ -100,7 +100,7 @@ export const AirTktForm = ({ candidate }) => {
         });
       }
     }
-  }, [interviewSchedules, candidate.tempID]);
+  }, [interviewSchedules, candidate.tempID, IVSSDetails]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {

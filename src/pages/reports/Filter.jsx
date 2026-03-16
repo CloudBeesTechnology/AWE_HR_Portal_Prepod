@@ -1,5 +1,3 @@
-import React from "react";
-
 export const Filter = ({ typeOfReport, setTypeOfReport, Reports }) => {
   return (
     <div>

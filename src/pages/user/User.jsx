@@ -19,7 +19,8 @@ export const User = () => {
     });
   }, []);
 
-  const { empPIData, userData, workInfoData } = useContext(DataSupply);
+  const { empPIData, userData, workInfoData, setFetchTableData } =
+    useContext(DataSupply);
   const { SubmitDeletedUser } = UserDelete();
   const { formattedPermissions } = useDeleteAccess();
   const [deletePopup, setdeletePopup] = useState(false);
@@ -38,6 +39,10 @@ export const User = () => {
   const [currentPage, setCurrentPage] = useState(1); // updated by hari
   const [rowsPerPage, setRowsPerPage] = useState(30); // updated by hari
   const [searchResults, setSearchResults] = useState([]);
+
+  useEffect(() => {
+    setFetchTableData(["empPIData", "userData", "workInfoData"]);
+  }, []);
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;

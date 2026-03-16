@@ -5,11 +5,10 @@ import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { useContext, useEffect, useState } from "react";
 import { AddCourseForm } from "./AddCourseForm"; // Import the AddCourseForm component
-import { DataSupply } from "../../../utils/DataStoredContext";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 
 export const AddCourse = () => {
-  const { empPIData, AddCourseDetails } = useContext(DataSupply);
-
+  const { empPIData, AddCourseDetails } = useTrainingData();
   const {
     register,
     setValue,
@@ -45,8 +44,6 @@ export const AddCourse = () => {
     fetchData();
   }, [empPIData, AddCourseDetails]);
 
-
-
   const handleCourseSelectChange = (event) => {
     const selectedValue = event.target.value;
 
@@ -69,7 +66,6 @@ export const AddCourse = () => {
   };
   // console.log("Selected Course:", selectedCourse);
   // console.log("Course Name:", selectedCourse?.courseName);
-  
 
   return (
     <section className="p-10 center flex-col gap-16 bg-[#F8F8F8] mt-10">
@@ -80,100 +76,93 @@ export const AddCourse = () => {
         </Link>
 
         <article className="w-full  center gap-5 text-dark_grey ">
-          <p
-          className="text-center mt-2 text_size_2 relative after:absolute after:w-full after:h-1 after:bg-primary after:-bottom-2 after:left-0">
-          
+          <p className="text-center mt-2 text_size_2 relative after:absolute after:w-full after:h-1 after:bg-primary after:-bottom-2 after:left-0">
             Add Course
-          </p>    
-        </article>       
+          </p>
+        </article>
       </div>
 
-        <div className="screen-size center  w-full h-full">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full  max-h-[400px] h-full">
-            <div className="flex justify-end items-center py-2">
-              <button
-                type="button"
-                className="bg-primary font-bold py-2 px-5 text-dark_grey rounded-md"
-                onClick={() => setIsModalOpen(true)} // Open the modal
-              >
-                Add Course
-              </button>
-            </div>
-            <form >
-              {/* Course Selection */}
-              <div className="mb-5">
-                <label htmlFor="courseSelect" className="text_size_5">
-                   Course Code:
-                </label>
-                <select
-                  {...register("courseSelect")}
-                  onChange={handleCourseSelectChange}
-                  className="input-field select-custom"
-                >
-                  <option value="">Select Course</option>
-                  {AddCourseDetails.map((course) => (
-                    <option key={course.courseSelect} value={course.courseSelect}>
-                      {course.courseSelect}
-                    </option>
-                  ))}
-                </select>
-           
-              </div>
-
-              {/* Course Name */}
-              <div className="mb-5">
-                <label className="text_size_5">Course Name</label>
-                <select
-                  {...register("courseName")}
-                  className="input-field select-custom"
-                >
-                  {selectedCourse && Array.isArray(selectedCourse.courseName) ? (
-                    selectedCourse.courseName.map((courseName, index) => (
-                      <option key={index} value={courseName}>
-                        {courseName}
-                      </option>
-                    ))
-                  ) : (
-                    <option value={selectedCourse?.courseName || ""}>
-                      {selectedCourse?.courseName || "No Course Name Available"}
-                    </option>
-                  )}
-                </select>
-  
-              </div>
-
-              {/* Training Company */}
-              <div className="mb-5">
-                <label className="text_size_5">Training Company</label>
-                <select
-                  {...register("company")}
-                  className="input-field select-custom"
-                >
-                  {selectedCourse && Array.isArray(selectedCourse.company) ? (
-                    selectedCourse.company.map((company, index) => (
-                      <option key={index} value={company}>
-                        {company}
-                      </option>
-                    ))
-                  ) : (
-                    <option value={selectedCourse?.company || ""}>
-                      {selectedCourse?.company || "No Company Available"}
-                    </option>
-                  )}
-                </select>
-            
-              </div>
-            </form>
+      <div className="screen-size center  w-full h-full">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full  max-h-[400px] h-full">
+          <div className="flex justify-end items-center py-2">
+            <button
+              type="button"
+              className="bg-primary font-bold py-2 px-5 text-dark_grey rounded-md"
+              onClick={() => setIsModalOpen(true)} // Open the modal
+            >
+              Add Course
+            </button>
           </div>
-        </div>
-      {isModalOpen && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center border mt-20">
-    
-      <AddCourseForm closeModal={() => setIsModalOpen(false)} />
-    </div>
-  // </div>
-)}
+          <form>
+            {/* Course Selection */}
+            <div className="mb-5">
+              <label htmlFor="courseSelect" className="text_size_5">
+                Course Code:
+              </label>
+              <select
+                {...register("courseSelect")}
+                onChange={handleCourseSelectChange}
+                className="input-field select-custom"
+              >
+                <option value="">Select Course</option>
+                {AddCourseDetails.map((course) => (
+                  <option key={course.courseSelect} value={course.courseSelect}>
+                    {course.courseSelect}
+                  </option>
+                ))}
+              </select>
+            </div>
 
+            {/* Course Name */}
+            <div className="mb-5">
+              <label className="text_size_5">Course Name</label>
+              <select
+                {...register("courseName")}
+                className="input-field select-custom"
+              >
+                {selectedCourse && Array.isArray(selectedCourse.courseName) ? (
+                  selectedCourse.courseName.map((courseName, index) => (
+                    <option key={index} value={courseName}>
+                      {courseName}
+                    </option>
+                  ))
+                ) : (
+                  <option value={selectedCourse?.courseName || ""}>
+                    {selectedCourse?.courseName || "No Course Name Available"}
+                  </option>
+                )}
+              </select>
+            </div>
+
+            {/* Training Company */}
+            <div className="mb-5">
+              <label className="text_size_5">Training Company</label>
+              <select
+                {...register("company")}
+                className="input-field select-custom"
+              >
+                {selectedCourse && Array.isArray(selectedCourse.company) ? (
+                  selectedCourse.company.map((company, index) => (
+                    <option key={index} value={company}>
+                      {company}
+                    </option>
+                  ))
+                ) : (
+                  <option value={selectedCourse?.company || ""}>
+                    {selectedCourse?.company || "No Company Available"}
+                  </option>
+                )}
+              </select>
+            </div>
+          </form>
+        </div>
+      </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center border mt-20">
+          <AddCourseForm closeModal={() => setIsModalOpen(false)} />
+        </div>
+        // </div>
+      )}
     </section>
   );
 };

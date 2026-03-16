@@ -1,13 +1,11 @@
-import { useContext, useEffect, useState } from "react";
-import { DataSupply } from "../../utils/DataStoredContext";
+import { useEffect, useState } from "react";
+
 import { getUrl } from "@aws-amplify/storage";
 import avatar from "../../assets/navabar/avatar.jpeg";
 import { Link } from "react-router-dom";
 import { DateFormat } from "../../utils/DateFormat";
 
-export const NewJoineeTable = () => {
-  const { empPIData, workInfoData, IDData } = useContext(DataSupply);
-
+export const NewJoineeTable = ({ empPIData, workInfoData, IDData }) => {
   // State variables
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
@@ -15,15 +13,17 @@ export const NewJoineeTable = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      // if (!empPIData?.length || !workInfoData?.length || !IDData?.length)
+      //   return;
       try {
         // Merge employee data with work info and ID data
         const mergedData = empPIData
-          .map((emp) => {
+          ?.map((emp) => {
             const WIDetails = workInfoData
-              ? workInfoData.find((user) => user.empID === emp.empID)
+              ? workInfoData?.find((user) => user.empID === emp.empID)
               : {};
             const IDDetails = IDData
-              ? IDData.find((user) => user.empID === emp.empID)
+              ? IDData?.find((user) => user.empID === emp.empID)
               : {};
 
             return {
@@ -54,7 +54,7 @@ export const NewJoineeTable = () => {
     const fetchProfilePhotos = async () => {
       try {
         const updatedJoinees = await Promise.all(
-          latestJoinees.map(async (joinee) => {
+          latestJoinees?.map(async (joinee) => {
             if (joinee.profilePhoto) {
               const result = await getUrl({ path: joinee.profilePhoto });
               return { ...joinee, profilePhotoUrl: result.url };

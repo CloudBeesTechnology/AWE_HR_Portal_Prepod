@@ -1,11 +1,13 @@
-import { useState, useEffect, useContext } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { DataSupply } from '../../../utils/DataStoredContext';
-import { TrainVT } from './TrainVT';
+import { useState, useEffect, useContext } from "react";
+import { useOutletContext } from "react-router-dom";
+
+import { TrainVT } from "./TrainVT";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 
 export const TableBlasting = () => {
   const { tableColumns } = useOutletContext();
-  const { empPIData, BastingInfo } = useContext(DataSupply);
+
+  const { empPIData, BastingInfo } = useTrainingData();
 
   const addBastingForm = [
     { header: "Employee ID", key: "empID" },
@@ -26,8 +28,8 @@ export const TableBlasting = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A"; // Handle empty or invalid date
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
@@ -46,11 +48,11 @@ export const TableBlasting = () => {
         setMergeData(mergedData);
         setLoading(false);
       } catch (err) {
-        setError('Error merging data.');
+        setError("Error merging data.");
         setLoading(false);
       }
     } else {
-      setError('Required data is missing.');
+      setError("Required data is missing.");
       setLoading(false);
     }
   }, [empPIData, BastingInfo]);
@@ -78,5 +80,3 @@ export const TableBlasting = () => {
     </div>
   );
 };
-
-

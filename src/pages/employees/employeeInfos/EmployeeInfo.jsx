@@ -52,7 +52,8 @@ export const EmployeeInfo = () => {
   const { SubmitIDData } = IDDetailsFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
   const { UpdateIDValue } = UpdateIDDetails();
-  const { empPIData, IDData, dropDownVal, candyToEmp } = useContext(DataSupply);
+  const { empPIData, IDData, dropDownVal, candyToEmp, setFetchTableData } =
+    useContext(DataSupply);
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [allEmpDetails, setAllEmpDetails] = useState([]);
@@ -104,6 +105,10 @@ export const EmployeeInfo = () => {
   const [showTitle, setShowTitle] = useState("");
   const [deletedFiles, setDeletedFiles] = useState({});
   const [disableEmpID, setDisableEmpID] = useState(false);
+
+  useEffect(() => {
+    setFetchTableData(["empPIData", "IDData", "dropDownVal", "candyToEmp"]);
+  }, []);
 
   const handleNationalityChange = (e) => {
     setSelectedNationality(e.target.value);
@@ -816,6 +821,7 @@ export const EmployeeInfo = () => {
       const checkingPITable = empPIData.find(
         (match) => match.empID === data.empID
       );
+
       const checkingIDTable = IDData.find(
         (match) => match.empID === data.empID
       );

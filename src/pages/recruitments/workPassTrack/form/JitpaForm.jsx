@@ -14,10 +14,10 @@ import { DeleteUploadJitpa } from "../deleteUpload/DeleteUploadJitpa";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
 import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
-import { DataSupply } from "../../../../utils/DataStoredContext";
+// import { DataSupply } from "../../../../utils/DataStoredContext";
 
-export const JitpaForm = ({ candidate }) => {
-  const { IVSSDetails } = useContext(DataSupply);
+export const JitpaForm = ({ candidate, IVSSDetails }) => {
+  // const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules, loading: interviewLoading } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
@@ -100,7 +100,7 @@ export const JitpaForm = ({ candidate }) => {
         });
       }
     }
-  }, [interviewSchedules, candidate.tempID]);
+  }, [interviewSchedules, candidate.tempID, IVSSDetails]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {

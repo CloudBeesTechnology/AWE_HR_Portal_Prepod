@@ -21,7 +21,7 @@ export const Doe = () => {
   }, []);
 
   const { searchResultData } = useOutletContext();
-  const { DNData } = useContext(DataSupply);
+  const { DNData, setFetchTableData } = useContext(DataSupply);
   const { CrerDoeFunData } = CreateDoe();
   const { UpdateMPData } = UpdateDataFun();
   const { formattedPermissions } = useDeleteAccess();
@@ -52,6 +52,10 @@ export const Doe = () => {
   const [uploadDoe, setUploadDoe] = useState({
     doeEmpUpload: [],
   });
+
+  useEffect(() => {
+    setFetchTableData(["DNData"]);
+  }, []);
 
   const EMPID = localStorage.getItem("userID");
   const TODAY = new Date().toISOString().split("T")[0];
@@ -85,7 +89,7 @@ export const Doe = () => {
       ...prev,
       [label]: value,
     }));
-    console.log(value);
+   
   };
 
   const handleFileChange = async (e, label) => {

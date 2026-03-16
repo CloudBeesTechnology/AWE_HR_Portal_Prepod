@@ -71,11 +71,11 @@ export const PersonalAcci = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [searchResultData, setSearchResultData] = useState([]);
   const { formattedPermissions } = useDeleteAccess();
-  const { personalAcciData } = useContext(DataSupply);
+  const { personalAcciData, setFetchTableData } = useContext(DataSupply);
   const { empID, requiredPermissions, access } = useOutletContext();
   const userType = localStorage.getItem("userID");
   const [trackEmpID, setTrackEmpID] = useState(false);
-  
+
   const {
     register,
     handleSubmit,
@@ -87,7 +87,9 @@ export const PersonalAcci = () => {
     resolver: yupResolver(PersonalAcciSchema),
   });
 
-  // console.log("J");
+  useEffect(() => {
+    setFetchTableData(["personalAcciData"]);
+  }, []);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -322,13 +324,18 @@ export const PersonalAcci = () => {
     try {
       const today = new Date().toISOString().split("T")[0];
 
-      const checkingDITable = personalAcciData.find(
-        (match) => match.id === searchResultData.id
+      const checkingDITable = personalAcciData?.find(
+        (match) => match?.id === searchResultData?.id
       );
 
       if (checkingDITable) {
-        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
-        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+        const previous = checkingDITable.updatedBy
+          ? JSON.parse(checkingDITable.updatedBy)
+          : [];
+        const updatedBy = JSON.stringify([
+          ...previous,
+          { userID: userType, date: today },
+        ]);
         const PAUpValue = {
           ...data,
           perAccUp: JSON.stringify(uploadPAU.perAccUp),
@@ -749,7 +756,7 @@ export const PersonalAcci = () => {
           </p>
         )}
       </div>
-     
+
       {deletePopup && (
         <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}

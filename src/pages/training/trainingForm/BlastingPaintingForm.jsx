@@ -1,27 +1,26 @@
-import { useState, useEffect} from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import {blastingPaintingSchema} from '../../../services/TrainingValidation'
-import { DataSupply } from '../../../utils/DataStoredContext';
-import { useContext } from 'react';
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { blastingPaintingSchema } from "../../../services/TrainingValidation";
+import { DataSupply } from "../../../utils/DataStoredContext";
+import { useContext } from "react";
 import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
-import { BlastDataFun } from '../../../services/createMethod/BlastDataFun';
-import { BlastDataUp } from '../../../services/updateMethod/BlastDataUp';
-import { SpinLogo } from '../../../utils/SpinLogo';
+import { BlastDataFun } from "../../../services/createMethod/BlastDataFun";
+import { BlastDataUp } from "../../../services/updateMethod/BlastDataUp";
+import { SpinLogo } from "../../../utils/SpinLogo";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 export const BlastingPaintingForm = () => {
-  
-  const { empPIData, workInfoData, BastingInfo} =useContext(DataSupply);
+  const { empPIData, workInfoData, BastingInfo } = useTrainingData();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-  
 
   const { BlastData } = BlastDataFun();
-  const { BlastUp } = BlastDataUp(); 
+  const { BlastUp } = BlastDataUp();
   const [notification, setNotification] = useState(false);
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
@@ -35,7 +34,9 @@ export const BlastingPaintingForm = () => {
   });
   const {
     register,
-    handleSubmit,setValue,watch,
+    handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(blastingPaintingSchema),
@@ -78,7 +79,7 @@ export const BlastingPaintingForm = () => {
     if (typeof url === "string" && url) {
       return url.split("/").pop(); // Extract the file name from URL
     }
-    return ""; 
+    return "";
   };
 
   const getFileName = (filePath) => {
@@ -95,9 +96,7 @@ export const BlastingPaintingForm = () => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
-    const allowedTypes = [
-      "application/pdf",
-    ];
+    const allowedTypes = ["application/pdf"];
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file ");
       return;
@@ -107,7 +106,7 @@ export const BlastingPaintingForm = () => {
     setValue(label, [...currentFiles, selectedFile]);
 
     try {
-      await uploadDocs(selectedFile, label, setUploadBlast,watchedEmpID);
+      await uploadDocs(selectedFile, label, setUploadBlast, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name, // Store just the file name
@@ -117,14 +116,17 @@ export const BlastingPaintingForm = () => {
     }
   };
 
-
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
-  
+
   const searchResult = (result) => {
     // console.log("Search result:", result); // Debugging
-  
-    const keysToSet = ["empID","empBadgeNo","name","position",
+
+    const keysToSet = [
+      "empID",
+      "empBadgeNo",
+      "name",
+      "position",
       "blastingRemarks",
       "blastingEndDate",
       "blastingStartDate",
@@ -143,19 +145,16 @@ export const BlastingPaintingForm = () => {
       "weldingCode",
       "weldingMaterial",
     ];
-    const fields = [
-      "department",
-    ];
+    const fields = ["department"];
     const uploadFields = ["blastingUpload"];
-  
+
     // Set simple fields
     keysToSet.forEach((key) => {
       if (result[key]) {
         setValue(key, result[key]);
       }
     });
-  
-   
+
     // Set other fields
     fields.forEach((field) => {
       const value = getLastValue(result[field]);
@@ -169,23 +168,23 @@ export const BlastingPaintingForm = () => {
         try {
           const parsedArray = JSON.parse(result?.[field][0]);
           setValue(field, parsedArray);
-    
+
           setUploadBlast((prev) => ({ ...prev, [field]: parsedArray }));
-    
+
           // Check if parsedArray is valid and non-empty
           if (Array.isArray(parsedArray) && parsedArray.length > 0) {
             const lastItem = parsedArray[parsedArray.length - 1];
-    
+
             // Check if lastItem has the upload property
             const fileName = lastItem?.upload
               ? getFileName(lastItem.upload)
               : "Unknown file";
-    
+
             setUploadedFileNames((prev) => ({
               ...prev,
               [field]: fileName,
             }));
-          } 
+          }
         } catch (error) {
           console.error(`Error parsing upload field ${field}:`, error);
         }
@@ -197,18 +196,15 @@ export const BlastingPaintingForm = () => {
     // console.log("Form data:", data);
 
     try {
-      
       const BlastRecord = BastingInfo
         ? BastingInfo.find((match) => match.empID === data.empID)
         : {};
-     
-      if (
-        BlastRecord 
-      ) {
+
+      if (BlastRecord) {
         const BlastUpValue = {
           ...data,
-          blastingUpload:uploadeBlast.blastingUpload,
-          id: BlastRecord.id,  
+          blastingUpload: uploadeBlast.blastingUpload,
+          id: BlastRecord.id,
         };
         // console.log(BlastUpValue);
 
@@ -218,11 +214,10 @@ export const BlastingPaintingForm = () => {
       } else {
         const BlastValue = {
           ...data,
-          blastingUpload:uploadeBlast.blastingUpload
-
+          blastingUpload: uploadeBlast.blastingUpload,
         };
-    // console.log(BlastValue,"Creact method");
-    
+        // console.log(BlastValue,"Creact method");
+
         await BlastData({ BlastValue });
         setShowTitle("Training Blasting Painting Saved successfully");
         setNotification(true);
@@ -233,21 +228,21 @@ export const BlastingPaintingForm = () => {
   };
 
   return (
-   <section className='bg-[#F8F8F8] p-10 rounded-lg mt-10'>
-     <div className="w-[30%]">
+    <section className="bg-[#F8F8F8] p-10 rounded-lg mt-10">
+      <div className="w-[30%]">
         <SearchDisplay
-            searchResult={searchResult}
-            newFormData={allEmpDetails}
-            searchIcon2={<IoSearch />}
-            placeholder="Employee Id"
-            rounded="rounded-lg"
-            filteredEmployees={filteredEmployees}
-            setFilteredEmployees={setFilteredEmployees}
-          />
-        </div>
+          searchResult={searchResult}
+          newFormData={allEmpDetails}
+          searchIcon2={<IoSearch />}
+          placeholder="Employee Id"
+          rounded="rounded-lg"
+          filteredEmployees={filteredEmployees}
+          setFilteredEmployees={setFilteredEmployees}
+        />
+      </div>
 
-     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 ">
-     <div className="flex justify-end  items-center py-5 mt-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 ">
+        <div className="flex justify-end  items-center py-5 mt-2">
           <div className="max-w-sm">
             <label className="text_size_5">Employee ID</label> <br />
             <input
@@ -261,127 +256,139 @@ export const BlastingPaintingForm = () => {
             )}
           </div>
         </div>
-      <div className="grid grid-cols-2 gap-6">
-        {/* Left Column */}
-         <div>
-         <label className="text_size_5">Employee Badge Number</label>           
-          <input
-            {...register('empBadgeNo')}
-            className="input-field"
-            type="text"
-          />
-         </div>
-         <div>
-         <label className="text_size_5">Employee Name</label>
-          <input
-            {...register('name')}
-            className="input-field"
-            type="text"
-          />        
-         </div>
-
+        <div className="grid grid-cols-2 gap-6">
+          {/* Left Column */}
           <div>
-          <label className="text_size_5">Department</label>
-          <input
-            {...register('department')}
-            className="input-field"
-            type="text"
-          />       
+            <label className="text_size_5">Employee Badge Number</label>
+            <input
+              {...register("empBadgeNo")}
+              className="input-field"
+              type="text"
+            />
+          </div>
+          <div>
+            <label className="text_size_5">Employee Name</label>
+            <input {...register("name")} className="input-field" type="text" />
           </div>
 
-          <div>  
+          <div>
+            <label className="text_size_5">Department</label>
+            <input
+              {...register("department")}
+              className="input-field"
+              type="text"
+            />
+          </div>
+
+          <div>
             <label className="text_size_5">Position</label>
-          <input
-            {...register('position')}
-            className="input-field"
-            type="text"
-          />
-        </div>
-
-         <div>
-         <label className="text_size_5">Blasting/Painting Badge Number</label>
-          <input
-            {...register('blastingBadgeNo')}
-            className="input-field"
-            type="text"
-          />
-          {errors.blastingBadgeNo && (
-            <p className="text-[red] text-[13px] mt-1">{errors.blastingBadgeNo.message}</p>
-          )}
-         </div>
-
-          <div>
-          <label className="text_size_5">Blasting/Painting Assessment Start Date</label>
-          <input
-            {...register('blastingStartDate')}
-            className="input-field"
-            type="date"
-          />
-          {errors.blastingStartDate && (
-            <p className="text-[red] text-[13px] mt-1">{errors.blastingStartDate.message}</p>
-          )}
-        </div>
-
-         <div>
-         <label className="text_size_5">Blasting/Painting Assessment End Date</label>
-          <input
-            {...register('blastingEndDate')}
-            className="input-field"
-            type="date"
-          />
-          {errors.blastingEndDate && (
-            <p className="text-[red] text-[13px] mt-1">{errors.blastingEndDate.message}</p>
-          )}
-         </div>
-
-        <div>
-          <label className="text_size_5">Blasting/Painting Qualification Expiry</label>
-          <input
-            {...register('blastingQulifiExp')}
-            className="input-field"
-            type="date"
-          />
-          {errors.blastingQulifiExp && (
-            <p className="text-[red] text-[13px] mt-1">{errors.blastingQulifiExp.message}</p>
-          )}
+            <input
+              {...register("position")}
+              className="input-field"
+              type="text"
+            />
           </div>
 
-         <div>
-         <label className="text_size_5">Remarks for Blasting/Painting Qualification</label>
-          <input
-            {...register('blastingRemarks')}
-            className="input-field"
-            type="text"
+          <div>
+            <label className="text_size_5">
+              Blasting/Painting Badge Number
+            </label>
+            <input
+              {...register("blastingBadgeNo")}
+              className="input-field"
+              type="text"
+            />
+            {errors.blastingBadgeNo && (
+              <p className="text-[red] text-[13px] mt-1">
+                {errors.blastingBadgeNo.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="text_size_5">
+              Blasting/Painting Assessment Start Date
+            </label>
+            <input
+              {...register("blastingStartDate")}
+              className="input-field"
+              type="date"
+            />
+            {errors.blastingStartDate && (
+              <p className="text-[red] text-[13px] mt-1">
+                {errors.blastingStartDate.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="text_size_5">
+              Blasting/Painting Assessment End Date
+            </label>
+            <input
+              {...register("blastingEndDate")}
+              className="input-field"
+              type="date"
+            />
+            {errors.blastingEndDate && (
+              <p className="text-[red] text-[13px] mt-1">
+                {errors.blastingEndDate.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="text_size_5">
+              Blasting/Painting Qualification Expiry
+            </label>
+            <input
+              {...register("blastingQulifiExp")}
+              className="input-field"
+              type="date"
+            />
+            {errors.blastingQulifiExp && (
+              <p className="text-[red] text-[13px] mt-1">
+                {errors.blastingQulifiExp.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="text_size_5">
+              Remarks for Blasting/Painting Qualification
+            </label>
+            <input
+              {...register("blastingRemarks")}
+              className="input-field"
+              type="text"
+            />
+          </div>
+
+          <FileUploadField
+            label="Upload File"
+            onChangeFunc={(e) => handleFileChange(e, "blastingUpload")}
+            register={register}
+            name="blastingUpload"
+            error={errors}
+            fileName={
+              uploadedFileNames.blastingUpload || extractFileName(BlasUpload)
+            }
           />
         </div>
 
-        <FileUploadField
-        label="Upload File"
-        onChangeFunc={(e) => handleFileChange(e, "blastingUpload")}
-        register={register}
-        name="blastingUpload"
-        error={errors}
-        fileName={
-          uploadedFileNames.blastingUpload ||
-          extractFileName(BlasUpload)
-        }
-      />
-      </div>
-
-      <div className='center'>
-      <button type="submit" className="primary_btn">
-        Submit
-      </button>
-      </div>
-    </form>
-    {notification && (
+        <div className="center">
+          <button type="submit" className="primary_btn">
+            Submit
+          </button>
+        </div>
+      </form>
+      {notification && (
         <SpinLogo
-        text={showTitle}
-        notification={notification}
+          text={showTitle}
+          notification={notification}
           path="/training"
         />
       )}
-   </section>
+    </section>
   );
 };
-

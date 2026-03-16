@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ApplicantSchema } from "../../services/Validation";
@@ -6,7 +6,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { IoCameraOutline } from "react-icons/io5";
 import { uploadDocString } from "../../services/uploadsDocsS3/UploadDocs";
 import { FormField } from "../../utils/FormField";
-import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 import { useTempID } from "../../utils/TempIDContext";
 import avatar from "../../assets/navabar/avatar.jpeg";
@@ -19,9 +18,10 @@ import {
   RaceDD,
   ReligionDD,
 } from "../../utils/DropDownMenus";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 
 export const ApplicantDetails = () => {
-  const { empPDData } = useContext(DataSupply);
+  const { empPDData } = useRecruitmentsData();
   const { tempID } = useTempID();
   const location = useLocation();
   const navigate = useNavigate();

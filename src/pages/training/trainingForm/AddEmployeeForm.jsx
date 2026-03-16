@@ -7,7 +7,6 @@ import { IoSearch } from "react-icons/io5";
 import { FaArrowLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { trainingUp } from "../../../services/uploadsDocsS3/UploadDocs";
-import { DataSupply } from "../../../utils/DataStoredContext";
 import { AddEmpFun } from "../../../services/createMethod/AddEmpFun";
 import { AddEmpReqUp } from "../../../services/updateMethod/AddEmpReqUp";
 import { SpinLogo } from "../../../utils/SpinLogo";
@@ -22,10 +21,11 @@ import { FaRegMinusSquare, FaRegPlusSquare } from "react-icons/fa";
 import { GoUpload } from "react-icons/go";
 import { MdCancel } from "react-icons/md";
 import useEmployeePersonalInfo from "../../../hooks/useEmployeePersonalInfo";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 
 export const AddEmployeeForm = () => {
   const { empPIData, workInfoData, AddCourseDetails, AddEmpReq } =
-    useContext(DataSupply);
+    useTrainingData();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

@@ -1,18 +1,19 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CourceValidationSchema } from "../../../services/TrainingValidation";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CiSquarePlus } from "react-icons/ci";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { AddCFFun } from "../../../services/createMethod/AddCFFun";
 import { AddCFUpdate } from "../../../services/updateMethod/AddCFUpdate";
-import { DataSupply } from "../../../utils/DataStoredContext";
+
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { FaRegMinusSquare } from "react-icons/fa";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 
 export const AddCourseForm = ({ closeModal }) => {
   const { AddCourseData } = AddCFFun();
-  const { AddCourseDetails } = useContext(DataSupply);
+  const { AddCourseDetails } = useTrainingData();
   const { AddCUpdateFun } = AddCFUpdate();
   // console.log(AddCourseDetails);
 
@@ -26,8 +27,8 @@ export const AddCourseForm = ({ closeModal }) => {
   });
 
   // State to track dynamic inputs
-  const [courseName, setCourseName] = useState([""]);  // Initial state for course names
-  const [company, setCompany] = useState([""]);  // Initial state for company names
+  const [courseName, setCourseName] = useState([""]); // Initial state for course names
+  const [company, setCompany] = useState([""]); // Initial state for company names
 
   // Add a new input field for course name
   const addCourseNameField = () => {
@@ -62,28 +63,24 @@ export const AddCourseForm = ({ closeModal }) => {
     try {
       // console.log("Form Data Submitted:", data);
 
-      const submittedCourseSelect = typeof data.courseSelect === 'string' ? data.courseSelect : '';
+      const submittedCourseSelect =
+        typeof data.courseSelect === "string" ? data.courseSelect : "";
 
       // Find an existing entry matching courseSelect
       const checkingEIDTable = AddCourseDetails?.find((match) => {
-        const matchCourseSelect = typeof match.courseSelect === 'string' ? match.courseSelect : '';
+        const matchCourseSelect =
+          typeof match.courseSelect === "string" ? match.courseSelect : "";
         return submittedCourseSelect === matchCourseSelect;
       });
 
       if (checkingEIDTable) {
         // Combine existing data with new data and remove duplicates
         const updatedCourseName = [
-          ...new Set([
-            ...checkingEIDTable.courseName,
-            ...data.courseName,
-          ]),
+          ...new Set([...checkingEIDTable.courseName, ...data.courseName]),
         ];
 
         const updatedCompany = [
-          ...new Set([
-            ...checkingEIDTable.company,
-            ...data.company,
-          ]),
+          ...new Set([...checkingEIDTable.company, ...data.company]),
         ];
 
         // Update logic
@@ -164,7 +161,7 @@ export const AddCourseForm = ({ closeModal }) => {
                     onClick={() => removeCourseNameField(index)}
                     className="ml-2 text-medium_grey"
                   >
-                    <FaRegMinusSquare/>
+                    <FaRegMinusSquare />
                   </button>
                 )}
                 {errors.courseName && errors.courseName[index] && (
@@ -206,7 +203,7 @@ export const AddCourseForm = ({ closeModal }) => {
                     onClick={() => removeCompanyField(index)}
                     className="ml-2 text-medium_grey"
                   >
-                    <FaRegMinusSquare/>
+                    <FaRegMinusSquare />
                   </button>
                 )}
                 {errors.company && errors.company[index] && (
@@ -243,4 +240,3 @@ export const AddCourseForm = ({ closeModal }) => {
     </div>
   );
 };
-

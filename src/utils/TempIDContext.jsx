@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { DataSupply } from "./DataStoredContext";
 
 const TempIDContext = createContext();
@@ -38,7 +38,11 @@ export const TempIDProvider = ({ children }) => {
   const [offshoreType, setOffshoreType] = useState("All");
   const [PDInfo, setPDInfo] = useState(null);
 
-  const { workInfoData, empPIData } = useContext(DataSupply);
+  const { workInfoData, empPIData, setFetchTableData } = useContext(DataSupply);
+
+  useEffect(() => {
+    setFetchTableData(["workInfoData", "empPIData"]);
+  }, []);
 
   useEffect(() => {
     const userID = localStorage.getItem("userID");

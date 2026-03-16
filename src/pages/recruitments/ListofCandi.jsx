@@ -1,20 +1,20 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Table } from "../../utils/Table";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { DataSupply } from "../../utils/DataStoredContext";
 import { useTempID } from "../../utils/TempIDContext";
 import { SearchListOfCandy } from "./Search/SearchListOfCandy";
 import { DeletePopup } from "../../utils/DeletePopup";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { CandyDelete } from "../../services/deleteMethod/CandyDelete";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 
 export const ListofCandi = () => {
-  const { empPDData, IVSSDetails } = useContext(DataSupply);
+  const { empPDData, IVSSDetails } = useRecruitmentsData();
   // console.log(empPDData);
-  
+
   const [selectedRow, setSelectedRow] = useState(null);
   const { setTempID } = useTempID();
   const { handleDeletePDDetails } = CandyDelete();
@@ -32,12 +32,13 @@ export const ListofCandi = () => {
 
   const empTempIDs = empPDData?.map((candidate) => candidate.tempID);
   const ivssTempIDs = IVSSDetails?.map((candidate) => candidate.tempID);
-  const matchedCandidates = IVSSDetails?.filter((ivssCandidate) => 
-    empPDData?.some((empCandidate) => empCandidate.tempID === ivssCandidate.tempID)
+  const matchedCandidates = IVSSDetails?.filter((ivssCandidate) =>
+    empPDData?.some(
+      (empCandidate) => empCandidate.tempID === ivssCandidate.tempID
+    )
   );
-  
+
   // console.log("Matched", matchedCandidates);
-  
 
   const tempIDsToExclude = empTempIDs?.filter((tempID) =>
     ivssTempIDs?.includes(tempID)
@@ -61,16 +62,19 @@ export const ListofCandi = () => {
       const matchedIVSS = matchedCandidates?.find(
         (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
       );
-      const isInMatchedCandidates = matchedIVSS && matchedIVSS.status === "Candidate List" && candidate.status !== "Inactive";;
+      const isInMatchedCandidates =
+        matchedIVSS &&
+        matchedIVSS.status === "Candidate List" &&
+        candidate.status !== "Inactive";
       return (
-        (!tempIDsToExclude.includes(candidate.tempID) && candidate.status !== "Inactive") ||
-        (isInMatchedCandidates)
+        (!tempIDsToExclude.includes(candidate.tempID) &&
+          candidate.status !== "Inactive") ||
+        isInMatchedCandidates
       );
     });
-  
+
     setFilteredData(allCandidates);
     setLoading(false);
-
   }, [empPDData, IVSSDetails, searchTerm]);
 
   const handleRowClick = (row) => {
@@ -120,33 +124,30 @@ export const ListofCandi = () => {
       setTempID(selectedTempID);
     }
   };
-  
+
   // const getTemp = () => {
   //   console.log('getTemp function called');
-    
+
   //   if (selectedRows.length === 1) {
   //     console.log('Selected Rows:', selectedRows);
-      
+
   //     const selectedTempID = filteredData[selectedRows[0]]?.tempID;
   //     console.log('Selected Temp ID:', selectedTempID);
-      
+
   //     setCandidate(selectedTempID);
   //     setTempID(selectedTempID);
-      
+
   //     console.log('Candidate set to:', selectedTempID);
   //     console.log('TempID set to:', selectedTempID);
   //   } else {
   //     console.log('Selected Rows length is not 1, it is:', selectedRows.length);
   //   }
   // };
-  
 
-  
   const requiredPermissions = ["Candidate"];
   const access = "Recruitment";
 
   // console.log("Filtered Data", filteredData);
-  
 
   return (
     <section className="screen-size min-h-screen w-full my-5">

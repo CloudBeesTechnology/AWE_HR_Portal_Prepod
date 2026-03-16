@@ -4,10 +4,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { VscClose } from "react-icons/vsc";
 import { useTempID } from "../../utils/TempIDContext";
-import { DataSupply } from "../../utils/DataStoredContext";
+import { useReportsData } from "../../context/reports/ReportsContext";
 
 export const ContractPDF = ({ userID, userType }) => {
-  const { contractForms, loading: dataLoading } = useContext(DataSupply);
+  const { contractForms, loading: dataLoading } = useReportsData();
   const navigate = useNavigate();
   const location = useLocation();
   const { gmPosition, HRMPosition } = useTempID();
@@ -83,9 +83,9 @@ export const ContractPDF = ({ userID, userType }) => {
         }
 
         const skillPool = emp?.skillPool ? emp?.skillPool.toUpperCase() : "";
-        
+
         // console.log(skillPool,"checkingpool");
-        
+
         const contractEndDates = emp.contractEnd || [];
         const lastDate = contractEndDates[contractEndDates.length - 1];
         const isContractActive = lastDate && emp.contStatus === true;
@@ -221,39 +221,40 @@ export const ContractPDF = ({ userID, userType }) => {
   const handleViewDetails = (personData) => {
     // const employeeHistory = contractForms.filter(
     //   (val) =>
-    //     (val.empID === personData.empID && val.genManager.trim() !== "") 
+    //     (val.empID === personData.empID && val.genManager.trim() !== "")
     // );
-  
-  //   setHistoryData(employeeHistory);
-  //   console.log(personData);
 
-  //   setSelectedPerson(personData);
-  // };
-  const employeeHistory = contractForms
-  .filter((val) => {
-    const emp = allData.find((d) => d.empID === val.empID);
-    if (!emp) return false;
+    //   setHistoryData(employeeHistory);
+    //   console.log(personData);
 
-    const isSameEmployee = val.empID === personData.empID;
-    const hasGenManager = val.genManager?.trim() !== "";
-    const hasHrManager = val.hrManager?.trim() !== "";
-    const skillPool = emp?.skillPool ? emp.skillPool.toUpperCase() : "";
-const hasSkillPool = skillPool === "SKILLED" || skillPool === "UNSKILLED"
-    return (
-      isSameEmployee &&
-      (hasGenManager ||
-        (val.genManager?.trim() === "" && hasSkillPool && hasHrManager)) 
-    );
-  })
-  .map((val) => {
-    const emp = allData.find((d) => d.empID === val.empID);
-    const skillPool = emp?.skillPool ? emp.skillPool.toUpperCase() : "";
-    return { ...val, skillPool }; // ✅ attach skillPool to each history record
-  });
+    //   setSelectedPerson(personData);
+    // };
+    const employeeHistory = contractForms
+      .filter((val) => {
+        const emp = allData.find((d) => d.empID === val.empID);
+        if (!emp) return false;
 
-setHistoryData(employeeHistory);
-setSelectedPerson(personData);
-  }
+        const isSameEmployee = val.empID === personData.empID;
+        const hasGenManager = val.genManager?.trim() !== "";
+        const hasHrManager = val.hrManager?.trim() !== "";
+        const skillPool = emp?.skillPool ? emp.skillPool.toUpperCase() : "";
+        const hasSkillPool =
+          skillPool === "SKILLED" || skillPool === "UNSKILLED";
+        return (
+          isSameEmployee &&
+          (hasGenManager ||
+            (val.genManager?.trim() === "" && hasSkillPool && hasHrManager))
+        );
+      })
+      .map((val) => {
+        const emp = allData.find((d) => d.empID === val.empID);
+        const skillPool = emp?.skillPool ? emp.skillPool.toUpperCase() : "";
+        return { ...val, skillPool }; // ✅ attach skillPool to each history record
+      });
+
+    setHistoryData(employeeHistory);
+    setSelectedPerson(personData);
+  };
 
   const closeModal = () => {
     setSelectedPerson(null);
@@ -365,11 +366,14 @@ setSelectedPerson(personData);
 
                           const hasGenManager = val.genManager?.trim() !== "";
                           const hasHrManager = val.hrManager?.trim() !== "";
-const hasSkillPool =val?.skillPool?.toUpperCase() === "SKILLED" || val?.skillPool?.toUpperCase() === "UNSKILLED"
+                          const hasSkillPool =
+                            val?.skillPool?.toUpperCase() === "SKILLED" ||
+                            val?.skillPool?.toUpperCase() === "UNSKILLED";
                           const showRow =
-                           hasGenManager ||
+                            hasGenManager ||
                             (val.genManager?.trim() === "" &&
-                             hasSkillPool && hasHrManager);
+                              hasSkillPool &&
+                              hasHrManager);
 
                           return (
                             showRow && (
@@ -441,12 +445,14 @@ const hasSkillPool =val?.skillPool?.toUpperCase() === "SKILLED" || val?.skillPoo
             {(() => {
               const hasHrManager = selectedPerson.hrmStatus?.trim() !== "";
               const gmApproved = !!selectedPerson.gmStatus;
-              console.log(selectedPerson,"sele");
-              
-              const hasSkillPool =selectedPerson?.skillPool?.toUpperCase() === "SKILLED" || selectedPerson?.skillPool?.toUpperCase() === "UNSKILLED"
+              console.log(selectedPerson, "sele");
+
+              const hasSkillPool =
+                selectedPerson?.skillPool?.toUpperCase() === "SKILLED" ||
+                selectedPerson?.skillPool?.toUpperCase() === "UNSKILLED";
               console.log(hasHrManager, "manager");
               console.log(gmApproved, "GM");
-              console.log(hasSkillPool, "skillpool",selectedPerson.skillPool);
+              console.log(hasSkillPool, "skillpool", selectedPerson.skillPool);
 
               let showSection = false;
 

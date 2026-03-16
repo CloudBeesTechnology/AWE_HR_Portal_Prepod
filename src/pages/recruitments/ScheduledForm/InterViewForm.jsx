@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { BsCloudUpload } from "react-icons/bs";
-import { DataSupply } from "../../../utils/DataStoredContext";
+// import { DataSupply } from "../../../utils/DataStoredContext";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { SpinLogo } from "../../../utils/SpinLogo";
 
-export const InterviewForm = ({ candidate }) => {
-  const { IVSSDetails, loading } = useContext(DataSupply);
+export const InterviewForm = ({ candidate, IVSSDetails, loading }) => {
+  // const { IVSSDetails, setFetchTableData, loading } = useContext(DataSupply);
   const { interviewDetails } = UpdateInterviewData();
 
   // Initialize form state
@@ -38,6 +38,11 @@ export const InterviewForm = ({ candidate }) => {
 
     return `${year}-${month}-${day}`;
   };
+
+  // useEffect(() => {
+  //   setFetchTableData(["IVSSDetails"]);
+  // }, []);
+
   useEffect(() => {
     if (IVSSDetails.length > 0 && candidate?.tempID) {
       const interviewData = IVSSDetails.find(

@@ -14,10 +14,10 @@ import { DeleteUploadImmi } from "../deleteUpload/DeleteUploadImmi";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
 import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
-import { DataSupply } from "../../../../utils/DataStoredContext";
+// import { DataSupply } from "../../../../utils/DataStoredContext";
 
-export const ImmigrationForm = ({ candidate }) => {
-  const { IVSSDetails } = useContext(DataSupply);
+export const ImmigrationForm = ({ candidate, IVSSDetails }) => {
+  // const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules, loading: interviewLoading } = useFetchCandy();
   const { createWPTrackingHandler } = useCreateWPTracking();
@@ -101,7 +101,7 @@ export const ImmigrationForm = ({ candidate }) => {
         });
       }
     }
-  }, [interviewSchedules, candidate.tempID]);
+  }, [interviewSchedules, candidate.tempID, IVSSDetails]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {

@@ -23,7 +23,7 @@ export const Jitpa = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const { BJLData } = useContext(DataSupply);
+  const { BJLData, setFetchTableData } = useContext(DataSupply);
   const { UpdateJitpaData } = UpdateJitpaFun();
   const { JitpaCreData } = JitpaCreFun();
 
@@ -50,6 +50,12 @@ export const Jitpa = () => {
   const [uploadjitpa, setUploadjitpa] = useState({
     jpEmpUpload: [],
   });
+
+  useEffect(() => {
+      setFetchTableData([
+        "BJLData"
+      ]);
+    }, []);
 
   const watchInducJitpaUpload = watch("jpEmpUpload", "");
 
@@ -116,7 +122,7 @@ export const Jitpa = () => {
       ...prev,
       [label]: value,
     }));
-    console.log(value);
+    
   };
 
   const handleFileChange = async (e, label) => {

@@ -13,7 +13,7 @@ import { LocalMobilization } from "../../../services/createMethod/CreateLOI";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadCVEV } from "../deleteDocsRecruit/DeleteUploadCVEV";
 import { DeletePopup } from "../../../utils/DeletePopup";
-import { DataSupply } from "../../../utils/DataStoredContext";
+// import { DataSupply } from "../../../utils/DataStoredContext";
 
 const CVEVFormSchema = Yup.object().shape({
   cvecApproveDate: Yup.date().notRequired(),
@@ -25,9 +25,9 @@ const CVEVFormSchema = Yup.object().shape({
     ),
 });
 
-export const CVEVForm = ({ candidate, formattedPermissions }) => {
+export const CVEVForm = ({ candidate, formattedPermissions, IVSSDetails }) => {
   const { localMobilization } = LocalMobilization();
-  const { IVSSDetails } = useContext(DataSupply);
+  // const { IVSSDetails, setFetchTableData } = useContext(DataSupply);
   const { mergedInterviewData, loading: interviewLoading } =
     useFetchInterview();
   const { loiDetails } = UpdateLoiData();
@@ -63,6 +63,10 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
 
   const EMPID = localStorage.getItem("userID");
   const TODAY = new Date().toISOString().split("T")[0];
+
+  // useEffect(() => {
+  //   setFetchTableData(["IVSSDetails"]);
+  // }, []);
 
   useEffect(() => {
     if (mergedInterviewData.length > 0 && candidate?.tempID) {
@@ -179,9 +183,16 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const selectedInterviewDataStatus = IVSSDetails.find(
-      (data) => data.tempID === candidate?.tempID
-    );
+    // const selectedInterviewDataStatus = IVSSDetails.find(
+    //   (data) => data.tempID === candidate?.tempID
+    // );
+
+    const selectedInterviewDataStatus =
+      Array.isArray(IVSSDetails) && IVSSDetails?.length > 0
+        ? IVSSDetails.find((data) => data.tempID === candidate?.tempID)
+        : {};
+
+
 
     const localMobilizationId = selectedInterviewData?.localMobilization?.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;

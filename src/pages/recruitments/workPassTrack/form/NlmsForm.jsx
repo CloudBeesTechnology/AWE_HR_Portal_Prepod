@@ -13,11 +13,11 @@ import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs"
 import { DeleteUploadNlms } from "../deleteUpload/DeleteUploadNlms";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
-import { DataSupply } from "../../../../utils/DataStoredContext";
+// import { DataSupply } from "../../../../utils/DataStoredContext";
 import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
 
-export const NlmsForm = ({ candidate }) => {
-  const { IVSSDetails } = useContext(DataSupply);
+export const NlmsForm = ({ candidate, IVSSDetails }) => {
+  // const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules, loading: interviewLoading } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
@@ -102,7 +102,7 @@ export const NlmsForm = ({ candidate }) => {
         });
       }
     }
-  }, [interviewSchedules, candidate.tempID]);
+  }, [interviewSchedules, candidate.tempID, IVSSDetails]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {

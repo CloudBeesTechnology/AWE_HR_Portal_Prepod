@@ -66,7 +66,7 @@ export const Travelling = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [searchResultData, setSearchResultData] = useState([]);
   const { formattedPermissions } = useDeleteAccess();
-  const { travelInsData } = useContext(DataSupply);
+  const { travelInsData, setFetchTableData } = useContext(DataSupply);
   const { empID, requiredPermissions, access } = useOutletContext();
   const userType = localStorage.getItem("userID");
   const [trackEmpID, setTrackEmpID] = useState(false);
@@ -79,6 +79,10 @@ export const Travelling = () => {
   } = useForm({
     resolver: yupResolver(TravellingSchema),
   });
+
+  useEffect(() => {
+      setFetchTableData(["travelInsData"]);
+    }, []);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

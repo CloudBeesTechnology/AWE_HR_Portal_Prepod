@@ -15,7 +15,8 @@ import { FormField } from "../../utils/FormField";
 export const NonLocalAcco = () => {
   const { NLADatas, errorEmpID } = NLACreate();
   const { NLAUpdateFun } = NLAUpdate();
-  const { empPIData, IDData, NLAData } = useContext(DataSupply);
+  const { empPIData, IDData, NLAData, setFetchTableData } =
+    useContext(DataSupply);
 
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
@@ -24,6 +25,10 @@ export const NonLocalAcco = () => {
   const [showTitle, setShowTitle] = useState("");
   const [trackEmpID, setTrackEmpID] = useState(false);
   const userType = localStorage.getItem("userID");
+
+  useEffect(() => {
+    setFetchTableData(["empPIData", "IDData", "NLAData"]);
+  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -130,10 +135,7 @@ export const NonLocalAcco = () => {
         const previous = checkingIDTable?.updatedBy
           ? JSON.parse(checkingIDTable.updatedBy)
           : [];
-        const updatedByLoc = [
-          ...previous,
-          { userID: userType, date: today },
-        ];
+        const updatedByLoc = [...previous, { userID: userType, date: today }];
         const orderedUpdatedBy = updatedByLoc?.map((entry) => ({
           userID: entry.userID,
           date: entry.date,

@@ -23,7 +23,7 @@ export const Immigration = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
   const { ImmigrationData } = ImmigrationFun();
-  const { PPValidsData } = useContext(DataSupply);
+  const { PPValidsData, setFetchTableData } = useContext(DataSupply);
   const { UpdateImmigraData } = UpdateImmigra();
 
   const {
@@ -61,6 +61,10 @@ export const Immigration = () => {
     immigEmpUpload: [],
     reEntryUpload: [],
   });
+
+  useEffect(() => {
+    setFetchTableData(["PPValidsData"]);
+  }, []);
 
   const EMPID = localStorage.getItem("userID");
   const TODAY = new Date().toISOString().split("T")[0];
@@ -176,7 +180,7 @@ export const Immigration = () => {
       ...prev,
       [label]: value,
     }));
-    console.log(value);
+    
   };
 
   const handleFileChange = async (e, label) => {
@@ -345,7 +349,7 @@ export const Immigration = () => {
           empPassExp,
           immigApproval,
           reEntryVisaExp,
-          arrivStampUpload: JSON.stringify(uploadedImmigrate.arrivStampUpload), 
+          arrivStampUpload: JSON.stringify(uploadedImmigrate.arrivStampUpload),
           immigEmpUpload: JSON.stringify(uploadedImmigrate.immigEmpUpload),
           reEntryUpload: JSON.stringify(uploadedImmigrate.reEntryUpload),
           createdBy: JSON.stringify([{ userID: EMPID, date: TODAY }]),

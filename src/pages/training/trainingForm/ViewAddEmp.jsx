@@ -1,14 +1,14 @@
 import { useState, useEffect, useContext } from "react";
 import { Outlet, Link } from "react-router-dom";
-import { DataSupply } from "../../../utils/DataStoredContext";
 import { FaArrowLeft } from "react-icons/fa6";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { TrainVT } from "../TableTraining/TrainVT";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 
 export const ViewAddEmp = () => {
   const { empPIData, workInfoData, trainingCertifi, AddEmpReq } =
-    useContext(DataSupply);
+    useTrainingData();
 
   const [mergeData, setMergeData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -167,163 +167,168 @@ export const ViewAddEmp = () => {
   };
 
   const exportTableToExcel = () => {
-  const reportTitle = "Employee Report";
-  const allRows = [];
+    const reportTitle = "Employee Report";
+    const allRows = [];
 
-  // First filter the data by date range (same logic as handleDate)
-  const dataToExport = filterByDateRange(mergeData, startDate, endDate);
+    // First filter the data by date range (same logic as handleDate)
+    const dataToExport = filterByDateRange(mergeData, startDate, endDate);
 
-  // Helper function to safely parse traineeTrack
-  const parseTraineeTrack = (rawTrack) => {
-    try {
-      if (!rawTrack) return [];
+    // Helper function to safely parse traineeTrack
+    const parseTraineeTrack = (rawTrack) => {
+      try {
+        if (!rawTrack) return [];
 
-      // If it's an array like ['"..."]'], extract the first item
-      if (Array.isArray(rawTrack) && typeof rawTrack[0] === "string") {
-        rawTrack = rawTrack[0];
+        // If it's an array like ['"..."]'], extract the first item
+        if (Array.isArray(rawTrack) && typeof rawTrack[0] === "string") {
+          rawTrack = rawTrack[0];
+        }
+
+        // If it's a string, unescape and clean it
+        if (typeof rawTrack === "string") {
+          // Unescape and fix malformed JSON
+          let fixed = rawTrack
+            .replace(/^"+|"+$/g, "") // remove wrapping double quotes
+            .replace(/\\"/g, '"') // unescape inner quotes
+            .replace(/([{,])(\s*)(\w+)\s*:/g, '$1"$3":') // add quotes to keys
+            .replace(/:\s*'([^']+)'/g, ': "$1"'); // convert single to double quotes if any
+
+          const parsed = JSON.parse(fixed);
+          return Array.isArray(parsed) ? parsed : [parsed];
+        }
+
+        // If already an object/array
+        return Array.isArray(rawTrack) ? rawTrack : [rawTrack];
+      } catch (e) {
+        console.error("❌ Error parsing traineeTrack:", e, rawTrack);
+        return [];
       }
-
-      // If it's a string, unescape and clean it
-      if (typeof rawTrack === "string") {
-        // Unescape and fix malformed JSON
-        let fixed = rawTrack
-          .replace(/^"+|"+$/g, "") // remove wrapping double quotes
-          .replace(/\\"/g, '"') // unescape inner quotes
-          .replace(/([{,])(\s*)(\w+)\s*:/g, '$1"$3":') // add quotes to keys
-          .replace(/:\s*'([^']+)'/g, ': "$1"'); // convert single to double quotes if any
-
-        const parsed = JSON.parse(fixed);
-        return Array.isArray(parsed) ? parsed : [parsed];
-      }
-
-      // If already an object/array
-      return Array.isArray(rawTrack) ? rawTrack : [rawTrack];
-    } catch (e) {
-      console.error("❌ Error parsing traineeTrack:", e, rawTrack);
-      return [];
-    }
-  };
-
-  // Loop through all filtered data (using dataToExport instead of filteredData)
-  dataToExport.forEach((data) => {
-    const employeeInfo = {
-      empID: data.empID || "N/A",
-      empBadgeNo: data.empBadgeNo || "N/A",
-      name: data.name || "N/A",
-      department: Array.isArray(data.department)
-        ? data.department[data.department.length - 1]
-        : data.department || "N/A",
     };
 
-    // Parse traineeTrack if it exists
-    let trackRecords = [];
+    // Loop through all filtered data (using dataToExport instead of filteredData)
+    dataToExport.forEach((data) => {
+      const employeeInfo = {
+        empID: data.empID || "N/A",
+        empBadgeNo: data.empBadgeNo || "N/A",
+        name: data.name || "N/A",
+        department: Array.isArray(data.department)
+          ? data.department[data.department.length - 1]
+          : data.department || "N/A",
+      };
 
-    try {
-      if (data.traineeTrack && data.traineeTrack.length > 0) {
-        // Parse each traineeTrack item (some might be arrays)
-        data.traineeTrack.forEach((trackItem) => {
-          const parsed = safeParseData(trackItem);
-          if (Array.isArray(parsed)) {
-            trackRecords.push(...parsed);
-          } else {
-            trackRecords.push(parsed);
+      // Parse traineeTrack if it exists
+      let trackRecords = [];
+
+      try {
+        if (data.traineeTrack && data.traineeTrack.length > 0) {
+          // Parse each traineeTrack item (some might be arrays)
+          data.traineeTrack.forEach((trackItem) => {
+            const parsed = safeParseData(trackItem);
+            if (Array.isArray(parsed)) {
+              trackRecords.push(...parsed);
+            } else {
+              trackRecords.push(parsed);
+            }
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing traineeTrack:", e);
+      }
+
+      // If no track records, add one row with basic info
+      if (trackRecords.length === 0) {
+        allRows.push({
+          ...employeeInfo,
+          MRNo: "N/A",
+          medicalName: "N/A",
+          medicalExpiry: "N/A",
+          medicalAppointDate: "N/A",
+          courseCode: "N/A",
+          courseName: "N/A",
+          company: "N/A",
+          traineeSD: "N/A",
+          traineeED: "N/A",
+          traineeStatus: "N/A",
+          traineeCourseFee: "N/A",
+        });
+      } else {
+        // Additional date filtering for individual track records
+        trackRecords.forEach((track) => {
+          const trackStartDate = track.traineeSD
+            ? new Date(track.traineeSD)
+            : null;
+          const trackEndDate = track.traineeED
+            ? new Date(track.traineeED)
+            : null;
+
+          // Check if this track record falls within the selected date range
+          const includeRecord =
+            (!startDate ||
+              (trackStartDate && trackStartDate >= new Date(startDate))) &&
+            (!endDate || (trackEndDate && trackEndDate <= new Date(endDate)));
+
+          if (includeRecord) {
+            allRows.push({
+              ...employeeInfo,
+              MRNo: track.MRNo || "N/A",
+              medicalName: track.medicalName || "N/A",
+              medicalExpiry: formatDate(track.medicalExpiry),
+              medicalAppointDate: formatDate(track.medicalAppointDate),
+              courseCode: track.courseCode || "N/A",
+              courseName: track.courseName || "N/A",
+              company: track.company || "N/A",
+              traineeSD: formatDate(track.traineeSD),
+              traineeED: formatDate(track.traineeED),
+              traineeStatus: track.traineeStatus || "N/A",
+              traineeCourseFee: track.traineeCourseFee || "N/A",
+            });
           }
         });
       }
-    } catch (e) {
-      console.error("Error parsing traineeTrack:", e);
-    }
-
-    // If no track records, add one row with basic info
-    if (trackRecords.length === 0) {
-      allRows.push({
-        ...employeeInfo,
-        MRNo: "N/A",
-        medicalName: "N/A",
-        medicalExpiry: "N/A",
-        medicalAppointDate: "N/A",
-        courseCode: "N/A",
-        courseName: "N/A",
-        company: "N/A",
-        traineeSD: "N/A",
-        traineeED: "N/A",
-        traineeStatus: "N/A",
-        traineeCourseFee: "N/A",
-      });
-    } else {
-      // Additional date filtering for individual track records
-      trackRecords.forEach((track) => {
-        const trackStartDate = track.traineeSD ? new Date(track.traineeSD) : null;
-        const trackEndDate = track.traineeED ? new Date(track.traineeED) : null;
-
-        // Check if this track record falls within the selected date range
-        const includeRecord = 
-          (!startDate || (trackStartDate && trackStartDate >= new Date(startDate))) &&
-          (!endDate || (trackEndDate && trackEndDate <= new Date(endDate)));
-
-        if (includeRecord) {
-          allRows.push({
-            ...employeeInfo,
-            MRNo: track.MRNo || "N/A",
-            medicalName: track.medicalName || "N/A",
-            medicalExpiry: formatDate(track.medicalExpiry),
-            medicalAppointDate: formatDate(track.medicalAppointDate),
-            courseCode: track.courseCode || "N/A",
-            courseName: track.courseName || "N/A",
-            company: track.company || "N/A",
-            traineeSD: formatDate(track.traineeSD),
-            traineeED: formatDate(track.traineeED),
-            traineeStatus: track.traineeStatus || "N/A",
-            traineeCourseFee: track.traineeCourseFee || "N/A",
-          });
-        }
-      });
-    }
-  });
-
-  // Rest of your export function remains the same...
-  console.log("Final data for Excel:", allRows);
-
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet(`${reportTitle}`);
-
-  // Add headers
-  const headerRow = worksheet.addRow(
-    tableColumns.addTraining.map((col) => col.header)
-  );
-
-  // Set column widths
-  worksheet.columns = tableColumns.addTraining.map((col) => ({
-    header: col.header,
-    width: col.header.length < 20 ? 20 : col.header.length,
-  }));
-
-  // Style headers
-  headerRow.eachCell((cell) => {
-    cell.font = { bold: true, size: 12, color: { argb: "f9f9f9" } };
-    cell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "787878" },
-    };
-    cell.alignment = { horizontal: "left" };
-  });
-
-  // Add data rows
-  allRows.forEach((row) => {
-    worksheet.addRow(
-      tableColumns.addTraining.map((col) => row[col.key] || "N/A")
-    );
-  });
-
-  // Generate and download the file
-  workbook.xlsx.writeBuffer().then((buffer) => {
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
-    saveAs(blob, `${reportTitle}.xlsx`);
-  });
-};
+
+    // Rest of your export function remains the same...
+    console.log("Final data for Excel:", allRows);
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(`${reportTitle}`);
+
+    // Add headers
+    const headerRow = worksheet.addRow(
+      tableColumns.addTraining.map((col) => col.header)
+    );
+
+    // Set column widths
+    worksheet.columns = tableColumns.addTraining.map((col) => ({
+      header: col.header,
+      width: col.header.length < 20 ? 20 : col.header.length,
+    }));
+
+    // Style headers
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, size: 12, color: { argb: "f9f9f9" } };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "787878" },
+      };
+      cell.alignment = { horizontal: "left" };
+    });
+
+    // Add data rows
+    allRows.forEach((row) => {
+      worksheet.addRow(
+        tableColumns.addTraining.map((col) => row[col.key] || "N/A")
+      );
+    });
+
+    // Generate and download the file
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, `${reportTitle}.xlsx`);
+    });
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";

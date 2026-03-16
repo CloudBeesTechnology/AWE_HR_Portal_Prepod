@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { DataSupply } from '../../../utils/DataStoredContext';
-import { TrainVT } from './TrainVT';
+import React, { useState, useEffect, useContext } from "react";
+import { useOutletContext } from "react-router-dom";
+import { TrainVT } from "./TrainVT";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 
 export const TableWelding = () => {
   const { tableColumns } = useOutletContext();
-  const { empPIData, WeldeInfo } = useContext(DataSupply);
+
+  const { empPIData, WeldeInfo } = useTrainingData();
 
   const addWelForm = [
     { header: "Employee ID", key: "empID" },
@@ -29,8 +30,8 @@ export const TableWelding = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A"; // Handle empty or invalid date
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
@@ -49,26 +50,25 @@ export const TableWelding = () => {
           })
           .filter(Boolean) // Remove nulls
           .sort((a, b) => a.empID.localeCompare(b.empID));
-        
+
         const updatedData = mergedData.map((data) => ({
           ...data,
-          weldingUpload: Array.isArray(data.weldingUpload) && data.weldingUpload.length > 0
-            ? [data.weldingUpload[data.weldingUpload.length - 1]] // Wrap the last object in an array
-            : "N/A", // If weldingUpload is empty or not an array
+          weldingUpload:
+            Array.isArray(data.weldingUpload) && data.weldingUpload.length > 0
+              ? [data.weldingUpload[data.weldingUpload.length - 1]] // Wrap the last object in an array
+              : "N/A", // If weldingUpload is empty or not an array
           WQExpiry: formatDate(data.WQExpiry),
         }));
-        
-        
-        
+
         // console.log(updatedData);
         setMergeData(updatedData);
         setLoading(false);
       } catch (err) {
-        setError('Error merging data.');
+        setError("Error merging data.");
         setLoading(false);
       }
     } else {
-      setError('Required data is missing.');
+      setError("Required data is missing.");
       setLoading(false);
     }
   }, [empPIData, WeldeInfo]);
@@ -85,7 +85,7 @@ export const TableWelding = () => {
     <div>
       <TrainVT
         mergering={mergeData}
-        columns={tableColumns?.weldingqualifi} 
+        columns={tableColumns?.weldingqualifi}
         popupAll={addWelForm}
       />
     </div>

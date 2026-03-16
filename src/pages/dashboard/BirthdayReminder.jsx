@@ -1,12 +1,11 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { IoPersonCircleOutline } from "react-icons/io5";
-import { DataSupply } from "../../utils/DataStoredContext";
+
 import { VscClose } from "react-icons/vsc";
 import { getUrl } from "@aws-amplify/storage";
 
-export const BirthdayReminder = () => {
-  const { empPIData } = useContext(DataSupply);
+export const BirthdayReminder = ({ empPIData }) => {
   const [birthdays, setBirthdays] = useState([]);
   const [profileImages, setProfileImages] = useState({});
   const [showModal, setShowModal] = useState(false);

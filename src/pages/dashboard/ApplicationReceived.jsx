@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { DataSupply } from "../../utils/DataStoredContext";
 
 const parseDate = (date) => {
@@ -15,9 +15,7 @@ const parseDate = (date) => {
   return isNaN(parsedDate.getTime()) ? null : parsedDate;
 };
 
-export const ApplicationReceived = () => {
-  const { hiringData, empPDData } = useContext(DataSupply);
-
+export const ApplicationReceived = ({ hiringData, empPDData }) => {
   const validData = hiringData?.filter((item) => {
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0); // Normalize time to 00:00:00

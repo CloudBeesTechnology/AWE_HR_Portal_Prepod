@@ -585,16 +585,16 @@ let FONT_AWESOME_BASE64 = null;
 function loadFontAsBase64(url) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.onload = function() {
+    xhr.onload = function () {
       const reader = new FileReader();
-      reader.onloadend = function() {
+      reader.onloadend = function () {
         resolve(reader.result);
       };
       reader.readAsDataURL(xhr.response);
     };
     xhr.onerror = reject;
-    xhr.open('GET', url);
-    xhr.responseType = 'blob';
+    xhr.open("GET", url);
+    xhr.responseType = "blob";
     xhr.send();
   });
 }
@@ -602,7 +602,9 @@ function loadFontAsBase64(url) {
 // Load the font when the worker starts
 (async function loadFontAwesome() {
   try {
-    FONT_AWESOME_BASE64 = await loadFontAsBase64('/fonts/fontawesome-webfont.ttf');
+    FONT_AWESOME_BASE64 = await loadFontAsBase64(
+      "/fonts/fontawesome-webfont.ttf"
+    );
   } catch (error) {
     // console.error('Failed to load Font Awesome:', error);
   }
@@ -1011,8 +1013,9 @@ const generatePDF = async (data) => {
   try {
     // Wait for the font to be loaded
     let attempts = 0;
-    while (!FONT_AWESOME_BASE64 && attempts < 50) { // Wait up to 5 seconds
-      await new Promise(resolve => setTimeout(resolve, 100));
+    while (!FONT_AWESOME_BASE64 && attempts < 50) {
+      // Wait up to 5 seconds
+      await new Promise((resolve) => setTimeout(resolve, 100));
       attempts++;
     }
 
@@ -1047,9 +1050,9 @@ const generatePDF = async (data) => {
     if (FONT_AWESOME_BASE64) {
       try {
         // Extract the base64 data from the data URL
-        const base64Data = FONT_AWESOME_BASE64.split(',')[1];
-        doc.addFileToVFS('fontawesome-webfont.ttf', base64Data);
-        doc.addFont('fontawesome-webfont.ttf', 'FontAwesome', 'normal');
+        const base64Data = FONT_AWESOME_BASE64.split(",")[1];
+        doc.addFileToVFS("fontawesome-webfont.ttf", base64Data);
+        doc.addFont("fontawesome-webfont.ttf", "FontAwesome", "normal");
       } catch (fontError) {
         // console.error('Failed to add Font Awesome to PDF:', fontError);
       }
@@ -1097,46 +1100,44 @@ const generatePDF = async (data) => {
       pageBreak: "auto",
       horizontalPageBreak: false,
       // didDrawCell is called for every cell after it's drawn — we'll draw the checkbox on top if token is present
-        didDrawCell: (hookData) => {
-          try {
-            const cell = hookData.cell;
-            const raw = cell.raw;
-            const text = String(cell.text || "");
+      didDrawCell: (hookData) => {
+        try {
+          const cell = hookData.cell;
+          const raw = cell.raw;
+          const text = String(cell.text || "");
 
-            // Draw checkmark using Font Awesome font when the CHECK_TOKEN is present in the cell
-            if (
-              (raw === CHECK_TOKEN || text === CHECK_TOKEN) &&
-              FONT_AWESOME_BASE64
-            ) {
-              // Save current font and style
-              const originalFont = doc.getFont();
-              const originalSize = doc.getFontSize();
-              
-              // Set Font Awesome font
-              doc.setFont('FontAwesome');
-              doc.setFontSize(8);
-              
-              // Unicode for Font Awesome checkmark is \uf00c
-              const checkmark = '\uf00c';
-              
-              // Center the text in the cell
-              const x = cell.x + (cell.width / 2);
-               const y = cell.y + cell.height / 2; // +2 for better vertical alignment
-             
-              // Draw the checkmark
-              doc.text(checkmark, x, y, { align: 'center', baseline: 'middle' });
-              
-              // Restore original font and style
+          // Draw checkmark using Font Awesome font when the CHECK_TOKEN is present in the cell
+          if (
+            (raw === CHECK_TOKEN || text === CHECK_TOKEN) &&
+            FONT_AWESOME_BASE64
+          ) {
+            // Save current font and style
+            const originalFont = doc.getFont();
+            const originalSize = doc.getFontSize();
+
+            // Set Font Awesome font
+            doc.setFont("FontAwesome");
+            doc.setFontSize(8);
+
+            // Unicode for Font Awesome checkmark is \uf00c
+            const checkmark = "\uf00c";
+
+            // Center the text in the cell
+            const x = cell.x + cell.width / 2;
+            const y = cell.y + cell.height / 2; // +2 for better vertical alignment
+
+            // Draw the checkmark
+            doc.text(checkmark, x, y, { align: "center", baseline: "middle" });
+
+            // Restore original font and style
             //   doc.setFont(originalFont);
             //   doc.setFontSize(originalSize);
-            }
-          } catch (e) {
-            // swallow drawing errors so PDF generation continues
-            // console.log("ERROR : ", e);
           }
-        },
-
-      
+        } catch (e) {
+          // swallow drawing errors so PDF generation continues
+          // console.log("ERROR : ", e);
+        }
+      },
 
       didDrawPage: (data) => {
         // Add footer on every page

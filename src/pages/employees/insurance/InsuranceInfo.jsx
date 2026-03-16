@@ -23,7 +23,8 @@ export const EmployeeInsurance = () => {
   }, []);
 
   const { searchResultData } = useOutletContext();
-  const { EmpInsuranceData, workMenDetails, dropDownVal } = useContext(DataSupply);
+  const { EmpInsuranceData, workMenDetails, dropDownVal, setFetchTableData } =
+    useContext(DataSupply);
 
   const { SubmitMPData } = EmpInsDataFun();
   const { UpdateEIDataSubmit } = UpdateEmpInsDataFun();
@@ -34,6 +35,10 @@ export const EmployeeInsurance = () => {
   const [showTitle, setShowTitle] = useState("");
   const [empStatusTypeValue, setEmpStatusTypeValue] = useState("");
   const [filteredWorkmenCompNo, setFilteredWorkmenCompNo] = useState([]);
+
+  useEffect(() => {
+    setFetchTableData(["EmpInsuranceData", "dropDownVal"]);
+  }, []);
 
   const {
     register,
@@ -53,12 +58,18 @@ export const EmployeeInsurance = () => {
 
   const insuHSDD = dropDownVal[0]?.insuHSDD.map((item) => ({
     value: item,
-    label: item.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "),
+    label: item
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" "),
   }));
 
   const nationalityDD = dropDownVal[0]?.nationalityDD.map((item) => ({
     value: item,
-    label: item.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "),
+    label: item
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" "),
   }));
 
   const otherNationValue = watch("otherNation");
@@ -76,10 +87,28 @@ export const EmployeeInsurance = () => {
     { label: "Marital Status", key: "marital", type: "text" },
     { label: "Nationality", key: "nationality", type: "text" },
     { label: "Other Nationality", key: "otherNation", type: "text" },
-    { label: "Group H&S Insurance", key: "groupIns", type: "select", options: insuHSDD },
-    { label: "Group H&S Insurance Enrollment Effective Date", key: "groupInsEffectDate", type: "date" },
-    { label: "Group H&S Insurance Enrollment End Date", key: "groupInsEndDate", type: "date" },
-    { label: "Travelling Insurance", key: "travelIns", type: "select", options: ["Yes", "No"] },
+    {
+      label: "Group H&S Insurance",
+      key: "groupIns",
+      type: "select",
+      options: insuHSDD,
+    },
+    {
+      label: "Group H&S Insurance Enrollment Effective Date",
+      key: "groupInsEffectDate",
+      type: "date",
+    },
+    {
+      label: "Group H&S Insurance Enrollment End Date",
+      key: "groupInsEndDate",
+      type: "date",
+    },
+    {
+      label: "Travelling Insurance",
+      key: "travelIns",
+      type: "select",
+      options: ["Yes", "No"],
+    },
   ];
 
   // Handle adding a new file input field
@@ -112,7 +141,12 @@ export const EmployeeInsurance = () => {
     }
 
     try {
-      const fileUrl = await uploadDocs(selectedFile, type, setUploadedDocs, index);
+      const fileUrl = await uploadDocs(
+        selectedFile,
+        type,
+        setUploadedDocs,
+        index
+      );
       if (fileUrl) {
         setUploadedDocs((prev) => {
           const updatedUploads = [...prev.empInsUpload];
@@ -126,8 +160,6 @@ export const EmployeeInsurance = () => {
     }
   };
 
-  
-  
   // Parse fetched data and update state
   useEffect(() => {
     if (!searchResultData) return;
@@ -159,7 +191,7 @@ export const EmployeeInsurance = () => {
 
   // Handle form submission
   const onSubmit = async (data) => {
-    const existingEmpInsurance = EmpInsuranceData.find(
+    const existingEmpInsurance = EmpInsuranceData?.find(
       (match) => match.empID === data.empID
     );
 
@@ -200,42 +232,60 @@ export const EmployeeInsurance = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-5 w-full ">
-        {formFields.map(({ label, key, type, options = [], className = "" }) => (
-          <div className="form-group" key={key}>
-            <label className="mb-1 text_size_5">{label}</label>
-            {type === "select" ? (
-              <select {...register(key)} className={`input-field select-custom ${className}`}>
-                <option value="">SELECT</option>
-                {options.map((option) => (
-                  typeof option === "string" ? (
-                    <option key={option} value={option.toUpperCase()}>{option.toUpperCase()}</option>
-                  ) : (
-                    <option key={option.value} value={option.value.toUpperCase()}>{option.label.toUpperCase()}</option>
-                  )
-                ))}
-              </select>
-            ) : key === "otherNation" ? (
-              <input
-                type={type}
-                {...register(key)}
-                className={`input-field ${className}`}
-                value={otherNationValue || "N/A"}
-              />
-            ) : (
-              <input
-                type={type}
-                {...register(key)}
-                className={`input-field ${className}`}
-              />
-            )}
-            {errors[key] && <p className="text-[red] text-[13px] mt-1">{errors[key]?.message}</p>}
-          </div>
-        ))}
+        {formFields.map(
+          ({ label, key, type, options = [], className = "" }) => (
+            <div className="form-group" key={key}>
+              <label className="mb-1 text_size_5">{label}</label>
+              {type === "select" ? (
+                <select
+                  {...register(key)}
+                  className={`input-field select-custom ${className}`}
+                >
+                  <option value="">SELECT</option>
+                  {options.map((option) =>
+                    typeof option === "string" ? (
+                      <option key={option} value={option.toUpperCase()}>
+                        {option.toUpperCase()}
+                      </option>
+                    ) : (
+                      <option
+                        key={option.value}
+                        value={option.value.toUpperCase()}
+                      >
+                        {option.label.toUpperCase()}
+                      </option>
+                    )
+                  )}
+                </select>
+              ) : key === "otherNation" ? (
+                <input
+                  type={type}
+                  {...register(key)}
+                  className={`input-field ${className}`}
+                  value={otherNationValue || "N/A"}
+                />
+              ) : (
+                <input
+                  type={type}
+                  {...register(key)}
+                  className={`input-field ${className}`}
+                />
+              )}
+              {errors[key] && (
+                <p className="text-[red] text-[13px] mt-1">
+                  {errors[key]?.message}
+                </p>
+              )}
+            </div>
+          )
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-5 mt-5">
         <div className="form-group">
-          <label className="mb-1 text_size_5">Workmen Compensation Insurance</label>
+          <label className="mb-1 text_size_5">
+            Workmen Compensation Insurance
+          </label>
           <select
             {...register("empStatusType")}
             className="input-field select-custom "
@@ -252,7 +302,9 @@ export const EmployeeInsurance = () => {
         </div>
 
         <div className="form-group">
-          <label className="mb-1 text_size_5">Workmen Compensation Policy Number</label>
+          <label className="mb-1 text_size_5">
+            Workmen Compensation Policy Number
+          </label>
           <select
             {...register("workmenCompNo")}
             className="input-field select-custom "
@@ -270,7 +322,9 @@ export const EmployeeInsurance = () => {
 
       <div className="grid grid-cols-2 gap-5 mt-5 ">
         <div>
-          <label className="block text_size_5">Personal Accident Insurance</label>
+          <label className="block text_size_5">
+            Personal Accident Insurance
+          </label>
           <select
             className="input-field select-custom"
             {...register("accidentIns")}
@@ -348,5 +402,3 @@ export const EmployeeInsurance = () => {
     </form>
   );
 };
-
-

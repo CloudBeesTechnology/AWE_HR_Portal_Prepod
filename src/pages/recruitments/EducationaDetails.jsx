@@ -1,21 +1,21 @@
-import { useEffect, useContext } from "react";
+import { useEffect } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FaRegMinusSquare } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
-import { EducationSchema } from "../../services/Validation"; 
+import { EducationSchema } from "../../services/Validation";
 import { useLocation, useNavigate } from "react-router-dom";
-import { DataSupply } from "../../utils/DataStoredContext";
 import { useTempID } from "../../utils/TempIDContext";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 
 export const EducationDetails = ({ fetchedData }) => {
   const { tempID } = useTempID();
-  const { educDetailsData } = useContext(DataSupply);
+  const { educDetailsData } = useRecruitmentsData();
   const location = useLocation();
   const navigatingPersonalData = location.state?.FormData;
 
   useEffect(() => {
-    window.scrollTo({ 
+    window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
@@ -29,7 +29,7 @@ export const EducationDetails = ({ fetchedData }) => {
     watch,
   } = useForm({
     resolver: yupResolver(EducationSchema),
-    
+
     defaultValues: {
       referees: [{ name: "", address: "", phoneNumber: "", profession: "" }],
       relatives: [{ name: "", positionHeld: "", relationship: "" }],
@@ -100,9 +100,7 @@ export const EducationDetails = ({ fetchedData }) => {
     });
   };
 
-  
   const handleAddReferee = () => {
- 
     appendCharacterReferee({
       name: "",
       address: "",
@@ -113,7 +111,6 @@ export const EducationDetails = ({ fetchedData }) => {
   };
 
   const handleAddRelative = () => {
-
     appendRelative({
       name: "",
       positionHeld: "",
@@ -123,75 +120,86 @@ export const EducationDetails = ({ fetchedData }) => {
   };
 
   useEffect(() => {
-
     const savedData = JSON.parse(localStorage.getItem("educationFormData"));
     if (savedData) {
       Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
     }
-  
+
     const handleBeforeUnload = () => {
       localStorage.removeItem("educationFormData");
     };
-  
+
     window.addEventListener("beforeunload", handleBeforeUnload);
-  
+
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [location, setValue]); 
+  }, [location, setValue]);
 
   const onSubmit = (data) => {
- 
     const navigatingEduData = {
       ...data,
       ...navigatingPersonalData,
     };
 
     // console.log("Step 3", navigatingEduData);
-    
 
-    localStorage.setItem("educationFormData", JSON.stringify(navigatingEduData));
-    
+    localStorage.setItem(
+      "educationFormData",
+      JSON.stringify(navigatingEduData)
+    );
+
     navigate("/addCandidates/otherDetails", {
       state: { FormData: navigatingEduData },
-    }); 
-
+    });
   };
-
 
   useEffect(() => {
     const parseDetails = (data) => {
       try {
-        let cleanedData = data.replace(/\\/g, ""); 
-        cleanedData = cleanedData.replace(/'/g, '"'); 
-        cleanedData = cleanedData.replace(/([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g, '$1"$3":'); 
-        cleanedData = cleanedData.replace(/:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g, ':"$1"'); 
+        let cleanedData = data.replace(/\\/g, "");
+        cleanedData = cleanedData.replace(/'/g, '"');
+        cleanedData = cleanedData.replace(
+          /([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g,
+          '$1"$3":'
+        );
+        cleanedData = cleanedData.replace(
+          /:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g,
+          ':"$1"'
+        );
         if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
-          cleanedData = cleanedData.slice(1, -1); 
+          cleanedData = cleanedData.slice(1, -1);
         }
-  
+
         const parsedData = JSON.parse(cleanedData);
-  
+
         if (!Array.isArray(parsedData)) {
           return [];
         }
-  
+
         return parsedData;
       } catch (error) {
         console.error("Error parsing details:", error);
         return [];
       }
     };
-  
+
     if (tempID) {
       if (educDetailsData.length > 0) {
-        const interviewData = educDetailsData.find((data) => data.tempID === tempID);
-        if (interviewData) {   
+        const interviewData = educDetailsData.find(
+          (data) => data.tempID === tempID
+        );
+        if (interviewData) {
           Object.keys(interviewData).forEach((key) => {
-          
-            if (key === "emgDetails" || key === "referees" || key === "relatives") {
-              if (Array.isArray(interviewData[key]) && typeof interviewData[key][0] === "string") {
-      
+            if (
+              key === "emgDetails" ||
+              key === "referees" ||
+              key === "relatives"
+            ) {
+              if (
+                Array.isArray(interviewData[key]) &&
+                typeof interviewData[key][0] === "string"
+              ) {
                 let parsedData = parseDetails(interviewData[key][0]);
                 if (parsedData.length > 0) {
                   setValue(key, parsedData);
@@ -207,13 +215,12 @@ export const EducationDetails = ({ fetchedData }) => {
           // console.log("No interview data found for tempID:", tempID);
         }
       }
-    } 
+    }
   }, [tempID, setValue, educDetailsData]);
-   
+
   // console.log("educ",educDetailsData)
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="">
-   
       <div className="relative mt-10">
         <label className="text_size_6 mb-3">
           Characters Referees{" "}
@@ -270,7 +277,7 @@ export const EducationDetails = ({ fetchedData }) => {
             {referee.isNew && (
               <button
                 type="button"
-                onClick={() => removeCharacterReferee(index)} 
+                onClick={() => removeCharacterReferee(index)}
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
                 <FaRegMinusSquare />
@@ -280,10 +287,10 @@ export const EducationDetails = ({ fetchedData }) => {
         ))}
         <button
           type="button"
-          onClick={handleAddReferee} 
+          onClick={handleAddReferee}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <CiSquarePlus /> 
+          <CiSquarePlus />
         </button>
       </div>
 
@@ -292,7 +299,6 @@ export const EducationDetails = ({ fetchedData }) => {
           Relatives Employed by the company
         </label>
         {relatives.map((relative, index) => (
-          
           <div key={relative.id} className="grid grid-cols-3 gap-4 mb-7">
             <Controller
               name={`relatives.${index}.name`}
@@ -331,10 +337,10 @@ export const EducationDetails = ({ fetchedData }) => {
             {relative.isNew && (
               <button
                 type="button"
-                onClick={() => removeRelative(index)} 
+                onClick={() => removeRelative(index)}
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <FaRegMinusSquare /> 
+                <FaRegMinusSquare />
               </button>
             )}
           </div>
@@ -348,7 +354,6 @@ export const EducationDetails = ({ fetchedData }) => {
         </button>
       </div>
 
-    
       <div>
         <label className="text_size_6 mb-3">
           Brief Description of Present Duties
@@ -439,7 +444,7 @@ export const EducationDetails = ({ fetchedData }) => {
                       {errors.emgDetails[index].phoneNumber.message}
                     </p>
                   )}
-                </div> 
+                </div>
               )}
             />
             <Controller
@@ -463,10 +468,10 @@ export const EducationDetails = ({ fetchedData }) => {
             {emergency.isNew && (
               <button
                 type="button"
-                onClick={() => removeEmergency(index)} 
+                onClick={() => removeEmergency(index)}
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <FaRegMinusSquare /> 
+                <FaRegMinusSquare />
               </button>
             )}
           </div>
@@ -479,7 +484,6 @@ export const EducationDetails = ({ fetchedData }) => {
           <CiSquarePlus />
         </button>
       </div>
-
 
       {[
         {
@@ -544,7 +548,7 @@ export const EducationDetails = ({ fetchedData }) => {
                     className={`w-[450px] mt-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded ${
                       errors[`${section.field}Desc`] ? "border-red-500" : ""
                     }`}
-                    disabled={watch(section.field) !== "yes"} 
+                    disabled={watch(section.field) !== "yes"}
                   />
                 )}
               />

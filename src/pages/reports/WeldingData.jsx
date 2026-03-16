@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { FilterTable } from './FilterTable';
+import React, { useEffect, useState } from "react";
+import { FilterTable } from "./FilterTable";
 
 export const WeldingData = ({ allData, typeOfReport, reportTitle }) => {
   const [tableBody, setTableBody] = useState([]);
@@ -19,7 +19,7 @@ export const WeldingData = ({ allData, typeOfReport, reportTitle }) => {
     "Thickness Range",
     "Diameter Range",
     "Welding Qualification Expiry",
-    "Remarks for Welding Qualification"
+    "Remarks for Welding Qualification",
   ]);
 
   const formatDate = (date, type) => {
@@ -42,7 +42,7 @@ export const WeldingData = ({ allData, typeOfReport, reportTitle }) => {
 
   const resignationMergedData = (data) => {
     return data
-      .filter((item) => item.WQExpiry) 
+      .filter((item) => item.WQExpiry)
       .map((item) => ({
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
@@ -62,7 +62,6 @@ export const WeldingData = ({ allData, typeOfReport, reportTitle }) => {
         WQRemarks: item.WQRemarks || "-",
       }));
   };
-  
 
   useEffect(() => {
     setTableBody(resignationMergedData(allData));
@@ -70,7 +69,12 @@ export const WeldingData = ({ allData, typeOfReport, reportTitle }) => {
 
   return (
     <div>
-      <FilterTable tableBody={tableBody} tableHead={tableHead} typeOfReport={typeOfReport} reportTitle={reportTitle} />
+      <FilterTable
+        tableBody={tableBody}
+        tableHead={tableHead}
+        typeOfReport={typeOfReport}
+        reportTitle={reportTitle}
+      />
     </div>
   );
 };

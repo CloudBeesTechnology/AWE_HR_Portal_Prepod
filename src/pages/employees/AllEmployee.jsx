@@ -29,6 +29,7 @@ export const AllEmployee = () => {
     SawpDetails,
     insuranceClaimsData,
     candyToEmp,
+    setFetchTableData,
   } = useContext(DataSupply);
 
   const [mergeData, setMergeData] = useState([]);
@@ -44,6 +45,31 @@ export const AllEmployee = () => {
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [paginatedData, setPaginatedData] = useState([]);
   const [data, setData] = useState([]);
+
+  useEffect(() => {
+    setFetchTableData([
+      "userData",
+      "empLeaveStatusData",
+      "educDetailsData",
+      "empPDData",
+      "empPIData",
+      "IDData",
+      "workInfoData",
+      "terminateData",
+      "leaveDetailsData",
+      "SRData",
+      "DNData",
+      "BJLData",
+      "PPValidsData",
+      "LMIData",
+      "EmpInsuranceData",
+      "depInsuranceData",
+      "NLAData",
+      "SawpDetails",
+      "insuranceClaimsData",
+      "candyToEmp",
+    ]);
+  }, []);
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();

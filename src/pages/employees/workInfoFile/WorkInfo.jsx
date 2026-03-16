@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, useOutletContext } from "react-router-dom";
@@ -10,8 +10,8 @@ import { WorkInfoFunc } from "../../../services/createMethod/WorkInfoFunc";
 import { WorkDataPass } from "../../employees/WorkDataPass";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { FormField } from "../../../utils/FormField";
-import { DataSupply } from "../../../utils/DataStoredContext";
-import {leavePassDD,workInfoUploads} from "../../../utils/DropDownMenus";
+
+import { leavePassDD, workInfoUploads } from "../../../utils/DropDownMenus";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { MdCancel } from "react-icons/md";
 import { UploadingFiles } from "../../employees/medicalDep/FileUploadField";
@@ -29,6 +29,15 @@ import { CreateSRData } from "../../../services/createMethod/CreateSRData";
 import { DeleteDocsWI } from "../../../services/uploadDocsDelete/DeleteDocsWI";
 import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../utils/DeletePopup";
+import { generateClient } from "@aws-amplify/api";
+import {
+  listEmpLeaveDetails,
+  listEmpPersonalInfos,
+  listEmpWorkInfos,
+  listKeyValueStores,
+  listServiceRecords,
+  listTerminationInfos,
+} from "../../../graphql/queries";
 
 export const WorkInfo = () => {
   const { formattedPermissions } = useDeleteAccess();
@@ -40,19 +49,16 @@ export const WorkInfo = () => {
   const { SRDataValue } = CreateSRData();
   const { LeaveDataValue } = CreateLeaveData();
   const { TerminateDataValue } = CreateTerminate();
-  
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  const client = generateClient();
 
-  const {
-    empPIData,
-    terminateData,
-    workInfoData,
-    leaveDetailsData,
-    SRData,
-    dropDownVal,
-  } = useContext(DataSupply);
+  const [dataState, setDataState] = useState({
+    empPIData: [],
+    terminateData: [],
+    workInfoData: [],
+    leaveDetailsData: [],
+    SRData: [],
+    dropDownVal: [],
+  });
 
   const {
     register,
@@ -100,6 +106,67 @@ export const WorkInfo = () => {
     otherDeparment: "",
     // Add other fields here if needed
   });
+
+  const {
+    empPIData,
+    terminateData,
+    workInfoData,
+    leaveDetailsData,
+    SRData,
+    dropDownVal,
+  } = dataState;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const queries = [
+          { query: listEmpPersonalInfos, key: "empPIData" },
+          { query: listTerminationInfos, key: "terminateData" },
+          { query: listEmpWorkInfos, key: "workInfoData" },
+          { query: listEmpLeaveDetails, key: "leaveDetailsData" },
+          { query: listServiceRecords, key: "SRData" },
+          { query: listKeyValueStores, key: "dropDownVal" },
+        ];
+
+        const responses = await Promise.all(
+          queries?.map(async ({ query, key }) => {
+            let allItems = [];
+            let nextToken = null;
+
+            do {
+              const response = await client.graphql({
+                query,
+                variables: { limit: 100, nextToken },
+              });
+
+              const dataKey = Object.keys(response.data)[0];
+              const items = response.data[dataKey]?.items || [];
+
+              allItems = [...allItems, ...items];
+              nextToken = response.data[dataKey]?.nextToken;
+            } while (nextToken);
+
+            return { key, items: allItems };
+          })
+        );
+
+        const newData = responses.reduce((acc, { key, items }) => {
+          acc[key] = items;
+          return acc;
+        }, {});
+
+        setDataState((prev) => ({ ...prev, ...newData }));
+      } catch (error) {
+        console.error("Data Fetch Error:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -163,18 +230,18 @@ export const WorkInfo = () => {
     const fetchData = async () => {
       try {
         const mergedData = empPIData
-          .map((emp) => {
+          ?.map((emp) => {
             const WIDetails = workInfoData
-              ? workInfoData.find((user) => user.empID === emp.empID)
+              ? workInfoData?.find((user) => user.empID === emp.empID)
               : {};
             const TDetails = terminateData
-              ? terminateData.find((user) => user.empID === emp.empID)
+              ? terminateData?.find((user) => user.empID === emp.empID)
               : {};
             const LDDetails = leaveDetailsData
-              ? leaveDetailsData.find((user) => user.empID === emp.empID)
+              ? leaveDetailsData?.find((user) => user.empID === emp.empID)
               : {};
             const SRDetails = SRData
-              ? SRData.find((user) => user.empID === emp.empID)
+              ? SRData?.find((user) => user.empID === emp.empID)
               : {};
 
             return {
@@ -208,9 +275,9 @@ export const WorkInfo = () => {
   const handleFileChange = async (e, label) => {
     const watchedEmpID = watch("empID");
     if (!watchedEmpID) {
-        alert("Please enter the Employee ID before uploading files.");
-        window.location.href = "/employeeInfo";
-        return;
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
     }
 
     const selectedFile = e.target.files[0];
@@ -223,15 +290,15 @@ export const WorkInfo = () => {
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
 
     // Ensure no duplicate files are added
     const currentFiles = watch(label) || [];
     if (currentFiles?.some((file) => file.name === selectedFile.name)) {
-        alert("This file has already been uploaded.");
-        return;
+      alert("This file has already been uploaded.");
+      return;
     }
 
     // **Check if the file was previously deleted and prevent re-adding**
@@ -250,7 +317,7 @@ export const WorkInfo = () => {
         [label]: selectedFile.name,
       }));
     } catch (err) {
-        console.error(err);
+      console.error(err);
     }
   };
 
@@ -286,14 +353,10 @@ export const WorkInfo = () => {
         );
         return;
       }
-      setdeleteTitle1(
-        `${fileName}`
-      );
+      setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
       // console.log(`Deleted "${fileName}". Remaining files:`);
-      setdeleteTitle1(
-        `${fileName}`
-      );
+      setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -314,22 +377,20 @@ export const WorkInfo = () => {
     }
     return typeof value === "string" ? value.trim().toUpperCase() : null;
   };
- 
 
   const searchResult = (result) => {
-    if (result){
-      setTrackEmpID(true)
+    if (result) {
+      setTrackEmpID(true);
     }
 
     const fieldValue = ["empID"];
 
-fieldValue.forEach((val) => {
-  const data = result[val];
+    fieldValue.forEach((val) => {
+      const data = result[val];
 
-  // Ensure the data is a string before setting the value
-  setValue(val, typeof data === "string" ? data : "");
-});
-    
+      // Ensure the data is a string before setting the value
+      setValue(val, typeof data === "string" ? data : "");
+    });
 
     const keysToSet = [
       // "empID",
@@ -370,13 +431,12 @@ fieldValue.forEach((val) => {
         result[key] !== undefined && result[key] !== null
           ? result[key].toString().trim().toUpperCase()
           : "";
-      
-      const toTitleCase = (input) =>
-        input
-          // .toLowerCase()
-          // .split(" ")
-          // .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          // .join(" ");
+
+      const toTitleCase = (input) => input;
+      // .toLowerCase()
+      // .split(" ")
+      // .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      // .join(" ");
 
       let value = toTitleCase(rawValue);
 
@@ -441,7 +501,7 @@ fieldValue.forEach((val) => {
       setValue(field, getArrayDateValue(valueToSet)); // Use getArrayDateValue for all fields
     });
     // console.log("key",arrayDateField);
-// console.log("res",result);
+    // console.log("res",result);
 
     setValue("hr", "Hr-notification@adininworks.com");
 
@@ -459,7 +519,7 @@ fieldValue.forEach((val) => {
     ];
 
     // Handle file uploads
-     uploadFields.forEach((field) => {
+    uploadFields.forEach((field) => {
       if (result[field]) {
         try {
           const rawArrayString = result[field][0]; // Access the first element of the array
@@ -498,21 +558,31 @@ fieldValue.forEach((val) => {
 
   const onSubmit = async (data) => {
     try {
-      const checkingPITable = empPIData?.find((match) => match.empID === data.empID) || null;
-      const terminateDataRecord = terminateData?.find((match) => match.empID === data.empID) || null;
-      const workInfoDataRecord = workInfoData?.find((match) => match.empID === data.empID) || null;
-      const leaveDetailsDataRecord = leaveDetailsData?.find((match) => match.empID === data.empID) || null;
-      const SRDataRecord = SRData?.find((match) => match.empID === data.empID) || null;
-  
+      const checkingPITable =
+        empPIData?.find((match) => match.empID === data.empID) || null;
+      const terminateDataRecord =
+        terminateData?.find((match) => match.empID === data.empID) || null;
+      const workInfoDataRecord =
+        workInfoData?.find((match) => match.empID === data.empID) || null;
+      const leaveDetailsDataRecord =
+        leaveDetailsData?.find((match) => match.empID === data.empID) || null;
+      const SRDataRecord =
+        SRData?.find((match) => match.empID === data.empID) || null;
+
       const today = new Date().toISOString().split("T")[0];
-  
+
       // ===== SR Data =====
       if (SRDataRecord) {
-        const previous = SRDataRecord.updatedBy ? JSON.parse(SRDataRecord.updatedBy) : [];
-        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+        const previous = SRDataRecord.updatedBy
+          ? JSON.parse(SRDataRecord.updatedBy)
+          : [];
+        const updatedBy = JSON.stringify([
+          ...previous,
+          { userID: userType, date: today },
+        ]);
         const SRUpValue = {
           ...data,
-          SRDataRecord:SRDataRecord,
+          SRDataRecord: SRDataRecord,
           uploadPR: JSON.stringify(nameServiceUp.uploadPR),
           uploadSP: JSON.stringify(nameServiceUp.uploadSP),
           uploadLP: JSON.stringify(nameServiceUp.uploadLP),
@@ -535,11 +605,16 @@ fieldValue.forEach((val) => {
         };
         await SRDataValue({ SRValue });
       }
-  
+
       // ===== Leave Details =====
       if (leaveDetailsDataRecord) {
-        const previous = leaveDetailsDataRecord.updatedBy ? JSON.parse(leaveDetailsDataRecord.updatedBy) : [];
-        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+        const previous = leaveDetailsDataRecord.updatedBy
+          ? JSON.parse(leaveDetailsDataRecord.updatedBy)
+          : [];
+        const updatedBy = JSON.stringify([
+          ...previous,
+          { userID: userType, date: today },
+        ]);
         const LeaveUpValue = {
           ...data,
           leaveDetailsDataRecord: leaveDetailsDataRecord,
@@ -556,15 +631,20 @@ fieldValue.forEach((val) => {
         };
         await LeaveDataValue({ LeaveValue });
       }
-  
+
       // ===== Work Info =====
       if (workInfoDataRecord) {
-        const previous = workInfoDataRecord.updatedBy ? JSON.parse(workInfoDataRecord.updatedBy) : [];
-        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+        const previous = workInfoDataRecord.updatedBy
+          ? JSON.parse(workInfoDataRecord.updatedBy)
+          : [];
+        const updatedBy = JSON.stringify([
+          ...previous,
+          { userID: userType, date: today },
+        ]);
         const workInfoUpValue = {
           ...data,
           sapNo: checkingPITable?.sapNo,
-          workInfoDataRecord:workInfoDataRecord,
+          workInfoDataRecord: workInfoDataRecord,
           updatedBy,
         };
         await WIUpdateData({ workInfoUpValue });
@@ -577,14 +657,19 @@ fieldValue.forEach((val) => {
         };
         await SubmitWIData({ workInfoValue });
       }
-  
+
       // ===== Terminate Data =====
       if (terminateDataRecord) {
-        const previous = terminateDataRecord.updatedBy ? JSON.parse(terminateDataRecord.updatedBy) : [];
-        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+        const previous = terminateDataRecord.updatedBy
+          ? JSON.parse(terminateDataRecord.updatedBy)
+          : [];
+        const updatedBy = JSON.stringify([
+          ...previous,
+          { userID: userType, date: today },
+        ]);
         const TerminateUpValue = {
           ...data,
-          terminateDataRecord:terminateDataRecord,
+          terminateDataRecord: terminateDataRecord,
           WIContract: JSON.stringify(nameServiceUp.WIContract),
           WIProbation: JSON.stringify(nameServiceUp.WIProbation),
           WIResignation: JSON.stringify(nameServiceUp.WIResignation),
@@ -614,11 +699,9 @@ fieldValue.forEach((val) => {
     }
   };
 
-  const requiredPermissions = [
-    "Work Info",
-  ];
+  const requiredPermissions = ["Work Info"];
 
-  const access = "Employee"
+  const access = "Employee";
 
   return (
     <section
@@ -672,7 +755,7 @@ fieldValue.forEach((val) => {
           dropDownVal={dropDownVal}
         />
 
-<div className="grid grid-cols-3 gap-5 form-group mt-5">
+        <div className="grid grid-cols-3 gap-5 form-group mt-5">
           {workFields.map((field, index) => (
             <div key={index} className="form-group">
               <label className="mb-1 text_size_5">{field.label}</label>
@@ -935,16 +1018,17 @@ fieldValue.forEach((val) => {
                             >
                               {fileName}
                               {formattedPermissions?.deleteAccess?.Employee?.includes(
-                              "Work Info") && (
-                              <button
-                                type="button"
-                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                                onClick={() =>
-                                  deleteFile(field.title, fileName)
-                                }
-                              >
-                                <MdCancel />
-                              </button>
+                                "Work Info"
+                              ) && (
+                                <button
+                                  type="button"
+                                  className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                  onClick={() =>
+                                    deleteFile(field.title, fileName)
+                                  }
+                                >
+                                  <MdCancel />
+                                </button>
                               )}
                             </span>
                           ))
@@ -1046,12 +1130,9 @@ fieldValue.forEach((val) => {
           path="/workInfo"
         />
       )}
-       {deletePopup && (
-                          <DeletePopup
-                            handleDeleteMsg={handleDeleteMsg}
-                            title1={deleteTitle1}
-                          />
-                        )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
+      )}
     </section>
   );
 };

@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect, useContext } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { DataSupply } from "../../../utils/DataStoredContext";
+import { useRecruitmentsData } from "../../../context/recruitments/RecruitmentsContext";
 export const SearchNonLocalCandy = ({
   allEmpDetails,
   searchUserList,
@@ -12,7 +12,7 @@ export const SearchNonLocalCandy = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
-  const { IVSSDetails, empPDData } = useContext(DataSupply);
+  const { IVSSDetails, empPDData } = useRecruitmentsData();
 
   useEffect(() => {
     setSearchQuery("");

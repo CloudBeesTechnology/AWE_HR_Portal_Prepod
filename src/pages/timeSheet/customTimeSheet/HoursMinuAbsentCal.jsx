@@ -34,7 +34,7 @@ export const HoursMinuAbsentCal = () => {
           lastIndexOfNWHPD === 8 &&
           lastIndexOfNWHPM === 24;
 
-        const xPattern = /^x\((\d+(\.\d+)?)\)(\d+(\.\d+)?)$/;
+        const xPattern = /^x\((\d+(\.\d+)?)\)(\d+(\.\d+)?)$/i;
         const xMatch = value?.match(xPattern);
         if (xMatch && findStaffLevelEmp) {
           const hours = parseFloat(xMatch[3]);
@@ -55,7 +55,7 @@ export const HoursMinuAbsentCal = () => {
           // continue;
         }
 
-        const halPattern = /^H[A-Z]*\d+$/;
+        const halPattern = /^H[A-Z]*\d+$/i;
         if (value?.match(halPattern) && findStaffLevelEmp) {
           const hours = parseFloat(value.replace(/[^0-9]/g, ""));
           totalStaffLevelEmpWorkHrs += 0;
@@ -117,7 +117,7 @@ export const HoursMinuAbsentCal = () => {
           lastIndexOfNWHPD === 8 &&
           lastIndexOfNWHPM === 24;
 
-        const xPattern = /^x\((\d+(\.\d+)?)\)(\d+(\.\d+)?)$/;
+        const xPattern = /^x\((\d+(\.\d+)?)\)(\d+(\.\d+)?)$/i;
         const xMatch = value?.match(xPattern);
         if (xMatch) {
           const hours = parseFloat(xMatch[3]);
@@ -131,7 +131,7 @@ export const HoursMinuAbsentCal = () => {
           continue;
         }
 
-        const halPattern = /^H[A-Z]*\d+$/;
+        const halPattern = /^H[A-Z]*\d+$/i;
         if (value?.match(halPattern) && findStaffLevelEmp) {
           const hours = parseFloat(value.replace(/[^0-9]/g, ""));
           totalHours += 0;

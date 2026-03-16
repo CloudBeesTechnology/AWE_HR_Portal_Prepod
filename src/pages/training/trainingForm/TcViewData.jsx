@@ -1,12 +1,13 @@
 import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import { DataSupply } from "../../../utils/DataStoredContext";
 import { FaArrowLeft } from "react-icons/fa6";
 import { CertifyTable } from "../TableTraining/CertifyTable";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 
 export const TcViewData = () => {
   const { empPIData, trainingCertifi, AddEmpReq, workInfoData } =
-    useContext(DataSupply);
+    useTrainingData();
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 

@@ -1,15 +1,15 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Table } from "../../utils/Table";
 import { IoSearch } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { DataSupply } from "../../utils/DataStoredContext";
 import { SearchLocalCandy } from "./Search/SearchLocalCandy";
 import { useTempID } from "../../utils/TempIDContext";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../utils/DeletePopup";
 import { CandyDelete } from "../../services/deleteMethod/CandyDelete";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 
 export const Localcandi = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,7 +23,7 @@ export const Localcandi = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
-  const { empPDData, IVSSDetails, educDetailsData } = useContext(DataSupply);
+  const { empPDData, IVSSDetails, educDetailsData } = useRecruitmentsData();
   const { setTempID } = useTempID();
   const navigate = useNavigate();
   const [editingData, setEditingData] = useState([]);
@@ -60,42 +60,41 @@ export const Localcandi = () => {
   // };
   // const handleDeleteClick = () => {
   //   console.log('Selected Rows before filtering:', selectedRows);
-    
+
   //   const remainingCandidates = filteredData.filter(
   //     (candidate) => !selectedRows.includes(candidate.sno)
   //   );
-    
+
   //   console.log('Remaining Candidates:', remainingCandidates);
-    
+
   //   setSelectedRows([]);
   //   console.log('Selected Rows after clearing:', selectedRows);
   // };
 
-
   // const handleDeleteClick = () => {
   //   console.log('Selected Rows before filtering:', selectedRows);
-    
+
   //   // Extract the objects from filteredData using the selected row indices
   //   const selectedObjects = selectedRows.map(index => filteredData[index]);
-  
+
   //   const selectedTempID = selectedObjects.tempID;
   //   const eduTempID = educDetailsData.filter((item) => {
   //     item.tempID === selectedTempID
   //   })
   //   console.log('Selected Objects:', selectedObjects);  // This will show the objects corresponding to the selected rows
-    
+
   //   // Filter out the candidates from filteredData by checking if the index is not in selectedRows
   //   const remainingCandidates = filteredData.filter((_, index) => !selectedRows.includes(index));
-    
+
   //   console.log('Remaining Candidates:', remainingCandidates);
-    
+
   //   // Clear the selected rows
   //   // setSelectedRows([]);
-    
+
   //   // Log the state of selected rows after clearing (it won't show the updated value immediately due to async state update)
   //   console.log('Selected Rows after clearing:', selectedRows);
   // };
-  
+
   // const handleDeleteMsg = () => {
   //   setdeletePopup(!deletePopup);
   // };
@@ -104,29 +103,32 @@ export const Localcandi = () => {
   //   setdeleteConfirm(!deleteConfirm);
   // };
 
-
   const handleDeleteClick = () => {
     // console.log('Selected Rows before filtering:', selectedRows);
-  
-    const selectedObjects = selectedRows.map(index => filteredData[index]);
-  
+
+    const selectedObjects = selectedRows.map((index) => filteredData[index]);
+
     // console.log('Selected Objects:', selectedObjects);
-  
-    const selectedTempIDs = selectedObjects.map(obj => obj.tempID);
-  
-    const eduTempIDs = educDetailsData.filter((item) => selectedTempIDs.includes(item.tempID));
-  
+
+    const selectedTempIDs = selectedObjects.map((obj) => obj.tempID);
+
+    const eduTempIDs = educDetailsData.filter((item) =>
+      selectedTempIDs.includes(item.tempID)
+    );
+
     // console.log('Matching Objects from educDetailsData:', eduTempIDs);
-  
-    const remainingCandidates = filteredData.filter((_, index) => !selectedRows.includes(index));
-  
+
+    const remainingCandidates = filteredData.filter(
+      (_, index) => !selectedRows.includes(index)
+    );
+
     // console.log('Remaining Candidates:', remainingCandidates);
-  
+
     setSelectedRows([]);
-  
+
     // console.log('Selected Rows after clearing:', selectedRows);
   };
-  
+
   const handleRowSelect = (updatedSelectedRows) => {
     setSelectedRows(updatedSelectedRows);
   };

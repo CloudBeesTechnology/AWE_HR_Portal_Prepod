@@ -1,13 +1,15 @@
 import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import { DataSupply } from "../../../utils/DataStoredContext";
 import { FaArrowLeft } from "react-icons/fa6";
 import { CertifyTable } from "../TableTraining/CertifyTable";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 
 export const OMEDataCertify = () => {
   // const { tableColumns } = useOutletContext();
+
   const { empPIData, trainingCertifi, AddEmpReq, workInfoData } =
-    useContext(DataSupply);
+    useTrainingData();
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [mergeData, setMergeData] = useState([]);
@@ -182,88 +184,88 @@ export const OMEDataCertify = () => {
     }
   };
 
- const finalData = filteredData
-  .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
-  .map((data) => {
-    let certifiExpiry = "N/A";
-    let eCertifiDate = "N/A";
-    let orgiCertifiDate = "N/A";
-    let poNo = "N/A";
-    let traineeSD = "N/A";
-    let traineeED = "N/A";
+  const finalData = filteredData
+    .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
+    .map((data) => {
+      let certifiExpiry = "N/A";
+      let eCertifiDate = "N/A";
+      let orgiCertifiDate = "N/A";
+      let poNo = "N/A";
+      let traineeSD = "N/A";
+      let traineeED = "N/A";
 
-    try {
-      if (data.trainingProof && data.trainingProof) {
-        const proof = safeParseData(data.trainingProof);
+      try {
+        if (data.trainingProof && data.trainingProof) {
+          const proof = safeParseData(data.trainingProof);
 
-        let lastProof = proof;
+          let lastProof = proof;
 
-        if (Array.isArray(proof)) {
-          lastProof = proof[proof.length - 1];
+          if (Array.isArray(proof)) {
+            lastProof = proof[proof.length - 1];
+          }
+
+          if (lastProof) {
+            certifiExpiry = lastProof.certifiExpiry
+              ? formatDate(lastProof.certifiExpiry)
+              : "N/A";
+            eCertifiDate = lastProof.eCertifiDate
+              ? formatDate(lastProof.eCertifiDate)
+              : "N/A";
+            orgiCertifiDate = lastProof.orgiCertifiDate
+              ? formatDate(lastProof.orgiCertifiDate)
+              : "N/A";
+            poNo = lastProof.poNo || "N/A";
+          }
+        } else {
+          console.log("No valid trainingProof found for this entry.");
         }
 
-        if (lastProof) { 
-          certifiExpiry = lastProof.certifiExpiry
-            ? formatDate(lastProof.certifiExpiry)
-            : "N/A";
-          eCertifiDate = lastProof.eCertifiDate
-            ? formatDate(lastProof.eCertifiDate)
-            : "N/A";
-          orgiCertifiDate = lastProof.orgiCertifiDate
-            ? formatDate(lastProof.orgiCertifiDate)
-            : "N/A";
-          poNo = lastProof.poNo || "N/A";
+        // Extract from traineeTrack
+        if (data.traineeTrack && data.traineeTrack) {
+          const track = safeParseData(data.traineeTrack);
+
+          let lastTrack = track;
+
+          if (Array.isArray(track)) {
+            lastTrack = track[track.length - 1];
+          }
+
+          if (lastTrack) {
+            traineeSD = lastTrack.traineeSD
+              ? formatDate(lastTrack.traineeSD)
+              : "N/A";
+            traineeED = lastTrack.traineeED
+              ? formatDate(lastTrack.traineeED)
+              : "N/A";
+          }
+        } else {
+          console.log("No valid traineeTrack found for this entry.");
         }
-      } else {
-        console.log("No valid trainingProof found for this entry.");
+      } catch (e) {
+        console.error("Error parsing trainingProof or traineeTrack:", e);
       }
 
-      // Extract from traineeTrack
-      if (data.traineeTrack && data.traineeTrack) {
-        const track = safeParseData(data.traineeTrack);
+      const finalEntry = {
+        ...data,
+        empID: data.empID || "-",
+        empBadgeNo: data.empBadgeNo || "-",
+        name: data.name || "-",
+        certifiExpiry,
+        eCertifiDate,
+        orgiCertifiDate,
+        poNo,
+        traineeSD,
+        traineeED,
+        department: Array.isArray(data.department)
+          ? data.department[data.department.length - 1]
+          : "-",
+        position: Array.isArray(data.position)
+          ? data.position[data.position.length - 1]
+          : "-",
+      };
 
-        let lastTrack = track;
-
-        if (Array.isArray(track)) {
-          lastTrack = track[track.length - 1];
-        }
-
-        if (lastTrack) {
-          traineeSD = lastTrack.traineeSD
-            ? formatDate(lastTrack.traineeSD)
-            : "N/A";
-          traineeED = lastTrack.traineeED
-            ? formatDate(lastTrack.traineeED)
-            : "N/A";
-        }
-      } else {
-        console.log("No valid traineeTrack found for this entry.");
-      }
-    } catch (e) {
-      console.error("Error parsing trainingProof or traineeTrack:", e);
-    }
-
-    const finalEntry = {
-      ...data,
-      empID: data.empID || "-",
-      empBadgeNo: data.empBadgeNo || "-",
-      name: data.name || "-",
-      certifiExpiry,
-      eCertifiDate,
-      orgiCertifiDate,
-      poNo,
-      traineeSD,
-      traineeED,
-      department: Array.isArray(data.department)
-        ? data.department[data.department.length - 1]
-        : "-",
-      position: Array.isArray(data.position)
-        ? data.position[data.position.length - 1]
-        : "-",
-    };
-
-    return finalEntry;
-  });
+      return finalEntry;
+    });
 
   return (
     <section className="bg-[#F8F8F8] mx-auto p-5 h-full w-full">

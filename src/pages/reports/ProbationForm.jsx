@@ -10,14 +10,13 @@ import { useState } from "react";
 import { ProbFormFun } from "../../services/createMethod/ProbFormFun";
 import { UpdateProbForm } from "../../services/updateMethod/UpdateProbForm";
 import { probationFormSchema } from "../../services/ReportValidation";
-import { DataSupply } from "../../utils/DataStoredContext";
-import { useContext } from "react";
 import { sendEmail } from "../../services/EmailServices";
 import { FaArrowLeft, FaSave, FaPrint, FaDownload } from "react-icons/fa";
 import { useTempID } from "../../utils/TempIDContext";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { useReactToPrint } from "react-to-print";
 import logo from "../../assets/logo/logo-with-name.svg";
+import { useReportsData } from "../../context/reports/ReportsContext";
 
 export const ProbationForm = ({ userID, userType }) => {
   const location = useLocation();
@@ -30,7 +29,8 @@ export const ProbationForm = ({ userID, userType }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isExtended, setIsExtended] = useState(false);
-  const { empPIData, workInfoData, ProbFData } = useContext(DataSupply);
+
+  const { empPIData, workInfoData, ProbFData } = useReportsData();
 
   const [emailData, setEmailData] = useState({
     supervisorEmpID: "",
@@ -395,14 +395,18 @@ export const ProbationForm = ({ userID, userType }) => {
         (match) => match.id === formDataValues.id
       );
 
-      const empPIRecord = empPIData.find((match) => match.empID === data?.empID);
+      const empPIRecord = empPIData.find(
+        (match) => match.empID === data?.empID
+      );
       const WorkInfoRecord = workInfoData.find(
         (match) => match.empID === data?.empID
       );
       const probationEndFormatted =
         Array.isArray(WorkInfoRecord?.probationEnd) &&
         WorkInfoRecord?.probationEnd.length > 0
-          ? WorkInfoRecord?.probationEnd[WorkInfoRecord?.probationEnd.length - 1]
+          ? WorkInfoRecord?.probationEnd[
+              WorkInfoRecord?.probationEnd.length - 1
+            ]
               .split("-")
               .reverse()
               .join("/")
@@ -411,7 +415,9 @@ export const ProbationForm = ({ userID, userType }) => {
       const prevProbDate =
         Array.isArray(WorkInfoRecord?.probationEnd) &&
         WorkInfoRecord?.probationEnd.length > 0
-          ? WorkInfoRecord?.probationEnd[WorkInfoRecord?.probationEnd.length - 1]
+          ? WorkInfoRecord?.probationEnd[
+              WorkInfoRecord?.probationEnd.length - 1
+            ]
           : "Not mentioned";
 
       const subject = "Probation Assessment Review";

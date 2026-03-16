@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 
 import { Link } from "react-router-dom";
 import { useNotifiCenter } from "../../hooks/useNotifiCenter";
+import { NotificationSkeleton } from "../../components/SkeletonLoader";
 
 export const RecentNotify = () => {
   const { matchingNotifications } = useNotifiCenter();
@@ -11,6 +12,7 @@ export const RecentNotify = () => {
   useEffect(() => {
     setNotify(matchingNotifications);
   }, [matchingNotifications]);
+
   // Filter unread notifications and exclude ones where leaveType is null
   const unreadNotifications = notify
     .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
@@ -30,6 +32,7 @@ export const RecentNotify = () => {
     "Probation Review Expiry",
     "Contract Expiry",
   ];
+
   return (
     <div className="flex justify-center p-2 w-full h-full ">
       <div className="rounded-2xl shadow-md w-full bg-white overflow-hidden">
@@ -37,7 +40,15 @@ export const RecentNotify = () => {
           <h2 className="mx-2">Recent Notifications</h2>
         </div>
 
-        {limitedNotifications.length > 0 ? (
+        {limitedNotifications.length === 0 &&
+        matchingNotifications.length === 0 ? (
+          <section className="divide-y">
+            {/* Show skeleton loaders based on expected notification count */}
+            {[1, 2, 3].map((index) => (
+              <NotificationSkeleton key={index} />
+            ))}
+          </section>
+        ) : limitedNotifications.length > 0 ? (
           <section className="divide-y">
             {[...limitedNotifications].map((notification, index) => {
               const { createdAt, message } = notification;
@@ -65,7 +76,6 @@ export const RecentNotify = () => {
                     <span className="text-sm font-medium text-dark_grey">
                       {notification?.leaveType}
                     </span>
-                    +
                     <span className="text-xs text-dark_grey truncate max-w-[300px]">
                       {cleanedMsg}
                     </span>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { LuFilter } from "react-icons/lu";
 import { StatusForm } from "./StatusForm";
@@ -8,7 +8,6 @@ import {
 } from "../../../graphql/queries";
 
 import { generateClient } from "@aws-amplify/api";
-import { DataSupply } from "../../../utils/DataStoredContext";
 import { InterviewTable } from "./InterviewTable";
 import { SelectedCandi } from "./SelectedCandi";
 import { LOIRecru } from "./LOIRecru";
@@ -17,6 +16,7 @@ import { PAAFRecru } from "./PAAFRecru";
 import { MobilizationRecru } from "./MobilizationRecru";
 import { getUrl } from "@aws-amplify/storage";
 import { IoSearch } from "react-icons/io5";
+import { useRecruitmentsData } from "../../../context/recruitments/RecruitmentsContext";
 const client = generateClient();
 
 const filterOptions = [
@@ -46,12 +46,9 @@ export const Status = () => {
   const [dropOption, setDropOption] = useState();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const {
-    empPDData,
+    const {  empPDData,
     educDetailsData,
-    IVSSDetails,
-    loading: statusLoading,
-  } = useContext(DataSupply);
+    IVSSDetails,loading: statusLoading, } = useRecruitmentsData();
 
   const mergeContextData = (empPDData, educDetailsData) => {
     return empPDData.map((piData) => {
@@ -646,17 +643,14 @@ export const Status = () => {
         </div>
       </div>
 
-   
-    
-          {renderComponent()}
-          {isFormVisible && (
-            <StatusForm
-              candidate={selectedInterviewCandidate}
-              onSave={handleFormSave}
-              onClose={closeForm}
-            />
-          )}
-      
+      {renderComponent()}
+      {isFormVisible && (
+        <StatusForm
+          candidate={selectedInterviewCandidate}
+          onSave={handleFormSave}
+          onClose={closeForm}
+        />
+      )}
     </section>
   );
 };

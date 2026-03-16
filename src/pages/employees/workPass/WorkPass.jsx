@@ -6,8 +6,14 @@ import { FaArrowLeft } from "react-icons/fa";
 import { DataSupply } from "../../../utils/DataStoredContext";
 
 export const WorkPass = () => {
-  const { empPIData, SawpDetails, DNData, BJLData, PPValidsData } =
-    useContext(DataSupply);
+  const {
+    empPIData,
+    SawpDetails,
+    DNData,
+    BJLData,
+    PPValidsData,
+    setFetchTableData,
+  } = useContext(DataSupply);
 
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [activeNavTab, setActiveNavTab] = useState("sawp");
@@ -16,6 +22,16 @@ export const WorkPass = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    setFetchTableData([
+      "empPIData",
+      "SawpDetails",
+      "DNData",
+      "BJLData",
+      "PPValidsData",
+    ]);
+  }, []);
 
   useEffect(() => {
     window.scrollTo({

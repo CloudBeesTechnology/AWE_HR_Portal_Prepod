@@ -28,8 +28,7 @@ const LabourImmigration = () => {
 
   const { SubmitMPData } = MedicalPassFunc();
   const { updateMedicalSubmit } = UpdateMedical();
-  const { empPIData, LMIData } = useContext(DataSupply);
-
+  const { empPIData, LMIData, setFetchTableData } = useContext(DataSupply);
 
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [arrayUploadDocs, setArrayUploadDocs] = useState([]);
@@ -52,6 +51,13 @@ const LabourImmigration = () => {
   const [dependPassData, setDependPassData] = useState(null);
   const [showTitle, setShowTitle] = useState("");
   const [disableEmpID, setDisableEmpID] = useState(false);
+
+  useEffect(() => {
+    setFetchTableData([
+      "empPIData",
+      "LMIData",
+    ]);
+  }, []);
 
   const {
     register,
@@ -102,7 +108,6 @@ const LabourImmigration = () => {
       [label]: value,
     }));
   };
-
 
   const handleFileChange = async (e, label) => {
     const watchedEmpID = watch("empID");
@@ -243,10 +248,8 @@ const LabourImmigration = () => {
   };
 
   const searchResult = (result) => {
- 
     const keysToSet = ["empID", "bruhimsRNo", "overMD", "overME", "bruhimsRD"];
     keysToSet.forEach((key) => {
-
       if (result[key]) {
         let value = result[key];
         if (key === "overMD" || key === "overME" || key === "bruhimsRD") {
@@ -289,7 +292,7 @@ const LabourImmigration = () => {
           setValue(field, parsedFiles);
           setDocsUploaded((prev) => ({
             ...prev,
-            [field]: parsedFiles, 
+            [field]: parsedFiles,
           }));
 
           setUploadedFileNames((prev) => ({
@@ -303,13 +306,11 @@ const LabourImmigration = () => {
     });
   };
   const getFileName = (filePath) => {
-    const fileNameWithExtension = filePath.split("/").pop(); 
+    const fileNameWithExtension = filePath.split("/").pop();
     return fileNameWithExtension;
   };
 
-
   const onSubmit = async (data) => {
-
     try {
       const checkingPITable = empPIData.find(
         (match) => match.empID === data.empID
@@ -335,7 +336,7 @@ const LabourImmigration = () => {
       }));
       const formatDate = (dateString) => {
         if (!dateString || isNaN(new Date(dateString).getTime())) {
-          return; 
+          return;
         }
         const date = new Date(dateString);
         const day = date.getDate().toString().padStart(2, "0");
@@ -391,17 +392,17 @@ const LabourImmigration = () => {
               const uploadDp =
                 uploadDpArray[index] && uploadDpArray[index].length > 0
                   ? uploadDpArray[index]
-                  : val.uploadDp || []; 
+                  : val.uploadDp || [];
 
               const uploadDr =
                 uploadDrArray[index] && uploadDrArray[index].length > 0
                   ? uploadDrArray[index]
                   : val.uploadDr || [];
-      
+
               return {
                 ...val,
-                uploadDp, 
-                uploadDr, 
+                uploadDp,
+                uploadDr,
               };
             })
           ),
@@ -436,8 +437,8 @@ const LabourImmigration = () => {
                 arrayUploadDocs?.uploadDr?.[index] || val.uploadDr;
               return {
                 ...val,
-                uploadDp, 
-                uploadDr, 
+                uploadDp,
+                uploadDr,
               };
             })
           ),

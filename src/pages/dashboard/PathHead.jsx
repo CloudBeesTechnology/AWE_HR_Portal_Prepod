@@ -6,76 +6,80 @@ import Group4 from "../../assets/Dashboard/Group4.svg";
 import { Link } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
 
-export const PathHead = () => {
-  const { empPIData, terminateData } = useContext(DataSupply);
+export const PathHead = ({ empPIData, terminateData }) => {
   const [bruneianCount, setBruneianCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [LPACount, setLPACount] = useState(0);
   const [SAWPCount, setSAWPCount] = useState(0);
 
   // Function to merge and calculate counts
- const calculateCounts = () => {
-  try {
-    // 🧩 Merge empPIData + terminateData using empId
-   const mergedData = empPIData
-          .map((emp) => {
-            const terminateInfo = terminateData
-              ? terminateData.find((item) => item.empID === emp.empID)
-              : {};
+  const calculateCounts = () => {
+    try {
+      // 🧩 Merge empPIData + terminateData using empId
+      const mergedData = empPIData
+        .map((emp) => {
+          const terminateInfo = terminateData
+            ? terminateData.find((item) => item.empID === emp.empID)
+            : {};
 
-            return {
-              ...emp,
-              ...terminateInfo,
-            };
-          })
-          .filter(Boolean);
-  //  console.log(mergedData);
-   
-    // 🔢 Count employees by contract type
-    const bruneianCount = countByContractType(mergedData, "LOCAL");
-    const lpaCount = countByContractType(mergedData, "LPA");
-    const sawpCount = countByContractType(mergedData, "SAWP");
-// console.log(lpaCount,"lpaCount");
-// console.log(sawpCount,"sawpCount");
-// console.log(bruneianCount,"bruneianCount");
+          return {
+            ...emp,
+            ...terminateInfo,
+          };
+        })
+        .filter(Boolean);
+      //  console.log(mergedData);
 
-    // // 🧾 Update states
-    setBruneianCount(bruneianCount);
-    setLPACount(lpaCount);
-    setSAWPCount(sawpCount);
-    setTotalCount(bruneianCount + lpaCount + sawpCount);
+      // 🔢 Count employees by contract type
+      const bruneianCount = countByContractType(mergedData, "LOCAL");
+      const lpaCount = countByContractType(mergedData, "LPA");
+      const sawpCount = countByContractType(mergedData, "SAWP");
+      // console.log(lpaCount,"lpaCount");
+      // console.log(sawpCount,"sawpCount");
+      // console.log(bruneianCount,"bruneianCount");
 
-    // console.log("Counts =>", { bruneianCount, lpaCount, sawpCount });
-  } catch (err) {
-    console.error("Error calculating counts:", err.message);
-  }
-};
+      // // 🧾 Update states
+      setBruneianCount(bruneianCount);
+      setLPACount(lpaCount);
+      setSAWPCount(sawpCount);
+      setTotalCount(bruneianCount + lpaCount + sawpCount);
 
-
-const countByContractType = (data, type) =>
-  data.filter((item) => {
-    const rawType = item?.contractType?.at(-1) ?? "";
-    const lastType = rawType.replace(/["\[\]]/g, "").trim().toUpperCase();
-
-    const termDateStr = (item?.termiDate ?? "").trim();
-    const resignDateStr = (item?.resignDate ?? "").trim();
-
-    const today = new Date();
-
-    const termDate = termDateStr ? new Date(termDateStr) : null;
-    const resignDate = resignDateStr ? new Date(resignDateStr) : null;
-
-    // ✅ Ignore if terminated/resigned today or before, for all contract types
-    if ((termDate && termDate <= today) || (resignDate && resignDate <= today)) {
-      return false;
+      // console.log("Counts =>", { bruneianCount, lpaCount, sawpCount });
+    } catch (err) {
+      console.error("Error calculating counts:", err.message);
     }
+  };
 
-    return lastType === type.toUpperCase();
-  }).length;
+  const countByContractType = (data, type) =>
+    data.filter((item) => {
+      const rawType = item?.contractType?.at(-1) ?? "";
+      const lastType = rawType
+        .replace(/["\[\]]/g, "")
+        .trim()
+        .toUpperCase();
 
-useEffect(() => {
-  calculateCounts();
-}, [empPIData, terminateData]);
+      const termDateStr = (item?.termiDate ?? "").trim();
+      const resignDateStr = (item?.resignDate ?? "").trim();
+
+      const today = new Date();
+
+      const termDate = termDateStr ? new Date(termDateStr) : null;
+      const resignDate = resignDateStr ? new Date(resignDateStr) : null;
+
+      // ✅ Ignore if terminated/resigned today or before, for all contract types
+      if (
+        (termDate && termDate <= today) ||
+        (resignDate && resignDate <= today)
+      ) {
+        return false;
+      }
+
+      return lastType === type.toUpperCase();
+    }).length;
+
+  useEffect(() => {
+    calculateCounts();
+  }, [empPIData, terminateData]);
 
   return (
     <div>

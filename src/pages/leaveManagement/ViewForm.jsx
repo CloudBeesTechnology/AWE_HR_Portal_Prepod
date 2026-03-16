@@ -17,15 +17,21 @@ export const ViewForm = ({
   userType,
   personalInfo,
 }) => {
-  const { empPIData } = useContext(DataSupply);
+  const { empPIData, setFetchTableData } = useContext(DataSupply);
   const { gmPosition, gmMail, GMEmpID, HRMPosition, hrManagerMail } =
     useTempID();
   const [remark, setRemark] = useState("");
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState("");
   const [path, setPath] = useState("");
-  const { handleUpdateLeaveStatus, handleUpdateTicketRequest } =
-    useLeaveManage();
+
+  useEffect(() => {
+    setFetchTableData(["empPIData"]);
+  }, []);
+  const { storedData, isLoading } = useContext(DataSupply);
+  const { handleUpdateLeaveStatus, handleUpdateTicketRequest } = useLeaveManage(
+    { storedData, isLoading }
+  );
   const { createNotification } = useCreateNotification();
 
   const managerName = empPIData.find((val) => {
@@ -100,9 +106,9 @@ export const ViewForm = ({
         leaveData.empLeaveSelectedFrom && leaveData.empLeaveSelectedTo
           ? isValidDateFormat(leaveData.empLeaveSelectedFrom) &&
             isValidDateFormat(leaveData.empLeaveSelectedTo)
-            ? `${DateFormat(
-                leaveData.empLeaveSelectedFrom
-              )} to ${DateFormat(leaveData.empLeaveSelectedTo)}`
+            ? `${DateFormat(leaveData.empLeaveSelectedFrom)} to ${DateFormat(
+                leaveData.empLeaveSelectedTo
+              )}`
             : `${leaveData.empLeaveSelectedFrom} to ${leaveData.empLeaveSelectedTo}`
           : leaveData.empLeaveStartDate && leaveData.empLeaveEndDate
           ? `${DateFormat(leaveData.empLeaveStartDate)} to ${DateFormat(
@@ -553,31 +559,39 @@ export const ViewForm = ({
           );
 
           if (HRMPosition === HRM && status === "Verified") {
-         
             //GM send email
             if (gmMail && Array.isArray(gmMail)) {
               for (const email of gmMail) {
-            await sendEmail(
-              `Ticket Request  ${
-                status === "Verified" ? "verified" : "marked as not eligible"
-              }`,
-              `Your employee  ${
-                ticketData.empName || "Not mention"
-              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
-                status === "Verified" ? "verified" : "marked as not eligible"
-              } by HR Manager ${personalInfo.name || "Not mention"}.
+                await sendEmail(
+                  `Ticket Request  ${
+                    status === "Verified"
+                      ? "verified"
+                      : "marked as not eligible"
+                  }`,
+                  `Your employee  ${
+                    ticketData.empName || "Not mention"
+                  } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                    status === "Verified"
+                      ? "verified"
+                      : "marked as not eligible"
+                  } by HR Manager ${personalInfo.name || "Not mention"}.
               <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
                `,
-              "hr_no-reply@adininworks.com",
-              email
-            );
-          }
-        } else {
-          console.log("Invalid email list");
-        }
+                  "hr_no-reply@adininworks.com",
+                  email
+                );
+              }
+            } else {
+              console.log("Invalid email list");
+            }
             // console.log("gmemail", gmMail);
 
-            if (gmMail && Array.isArray(gmMail) && GMEmpID && Array.isArray(GMEmpID)) {
+            if (
+              gmMail &&
+              Array.isArray(gmMail) &&
+              GMEmpID &&
+              Array.isArray(GMEmpID)
+            ) {
               for (let i = 0; i < gmMail.length; i++) {
                 await createNotification({
                   empID: ticketData.empID,
@@ -585,11 +599,13 @@ export const ViewForm = ({
                   message: `Your employee ${
                     ticketData.empName || "Not mentioned"
                   }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
-                    status === "Verified" ? "verified" : "marked as not eligible"
+                    status === "Verified"
+                      ? "verified"
+                      : "marked as not eligible"
                   } by HR Manager ${personalInfo.name}`,
                   senderEmail: "hr_no-reply@adininworks.com",
-                  receipentEmail: gmMail[i], 
-                  receipentEmpID: GMEmpID[i], 
+                  receipentEmail: gmMail[i],
+                  receipentEmpID: GMEmpID[i],
                   status: "Unread",
                 });
               }
@@ -597,7 +613,6 @@ export const ViewForm = ({
               console.log("Invalid GM email or Employee ID list");
             }
           } else if (HRMPosition === HRM && status === "Not Eligible") {
-
             await sendEmail(
               `Ticket Request  ${
                 status === "Verified" ? "verified" : "marked as not eligible"
@@ -660,10 +675,7 @@ export const ViewForm = ({
               receipentEmpID: ticketData.managerEmpID,
               status: "Unread",
             });
-
-          } 
-          
-          else if (gmPosition === "GENERAL MANAGER") {
+          } else if (gmPosition === "GENERAL MANAGER") {
             //employee email
             await sendEmail(
               `Ticket Request ${status}`,
@@ -712,7 +724,7 @@ export const ViewForm = ({
             } else {
               console.log("Invalid email list");
             }
-            
+
             // await sendEmail(
             //   `Ticket Request ${status}`,
             //   `Your employee  ${
@@ -791,8 +803,7 @@ export const ViewForm = ({
     const isPending = managerStatus === "Pending";
     const isApproved = supervisorStatus === "Approved";
     const isSupervisor = userType === "Supervisor";
-    const isNotSuperAdminOrHR =
-      userType !== "SuperAdmin" && userType !== "HR";
+    const isNotSuperAdminOrHR = userType !== "SuperAdmin" && userType !== "HR";
 
     // Case 1: Supervisor approved, Manager pending, Supervisor not SuperAdmin/HR
     if (
@@ -802,7 +813,6 @@ export const ViewForm = ({
       isSupervisor &&
       isNotSuperAdminOrHR
     ) {
-      
       return (
         <div className="center w-full">
           {/* <button

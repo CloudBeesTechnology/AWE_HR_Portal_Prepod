@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { VscClose } from "react-icons/vsc";
 import { InterviewForm } from "../ScheduledForm/InterViewForm";
 import { CandidateForm } from "../ScheduledForm/CandidateForm";
@@ -7,12 +7,16 @@ import { CVEVForm } from "../ScheduledForm/CVEVForm";
 import { PAAFForm } from "../ScheduledForm/PAAFForm";
 import { MobilizationForm } from "../ScheduledForm/MobilizationForm";
 import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { useRecruitmentsData } from "../../../context/recruitments/RecruitmentsContext";
 // getLocalMobilization
 
 export const StatusForm = ({ candidate, onClose, onSave }) => {
+  const { IVSSDetails, loading } = useRecruitmentsData();
+
   const { formattedPermissions } = useDeleteAccess();
   // const [activeTab, setActiveTab] = useState('Interview');
   const [show, setShow] = useState(0);
+
   return (
     <div className="fixed inset-0 bg-grey bg-opacity-80 z-50 center">
       <div className="bg-white p-10 rounded-lg w-full max-w-[700px] overflow-hidden relative">
@@ -22,7 +26,7 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
         >
           <VscClose size={20} />
         </button>
-         <div className="p-2 border border-BColor bg-[#FBFCFF]">
+        <div className="p-2 border border-BColor bg-[#FBFCFF]">
           <div className="flex justify-between gap-4 text-[13px] font-semibold">
             <div className="text-center ">
               <div className="underline">TEMP ID</div>
@@ -140,30 +144,40 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
             </h6>
           )}
         </article>
-        {show === 0 && <InterviewForm candidate={candidate} />}
+        {show === 0 && (
+          <InterviewForm
+            candidate={candidate}
+            IVSSDetails={IVSSDetails}
+            loading={loading}
+          />
+        )}
         {show === 1 && <CandidateForm candidate={candidate} />}
         {show === 2 && (
           <LOIForm
             candidate={candidate}
             formattedPermissions={formattedPermissions}
+            IVSSDetails={IVSSDetails}
           />
         )}
         {show === 3 && (
           <CVEVForm
             candidate={candidate}
             formattedPermissions={formattedPermissions}
+            IVSSDetails={IVSSDetails}
           />
         )}
         {show === 4 && (
           <PAAFForm
             candidate={candidate}
             formattedPermissions={formattedPermissions}
+            IVSSDetails={IVSSDetails}
           />
         )}
         {candidate?.contractType === "Local" && show === 5 && (
           <MobilizationForm
             candidate={candidate}
             formattedPermissions={formattedPermissions}
+            IVSSDetails={IVSSDetails}
           />
         )}
       </div>

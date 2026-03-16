@@ -18,7 +18,7 @@ import { CreateDoe } from "../../../services/createMethod/CreateDoe";
 export const Nlms = () => {
   const { searchResultData } = useOutletContext();
   const { formattedPermissions } = useDeleteAccess();
-  const { DNData, dropDownVal } = useContext(DataSupply);
+  const { DNData, dropDownVal, setFetchTableData } = useContext(DataSupply);
   const { CrerDoeFunData } = CreateDoe();
   const { uploadNlmsFun } = UpdateNlmsData();
   const [deletePopup, setdeletePopup] = useState(false);
@@ -51,6 +51,10 @@ export const Nlms = () => {
     nlmsEmpApproval: [],
     nlmsEmpValid: [],
   });
+
+  useEffect(() => {
+    setFetchTableData(["DNData", "dropDownVal"]);
+  }, []);
 
   const empID = watch("empID");
 
@@ -125,7 +129,7 @@ export const Nlms = () => {
       ...prev,
       [label]: value,
     }));
-    console.log(value);
+    
   };
 
   const handleFileChange = async (e, label) => {

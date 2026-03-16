@@ -7,11 +7,23 @@ import image4 from "../../assets/Employee/icon4.svg";
 import image5 from "../../assets/Employee/icon5.svg";
 import image6 from "../../assets/Employee/icon6.svg";
 import image7 from "../../assets/Employee/icon7.svg";
-import usePermission  from "../../hooks/usePermissionDashInside";
+import usePermission from "../../hooks/usePermissionDashInside";
+
+// Colored skeleton loader component
+const ColoredSkeletonCard = ({ borderColor }) => (
+  <div className="flex flex-col justify-center items-center p-2 max-w-xs w-full bg-white rounded-lg shadow-lg transition-shadow duration-200 animate-pulse">
+    <div
+      className={`w-full h-full flex flex-col justify-center items-center border-l-4 ${borderColor} opacity-50`}
+    >
+      <div className="w-[100px] h-[100px] p-3 bg-grey rounded-full mb-2"></div>
+      <div className={`h-4 bg-grey rounded w-3/4`}></div>
+    </div>
+  </div>
+);
 
 export const Employee = () => {
   const employeePermissions = usePermission("userID", "Employee");
- 
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -19,7 +31,6 @@ export const Employee = () => {
     });
   }, []);
 
-  
   const cards = [
     {
       id: 1,
@@ -80,33 +91,45 @@ export const Employee = () => {
 
     // You can add more cards if needed
   ];
-  const filteredCards = cards.filter((card) => employeePermissions.includes(card.title));
-// console.log(filteredCards);
+
+  const filteredCards = cards.filter((card) =>
+    employeePermissions.includes(card.title)
+  );
+  // console.log(filteredCards);
 
   return (
     <section className=" bg-[#F5F6F1CC] w-full p-10 min-h-screen">
       <div className="flex w-full flex-wrap justify-between gap-y-10 gap-x-2 mb-40">
-        {filteredCards.map((card) => (
-          <Link
-            key={card.id}
-            to={card.to}
-            className="  flex flex-col justify-center items-center p-2 max-w-xs w-full bg-white rounded-lg shadow-lg  transition-shadow duration-200"
-          >
-            <div
-              className={`w-full h-full flex flex-col justify-center items-center  border-l-4 ${card.borderColor}`}
-            >
-              
-              <img
-                className="w-[100px] h-[100px] p-3"
-                src={card.img}
-                alt={card.alt}
+        {filteredCards && filteredCards.length === 0
+          ? // Show colored skeleton loaders based on filteredCards length
+            // Since we don't know which cards will be filtered, show all possible skeletons
+            cards.map((card) => (
+              <ColoredSkeletonCard
+                key={`skeleton-${card.id}`}
+                borderColor={card.borderColor}
               />
-              <h2 className="text-[14px] font-semibold text-center">
-                {card.title}
-              </h2>
-            </div>
-          </Link>
-        ))}
+            ))
+          : // Show actual cards when loaded
+            filteredCards.map((card) => (
+              <Link
+                key={card.id}
+                to={card.to}
+                className="flex flex-col justify-center items-center p-2 max-w-xs w-full bg-white rounded-lg shadow-lg transition-shadow duration-200 hover:shadow-xl"
+              >
+                <div
+                  className={`w-full h-full flex flex-col justify-center items-center border-l-4 ${card.borderColor}`}
+                >
+                  <img
+                    className="w-[100px] h-[100px] p-3"
+                    src={card.img}
+                    alt={card.alt}
+                  />
+                  <h2 className="text-[14px] font-semibold text-center">
+                    {card.title}
+                  </h2>
+                </div>
+              </Link>
+            ))}
       </div>
     </section>
   );

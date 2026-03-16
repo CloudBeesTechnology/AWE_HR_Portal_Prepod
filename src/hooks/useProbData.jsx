@@ -7,10 +7,15 @@ const useMergedEmployeeData = () => {
     workInfoData = [],
     ProbFData = [],
     SRData = [],
+    setFetchTableData,
   } = useContext(DataSupply);
 
   const [mergedProbData, setMergedProbData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setFetchTableData(["empPIData", "workInfoData", "ProbFData", "SRData"]);
+  }, []);
 
   useEffect(() => {
     if (!empPIData || empPIData.length === 0) {
@@ -83,7 +88,7 @@ const useMergedEmployeeData = () => {
     });
 
     setLoading(false);
-  }, [empPIData, workInfoData, ProbFData]);
+  }, [empPIData, workInfoData, ProbFData, SRData]);
 
   // console.log("MP", mergedProbData);
   return { mergedProbData, loading };

@@ -1,15 +1,15 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Table } from "../../utils/Table";
 import { IoSearch } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { DataSupply } from "../../utils/DataStoredContext";
 import { SearchLocalCandy } from "./Search/SearchLocalCandy";
 import { useTempID } from "../../utils/TempIDContext";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../utils/DeletePopup";
 import { CandyDelete } from "../../services/deleteMethod/CandyDelete";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 
 export const Localcandi = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,7 +21,7 @@ export const Localcandi = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
-  const { empPDData, IVSSDetails } = useContext(DataSupply);
+  const { empPDData, IVSSDetails } = useRecruitmentsData();
   const { setTempID } = useTempID();
   const navigate = useNavigate();
   const [editingData, setEditingData] = useState([]);
@@ -43,8 +43,10 @@ export const Localcandi = () => {
   //   setLoading(false);
   // }, [empPDData, IVSSDetails, searchTerm]);
 
-  const matchedCandidates = IVSSDetails?.filter((ivssCandidate) => 
-    empPDData?.some((empCandidate) => empCandidate.tempID === ivssCandidate.tempID)
+  const matchedCandidates = IVSSDetails?.filter((ivssCandidate) =>
+    empPDData?.some(
+      (empCandidate) => empCandidate.tempID === ivssCandidate.tempID
+    )
   );
 
   useEffect(() => {
@@ -55,21 +57,22 @@ export const Localcandi = () => {
           candidate.nationality === "Brunei PR"
       )
       .filter((candidate) => {
-        const matchedIVSS =  matchedCandidates?.find(
+        const matchedIVSS = matchedCandidates?.find(
           (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
         );
-        const isStatusValid = matchedIVSS && matchedIVSS.status === "Candidate List";
+        const isStatusValid =
+          matchedIVSS && matchedIVSS.status === "Candidate List";
         return (
-          (!IVSSDetails.some((detail) => detail.tempID === candidate.tempID) && candidate.status !== "Inactive") ||
-          (isStatusValid)
-        )
+          (!IVSSDetails.some((detail) => detail.tempID === candidate.tempID) &&
+            candidate.status !== "Inactive") ||
+          isStatusValid
+        );
       });
-  
+
     setFilteredData(bruneiCandidates);
     setLoading(false);
   }, [empPDData, IVSSDetails, searchTerm]);
 
-  
   const handleRowClick = (row) => {
     setSelectedRow(row);
   };

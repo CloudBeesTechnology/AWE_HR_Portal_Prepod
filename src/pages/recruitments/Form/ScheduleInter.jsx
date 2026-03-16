@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { InterviewScheduleSchema } from "../../../services/Validation";
@@ -7,10 +7,10 @@ import { SubmitInterviewSchedule } from "../../../services/createMethod/SubmitIn
 import { FormField } from "../../../utils/FormField";
 import { LocalMobilization } from "../../../services/createMethod/CreateLOI";
 import { sendEmail } from "../../../services/EmailServices";
-import { DataSupply } from "../../../utils/DataStoredContext";
 import { IoSearch } from "react-icons/io5";
 import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
+import { useRecruitmentsData } from "../../../context/recruitments/RecruitmentsContext";
 
 export const ScheduleInter = ({ candidate, onClose }) => {
   const [notification, setNotification] = useState(false);
@@ -32,10 +32,9 @@ export const ScheduleInter = ({ candidate, onClose }) => {
     },
   });
 
-  const { empPIData } = useContext(DataSupply);
+  const { empPIData, IVSSDetails } = useRecruitmentsData();
   const { localMobilization } = LocalMobilization();
   const {
-
     register,
     handleSubmit,
     setValue,
@@ -43,7 +42,6 @@ export const ScheduleInter = ({ candidate, onClose }) => {
   } = useForm({
     resolver: yupResolver(InterviewScheduleSchema),
   });
-  const { IVSSDetails } = useContext(DataSupply);
   const { createSchedule } = SubmitInterviewSchedule();
   const { interviewDetails } = UpdateInterviewData();
 
@@ -53,9 +51,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
         (data) => data.tempID === candidate.tempID
       );
 
-     
       if (interviewData) {
-     
         setValue("interDate", interviewData.interDate?.split("T")[0]);
         setValue("interTime", interviewData.interTime);
         setValue("manager", interviewData.manager);
@@ -67,7 +63,6 @@ export const ScheduleInter = ({ candidate, onClose }) => {
   }, [IVSSDetails, candidate?.tempID]);
 
   const searchResult = (result) => {
-    
     setValue("manager", result?.name);
     setValue("empID", result?.empID);
     setFormData({
@@ -95,8 +90,6 @@ export const ScheduleInter = ({ candidate, onClose }) => {
   };
 
   const onSubmit = handleSubmit(async (data) => {
-    
-
     const formattedData = {
       ...data,
       interDate: new Date(data.interDate),
@@ -117,7 +110,6 @@ export const ScheduleInter = ({ candidate, onClose }) => {
         const interviewData = IVSSDetails.find(
           (data) => data.tempID === candidate.tempID
         );
-       
 
         if (interviewData) {
           await interviewDetails({

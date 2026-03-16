@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect, useContext } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { DataSupply } from "../../../utils/DataStoredContext";
+import { useRecruitmentsData } from "../../../context/recruitments/RecruitmentsContext";
 
 export const SearchListOfCandy = ({
   allEmpDetails,
@@ -13,7 +13,8 @@ export const SearchListOfCandy = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
-  const { empPDData, IVSSDetails } = useContext(DataSupply);
+
+  const { empPDData, IVSSDetails } = useRecruitmentsData();
 
   useEffect(() => {
     setSearchQuery("");

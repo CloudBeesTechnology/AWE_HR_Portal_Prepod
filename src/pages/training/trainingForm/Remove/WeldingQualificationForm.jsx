@@ -12,18 +12,18 @@ import { SpinLogo } from "../../../utils/SpinLogo";
 import { WeldingDataFun } from "../../../services/createMethod/WeldingDataFun";
 import { WeldingDataUp } from "../../../services/updateMethod/WeldingDataUp";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
-import { DataSupply } from "../../../../utils/DataStoredContext";
-import { useContext } from "react";
+
 import { WeldingOneFile } from "./WeldingOneFile";
+import { useTrainingData } from "../../../../context/training/TrainingContext";
 
 export const WeldingQualificationForm = () => {
-  const { empPIData, workInfoData, WeldeInfo} =useContext(DataSupply);
+  const { empPIData, workInfoData, WeldeInfo } = useTrainingData();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
   const { WQData } = WeldingDataFun();
-  const { WQDataFunUp } = WeldingDataUp(); 
+  const { WQDataFunUp } = WeldingDataUp();
   const [notification, setNotification] = useState(false);
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
@@ -31,19 +31,20 @@ export const WeldingQualificationForm = () => {
   const [showTitle, setShowTitle] = useState("");
   const [uploadedFileNames, setUploadedFileNames] = useState({
     weldingUpload: null,
- 
   });
   const [uploadeWQU, setUploadWQU] = useState({
     weldingUpload: [],
   });
   const {
     register,
-    handleSubmit,setValue,watch,
+    handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(WeldingValidationSchema),
   });
- 
+
   const [show, setShow] = useState(true);
   const watchedEmpID = watch("empID");
 
@@ -75,7 +76,7 @@ export const WeldingQualificationForm = () => {
     };
 
     fetchData();
-  }, [empPIData, workInfoData,WeldeInfo]);
+  }, [empPIData, workInfoData, WeldeInfo]);
 
   const weldingTCUpload = watch("weldingUpload", ""); // Watch the trainingUpCertifi field
 
@@ -83,7 +84,7 @@ export const WeldingQualificationForm = () => {
     if (typeof url === "string" && url) {
       return url.split("/").pop(); // Extract the file name from URL
     }
-    return ""; 
+    return "";
   };
 
   const getFileName = (filePath) => {
@@ -91,7 +92,6 @@ export const WeldingQualificationForm = () => {
     const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
     return fileName;
   };
-
 
   const handleFileChange = async (e, label) => {
     if (!watchedEmpID) {
@@ -101,9 +101,7 @@ export const WeldingQualificationForm = () => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
-    const allowedTypes = [
-      "application/pdf",
-    ];
+    const allowedTypes = ["application/pdf"];
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file ");
       return;
@@ -113,7 +111,7 @@ export const WeldingQualificationForm = () => {
     setValue(label, [...currentFiles, selectedFile]);
 
     try {
-      await uploadDocs(selectedFile, label, setUploadWQU ,watchedEmpID);
+      await uploadDocs(selectedFile, label, setUploadWQU, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name, // Store just the file name
@@ -123,15 +121,17 @@ export const WeldingQualificationForm = () => {
     }
   };
 
-
-
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
-  
+
   const searchResult = (result) => {
     console.log("Search result:", result); // Debugging
-  
-    const keysToSet = ["empID","empBadgeNo","name","position",
+
+    const keysToSet = [
+      "empID",
+      "empBadgeNo",
+      "name",
+      "position",
       "diameterRange",
       "fillerMetal",
       "thicknessRange",
@@ -145,19 +145,16 @@ export const WeldingQualificationForm = () => {
       "weldingCode",
       "weldingMaterial",
     ];
-    const fields = [
-      "department",
-    ];
+    const fields = ["department"];
     const uploadFields = ["weldingUpload"];
-  
+
     // Set simple fields
     keysToSet.forEach((key) => {
       if (result[key]) {
         setValue(key, result[key]);
       }
     });
-  
-   
+
     // Set other fields
     fields.forEach((field) => {
       const value = getLastValue(result[field]);
@@ -171,23 +168,23 @@ export const WeldingQualificationForm = () => {
         try {
           const parsedArray = JSON.parse(result?.[field][0]);
           setValue(field, parsedArray);
-    
+
           setUploadWQU((prev) => ({ ...prev, [field]: parsedArray }));
-    
+
           // Check if parsedArray is valid and non-empty
           if (Array.isArray(parsedArray) && parsedArray.length > 0) {
             const lastItem = parsedArray[parsedArray.length - 1];
-    
+
             // Check if lastItem has the upload property
             const fileName = lastItem?.upload
               ? getFileName(lastItem.upload)
               : "Unknown file";
-    
+
             setUploadedFileNames((prev) => ({
               ...prev,
               [field]: fileName,
             }));
-          } 
+          }
         } catch (error) {
           console.error(`Error parsing upload field ${field}:`, error);
         }
@@ -199,18 +196,15 @@ export const WeldingQualificationForm = () => {
     console.log("Form data:", data);
 
     try {
-      
       const WQDataRecord = WeldeInfo
         ? WeldeInfo.find((match) => match.empID === data.empID)
         : {};
-     
-      if (
-        WQDataRecord 
-      ) {
+
+      if (WQDataRecord) {
         const WQDataUp = {
           ...data,
-          weldingUpload:uploadeWQU.weldingUpload,
-          id: WQDataRecord.id,  
+          weldingUpload: uploadeWQU.weldingUpload,
+          id: WQDataRecord.id,
         };
         console.log(WQDataUp);
 
@@ -220,8 +214,7 @@ export const WeldingQualificationForm = () => {
       } else {
         const WQValue = {
           ...data,
-          weldingUpload:uploadeWQU.weldingUpload
-
+          weldingUpload: uploadeWQU.weldingUpload,
         };
         await WQData({ WQValue });
         setShowTitle("Training Welding Qualification Saved successfully");
@@ -260,118 +253,110 @@ export const WeldingQualificationForm = () => {
             Blasting Painting
           </h2>
         </article>
-
-     
       </div>
       {show && (
         <section className=" p-10 w-full bg-white  rounded-lg shadow-lg mt-10">
-             <div className="w-[30%]">
-        <SearchDisplay
-            searchResult={searchResult}
-            newFormData={allEmpDetails}
-            searchIcon2={<IoSearch />}
-            placeholder="Employee Id"
-            rounded="rounded-lg"
-            filteredEmployees={filteredEmployees}
-            setFilteredEmployees={setFilteredEmployees}
-          />
-        </div>
-
-          <form
-          onSubmit={handleSubmit(onSubmit)}
-        >
-
-<div className="flex justify-end  items-center py-5 mt-2">
-          <div className="max-w-sm">
-            <label className="text_size_5">Employee ID</label> <br />
-            <input
-              // ref={inputRef}
-              type="text"
-              className="input-field"
-              {...register("empID")}
+          <div className="w-[30%]">
+            <SearchDisplay
+              searchResult={searchResult}
+              newFormData={allEmpDetails}
+              searchIcon2={<IoSearch />}
+              placeholder="Employee Id"
+              rounded="rounded-lg"
+              filteredEmployees={filteredEmployees}
+              setFilteredEmployees={setFilteredEmployees}
             />
-            {errors.empID && (
-              <p className="text-[red] text-[12px]">{errors.empID.message}</p>
-            )}
           </div>
-        </div>
-          <div className="grid grid-cols-2 gap-6 ">
-            <div>
-              <label className="text_size_5">Employee Badge Number</label>
-              <input
-                {...register("empBadgeNo")}
-                className="input-field"
-             />
-              {errors.empBadgeNo && (
-                <p className="text-[red] text-[13px] mt-1">
-                  {errors.empBadgeNo.message}
-                </p>
-              )}
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex justify-end  items-center py-5 mt-2">
+              <div className="max-w-sm">
+                <label className="text_size_5">Employee ID</label> <br />
+                <input
+                  // ref={inputRef}
+                  type="text"
+                  className="input-field"
+                  {...register("empID")}
+                />
+                {errors.empID && (
+                  <p className="text-[red] text-[12px]">
+                    {errors.empID.message}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-6 ">
+              <div>
+                <label className="text_size_5">Employee Badge Number</label>
+                <input {...register("empBadgeNo")} className="input-field" />
+                {errors.empBadgeNo && (
+                  <p className="text-[red] text-[13px] mt-1">
+                    {errors.empBadgeNo.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="text_size_5">Employee Name</label>
+                <input
+                  {...register("name")}
+                  className="input-field"
+                  type="text"
+                />
+              </div>
+              <div>
+                <label className="text_size_5">Department</label>
+                <input {...register("department")} className="input-field" />
+                {errors.department && (
+                  <p className="text-[red] text-[13px] mt-1">
+                    {errors.department.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="text_size_5">Position</label>
+                <input
+                  {...register("position")}
+                  className="input-field"
+                  type="text"
+                />
+                {errors.position && (
+                  <p className="text-[red] text-[13px] mt-1">
+                    {errors.position.message}
+                  </p>
+                )}
+              </div>
+            </div>
+            <WeldingOneFile register={register} errors={errors} />
+
+            <div className="mt-6">
+              <FileUploadField
+                label="Upload File"
+                onChangeFunc={(e) => handleFileChange(e, "weldingUpload")}
+                register={register}
+                name="weldingUpload"
+                error={errors}
+                fileName={
+                  uploadedFileNames.weldingUpload ||
+                  extractFileName(weldingTCUpload)
+                }
+              />
             </div>
 
-            <div>
-              <label className="text_size_5">Employee Name</label>
-              <input
-                {...register("name")}
-                className="input-field"
-                type="text"
-              />
-              </div>
-              <div>
-              <label className="text_size_5">Department</label>
-              <input {...register("department")} className="input-field"/>
-              {errors.department && (
-                <p className="text-[red] text-[13px] mt-1">
-                  {errors.department.message}
-                </p>
-              )}
-              </div>
-
-              <div>
-             <label className="text_size_5">Position</label>
-              <input
-                {...register("position")}
-                className="input-field"
-                type="text"
-              />
-              {errors.position && (
-                <p className="text-[red] text-[13px] mt-1">
-                  {errors.position.message}
-                </p>
-              )}
-             </div>
-        
-          </div>
-          <WeldingOneFile register={register}
-          errors={errors} />
-
-       <div className="mt-6">
-       <FileUploadField
-        label="Upload File"
-        onChangeFunc={(e) => handleFileChange(e, "weldingUpload")}
-        register={register}
-        name="weldingUpload"
-        error={errors}
-        fileName={
-          uploadedFileNames.weldingUpload ||
-          extractFileName(weldingTCUpload)
-        }
-      />
-       </div>
-
-          <div className="center">
-            <button type="submit" className="primary_btn my-10">
-              Submit
-            </button>
-          </div>
-        </form>
+            <div className="center">
+              <button type="submit" className="primary_btn my-10">
+                Submit
+              </button>
+            </div>
+          </form>
         </section>
       )}{" "}
       {!show && <BlastingPaintingForm />}
       {notification && (
         <SpinLogo
-        text={showTitle}
-        notification={notification}
+          text={showTitle}
+          notification={notification}
           path="/training"
         />
       )}

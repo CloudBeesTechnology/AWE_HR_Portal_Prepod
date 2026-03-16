@@ -1,17 +1,17 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Table } from "../../utils/Table";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { DataSupply } from "../../utils/DataStoredContext";
 import { SearchNonLocalCandy } from "./Search/SearchNonLocal";
 import { SearchLocalCandy } from "./Search/SearchLocalCandy";
 import { useTempID } from "../../utils/TempIDContext";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../utils/DeletePopup";
 import { CandyDelete } from "../../services/deleteMethod/CandyDelete";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 
 export const NonlocCandi = () => {
   const { formattedPermissions } = useDeleteAccess();
@@ -28,7 +28,7 @@ export const NonlocCandi = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { setTempID } = useTempID();
-  const { empPDData, IVSSDetails, educDetailsData } = useContext(DataSupply);
+  const { empPDData, IVSSDetails, educDetailsData} = useRecruitmentsData();
   const navigate = useNavigate();
 
   // useEffect(() => {
@@ -47,32 +47,38 @@ export const NonlocCandi = () => {
   //   setLoading(false);
   // }, [empPDData, IVSSDetails, searchTerm]);
 
-    const matchedCandidates = IVSSDetails?.filter((ivssCandidate) => 
-      empPDData?.some((empCandidate) => empCandidate.tempID === ivssCandidate.tempID)
-    );
-  
-    useEffect(() => {
-      const bruneiCandidates = empPDData
-        .filter(
-          (candidate) =>
-            candidate.nationality !== "Bruneian" &&
-            candidate.nationality !== "Brunei PR"
-        )
-        .filter((candidate) => {
-          const matchedIVSS =  matchedCandidates?.find(
-            (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
-          );
-          const isStatusValid = matchedIVSS && matchedIVSS.status === "Candidate List";
-          
-          return (
-            (!IVSSDetails.some((detail) => detail.tempID === candidate.tempID && candidate.status !== "Inactive")) ||
-            (isStatusValid)
-          )
-        });
-    
-      setFilteredData(bruneiCandidates);
-      setLoading(false);
-    }, [empPDData, IVSSDetails, searchTerm]);
+  const matchedCandidates = IVSSDetails?.filter((ivssCandidate) =>
+    empPDData?.some(
+      (empCandidate) => empCandidate.tempID === ivssCandidate.tempID
+    )
+  );
+
+  useEffect(() => {
+    const bruneiCandidates = empPDData
+      .filter(
+        (candidate) =>
+          candidate.nationality !== "Bruneian" &&
+          candidate.nationality !== "Brunei PR"
+      )
+      .filter((candidate) => {
+        const matchedIVSS = matchedCandidates?.find(
+          (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
+        );
+        const isStatusValid =
+          matchedIVSS && matchedIVSS.status === "Candidate List";
+
+        return (
+          !IVSSDetails.some(
+            (detail) =>
+              detail.tempID === candidate.tempID &&
+              candidate.status !== "Inactive"
+          ) || isStatusValid
+        );
+      });
+
+    setFilteredData(bruneiCandidates);
+    setLoading(false);
+  }, [empPDData, IVSSDetails, searchTerm]);
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);

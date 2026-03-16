@@ -66,7 +66,7 @@ export const WorkmenComp = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [searchResultData, setSearchResultData] = useState([]);
   const { formattedPermissions } = useDeleteAccess();
-  const { workMenDetails } = useContext(DataSupply);
+  const { workMenDetails, setFetchTableData } = useContext(DataSupply);
   const { empID, requiredPermissions, access } = useOutletContext();
   const userType = localStorage.getItem("userID");
   const [trackEmpID, setTrackEmpID] = useState(false);
@@ -81,6 +81,10 @@ export const WorkmenComp = () => {
   } = useForm({
     resolver: yupResolver(WorkmenCompSchema),
   });
+
+  useEffect(() => {
+    setFetchTableData(["workMenDetails"]);
+  }, []);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -334,8 +338,13 @@ export const WorkmenComp = () => {
       );
 
       if (checkingDITable) {
-        const previous = checkingDITable.updatedBy ? JSON.parse(checkingDITable.updatedBy) : [];
-        const updatedBy = JSON.stringify([...previous, { userID: userType, date: today }]);
+        const previous = checkingDITable.updatedBy
+          ? JSON.parse(checkingDITable.updatedBy)
+          : [];
+        const updatedBy = JSON.stringify([
+          ...previous,
+          { userID: userType, date: today },
+        ]);
         const WCUpValue = {
           ...data,
           workmenComUp: JSON.stringify(uploadWCU.workmenComUp),

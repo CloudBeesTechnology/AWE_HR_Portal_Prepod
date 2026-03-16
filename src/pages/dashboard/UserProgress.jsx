@@ -1,9 +1,5 @@
-import React, { useContext } from "react";
-import { DataSupply } from "../../utils/DataStoredContext";
-
-export const UserProgress = () => {
-  const { userData } = useContext(DataSupply);
-  const userCounts = userData.reduce(
+export const UserProgress = ({ userData }) => {
+  const userCounts = userData?.reduce(
     (acc, val) => {
       if (val.selectType !== "Employee" && val.status === "Active") {
         acc.active += 1;

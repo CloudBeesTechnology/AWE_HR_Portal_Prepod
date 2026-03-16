@@ -125,6 +125,9 @@ import { useTempID } from "../utils/TempIDContext";
 import { usePersonalDetails } from "../hooks/usePersonalDetails";
 import { EmpLeaveCalculation } from "../pages/leaveManagement/empLeaveSummary/EmpLeaveCalculation";
 import { EmpProDataLeaveCal } from "../pages/leaveManagement/empLeaveSummary/EmpProDataLeaveCal";
+import TrainingLayout from "../layouts/TrainingLayout";
+import ReportsLayout from "../layouts/ReportsLayout";
+import RecruitmentsLayout from "../layouts/RecruitmentsLayout";
 
 const client = generateClient();
 
@@ -281,37 +284,39 @@ const NavigationLinks = () => {
       )}
       {allowedCategories.includes("Recruitment") && (
         <>
-          <Route path="/recruitment" Component={Recruitments} />
-          {/* <Route path="/applyemployreq" Component={ApplyEmployReq}/> */}
-          <Route path="/recrutiles" Component={RecruTiles}>
-            <Route path="candidate" element={<Candidate />} />
-            <Route path="applyemployreq" element={<ApplyEmployReq />} />
-            <Route path="listofcandi" element={<ListofCandi />} />
-            <Route path="localcandi" element={<Localcandi />} />
-            <Route path="nonloccandi" element={<NonlocCandi />} />
-            <Route path="employreq" element={<EmployReq />} />
-            {/* <Route path="employreq" element={<EmployReq />} /> */}
-            <Route path="status" element={<Status />} />
-            <Route path="workpasstracking" element={<WorkpassTracking />} />
-          <Route path="hiringJob" element={<HiringJob />} />
-          </Route>
-          <Route path="/postJob" element={<CreateJob />} />
-          <Route path="/addCandidates" Component={AddCandidates}>
-            <Route index element={<ApplicantDetails />} />
-            <Route path="personalDetails" element={<PersonalDetails />} />
-            <Route path="educationDetails" element={<EducationDetails />} />
-            <Route path="otherDetails" element={<OtherDetails />} />
+          <Route path="/" element={<RecruitmentsLayout />}>
+            <Route path="recruitment" element={<Recruitments />} />
+            {/* <Route path="/applyemployreq" element={<ApplyEmployReq}/> */}
+            <Route path="recrutiles" element={<RecruTiles />}>
+              <Route path="candidate" element={<Candidate />} />
+              <Route path="applyemployreq" element={<ApplyEmployReq />} />
+              <Route path="listofcandi" element={<ListofCandi />} />
+              <Route path="localcandi" element={<Localcandi />} />
+              <Route path="nonloccandi" element={<NonlocCandi />} />
+              <Route path="employreq" element={<EmployReq />} />
+              {/* <Route path="employreq" element={<EmployReq />} /> */}
+              <Route path="status" element={<Status />} />
+              <Route path="workpasstracking" element={<WorkpassTracking />} />
+              <Route path="hiringJob" element={<HiringJob />} />
+            </Route>
+            <Route path="postJob" element={<CreateJob />} />
+            <Route path="addCandidates" element={<AddCandidates />}>
+              <Route index element={<ApplicantDetails />} />
+              <Route path="personalDetails" element={<PersonalDetails />} />
+              <Route path="educationDetails" element={<EducationDetails />} />
+              <Route path="otherDetails" element={<OtherDetails />} />
+            </Route>
           </Route>
         </>
       )}
       {allowedCategories.includes("Employee") && (
         <>
-          <Route path="/insuranceAdd" Component={InsuranceNav}>
+          <Route path="/insuranceAdd" element={<InsuranceNav />}>
             <Route index element={<EmployeeInsurance />} />
             <Route path="dependentInsurance" element={<DependentInsurance />} />
           </Route>
 
-          <Route path="/sawp" Component={WorkPass}>
+          <Route path="/sawp" element={<WorkPass />}>
             <Route index element={<Sawp />} />
             <Route path="doe" element={<Doe />} />
             <Route path="nlms" element={<Nlms />} />
@@ -344,8 +349,9 @@ const NavigationLinks = () => {
           </Route>
         </>
       )}
-      {allowedCategories.includes("Training") && (
+      {/* {allowedCategories.includes("Training") && (
         <>
+        
           <Route path="/training" Component={Training} />
           <Route path="/training/AcTc" Component={AddCourse} />
           <Route
@@ -359,6 +365,26 @@ const NavigationLinks = () => {
           <Route path="/omgCertify" Component={OMEDataCertify} />
           <Route path="/training/hr" Component={HRSplit} />
           <Route path="/training/tcView" Component={TcViewData} />
+         
+        </>
+      )} */}
+      {allowedCategories.includes("Training") && (
+        <>
+          <Route path="/" element={<TrainingLayout />}>
+            <Route path="training" element={<Training />} />
+            <Route path="training/AcTc" element={<AddCourse />} />
+            <Route
+              path="training/trainingCertify"
+              element={<TrainingCertificatesForm />}
+            />
+            <Route path="trainingReq" element={<AddEmpReq />} />
+            <Route path="trainingReq/add" element={<AddEmployeeForm />} />
+            <Route path="trainingReq/view" element={<ViewAddEmp />} />
+            <Route path="blngCertify" element={<BlngCertify />} />
+            <Route path="omgCertify" element={<OMEDataCertify />} />
+            <Route path="training/hr" element={<HRSplit />} />
+            <Route path="training/tcView" element={<TcViewData />} />
+          </Route>
         </>
       )}
       {allowedCategories.includes("TimeSheet") && (
@@ -398,45 +424,47 @@ const NavigationLinks = () => {
       )}
       {allowedCategories.includes("Report") && (
         <>
-          <Route path="/reports" Component={Reports} />
-          <Route
-            path="/probForm"
-            element={<ProbationForm userID={userID} userType={userType} />}
-          />
-          <Route path="/contractForms" Component={ContractFormPDF} />
+          <Route path="/" element={<ReportsLayout />}>
+            <Route path="reports" element={<Reports />} />
+            <Route
+              path="probForm"
+              element={<ProbationForm userID={userID} userType={userType} />}
+            />
+            <Route path="contractForms" element={<ContractFormPDF />} />
 
-          <Route path="/rm" Component={RM} />
-          <Route path="/filterTable" Component={FilterTable} />
-          <Route path="/resignation" Component={Resignation} />
-          <Route path="/termination" Component={Termination} />
-          <Route path="/probationReview" Component={ProbationReview} />
-          <Route path="/contractReview" Component={ContractReview} />
-          <Route path="/empPassExpiry" Component={EmpPE} />
-          <Route path="/ldExpiry" Component={LDexpiry} />
-          <Route path="/passportExpiry" Component={PassportExpiry} />
-          <Route path="/empMedical" Component={EmploymentMedical} />
-          <Route path="/newRecruit" Component={NewRecruit} />
-          <Route path="/trainingRC" Component={TrainingRCData} />
-          <Route path="/lbdKpi" Component={LbdKpi} />
-          <Route path="/groupHS" Component={GroupHSData} />
-          <Route path="/leavePass" Component={LeavePassData} />
-          <Route
-            path="/contractForms"
-            element={<ContractPDF userID={userID} userType={userType} />}
-          />
-          <Route path="/promotion" Component={PromotionRep} />
-          <Route
-            path="/probFormUpdate"
-            element={<ProbationPDF userID={userID} userType={userType} />}
-          />
-          <Route
-            path="/probReviewForm"
-            element={<ProbReviewForm userID={userID} userType={userType} />}
-          />
-          <Route
-            path="/ContractUp"
-            element={<ContractPDF userID={userID} userType={userType} />}
-          />
+            <Route path="rm" element={<RM />} />
+            <Route path="filterTable" element={<FilterTable />} />
+            <Route path="resignation" element={<Resignation />} />
+            <Route path="termination" element={<Termination />} />
+            <Route path="probationReview" element={<ProbationReview />} />
+            <Route path="contractReview" element={<ContractReview />} />
+            <Route path="empPassExpiry" element={<EmpPE />} />
+            <Route path="ldExpiry" element={<LDexpiry />} />
+            <Route path="passportExpiry" element={<PassportExpiry />} />
+            <Route path="empMedical" element={<EmploymentMedical />} />
+            <Route path="newRecruit" element={<NewRecruit />} />
+            <Route path="trainingRC" element={<TrainingRCData />} />
+            <Route path="lbdKpi" element={<LbdKpi />} />
+            <Route path="groupHS" element={<GroupHSData />} />
+            <Route path="leavePass" element={<LeavePassData />} />
+            <Route
+              path="contractForms"
+              element={<ContractPDF userID={userID} userType={userType} />}
+            />
+            <Route path="promotion" Component={PromotionRep} />
+            <Route
+              path="probFormUpdate"
+              element={<ProbationPDF userID={userID} userType={userType} />}
+            />
+            <Route
+              path="probReviewForm"
+              element={<ProbReviewForm userID={userID} userType={userType} />}
+            />
+            <Route
+              path="ContractUp"
+              element={<ContractPDF userID={userID} userType={userType} />}
+            />
+          </Route>
         </>
       )}
       {allowedCategories.includes("BenefitsAndRewards") && (

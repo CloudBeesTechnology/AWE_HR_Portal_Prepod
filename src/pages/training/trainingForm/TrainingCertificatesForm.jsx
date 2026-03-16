@@ -4,7 +4,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { trainingCertificatesValidation } from "../../../services/TrainingValidation";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { TCDataFun } from "../../../services/createMethod/TCDataFun";
-import { DataSupply } from "../../../utils/DataStoredContext";
 import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
 import { FormField } from "../../../utils/FormField";
@@ -20,10 +19,11 @@ import { FaRegMinusSquare, FaRegPlusSquare } from "react-icons/fa";
 import { GoUpload } from "react-icons/go";
 import { MdCancel } from "react-icons/md";
 import { trainingUp } from "../../../services/uploadsDocsS3/UploadDocs";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 
 export const TrainingCertificatesForm = () => {
   const { empPIData, workInfoData, trainingCertifi, AddEmpReq } =
-    useContext(DataSupply);
+    useTrainingData();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

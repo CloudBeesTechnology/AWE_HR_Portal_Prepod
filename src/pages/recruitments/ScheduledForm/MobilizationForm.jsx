@@ -13,7 +13,7 @@ import { SpinLogo } from "../../../utils/SpinLogo";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadLOI } from "../deleteDocsRecruit/DeleteUploadLOI";
 import { DeletePopup } from "../../../utils/DeletePopup";
-import { DataSupply } from "../../../utils/DataStoredContext";
+// import { DataSupply } from "../../../utils/DataStoredContext";
 
 const MOBFormSchema = Yup.object().shape({
   mobSignDate: Yup.date().notRequired(),
@@ -25,9 +25,9 @@ const MOBFormSchema = Yup.object().shape({
     ),
 });
 
-export const MobilizationForm = ({ candidate, formattedPermissions }) => {
+export const MobilizationForm = ({ candidate, formattedPermissions, IVSSDetails }) => {
   const { localMobilization } = LocalMobilization();
-  const { IVSSDetails } = useContext(DataSupply);
+  // const { IVSSDetails, setFetchTableData } = useContext(DataSupply);
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData, loading: interviewLoading } =
     useFetchInterview();
@@ -65,6 +65,10 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
 
   const EMPID = localStorage.getItem("userID");
   const TODAY = new Date().toISOString().split("T")[0];
+
+  // useEffect(() => {
+  //   setFetchTableData(["IVSSDetails"]);
+  // }, []);
 
   useEffect(() => {
     if (mergedInterviewData.length > 0) {

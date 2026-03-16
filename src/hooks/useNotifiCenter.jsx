@@ -7,7 +7,6 @@ import {
 } from "react";
 
 import { format } from "date-fns";
-import { DataSupply } from "../utils/DataStoredContext";
 import { generateClient } from "@aws-amplify/api";
 import { updateEmailNotifi } from "../graphql/mutations";
 import { listEmailNotifis, listEmpPersonalInfos } from "../graphql/queries";
@@ -101,8 +100,10 @@ export const NotifiCenterProvider = ({ children }) => {
           .filter(
             (notification) =>
               !notification?.leaveType?.toLowerCase().includes("leave") &&
-            !notification?.leaveType?.toLowerCase().includes("unpaid authorize")
-                      )
+              !notification?.leaveType
+                ?.toLowerCase()
+                .includes("unpaid authorize")
+          )
           .map((notification) => ({
             ...notification,
             subject:
@@ -129,8 +130,10 @@ export const NotifiCenterProvider = ({ children }) => {
         ) || [];
 
       const formattedHRNotifications = hrNotifications
-        .filter((notification) => !notification?.leaveType?.toLowerCase().includes("leave") &&
-        !notification?.leaveType?.toLowerCase().includes("unpaid authorize")
+        .filter(
+          (notification) =>
+            !notification?.leaveType?.toLowerCase().includes("leave") &&
+            !notification?.leaveType?.toLowerCase().includes("unpaid authorize")
         )
         .map((notification) => ({
           ...notification,

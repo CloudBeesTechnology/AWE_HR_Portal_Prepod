@@ -1,11 +1,11 @@
-import React, { useContext, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { IoSearch } from "react-icons/io5";
 import { DateFormat } from "../../utils/DateFormat";
-import { DataSupply } from "../../utils/DataStoredContext";
+import { useReportsData } from "../../context/reports/ReportsContext";
 
 export const FilterTable = ({
   tableBody,
@@ -19,12 +19,13 @@ export const FilterTable = ({
   userType
 }) => {
   const navigate = useNavigate();
-  const { dropDownVal } = useContext(DataSupply);
+
+  const { dropDownVal } = useReportsData();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 30;
-console.log(tableBody.length,"filtertable");
 
   // Render skeleton loader when loading is true
   if (loading) {

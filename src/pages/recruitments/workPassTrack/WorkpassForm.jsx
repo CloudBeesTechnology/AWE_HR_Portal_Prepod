@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { VscClose } from "react-icons/vsc";
 import { SawpForm } from "./form/SawpForm";
 import { DoeForm } from "./form/DoeForm";
@@ -9,8 +9,11 @@ import { LabourDepForm } from "./form/LabourDepForm";
 import { ImmigrationForm } from "./form/ImmigrationForm";
 import { AirTktForm } from "./form/AirTktForm";
 import { NonLocalMobilizForm } from "./form/NonLocalMobilizForm";
+import { useRecruitmentsData } from "../../../context/recruitments/RecruitmentsContext";
 
 export const WorkpassForm = ({ candidate, onClose, onSave }) => {
+
+  const { IVSSDetails } = useRecruitmentsData();
   const [show, setShow] = useState(0);
 
   const handleTabClick = (index) => {
@@ -87,15 +90,15 @@ export const WorkpassForm = ({ candidate, onClose, onSave }) => {
         </article>
 
         {/* Render the corresponding form based on `show` state */}
-        {show === 0 && <SawpForm candidate={candidate} />}
-        {show === 1 && <DoeForm candidate={candidate} />}
-        {show === 2 && <NlmsForm candidate={candidate} />}
-        {show === 3 && <BankForm candidate={candidate} />}
-        {show === 4 && <JitpaForm candidate={candidate} />}
-        {show === 5 && <LabourDepForm candidate={candidate} />}
-        {show === 6 && <ImmigrationForm candidate={candidate} />}
-        {show === 7 && <AirTktForm candidate={candidate} />}
-        {show === 8 && <NonLocalMobilizForm candidate={candidate} />}
+        {show === 0 && <SawpForm candidate={candidate} IVSSDetails={IVSSDetails}/>}
+        {show === 1 && <DoeForm candidate={candidate} IVSSDetails={IVSSDetails}/>}
+        {show === 2 && <NlmsForm candidate={candidate} IVSSDetails={IVSSDetails}/>}
+        {show === 3 && <BankForm candidate={candidate} IVSSDetails={IVSSDetails}/>}
+        {show === 4 && <JitpaForm candidate={candidate} IVSSDetails={IVSSDetails}/>}
+        {show === 5 && <LabourDepForm candidate={candidate} IVSSDetails={IVSSDetails}/>}
+        {show === 6 && <ImmigrationForm candidate={candidate} IVSSDetails={IVSSDetails}/>}
+        {show === 7 && <AirTktForm candidate={candidate} IVSSDetails={IVSSDetails}/>}
+        {show === 8 && <NonLocalMobilizForm candidate={candidate} IVSSDetails={IVSSDetails}/>}
       </div>
     </div>
   );

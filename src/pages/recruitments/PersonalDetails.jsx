@@ -4,15 +4,15 @@ import { PersonalSchema } from "../../services/Validation";
 import { FaRegMinusSquare } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useState } from "react";
 import { BwnIcColourDD, LanguageDD } from "../../utils/DropDownMenus";
 import { useTempID } from "../../utils/TempIDContext";
-import { DataSupply } from "../../utils/DataStoredContext";
 import { ChevronDown } from "lucide-react";
 import { FaRegWindowClose } from "react-icons/fa";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 export const PersonalDetails = () => {
   const { tempID } = useTempID();
-  const { empPDData } = useContext(DataSupply);
+  const { empPDData } = useRecruitmentsData();
   const location = useLocation();
   const applicationData = location.state?.FormData;
   // console.log(applicationData);

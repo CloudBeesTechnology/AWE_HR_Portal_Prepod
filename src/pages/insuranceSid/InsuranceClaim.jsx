@@ -25,7 +25,7 @@ export const InsuranceClaim = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-  const { insuranceClaimsData, empPIData, dropDownVal } =
+  const { insuranceClaimsData, empPIData, dropDownVal, setFetchTableData } =
     useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const [deletePopup, setdeletePopup] = useState(false);
@@ -52,6 +52,10 @@ export const InsuranceClaim = () => {
       insuranceClaims: [{}],
     },
   });
+
+  useEffect(() => {
+    setFetchTableData(["insuranceClaimsData", "empPIData", "dropDownVal"]);
+  }, []);
 
   const [inputFields, setInputFields] = useState([{ id: Date.now() }]);
   const [uploadedFileDep, setUploadedFileDep] = useState({});
@@ -133,7 +137,7 @@ export const InsuranceClaim = () => {
 
       // Ensure `insuranceClaims` exists
       if (updatedDocs.insuranceClaims) {
-        delete updatedDocs.insuranceClaims[index]; 
+        delete updatedDocs.insuranceClaims[index];
       }
 
       return updatedDocs;
@@ -336,7 +340,6 @@ export const InsuranceClaim = () => {
     }
   };
 
-
   const onSubmit = async (data) => {
     try {
       const today = new Date().toISOString().split("T")[0];
@@ -407,7 +410,7 @@ export const InsuranceClaim = () => {
         return null;
       }
     })
-    .flat() 
+    .flat()
     .filter((item) => item && typeof item === "object");
 
   return (

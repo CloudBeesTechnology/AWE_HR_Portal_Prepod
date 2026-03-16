@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { RecDashdetails } from "./RecDashdetails";
 import usePermission from "../../hooks/usePermissionDashInside";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 
 // Skeleton loader component
 const SkeletonCard = () => (
@@ -13,6 +14,7 @@ const SkeletonCard = () => (
 export const RecruDash = () => {
   const navigate = useNavigate();
   const recruitmentPermissions = usePermission("userID", "Recruitment");
+  const { loading } = useRecruitmentsData();
 
   const handleTileClick = (title) => {
     if (title === "Apply Employee Requisition") {
@@ -45,7 +47,7 @@ export const RecruDash = () => {
   return (
     <section className="min-h-screen p-10 bg-[#F5F6F1]">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-6 justify-items-center py-10 text-black">
-        {isLoading
+        {isLoading || loading
           ? // Show 8 skeleton loaders while loading
             Array.from({ length: 8 }).map((_, index) => (
               <SkeletonCard key={index} />

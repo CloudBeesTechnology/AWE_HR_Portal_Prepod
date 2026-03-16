@@ -147,6 +147,7 @@ export const EmpLeaveBalance = () => {
     const dataToPaginate =
       searchResults.length > 0 ? searchResults : secondartyData;
 
+    console.log("secondartyData : ", secondartyData.length);
     if (dataToPaginate.length === 0) {
       setFilteredData([]);
       return;

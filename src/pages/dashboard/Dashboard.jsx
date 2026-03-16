@@ -10,7 +10,29 @@ import { DataSupply } from "../../utils/DataStoredContext";
 
 export const Dashboard = () => {
   const dashboardPermissions = usePermission("userID", "Dashboard");
-  const { loading } = useContext(DataSupply);
+  const {
+    userData,
+    hiringData,
+    empPDData,
+    empPIData,
+    workInfoData,
+    IDData,
+    terminateData,
+    loading,
+    setFetchTableData,
+  } = useContext(DataSupply);
+
+  useEffect(() => {
+    setFetchTableData([
+      "userData",
+      "hiringData",
+      "empPDData",
+      "empPIData",
+      "workInfoData",
+      "IDData",
+      "terminateData",
+    ]);
+  }, []);
 
   useEffect(() => {
     window.scrollTo({
@@ -210,7 +232,7 @@ export const Dashboard = () => {
       <div className="flex flex-col">
         {dashboardPermissions.includes("Employee count") && (
           <div>
-            <PathHead />
+            <PathHead empPIData={empPIData} terminateData={terminateData} />
           </div>
         )}
         <div className="flex gap-2 px-3 w-full py-2">
@@ -224,7 +246,10 @@ export const Dashboard = () => {
           {/* Column 2: Attendance */}
           {dashboardPermissions.includes("Application Received") && (
             <div className="w-full flex-1">
-              <ApplicationReceived />
+              <ApplicationReceived
+                hiringData={hiringData}
+                empPDData={empPDData}
+              />
             </div>
           )}
 
@@ -234,12 +259,12 @@ export const Dashboard = () => {
             <div className="flex-1 gap-2  flex flex-col justify-between items-end h-full ">
               {dashboardPermissions.includes("User Action") && (
                 <div className="w-full flex-1">
-                  <UserProgress />
+                  <UserProgress userData={userData && userData} />
                 </div>
               )}
               {dashboardPermissions.includes("Birthday Reminder") && (
                 <div className="w-full flex-1">
-                  <BirthdayReminder />
+                  <BirthdayReminder empPIData={empPIData} />
                 </div>
               )}
             </div>
@@ -250,12 +275,28 @@ export const Dashboard = () => {
         {dashboardPermissions.includes("New Joinee") && (
           <div>
             {" "}
-            <NewJoineeTable />
+            <NewJoineeTable
+              empPIData={empPIData}
+              workInfoData={workInfoData}
+              IDData={IDData}
+            />
           </div>
         )}
       </div>
     );
-  }, [dashboardPermissions, loading]);
+  }, [
+    dashboardPermissions,
+    loading,
+    // userData,
+    // hiringData,
+    // empPDData,
+    // empPIData,
+    // workInfoData,
+    // IDData,
+    // terminateData,
+    // loading,
+    // setFetchTableData,
+  ]);
 
   return (
     <section className="flex flex-col w-full pb-10 pt-5">

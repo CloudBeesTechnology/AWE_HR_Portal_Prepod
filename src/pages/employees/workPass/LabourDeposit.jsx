@@ -24,7 +24,7 @@ export const LabourDeposit = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const { BJLData } = useContext(DataSupply);
+  const { BJLData, setFetchTableData } = useContext(DataSupply);
   const { UpdateLDData } = UpdateLDFun();
   const { LabourCreData } = LabCreFun();
 
@@ -51,6 +51,10 @@ export const LabourDeposit = () => {
   const [uploadLD, setUploadLD] = useState({
     lbrDepoUpload: [],
   });
+
+  useEffect(() => {
+    setFetchTableData(["BJLData"]);
+  }, []);
 
   const watchInducLdUpload = watch("lbrDepoUpload", "");
 
@@ -117,7 +121,7 @@ export const LabourDeposit = () => {
       ...prev,
       [label]: value,
     }));
-    console.log(value);
+    
   };
 
   const handleFileChange = async (e, label) => {

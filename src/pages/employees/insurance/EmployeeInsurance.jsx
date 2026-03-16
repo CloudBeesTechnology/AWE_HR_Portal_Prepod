@@ -19,7 +19,7 @@ import { DeletePopup } from "../../../utils/DeletePopup";
 export const EmployeeInsurance = () => {
   const { formattedPermissions } = useDeleteAccess();
   const { searchResultData } = useOutletContext();
-  const { EmpInsuranceData, workMenDetails, dropDownVal } =
+  const { EmpInsuranceData, workMenDetails, dropDownVal, setFetchTableData } =
     useContext(DataSupply);
   const { SubmitMPData } = EmpInsDataFun();
   const { UpdateEIDataSubmit } = UpdateEmpInsDataFun();
@@ -63,6 +63,10 @@ export const EmployeeInsurance = () => {
   const otherNationValue = watch("otherNation");
   const [empStatusTypeValue, setEmpStatusTypeValue] = useState("");
   const [filteredWorkmenCompNo, setFilteredWorkmenCompNo] = useState([]);
+
+  useEffect(() => {
+    setFetchTableData(["EmpInsuranceData", "workMenDetails", "dropDownVal"]);
+  }, []);
 
   const formFields = [
     { label: "Employee Badge Number", key: "empBadgeNo", type: "text" },

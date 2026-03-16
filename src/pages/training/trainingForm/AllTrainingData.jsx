@@ -1,7 +1,8 @@
 import { useState, useEffect, useContext } from "react";
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
-import { DataSupply } from "../../../utils/DataStoredContext";
+
 import { FaArrowLeft } from "react-icons/fa6";
+import { useTrainingData } from "../../../context/training/TrainingContext";
 
 export const AllTrainingData = () => {
   const {
@@ -12,7 +13,7 @@ export const AllTrainingData = () => {
     AddEmpReq,
     WeldeInfo,
     BastingInfo,
-  } = useContext(DataSupply);
+  } = useTrainingData();
 
   const [mergeData, setMergeData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -44,7 +45,9 @@ export const AllTrainingData = () => {
         })
         .filter((item) => item !== null); // Remove null values (non-matching empID)
 
-      const sortedData = mergedData.sort((a, b) => a.empID.localeCompare(b.empID));
+      const sortedData = mergedData.sort((a, b) =>
+        a.empID.localeCompare(b.empID)
+      );
       setMergeData(sortedData);
       setFilteredData(sortedData);
       setLoading(false);
@@ -52,7 +55,15 @@ export const AllTrainingData = () => {
       setError("Data not fully available.");
       setLoading(false);
     }
-  }, [IDData, empPIData, workInfoData, trainingCertifi, AddEmpReq, WeldeInfo, BastingInfo]);
+  }, [
+    IDData,
+    empPIData,
+    workInfoData,
+    trainingCertifi,
+    AddEmpReq,
+    WeldeInfo,
+    BastingInfo,
+  ]);
 
   // const handleSearch = (searchTerm) => {
   //   if (!searchTerm) {
@@ -138,42 +149,62 @@ export const AllTrainingData = () => {
   return (
     <section className="w-full">
       <div className="relative mx-auto p-5 h-full">
-       
         <div className=" flex items-center my-5">
-        <div className=" ">
-        <Link to="/training" className="text-xl  text-grey ">
-          <FaArrowLeft />
-        </Link>
+          <div className=" ">
+            <Link to="/training" className="text-xl  text-grey ">
+              <FaArrowLeft />
+            </Link>
+          </div>
+          <div className="w-full  flex justify-center items-center">
+            <p className=" uppercase py-2 px-3 rounded-lg text_size_2 font-semibold w-[300px] ">
+              All Training Details
+            </p>
+          </div>
         </div>
-      <div className="w-full  flex justify-center items-center">
-      <p className=" uppercase py-2 px-3 rounded-lg text_size_2 font-semibold w-[300px] ">      
-            All Training Details
-        </p>  
-      </div>
-</div>
 
         <div className="flex items-center gap-10 m-4 text-[16px] font-semibold mt-10">
           <button
-            className={`py-2 px-4 focus:outline-none ${activeNavTab === "addTraining" ? "border-b-4 border-yellow" : ""}`}
+            className={`py-2 px-4 focus:outline-none ${
+              activeNavTab === "addTraining" ? "border-b-4 border-yellow" : ""
+            }`}
             onClick={() => handleTabClick("addTraining", "/allTraining")}
           >
             Add Employee
           </button>
           <button
-            className={`py-2 px-4 focus:outline-none ${activeNavTab === "weldingqualifi" ? "border-b-4 border-yellow" : ""}`}
-            onClick={() => handleTabClick("weldingqualifi", "/allTraining/weldingqualifi")}
+            className={`py-2 px-4 focus:outline-none ${
+              activeNavTab === "weldingqualifi"
+                ? "border-b-4 border-yellow"
+                : ""
+            }`}
+            onClick={() =>
+              handleTabClick("weldingqualifi", "/allTraining/weldingqualifi")
+            }
           >
             Welding Qualification
           </button>
           <button
-            className={`py-2 px-4 focus:outline-none ${activeNavTab === "blastingpainting" ? "border-b-4 border-yellow" : ""}`}
-            onClick={() => handleTabClick("blastingpainting", "/allTraining/blastingpainting")}
+            className={`py-2 px-4 focus:outline-none ${
+              activeNavTab === "blastingpainting"
+                ? "border-b-4 border-yellow"
+                : ""
+            }`}
+            onClick={() =>
+              handleTabClick(
+                "blastingpainting",
+                "/allTraining/blastingpainting"
+              )
+            }
           >
             Blasting Painting List
           </button>
           <button
-            className={`py-2 px-4 focus:outline-none ${activeNavTab === "trainCertifi" ? "border-b-4 border-yellow" : ""}`}
-            onClick={() => handleTabClick("trainCertifi", "/allTraining/trainCertifi")}
+            className={`py-2 px-4 focus:outline-none ${
+              activeNavTab === "trainCertifi" ? "border-b-4 border-yellow" : ""
+            }`}
+            onClick={() =>
+              handleTabClick("trainCertifi", "/allTraining/trainCertifi")
+            }
           >
             Training Certificates
           </button>

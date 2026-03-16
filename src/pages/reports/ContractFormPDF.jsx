@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import "jspdf-autotable"; // Ensure this is imported
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { downloadPDF } from "../../utils/DownloadPDF";
 import { ContractForm } from "../../services/createMethod/CreateContract";
-import { DataSupply } from "../../utils/DataStoredContext";
+
 import { UpdateContractData } from "../../services/updateMethod/UpdateContractForm";
 import { sendEmail } from "../../services/EmailServices";
 import { FaArrowLeft, FaSave, FaPrint, FaDownload } from "react-icons/fa";
@@ -15,12 +15,14 @@ import logo from "../../assets/logo/logo-with-name.svg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ContractFormSchema } from "../../services/ReportValidation";
+import { useReportsData } from "../../context/reports/ReportsContext";
 
 export const ContractFormPDF = () => {
   const { contractForm } = ContractForm();
   const { gmPosition, PDInfo, HRMPosition } = useTempID();
   const { contractDetails } = UpdateContractData();
-  const { contractForms, workInfoData, empPIData } = useContext(DataSupply);
+
+  const { contractForms, workInfoData, empPIData } = useReportsData();
   const location = useLocation();
   const { employeeData, matchedID } = location.state || {};
   const { createNotification } = useCreateNotification();
@@ -33,7 +35,7 @@ export const ContractFormPDF = () => {
   const [contractData, setContractData] = useState([]);
 
   const contractEndDateStr = employeeData?.contractEndDate;
-// console.log(employeeData,"employeeData");
+  // console.log(employeeData,"employeeData");
 
   const [managerData, setManagerData] = useState({
     managerEmpID: "",
@@ -43,8 +45,8 @@ export const ContractFormPDF = () => {
     genManagerEmail: [],
     skilledAndUnskilled: null,
   });
-const [oldCEDDate,setOldCEDDate]=useState("");
-const [oldCSDDate,setOldCSDDate]=useState("");
+  const [oldCEDDate, setOldCEDDate] = useState("");
+  const [oldCSDDate, setOldCSDDate] = useState("");
   const {
     register,
     handleSubmit,
@@ -83,7 +85,7 @@ const [oldCSDDate,setOldCSDDate]=useState("");
 
   useEffect(() => {
     // Step 1: Extract managerEmpID from workInfoData based on employeeData.empID
-    if (workInfoData.length > 0 && employeeData?.empID) {
+    if (workInfoData?.length > 0 && employeeData?.empID) {
       const workInfo = workInfoData.find(
         (data) => data.empID === employeeData.empID
       );
@@ -160,8 +162,8 @@ const [oldCSDDate,setOldCSDDate]=useState("");
     if (contractForms.length > 0) {
       const contractValue = contractForms.filter((val) => val.id === matchedID);
       // console.log(contractValue,"contract");
-      setOldCEDDate(contractValue[0]?.oldCED||"");
-      setOldCSDDate(contractValue[0]?.oldCSD||"");
+      setOldCEDDate(contractValue[0]?.oldCED || "");
+      setOldCSDDate(contractValue[0]?.oldCSD || "");
       const contractData = contractValue.find(
         (data) => data.empID === employeeData?.empID
       );
@@ -217,9 +219,11 @@ const [oldCSDDate,setOldCSDDate]=useState("");
     managerData
   ) => {
     const subject = "Contract Verification by HRM";
-    const notifyMessageHR = `Your Employee Mr./Ms. ${empName || "Not mentioned"
-      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
-      }, has been verified by HRM.`;
+    const notifyMessageHR = `Your Employee Mr./Ms. ${
+      empName || "Not mentioned"
+    }'s contract period ending on ${
+      contractEndFormatted || "Not Mentioned"
+    }, has been verified by HRM.`;
 
     if (skillPool === null) {
       if (Array.isArray(managerData?.genManagerEmail)) {
@@ -228,8 +232,10 @@ const [oldCSDDate,setOldCSDDate]=useState("");
             subject,
             `<html>
           <body>
-            <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
-            }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+            <p>Your Employee Mr./Ms. ${
+              empName || "Not mentioned"
+            }'s contract period ending on ${
+              contractEndFormatted || "Not Mentioned"
             },
               <br/>
               has been verified by HRM.
@@ -256,8 +262,10 @@ const [oldCSDDate,setOldCSDDate]=useState("");
         subject,
         `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
-        }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${
+          empName || "Not mentioned"
+        }'s contract period ending on ${
+          contractEndFormatted || "Not Mentioned"
         },
           <br/>
          has been verified by HR Manager,
@@ -280,16 +288,20 @@ const [oldCSDDate,setOldCSDDate]=useState("");
     managerData
   ) => {
     const subject = "Contract Review by Manager";
-    const notifyMessageManager = `Your Employee Mr./Ms. ${empName || "Not mentioned"
-      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
-      }, has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.`;
+    const notifyMessageManager = `Your Employee Mr./Ms. ${
+      empName || "Not mentioned"
+    }'s contract period ending on ${
+      contractEndFormatted || "Not Mentioned"
+    }, has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.`;
 
     const result = await sendEmail(
       subject,
       `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
-      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${
+          empName || "Not mentioned"
+        }'s contract period ending on ${
+        contractEndFormatted || "Not Mentioned"
       },
           <br/>
           has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.
@@ -318,16 +330,20 @@ const [oldCSDDate,setOldCSDDate]=useState("");
     managerData
   ) => {
     const subject = "Contract Confirmation by General Manager";
-    const notifyMessageGM = `Your Employee Mr./Ms. ${empName || "Not mentioned"
-      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
-      }, has been confirmed by the GENERAL MANAGER.`;
+    const notifyMessageGM = `Your Employee Mr./Ms. ${
+      empName || "Not mentioned"
+    }'s contract period ending on ${
+      contractEndFormatted || "Not Mentioned"
+    }, has been confirmed by the GENERAL MANAGER.`;
 
     const result = await sendEmail(
       subject,
       `<html>
       <body>
-        <p>Your Employee Mr./Ms. ${empName || "Not mentioned"
-      }'s contract period ending on ${contractEndFormatted || "Not Mentioned"
+        <p>Your Employee Mr./Ms. ${
+          empName || "Not mentioned"
+        }'s contract period ending on ${
+        contractEndFormatted || "Not Mentioned"
       },
           <br/>
           has been confirmed by the GENERAL MANAGER,
@@ -380,11 +396,11 @@ const [oldCSDDate,setOldCSDDate]=useState("");
 
       const contractEndFormatted =
         Array.isArray(WorkInfoRecord?.contractEnd) &&
-          WorkInfoRecord?.contractEnd?.length > 0
+        WorkInfoRecord?.contractEnd?.length > 0
           ? WorkInfoRecord.contractEnd[WorkInfoRecord.contractEnd.length - 1]
-            .split("-")
-            .reverse()
-            .join("/")
+              .split("-")
+              .reverse()
+              .join("/")
           : "Not mentioned";
 
       // 🔹 Determine renewalStatus
@@ -436,7 +452,10 @@ const [oldCSDDate,setOldCSDDate]=useState("");
         extendedStatus: renewalStatus,
         renewalContract: data.renewalContract,
         contStatus: true,
-        ...(renewalStatus === "hrmView" && { oldCED: contractEndDateStr, oldCSD: employeeData?.contractStartDate, }),
+        ...(renewalStatus === "hrmView" && {
+          oldCED: contractEndDateStr,
+          oldCSD: employeeData?.contractStartDate,
+        }),
       };
 
       const existingContractData = contractData;
@@ -486,7 +505,6 @@ const [oldCSDDate,setOldCSDDate]=useState("");
             (data.extendedStatus &&
               (!existingContractData?.extendedStatus ||
                 existingContractData?.extendedStatus !== data.extendedStatus))),
-
 
         // hr:
         //   userType === "HR" &&
@@ -651,7 +669,7 @@ const [oldCSDDate,setOldCSDDate]=useState("");
               className="no-print left-button text-xl text-start w-[50px] text-grey"
               onClick={() => {
                 // Mark that we're navigating back from contract form
-                sessionStorage.setItem('contractReview_visited', 'true');
+                sessionStorage.setItem("contractReview_visited", "true");
 
                 // Preserve dates when navigating back
                 // Note: The dates should already be in localStorage from ContractReview
@@ -765,8 +783,8 @@ const [oldCSDDate,setOldCSDDate]=useState("");
                         {oldCEDDate
                           ? oldCEDDate
                           : employeeData?.contractEndDate
-                            ? employeeData.contractEndDate
-                            : "N/A"}
+                          ? employeeData.contractEndDate
+                          : "N/A"}
                       </td>
                       <td className="border border-medium_grey p-1 py-4">
                         {employeeData?.nlmsEmpApproval || "N/A"}

@@ -20,7 +20,7 @@ export const BankGuarantee = () => {
   const { formattedPermissions } = useDeleteAccess();
   const { searchResultData } = useOutletContext();
   const { BGData } = BJLDataFun();
-  const { BJLData } = useContext(DataSupply);
+  const { BJLData, setFetchTableData } = useContext(DataSupply);
   const { UpdateBJLFun } = UpdateBJL();
 
   useEffect(() => {
@@ -53,6 +53,12 @@ export const BankGuarantee = () => {
   const [uploadBG, setUploadBG] = useState({
     bankEmpUpload: [],
   });
+
+   useEffect(() => {
+      setFetchTableData([
+       "BJLData"
+      ]);
+    }, []);
 
   const EMPID = localStorage.getItem("userID");
   const TODAY = new Date().toISOString().split("T")[0];
@@ -248,7 +254,7 @@ export const BankGuarantee = () => {
 
   const onSubmit = async (data) => {
     try {
-      const checkingEIDTable = BJLData.find(
+      const checkingEIDTable = BJLData?.find(
         (match) => match.empID === data.empID
       );
 

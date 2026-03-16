@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import AweLogo from "../../assets/logo/logo-with-name.svg";
 import { ScheduleInter } from "./Form/ScheduleInter";
 import {
@@ -15,7 +15,6 @@ import {
 } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { SpinLogo } from "../../utils/SpinLogo";
-import { DataSupply } from "../../utils/DataStoredContext";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
@@ -23,6 +22,7 @@ import { getUrl } from "@aws-amplify/storage";
 import { sendEmail } from "../../services/EmailServices";
 import { DateFormat } from "../../utils/DateFormat";
 import defaultAvatar from "../../assets/navabar/defaultAvatar.jpg";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -30,8 +30,13 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 const client = generateClient();
 
-export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
-  const { IVSSDetails, empPDData, educDetailsData } = useContext(DataSupply);
+export const ReviewForm = ({
+  candidate,
+  onClose,
+  showDecisionButtons,
+  setFetchTableData,
+}) => {
+  const { IVSSDetails, empPDData, educDetailsData } = useRecruitmentsData();
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [notification, setNotification] = useState(false);
   const [imageUrl, setImageUrl] = useState("");

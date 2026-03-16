@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CandidatesSchema } from "../../services/Validation";
@@ -8,13 +8,13 @@ import { listPersonalDetails } from "../../graphql/queries";
 import { RecODFunc } from "../../services/createMethod/RecODFunc";
 import { FileUploadField } from "../employees/medicalDep/FileUploadField";
 import { uploadReqString } from "../../services/uploadsDocsS3/UploadDocs";
-import { DataSupply } from "../../utils/DataStoredContext";
 import { useTempID } from "../../utils/TempIDContext";
 import { CandyDetails } from "../../services/updateMethod/UpdatePersonalDetails";
 import { DeleteUploadApplication } from "../recruitments/deleteDocsRecruit/DeleteUploadApplication";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../utils/DeletePopup";
 import { handleDeleteFileTemp } from "../../services/uploadsDocsS3/DeleteTempDocs";
+import { useRecruitmentsData } from "../../context/recruitments/RecruitmentsContext";
 
 const client = generateClient();
 
@@ -30,7 +30,7 @@ export const OtherDetails = ({ fetchedData }) => {
   const location = useLocation();
   // const navigatingEducationData = location.state?.FormData;
   const { tempID } = useTempID();
-  const { empPDData, educDetailsData } = useContext(DataSupply);
+  const { empPDData, educDetailsData} = useRecruitmentsData();
 
   const [isUploadingString, setIsUploadingString] = useState({
     uploadResume: false,
