@@ -55,18 +55,30 @@ export const NotifiCenterProvider = ({ children }) => {
       let nextToken = null;
       let emailNotify = [];
 
+      // Calculate date from 30 days ago
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 32);
+      const thirtyDaysAgoISO = thirtyDaysAgo.toISOString();
+
       try {
         do {
           const dataEmp = await client.graphql({
             query: listEmailNotifis,
-            variables: { nextToken },
+            variables: { 
+              nextToken,
+              filter: {
+                createdAt: {
+                  ge: thirtyDaysAgoISO
+                }
+              }
+            },
           });
 
           const empStore = dataEmp?.data?.listEmailNotifis?.items || [];
           emailNotify = [...emailNotify, ...empStore];
           nextToken = dataEmp?.data?.listEmailNotifis?.nextToken;
         } while (nextToken);
-
+        console.log(emailNotify);
         setEmailNotifi(emailNotify);
       } catch (error) {
         // console.error("Error fetching employee data:", error);
