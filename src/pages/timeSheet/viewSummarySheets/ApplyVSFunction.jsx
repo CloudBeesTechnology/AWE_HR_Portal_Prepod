@@ -115,7 +115,7 @@ export const ApplyVSFunction = ({
 
         const approvedLeaveStatus = leaveStatusData?.filter(
           (fil) =>
-            fil.managerStatus === "Approved" && fil.empStatus !== "Cancelled"
+            fil.managerStatus === "Approved" && fil.empStatus !== "Cancelled",
         );
 
         const groupBySapNo = (data) => {
@@ -139,7 +139,7 @@ export const ApplyVSFunction = ({
         };
 
         const grouped = Object.values(
-          groupBySapNo(convertedStringToArrayObj || [])
+          groupBySapNo(convertedStringToArrayObj || []),
         );
 
         const seperateDateMethod = (inputData) => {
@@ -165,7 +165,7 @@ export const ApplyVSFunction = ({
                   empBadgeNo: entry.empBadgeNo || null,
                   fidNo: entry.fidNo || null,
                   data: records || null,
-                })
+                }),
               );
             })
             .flat();
@@ -241,7 +241,7 @@ export const ApplyVSFunction = ({
           const matches = approvedLeaveStatus.filter(
             (so) =>
               String(val.empID)?.toUpperCase()?.trim() ===
-              String(so.empID)?.toUpperCase()?.trim()
+              String(so.empID)?.toUpperCase()?.trim(),
           );
 
           if (matches.length > 0) {
@@ -318,7 +318,7 @@ export const ApplyVSFunction = ({
 
         const isHalfDayLeave = (abbreviation) =>
           ["HAL", "HCL", "HUAL", "HSL", "HCL"].some((prefix) =>
-            abbreviation?.startsWith?.(prefix)
+            abbreviation?.startsWith?.(prefix),
           );
 
         const transformData = (inputData) => {
@@ -362,7 +362,7 @@ export const ApplyVSFunction = ({
                 toDate,
                 workHrs,
                 leaveTypeAbbreviation[leaveType],
-                days === 0.5
+                days === 0.5,
               ),
               daysDifference: days,
             });
@@ -373,7 +373,7 @@ export const ApplyVSFunction = ({
               Object.values(listDate).forEach((value) => {
                 if (isHalfDayLeave(value)) {
                   const leaveTypeKey = Object.keys(leaveTypeAbbreviation).find(
-                    (key) => value.includes(leaveTypeAbbreviation[key])
+                    (key) => value.includes(leaveTypeAbbreviation[key]),
                   );
                   emp.leaveCounts[leaveTypeKey] =
                     (emp.leaveCounts[leaveTypeKey] || 0) + 0.5;
@@ -441,7 +441,7 @@ export const ApplyVSFunction = ({
           toDate,
           workHrs,
           abbreviation,
-          isHalfDay
+          isHalfDay,
         ) => {
           const start = new Date(fromDate);
           const end = new Date(toDate);
@@ -493,7 +493,7 @@ export const ApplyVSFunction = ({
 
         // const holidayDates = []
         const holidayDates = companyHolidayList?.flatMap(
-          (holiday) => holiday.dates || [holiday.date]
+          (holiday) => holiday.dates || [holiday.date],
         );
 
         const formattedHolidayDates = holidayDates?.map((dateStr) => {
@@ -591,14 +591,14 @@ export const ApplyVSFunction = ({
                   formattedDateObject?.getMonth() + 1
                 }-${formattedDateObject?.getFullYear()}`;
                 return formattedDay === dayStr;
-              }
+              },
             );
 
             const formattedDate = (date) => {
               const [day, month, year] = date.split("-");
               return `${year}-${month.padStart(2, "0")}-${day.padStart(
                 2,
-                "0"
+                "0",
               )}`;
             };
 
@@ -635,7 +635,7 @@ export const ApplyVSFunction = ({
             }
 
             const recognizeFileType = ["Offshore", "Offshore's ORMC"]?.includes(
-              identifyFileType
+              identifyFileType,
             );
 
             function convertNumToHours(input) {
@@ -697,7 +697,7 @@ export const ApplyVSFunction = ({
               }
 
               return parseFloat(
-                `${hours}.${hundredMinutes.toString().padStart(2, "0")}`
+                `${hours}.${hundredMinutes.toString().padStart(2, "0")}`,
               );
             }
 
@@ -733,7 +733,7 @@ export const ApplyVSFunction = ({
                 let empType = "staffLevelEmp";
                 const formattedAbsentHrs = workHrsAbsentCal(
                   workingHrs,
-                  empType
+                  empType,
                 );
                 const absence = parseFloat(formattedAbsentHrs).toFixed(2);
                 const presentHrs = parseFloat(workingHrs).toFixed(2);
@@ -769,7 +769,7 @@ export const ApplyVSFunction = ({
                   let empType = "normalEmp";
                   const formattedAbsentHrs = workHrsAbsentCal(
                     workingHrs,
-                    empType
+                    empType,
                   );
                   const absence = parseFloat(formattedAbsentHrs).toFixed(2);
                   const presentHrs = parseFloat(workingHrs).toFixed(2);
@@ -785,7 +785,7 @@ export const ApplyVSFunction = ({
                   let empType = "normalEmp";
                   const formattedAbsentHrs = workHrsAbsentCal(
                     workingHrs,
-                    empType
+                    empType,
                   );
                   const absence = parseFloat(formattedAbsentHrs).toFixed(2);
                   const presentHrs = parseFloat(workingHrs).toFixed(2);
@@ -924,7 +924,7 @@ export const ApplyVSFunction = ({
 
             const holidaysAndAbsent = countOccurrences(
               data.workingHrs,
-              keysToCount
+              keysToCount,
             );
 
             holidaysAndAbsent["PHD"] +=
@@ -988,9 +988,8 @@ export const ApplyVSFunction = ({
           return inputData;
         };
 
-        const updatedData = await updateFieldBasedOnConditions(
-          addLeaveTypeCount
-        );
+        const updatedData =
+          await updateFieldBasedOnConditions(addLeaveTypeCount);
 
         const isDateInRange = (date, start, end) => {
           const parsedDate = new Date(date);
@@ -1009,7 +1008,7 @@ export const ApplyVSFunction = ({
             ?.map((item) => ({
               ...item,
               data: item.data.filter((fin) =>
-                isDateInRange(fin.date, getStartDate, getEndDate)
+                isDateInRange(fin.date, getStartDate, getEndDate),
               ), // Filtered by date
             }))
             .filter((item) => item.data.length > 0); // Remove empty objects after filtering
@@ -1020,14 +1019,14 @@ export const ApplyVSFunction = ({
                 val.data.map(async (fin) => {
                   const getHisName = await GetViewSummaryUpdater(
                     empPIData,
-                    fin?.assignBy
+                    fin?.assignBy,
                   );
                   return getHisName?.name || null;
-                })
+                }),
               );
 
               return { ...val, timeKeeper: timeKeeperNames }; // Assign timeKeeperNames after filtering
-            })
+            }),
           );
 
           return results; // Return filtered results with all names
@@ -1130,7 +1129,7 @@ export const ApplyVSFunction = ({
             item,
             dayCounts,
             getStartDate,
-            extractValue
+            extractValue,
           ) => {
             return Array.from({ length: dayCounts }, (_, i) => {
               const currentDay = new Date(getStartDate);
@@ -1163,7 +1162,7 @@ export const ApplyVSFunction = ({
             (entry) => {
               // return entry?.verify ?? null;
               return entry?.empWorkInfo?.[0]?.verify ?? null;
-            }
+            },
           );
 
           // Function to get 'updatedAt' if 'verify' is "Yes", otherwise null
@@ -1176,11 +1175,11 @@ export const ApplyVSFunction = ({
               return entry?.empWorkInfo?.[0]?.verify === "Yes"
                 ? entry.updatedAt
                 : null;
-            }
+            },
           );
 
           const jobcode = item?.data?.map(
-            ({ empWorkInfo }) => empWorkInfo[0]?.JOBCODE
+            ({ empWorkInfo }) => empWorkInfo[0]?.JOBCODE,
           );
 
           return {
@@ -1204,7 +1203,53 @@ export const ApplyVSFunction = ({
           };
         }).filter(Boolean);
 
-        await ProcessedDataFunc(transformedData);
+        const findCorrectNWHPD = (rawData) => {
+          try {
+            return rawData.map((item) => {
+              try {
+                const normalWorkHrs = item?.data?.[0]?.normalWorkHrs;
+
+                // find index of first match
+                const matchedIndex = item.workHrs.findIndex(
+                  (hrs) => hrs === normalWorkHrs,
+                );
+
+                // if no match found or invalid index
+                if (matchedIndex === -1 || !item.workMonth[matchedIndex]) {
+                  return {
+                    ...item,
+                    workHrs: item.workHrs,
+                    workMonth: item.workMonth,
+                  };
+                }
+
+                return {
+                  ...item,
+                  workHrs: [item.workHrs[matchedIndex]],
+                  workMonth: [item.workMonth[matchedIndex]],
+                };
+              } catch (innerError) {
+                console.error("Error processing item:", innerError);
+
+                // return original item if error in single object
+                return item;
+              }
+            });
+          } catch (error) {
+            console.error("Error in transformData:", error);
+            return rawData;
+          }
+        };
+
+        const assignedCorrectNWHPD = findCorrectNWHPD(transformedData);
+        // const filteredDatas = assignedCorrectNWHPD?.filter(
+        //   (val) => val.empName[0]?.trim().toUpperCase() === "ADI ALIF BIN ABU",
+        // );
+        // console.log("filteredDatas : ", filteredDatas);
+        // console.log("assignedCorrectNWHPD : ", assignedCorrectNWHPD);
+        // console.log("transformedData : ", transformedData);
+
+        await ProcessedDataFunc(assignedCorrectNWHPD);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {
         fetchData();

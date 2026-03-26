@@ -13,7 +13,7 @@ export const useGetTimeSheetData = () => {
 
       // Calculate date from 30 days ago
       const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 32);
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 45);
       const thirtyDaysAgoISO = thirtyDaysAgo.toISOString();
 
       // Fetch all data with filter
@@ -38,7 +38,7 @@ export const useGetTimeSheetData = () => {
           if (item) allData.push(item);
         }
       } while (nextToken);
-console.log("allData : ",allData.length);
+
       setAllData(allData);
     };
     

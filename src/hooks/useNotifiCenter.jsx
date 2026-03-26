@@ -57,20 +57,20 @@ export const NotifiCenterProvider = ({ children }) => {
 
       // Calculate date from 30 days ago
       const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 32);
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 15);
       const thirtyDaysAgoISO = thirtyDaysAgo.toISOString();
 
       try {
         do {
           const dataEmp = await client.graphql({
             query: listEmailNotifis,
-            variables: { 
+            variables: {
               nextToken,
               filter: {
                 createdAt: {
-                  ge: thirtyDaysAgoISO
-                }
-              }
+                  ge: thirtyDaysAgoISO,
+                },
+              },
             },
           });
 
@@ -78,7 +78,7 @@ export const NotifiCenterProvider = ({ children }) => {
           emailNotify = [...emailNotify, ...empStore];
           nextToken = dataEmp?.data?.listEmailNotifis?.nextToken;
         } while (nextToken);
-        console.log(emailNotify);
+
         setEmailNotifi(emailNotify);
       } catch (error) {
         // console.error("Error fetching employee data:", error);
@@ -98,13 +98,13 @@ export const NotifiCenterProvider = ({ children }) => {
     let notificationsList = [];
     if (userID) {
       const matched = empPIData.find(
-        (item) => item.empID.toString() === userID.toString().toUpperCase()
+        (item) => item.empID.toString() === userID.toString().toUpperCase(),
       );
 
       if (matched?.officialEmail) {
         const userNotifications = emailNotifi.filter(
           (notification) =>
-            notification.receipentEmail === matched.officialEmail
+            notification.receipentEmail === matched.officialEmail,
         );
         // console.log(userNotifications);
 
@@ -114,7 +114,7 @@ export const NotifiCenterProvider = ({ children }) => {
               !notification?.leaveType?.toLowerCase().includes("leave") &&
               !notification?.leaveType
                 ?.toLowerCase()
-                .includes("unpaid authorize")
+                .includes("unpaid authorize"),
           )
           .map((notification) => ({
             ...notification,
@@ -122,7 +122,7 @@ export const NotifiCenterProvider = ({ children }) => {
               notification.message?.split(" - ")[0] || notification.subject,
             date: format(
               new Date(notification.createdAt),
-              "dd MMM yyyy, hh:mm a"
+              "dd MMM yyyy, hh:mm a",
             ),
           }));
       }
@@ -138,14 +138,16 @@ export const NotifiCenterProvider = ({ children }) => {
       ];
       const hrNotifications =
         emailNotifi?.filter((notification) =>
-          hrEmails.includes(notification.receipentEmail)
+          hrEmails.includes(notification.receipentEmail),
         ) || [];
 
       const formattedHRNotifications = hrNotifications
         .filter(
           (notification) =>
             !notification?.leaveType?.toLowerCase().includes("leave") &&
-            !notification?.leaveType?.toLowerCase().includes("unpaid authorize")
+            !notification?.leaveType
+              ?.toLowerCase()
+              .includes("unpaid authorize"),
         )
         .map((notification) => ({
           ...notification,
@@ -153,7 +155,7 @@ export const NotifiCenterProvider = ({ children }) => {
             notification.message?.split(" - ")[0] || notification.subject,
           date: format(
             new Date(notification.createdAt),
-            "dd MMM yyyy, hh:mm a"
+            "dd MMM yyyy, hh:mm a",
           ),
           // read: storedReadNotifications.includes(notification.id) || notification.status === "Read",
         }));
@@ -161,7 +163,7 @@ export const NotifiCenterProvider = ({ children }) => {
       notificationsList = [...notificationsList, ...formattedHRNotifications];
     }
     const countingStatus = notificationsList.filter(
-      (val) => val?.status !== "Read"
+      (val) => val?.status !== "Read",
     ).length;
 
     setUnreadCount(countingStatus);
@@ -184,15 +186,15 @@ export const NotifiCenterProvider = ({ children }) => {
 
       setMatchingNotifications((prevNotifications) =>
         prevNotifications.map((notif) =>
-          notif.id === notification.id ? { ...notif, status: "Read" } : notif
-        )
+          notif.id === notification.id ? { ...notif, status: "Read" } : notif,
+        ),
       );
       setUnreadCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0));
       // setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
     } catch (error) {
       console.error(
         "handleReadMore - Failed to update notification status:",
-        error
+        error,
       );
     }
   };
