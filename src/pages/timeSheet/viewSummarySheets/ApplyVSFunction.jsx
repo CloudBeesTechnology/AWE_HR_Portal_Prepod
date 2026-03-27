@@ -23,7 +23,7 @@ export const ApplyVSFunction = ({
   prevYearHolidays,
   dummyLeaveStatus,
   dayCounts,
-  mergedData,
+  mergedData: getMergedData,
   leaveStatuses,
   empPIData,
   companyHolidayList,
@@ -33,55 +33,9 @@ export const ApplyVSFunction = ({
   const identifyFileType = convertedStringToArrayObj?.[0]?.fileType;
 
   try {
-    // const fetchAllData = async (queryName) => {
-    //   let allData = [];
-    //   let nextToken = null;
-
-    //   do {
-    //     const response = await client.graphql({
-    //       query: queryName,
-    //       variables: { nextToken },
-    //     });
-
-    //     const items = response.data[Object.keys(response.data)[0]].items;
-    //     allData = [...allData, ...items];
-    //     nextToken = response.data[Object.keys(response.data)[0]].nextToken;
-    //   } while (nextToken);
-
-    //   return allData;
-    // };
 
     useEffect(() => {
       const fetchData = async () => {
-        // const [empPersonalInfos, empWorkInfos, leaveStatuses] =
-        //   await Promise.all([
-        //     fetchAllData(listEmpPersonalInfos),
-        //     fetchAllData(listEmpWorkInfos),
-        //     fetchAllData(listLeaveStatuses),
-        //   ]);
-
-        // const mergedData = empPersonalInfos
-        //   .map((candidate) => {
-        //     const sapNoRemoved = empWorkInfos?.map((item) => {
-        //       const { sapNo, ...rest } = item;
-        //       return rest;
-        //     });
-
-        //     const interviewDetails = sapNoRemoved.find(
-        //       (item) => item.empID === candidate.empID
-        //     );
-
-        //     if (!interviewDetails) {
-        //       return null;
-        //     }
-
-        //     return {
-        //       ...candidate,
-        //       ...interviewDetails,
-        //       // ...leaveDetail,
-        //     };
-        //   })
-        //   .filter((item) => item !== null);
 
         convertedStringToArrayObj?.forEach((sheet) => {
           try {
@@ -128,6 +82,7 @@ export const ApplyVSFunction = ({
               acc[key] = {
                 empBadgeNo: item.empBadgeNo || null,
                 fidNo: item.fidNo || null,
+                normalWorkHrs: item.normalWorkHrs || "0",
                 data: [],
               };
             }
@@ -141,6 +96,70 @@ export const ApplyVSFunction = ({
         const grouped = Object.values(
           groupBySapNo(convertedStringToArrayObj || []),
         );
+
+        const assignCorrectNWHPD_NWHPM = (value, normalWorkHrs) => {
+          try {
+            const workHrsArray = value.workHrs;
+            const workMonthArray = value.workMonth;
+
+            // Find matching positions from backward to front
+            let matchedWorkHrs = null;
+            let matchedWorkMonth = null;
+
+            // Iterate from last index to first
+            for (let i = workHrsArray.length - 1; i >= 0; i--) {
+              if (workHrsArray[i] === normalWorkHrs) {
+                // Calculate the corresponding index in workMonth array
+                // The last element of workHrs corresponds to the last element of workMonth
+                const workMonthIndex =
+                  workMonthArray.length - (workHrsArray.length - i);
+
+                // Check if the index is valid
+                if (
+                  workMonthIndex >= 0 &&
+                  workMonthIndex < workMonthArray.length
+                ) {
+                  matchedWorkHrs = workHrsArray[i];
+                  matchedWorkMonth = workMonthArray[workMonthIndex];
+                  break; // Stop at first match from backward
+                }
+              }
+            }
+
+            // If match found, return filtered object
+            if (matchedWorkHrs !== null && matchedWorkMonth !== null) {
+              return {
+                ...value,
+                workHrs: [matchedWorkHrs],
+                workMonth: [matchedWorkMonth],
+              };
+            }
+
+            // If no match found, return original object
+            return value;
+          } catch (error) {
+            console.error("Error in findCorrectNWHPD:", error);
+            return value;
+          }
+        };
+
+        const mergedData = getMergedData?.map((val) => {
+          const matched = grouped?.find(
+            (fin) =>
+              (fin.empBadgeNo &&
+                String(fin.empBadgeNo)?.toUpperCase()?.trim() ===
+                  String(val.empBadgeNo)?.toUpperCase()?.trim()) ||
+              (fin.fidNo &&
+                String(fin.fidNo)?.toUpperCase()?.trim() ===
+                  String(val.sapNo)?.toUpperCase()?.trim()),
+          );
+
+          if (matched) {
+            return assignCorrectNWHPD_NWHPM(val, matched.normalWorkHrs);
+          }
+
+          return val; // fallback if no match
+        });
 
         const seperateDateMethod = (inputData) => {
           return inputData
@@ -321,8 +340,11 @@ export const ApplyVSFunction = ({
             abbreviation?.startsWith?.(prefix),
           );
 
+        // ... existing code ...
+
         const transformData = (inputData) => {
           const result = {};
+          const existHalfDayMapByEmp = new Map();
 
           inputData.forEach((entry) => {
             const {
@@ -335,6 +357,11 @@ export const ApplyVSFunction = ({
               days,
               workHrs,
             } = entry;
+
+            if (!existHalfDayMapByEmp.has(empID)) {
+              existHalfDayMapByEmp.set(empID, new Map());
+            }
+            const existHalfDayMapForEmp = existHalfDayMapByEmp.get(empID);
 
             if (!result[empID]) {
               result[empID] = {
@@ -363,6 +390,7 @@ export const ApplyVSFunction = ({
                 workHrs,
                 leaveTypeAbbreviation[leaveType],
                 days === 0.5,
+                existHalfDayMapForEmp,
               ),
               daysDifference: days,
             });
@@ -385,63 +413,14 @@ export const ApplyVSFunction = ({
           return Object.values(result);
         };
 
-        // const generateDateList = (
-        //   fromDate,
-        //   toDate,
-        //   workHrs,
-        //   abbreviation,
-        //   isHalfDay
-        // ) => {
-        //   const start = new Date(fromDate);
-        //   const end = new Date(toDate);
-        //   let existHalfDay = [];
-        //   const listDate = {};
-        //   const NWHPD =
-        //     Array.isArray(workHrs) && workHrs?.length > 0
-        //       ? workHrs[workHrs?.length - 1]
-        //       : workHrs || 0;
-        //   const devidedNWHPD = parseFloat(NWHPD) / 2;
-
-        //   while (start <= end) {
-        //     const dayStr = `${start.getDate()}-${
-        //       start.getMonth() + 1
-        //     }-${start.getFullYear()}`;
-        //     if (isHalfDay) {
-        //       existHalfDay?.push({
-        //         dayStr: `H${abbreviation}${devidedNWHPD}`,
-        //       });
-        //     }
-        //     if (isHalfDay) {
-        //       const keysArray = existHalfDay?.map((obj) => Object.keys(obj)[0]);
-        //       existHalfDay.forEach((obj) => {
-        //         Object.keys(obj).forEach((key) => {
-        //           // console.log("Key:", key, "Value:", obj[key]);
-
-        //           listDate[dayStr] = keysArray?.includes(key)
-        //             ? `${obj[key]} / H${abbreviation}${devidedNWHPD}`
-        //             : `H${abbreviation}${devidedNWHPD}`;
-        //         });
-        //       });
-        //     } else {
-        //       listDate[dayStr] = abbreviation;
-        //     }
-
-        //     // listDate[dayStr] = isHalfDay
-        //     //   ? `H${abbreviation}${devidedNWHPD}`
-        //     //   : abbreviation;
-        //     start.setDate(start.getDate() + 1);
-        //   }
-
-        //   return listDate;
-        // };
-
-        const existHalfDayMap = new Map();
+        // Deleted:const existHalfDayMap = new Map();
         const generateDateList = (
           fromDate,
           toDate,
           workHrs,
           abbreviation,
           isHalfDay,
+          existHalfDayMap,
         ) => {
           const start = new Date(fromDate);
           const end = new Date(toDate);
@@ -489,6 +468,7 @@ export const ApplyVSFunction = ({
           return listDate;
         };
 
+        // ... existing code ...
         const leaveCount_ = transformData(filteredData);
 
         // const holidayDates = []
@@ -738,10 +718,8 @@ export const ApplyVSFunction = ({
                 const absence = parseFloat(formattedAbsentHrs).toFixed(2);
                 const presentHrs = parseFloat(workingHrs).toFixed(2);
 
-                acc[dayStr] =
-                  absence === "0.00"
-                    ? presentHrs
-                    : `x(${absence})${presentHrs}`;
+                acc[dayStr] = absence === "0.00" ? presentHrs : presentHrs;
+                // : `x(${absence})${presentHrs}`;
               } else if (
                 dayOfWeek === "Saturday" &&
                 parseFloat(result.split(":")[0]) === parseFloat(checkEntry) &&
@@ -1203,54 +1181,9 @@ export const ApplyVSFunction = ({
           };
         }).filter(Boolean);
 
-        const findCorrectNWHPD = (rawData) => {
-          try {
-            return rawData.map((item) => {
-              try {
-                const normalWorkHrs = item?.data?.[0]?.normalWorkHrs;
-
-                // find index of first match
-                const matchedIndex = item.workHrs.findIndex(
-                  (hrs) => hrs === normalWorkHrs,
-                );
-
-                // if no match found or invalid index
-                if (matchedIndex === -1 || !item.workMonth[matchedIndex]) {
-                  return {
-                    ...item,
-                    workHrs: item.workHrs,
-                    workMonth: item.workMonth,
-                  };
-                }
-
-                return {
-                  ...item,
-                  workHrs: [item.workHrs[matchedIndex]],
-                  workMonth: [item.workMonth[matchedIndex]],
-                };
-              } catch (innerError) {
-                console.error("Error processing item:", innerError);
-
-                // return original item if error in single object
-                return item;
-              }
-            });
-          } catch (error) {
-            console.error("Error in transformData:", error);
-            return rawData;
-          }
-        };
-
-        const assignedCorrectNWHPD = findCorrectNWHPD(transformedData);
-        // const filteredDatas = assignedCorrectNWHPD?.filter(
-        //   (val) => val.empName[0]?.trim().toUpperCase() === "ADI ALIF BIN ABU",
-        // );
-        // console.log("filteredDatas : ", filteredDatas);
-        // console.log("assignedCorrectNWHPD : ", assignedCorrectNWHPD);
-        // console.log("transformedData : ", transformedData);
-
-        await ProcessedDataFunc(assignedCorrectNWHPD);
+        await ProcessedDataFunc(transformedData);
       };
+
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {
         fetchData();
       } else {
