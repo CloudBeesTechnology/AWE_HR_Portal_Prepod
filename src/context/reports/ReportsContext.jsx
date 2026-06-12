@@ -167,6 +167,12 @@ const dataCache = {
   CACHE_DURATION: 5 * 60 * 1000, // 5 minutes cache
 };
 
+// Call this after any mutation (e.g. probation form submit) to force a fresh fetch
+export const clearReportsCache = () => {
+  dataCache.data = null;
+  dataCache.timestamp = null;
+};
+
 export const ReportsProvider = ({ children }) => {
   const [reportsData, setReportsData] = useState({
     empPIData: [],

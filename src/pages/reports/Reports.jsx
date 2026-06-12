@@ -16,7 +16,7 @@ import Resignation from "../../assets/ReportIcon/Resignation.svg";
 import leavePass from "../../assets/ReportIcon/leavePass.svg";
 import promotion from "../../assets/ReportIcon/promotion.svg";
 import useProbData from "../../hooks/useProbData";
-import { useReportsData } from "../../context/reports/ReportsContext";
+import { useReportsData, clearReportsCache } from "../../context/reports/ReportsContext";
 import { DataSupply } from "../../utils/DataStoredContext";
 
 // Custom skeleton component for report cards
@@ -33,7 +33,7 @@ export const Reports = () => {
   const [permissionData, setPermissionData] = useState([]);
   let reportPermissions = permissionData;
 
-  const { userData, setFetchTableData } = useContext(DataSupply);
+  const { userData, setFetchTableData, forceRefreshKeys } = useContext(DataSupply);
 
   const {
     empPIData,
@@ -98,6 +98,12 @@ export const Reports = () => {
 
   useEffect(() => {
     setFetchTableData(["userData"]);
+  }, []);
+
+  // Clear BOTH caches on every visit to Reports so Probation Review always gets fresh data
+  useEffect(() => {
+    clearReportsCache();              // ReportsContext cache
+    forceRefreshKeys(["ProbFData"]); // DataStoredContext (actual source for mergedProbData)
   }, []);
 
   useEffect(() => {
@@ -236,37 +242,37 @@ export const Reports = () => {
       <div className="grid grid-cols-4 flex-wrap gap-5 mt-14">
         {showSkeleton
           ? // Render custom skeleton loaders when data is loading or no cards to show
-            Array.from({ length: 17 }).map((_, index) => (
-              <ReportCardSkeleton key={index} />
-            ))
+          Array.from({ length: 17 }).map((_, index) => (
+            <ReportCardSkeleton key={index} />
+          ))
           : // Render actual cards when data is loaded and permissions are available
-            filteredCards.map((tile, index) => (
-              <div
-                key={index}
-                className="flex flex-col justify-center items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer border-2 border-[#EAD892] w-[200px] h-[150px]"
-                onClick={() =>
-                  navigate(tile.path, {
-                    state: {
-                      allData:
-                        tile.title === "Probation Review" ||
+          filteredCards.map((tile, index) => (
+            <div
+              key={index}
+              className="flex flex-col justify-center items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer border-2 border-[#EAD892] w-[200px] h-[150px]"
+              onClick={() =>
+                navigate(tile.path, {
+                  state: {
+                    allData:
+                      tile.title === "Probation Review" ||
                         tile.title === "Probation Form Update"
-                          ? mergedProbData
-                          : mergedData,
-                      title: tile.title,
-                    },
-                  })
-                }
-              >
-                <img
-                  src={tile.icon}
-                  alt={tile.title}
-                  className="mb-4 w-12 h-12"
-                />
-                <p className="text-center font-medium text-gray-700">
-                  {tile.title}
-                </p>
-              </div>
-            ))}
+                        ? mergedProbData
+                        : mergedData,
+                    title: tile.title,
+                  },
+                })
+              }
+            >
+              <img
+                src={tile.icon}
+                alt={tile.title}
+                className="mb-4 w-12 h-12"
+              />
+              <p className="text-center font-medium text-gray-700">
+                {tile.title}
+              </p>
+            </div>
+          ))}
       </div>
     </div>
   );

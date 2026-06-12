@@ -251,28 +251,28 @@ export const ProbationReview = () => {
               item.probExtendStatus === "Extended"
                 ? "Pending"
                 : item.supervisorApproved
-                ? "Approved"
-                : "Pending",
+                  ? "Approved"
+                  : "Pending",
           }),
           ...(HRMPosition === "HR MANAGER"
             ? {
-                status:
-                  item.probExtendStatus === "Extended"
-                    ? "Pending"
-                    : item.hrName
+              status:
+                item.probExtendStatus === "Extended"
+                  ? "Pending"
+                  : item.hrName
                     ? "Approved"
                     : "Pending",
-              }
+            }
             : userType === "HR"
-            ? {
+              ? {
                 status:
                   item.probExtendStatus === "Extended"
                     ? "Pending"
                     : item.hrName
-                    ? "Approved"
-                    : "Pending",
+                      ? "Approved"
+                      : "Pending",
               }
-            : {}),
+              : {}),
         };
       })
       .filter(Boolean)
@@ -304,7 +304,7 @@ export const ProbationReview = () => {
         setOriginalTableBody(mergedData);
         setLoading(false); // Set loading to false when data processing is complete
       }, 100); // Small delay to show the loading state
-      
+
       return () => clearTimeout(timer);
     }
   }, [allData, userType, gmPosition, userID, HRMPosition]);

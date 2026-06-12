@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useContext } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { ConfirmationForm } from "./ConfirmationForm";
@@ -16,7 +16,8 @@ import { useTempID } from "../../utils/TempIDContext";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { useReactToPrint } from "react-to-print";
 import logo from "../../assets/logo/logo-with-name.svg";
-import { useReportsData } from "../../context/reports/ReportsContext";
+import { useReportsData, clearReportsCache } from "../../context/reports/ReportsContext";
+import { DataSupply } from "../../utils/DataStoredContext";
 
 export const ProbReviewForm = ({ userID, userType }) => {
   const location = useLocation();
@@ -31,6 +32,7 @@ export const ProbReviewForm = ({ userID, userType }) => {
   const [isExtended, setIsExtended] = useState(false);
 
   const { empPIData, workInfoData, ProbFData } = useReportsData();
+  const { forceRefreshKeys } = useContext(DataSupply);
 
   const [emailData, setEmailData] = useState({
     supervisorEmpID: "",
@@ -505,6 +507,11 @@ export const ProbReviewForm = ({ userID, userType }) => {
       }
 
       await ProbFormsData({ ProbValue });
+
+      // Bust the Reports context cache (ReportsContext) AND
+      // force-reset ProbFData in DataStoredContext (the actual source for mergedProbData)
+      clearReportsCache();
+      forceRefreshKeys(["ProbFData"]);
 
       setIsLoading(false);
 

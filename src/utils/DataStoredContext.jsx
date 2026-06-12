@@ -1,5 +1,5 @@
 import { generateClient } from "@aws-amplify/api";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import {
   listBJLDetails,
   listEducationDetails,
@@ -97,6 +97,23 @@ const DataStoredContext = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+
+  /**
+   * Reset the specified data keys to [] so the next fetchTableData trigger
+   * will re-fetch them from the server (bypasses the "only fetch if empty" guard).
+   * Then re-trigger the fetch effect by setting a fresh fetchTableData array.
+   *
+   * Usage: forceRefreshKeys(["ProbFData", "workInfoData"])
+   */
+  const forceRefreshKeys = useCallback((keys = []) => {
+    setDataState((prev) => {
+      const reset = keys.reduce((acc, k) => ({ ...acc, [k]: [] }), {});
+      return { ...prev, ...reset };
+    });
+    // Re-trigger the fetch useEffect with the same keys
+    setFetchTableData((prev) => [...prev.filter((k) => !keys.includes(k)), ...keys]);
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -257,6 +274,7 @@ const DataStoredContext = ({ children }) => {
       value={{
         ...dataState,
         setFetchTableData,
+        forceRefreshKeys,
         storedData,
         loading,
         isLoading,
